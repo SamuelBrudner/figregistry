@@ -78,8 +78,9 @@ if [ -f "/.dockerenv" ] || grep -q docker /proc/1/cgroup 2>/dev/null; then
     # In Docker, conda might be installed but not in PATH
     if ! command_exists conda; then
         # Try to source conda.sh from common locations
-        for conda_path in "/opt/conda/etc/profile.d/conda.sh" 
-                         "/usr/local/miniconda/etc/profile.d/conda.sh"
+        for conda_path in \
+            "/opt/conda/etc/profile.d/conda.sh" \
+            "/usr/local/miniconda/etc/profile.d/conda.sh"
         do
             if [ -f "$conda_path" ]; then
                 log "info" "Sourcing conda from $conda_path"
