@@ -90,9 +90,63 @@ if [ -f "/.dockerenv" ] || grep -q docker /proc/1/cgroup 2>/dev/null; then
             fi
         done
         
-        # Verify conda is now available
+        # If conda still not found, install Miniconda
         if ! command_exists conda; then
-            error "Conda not found in Docker container. Please ensure the container has Conda installed."
+            log "warning" "Conda not found. Installing Miniconda..."
+            
+            # Install prerequisites
+            if command -v apt-get >/dev/null 2>&1; then
+                log "info" "Installing prerequisites using apt-get..."
+                apt-get update && apt-get install -y --no-install-recommends \
+                    wget \
+                    bzip2 \
+                    ca-certificates \
+                    libglib2.0-0 \
+                    libxext6 \
+                    libsm6 \
+                    libxrender1 \
+                    git \
+                    procps \
+                    && rm -rf /var/lib/apt/lists/*
+            elif command -v yum >/dev/null 2>&1; then
+                log "info" "Installing prerequisites using yum..."
+                yum install -y \
+                    wget \
+                    bzip2 \
+                    ca-certificates \
+                    glibc \
+                    libXext \
+                    libSM \
+                    libXrender \
+                    git \
+                    procps-ng \
+                    && yum clean all
+            else
+                error "Cannot install Miniconda: Unsupported package manager (neither apt-get nor yum found)"
+            fi
+            
+            # Install Miniconda
+            MINICONDA_INSTALLER="/tmp/miniconda.sh"
+            MINICONDA_PATH="/usr/local/miniconda"
+            
+            log "info" "Downloading Miniconda3..."
+            wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O "$MINICONDA_INSTALLER"
+            
+            log "info" "Installing Miniconda3 to $MINICONDA_PATH..."
+            bash "$MINICONDA_INSTALLER" -b -p "$MINICONDA_PATH"
+            rm "$MINICONDA_INSTALLER"
+            
+            # Initialize conda
+            export PATH="$MINICONDA_PATH/bin:$PATH"
+            # shellcheck source=/dev/null
+            source "$MINICONDA_PATH/etc/profile.d/conda.sh"
+            
+            # Verify installation
+            if ! command_exists conda; then
+                error "Failed to install Miniconda. Please install it manually."
+            fi
+            
+            log "success" "Miniconda installed successfully"
         fi
     fi
 else
