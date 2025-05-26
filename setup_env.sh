@@ -204,20 +204,36 @@ if conda env list | grep -q "^${ENV_NAME}\s"; then
     log "info" "Updating existing ${ENV_TYPE} environment '${ENV_NAME}'"
     run_command_verbose conda env update -f "${ENV_FILE}" -n ${ENV_NAME} --prune
 else
-    log "info" "Creating new ${ENV_TYPE} environment '${ENV_NAME}'"
-    run_command_verbose conda env create -f "${ENV_FILE}" -n "${ENV_NAME}"
-fi
+    # Create the conda environment without the pip section
+    log "info" "Creating new development environment '$ENV_NAME'"
+    if ! conda env create -f "$ENV_FILE" -n "$ENV_NAME"; then
+        error "Failed to create conda environment. See above for details."
+    fi
 
-# Activate the environment
-log "info" "Activating environment '${ENV_NAME}'"
-if ! conda activate ${ENV_NAME}; then
-    error "Failed to activate environment '${ENV_NAME}'. Please activate it manually."
+    # Activate the environment
+    log "info" "Activating environment '$ENV_NAME'"
+    if ! conda activate "$ENV_NAME"; then
+        error "Failed to activate conda environment. Try running 'conda init <your-shell>' and restarting your shell."
+    fi
+
+    # Install the package in development mode
+    log "info" "Installing package in development mode..."
+    if [ -f "setup.py" ]; then
+        pip install -e .[dev]
+    elif [ -f "pyproject.toml" ]; then
+        pip install -e ".[dev]"
+    else
+        log "warning" "No setup.py or pyproject.toml found. Skipping package installation."
+    fi
 fi
 
 # --- Install Package ---
 section "Installing FigRegistry in Development Mode"
 
-log "info" "Installing package in development mode"
+# Install development tools if in development mode
+if [ "$DEVELOPMENT_MODE" = true ]; then
+    log "info" "Development tools are already included in the environment."
+fi
 run_command_verbose pip install -e "${SCRIPT_DIR}"
 
 # --- Setup Development Tools ---
