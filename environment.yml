@@ -1,0 +1,31 @@
+# FigRegistry Production Environment
+# Follows academic-biology software development guidelines (v2025-05-16)
+name: figregistry
+channels:
+  - conda-forge
+  - nodefaults  # Be explicit about channel priority
+
+dependencies:
+  # Core Python
+  - python=3.10  # Matches the minimum version in pyproject.toml
+  - pip
+
+  # Core Dependencies
+  - pydantic>=2.0.0  # For data validation and settings management
+  - matplotlib>=3.0.0  # Core plotting library
+  - pyyaml>=6.0.0  # YAML parsing for configuration
+  - numpy>=1.20.0  # Required by matplotlib and common in scientific computing
+  - pandas>=1.3.0  # For data manipulation (commonly needed with figures)
+  - scipy>=1.7.0  # Scientific computing utilities
+  - pip:
+    - .  # Install the package in production mode
+
+# Create the environment with:
+# conda env create -f environment.yml
+# conda activate figregistry
+
+# To update the environment after changes:
+# conda env update -f environment.yml --prune
+
+# To export the exact environment (for reproducibility):
+# conda env export --from-history > environment.lock.yml
