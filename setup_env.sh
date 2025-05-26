@@ -71,18 +71,46 @@ log "info" "Using environment file: ${ENV_FILE}"
 # --- Check for Conda ---
 section "Checking for Conda Installation"
 
-if ! command_exists conda; then
-    error "Conda not found in PATH. Please install Miniconda or Anaconda first.\nDownload Miniconda from: https://docs.conda.io/en/latest/miniconda.html"
+# Check if we're running in a container
+if [ -f "/.dockerenv" ] || grep -q docker /proc/1/cgroup 2>/dev/null; then
+    log "info" "Running inside a Docker container"
+    
+    # In Docker, conda might be installed but not in PATH
+    if ! command_exists conda; then
+        # Try to source conda.sh from common locations
+        for conda_path in "/opt/conda/etc/profile.d/conda.sh" 
+                         "/usr/local/miniconda/etc/profile.d/conda.sh"
+        do
+            if [ -f "$conda_path" ]; then
+                log "info" "Sourcing conda from $conda_path"
+                # shellcheck source=/dev/null
+                source "$conda_path"
+                break
+            fi
+        done
+        
+        # Verify conda is now available
+        if ! command_exists conda; then
+            error "Conda not found in Docker container. Please ensure the container has Conda installed."
+        fi
+    fi
+else
+    # Standard non-Docker environment
+    if ! command_exists conda; then
+        error "Conda not found in PATH. Please install Miniconda or Anaconda first.\nDownload Miniconda from: https://docs.conda.io/en/latest/miniconda.html"
+    fi
 fi
 
 # Initialize conda for this shell
 log "info" "Initializing conda..."
-if ! eval "$(conda shell.bash hook 2> /dev/null)"; then
+
+# Try standard conda initialization
+if ! eval "$(conda shell.bash hook 2> /dev/null)" >/dev/null 2>&1; then
     log "warning" "Failed to initialize conda with shell.bash hook"
     
     # Try alternative initialization methods
     local conda_sh=""
-    for prefix in "${HOME}/miniconda3" "${HOME}/anaconda3" "/opt/conda" "/usr/local/miniconda" "/usr/local/anaconda3"; do
+    for prefix in "${HOME}/miniconda3" "${HOME}/anaconda3" "/opt/conda" "/usr/local/miniconda" "/usr/local/aniconda3" "/opt/conda"; do
         if [ -f "${prefix}/etc/profile.d/conda.sh" ]; then
             conda_sh="${prefix}/etc/profile.d/conda.sh"
             break
@@ -92,11 +120,19 @@ if ! eval "$(conda shell.bash hook 2> /dev/null)"; then
     if [ -n "$conda_sh" ]; then
         log "info" "Sourcing conda.sh from ${conda_sh}"
         # shellcheck source=/dev/null
-        source "$conda_sh"
-    else
-        error "Could not find conda.sh. Please initialize conda manually."
+        if ! source "$conda_sh" 2>/dev/null; then
+            log "warning" "Failed to source $conda_sh"
+        fi
+    fi
+    
+    # Final check if conda is available
+    if ! command -v conda >/dev/null 2>&1; then
+        error "Could not initialize conda. Please ensure Conda is properly installed and initialized."
     fi
 fi
+
+# Ensure conda is in PATH
+export PATH="${CONDA_PREFIX:-$HOME/miniconda3}/bin:$PATH"
 
 # --- Environment Setup ---
 section "Setting up Conda Environment"
