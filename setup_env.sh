@@ -25,6 +25,14 @@ source "$UTILS_SCRIPT" || {
     exit 1
 }
 
+# Initialize conda
+if [ -f "$(conda info --base)/etc/profile.d/conda.sh" ]; then
+    source "$(conda info --base)/etc/profile.d/conda.sh"
+else
+    log "error" "Could not initialize conda. Make sure conda is installed and available in your PATH."
+    exit 1
+fi
+
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -63,7 +71,10 @@ else
 fi
 
 # Print a section header for the script start
-section "FigRegistry ${ENV_TYPE^} Environment Setup"
+# Capitalize first letter of ENV_TYPE for display
+ENV_TYPE_DISPLAY=$(echo "${ENV_TYPE}" | awk '{print toupper(substr($0,1,1)) tolower(substr($0,2))}')
+
+section "FigRegistry ${ENV_TYPE_DISPLAY} Environment Setup"
 
 log "info" "Starting FigRegistry ${ENV_TYPE} environment setup in ${SCRIPT_DIR}"
 log "info" "Using environment file: ${ENV_FILE}"
@@ -218,12 +229,23 @@ else
 
     # Install the package in development mode
     log "info" "Installing package in development mode..."
-    if [ -f "setup.py" ]; then
-        pip install -e .[dev]
-    elif [ -f "pyproject.toml" ]; then
-        pip install -e ".[dev]"
+    # Activate conda environment to ensure pip is available
+    source "$(conda info --base)/etc/profile.d/conda.sh"
+    conda activate "${ENV_NAME}"
+    
+    # Use the full path to pip to ensure we're using the correct one
+    PIP_PATH="$(conda run -n "${ENV_NAME}" which pip)"
+    if [ -z "${PIP_PATH}" ]; then
+        log "error" "Could not find pip in the conda environment"
+        exit 1
+    fi
+    
+    run_command "${PIP_PATH} install -e ."
+    if [ $? -eq 0 ]; then
+        log "success" "Package installed in development mode"
     else
-        log "warning" "No setup.py or pyproject.toml found. Skipping package installation."
+        log "error" "Failed to install package in development mode"
+        exit 1
     fi
 fi
 
