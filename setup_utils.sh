@@ -37,6 +37,25 @@ run_command_verbose() {
     if [ "$#" -eq 0 ]; then
         error "run_command_verbose: No command provided."
     fi
+    
+    # Special handling for pip commands to ensure we use the conda environment's pip
+    if { [ "$1" = "pip" ] || [ "$1" = "pip3" ] || 
+         { [ "$1" = "python" ] && [ "${2:-}" = "-m" ] && [ "${3:-}" = "pip" ]; }; }; then
+        # If we're in a conda environment, use the full path to pip
+        if [ -n "${CONDA_PREFIX:-}" ]; then
+            PIP_PATH="${CONDA_PREFIX}/bin/pip"
+            if [ -f "$PIP_PATH" ]; then
+                # Replace pip/python -m pip with the full path
+                if [ "$1" = "python" ]; then
+                    shift 2  # Remove 'python -m pip'
+                    set -- "$PIP_PATH" "$@"
+                else
+                    set -- "$PIP_PATH" "${@:2}"
+                fi
+            fi
+        fi
+    fi
+    
     echo -e "${YELLOW}Running: $@${NC}"
     if ! "$@"; then
         error "Command failed: '$*'"

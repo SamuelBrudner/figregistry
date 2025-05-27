@@ -209,8 +209,6 @@ if [ ! -f "${ENV_FILE}" ]; then
 fi
 
 # Check if environment already exists
-section "Setting up Conda Environment"
-
 if conda env list | grep -q "^${ENV_NAME}\s"; then
     log "info" "Updating existing ${ENV_TYPE} environment '${ENV_NAME}'"
     run_command_verbose conda env update -f "${ENV_FILE}" -n ${ENV_NAME} --prune
@@ -229,18 +227,16 @@ else
 
     # Install the package in development mode
     log "info" "Installing package in development mode..."
-    # Activate conda environment to ensure pip is available
-    source "$(conda info --base)/etc/profile.d/conda.sh"
-    conda activate "${ENV_NAME}"
     
-    # Use the full path to pip to ensure we're using the correct one
-    PIP_PATH="$(conda run -n "${ENV_NAME}" which pip)"
-    if [ -z "${PIP_PATH}" ]; then
-        log "error" "Could not find pip in the conda environment"
+    # Make sure we're using the conda environment's Python
+    PYTHON_PATH="$(conda run -n "${ENV_NAME}" which python)"
+    if [ -z "${PYTHON_PATH}" ]; then
+        log "error" "Could not find Python in the conda environment"
         exit 1
     fi
     
-    run_command "${PIP_PATH} install -e ."
+    # Install in development mode using the conda environment's Python
+    run_command "${PYTHON_PATH} -m pip install -e ."
     if [ $? -eq 0 ]; then
         log "success" "Package installed in development mode"
     else
@@ -252,11 +248,15 @@ fi
 # --- Install Package ---
 section "Installing FigRegistry in Development Mode"
 
-# Install development tools if in development mode
-if [ "$DEVELOPMENT_MODE" = true ]; then
-    log "info" "Development tools are already included in the environment."
+# Install the package in development mode using the conda environment's Python
+PYTHON_PATH="$(conda run -n "${ENV_NAME}" which python)"
+if [ -z "${PYTHON_PATH}" ]; then
+    log "error" "Could not find Python in the conda environment"
+    exit 1
 fi
-run_command_verbose pip install -e "${SCRIPT_DIR}"
+
+# Install the package in development mode
+run_command_verbose "${PYTHON_PATH}" -m pip install -e "${SCRIPT_DIR}"
 
 # --- Setup Development Tools ---
 section "Setting Up Development Tools"
@@ -267,7 +267,7 @@ if command -v pre-commit &> /dev/null; then
     run_command_verbose pre-commit install
 else
     log "warning" "pre-commit not found. Installing..."
-    run_command_verbose pip install pre-commit
+    run_command_verbose "${PYTHON_PATH}" -m pip install pre-commit
     run_command_verbose pre-commit install
 fi
 
