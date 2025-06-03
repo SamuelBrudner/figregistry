@@ -1,0 +1,903 @@
+# Advanced Kedro Data Catalog Configuration with FigRegistry Integration
+# ========================================================================
+#
+# This catalog demonstrates sophisticated FigureDataSet integration showcasing
+# the full capabilities of the figregistry-kedro plugin for automated figure
+# styling, versioning, and management within complex data science workflows.
+#
+# Features Demonstrated:
+# - Advanced FigureDataSet configurations with sophisticated plugin capabilities (F-005)
+# - Complex condition-based styling with dynamic parameter resolution (F-002)
+# - Multi-purpose figure outputs for exploration, presentation, and publication (F-004)
+# - Complex condition parameter resolution using pipeline metadata (F-005-RQ-004)
+# - Style parameter overrides for specific catalog entries (F-002)
+# - Comprehensive Kedro versioning integration with FigRegistry (F-005-RQ-002)
+# - Enterprise-grade experiment tracking and reproducible research workflows
+# - Advanced catalog patterns including conditional dataset activation
+#
+# Architecture:
+# This catalog eliminates manual figure management through automated catalog
+# operations, demonstrating the core objective of zero-touch figure styling
+# and persistence within sophisticated experimental scenarios.
+
+# ==============================================================================
+# TRAINING PIPELINE DATASETS
+# ==============================================================================
+
+# Advanced training data visualization with sophisticated condition resolution
+training_data_quality_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/training/data_quality_analysis.png
+  purpose: exploration
+  condition_param: data_quality_condition
+  style_params:
+    # Dataset-specific overrides for enhanced visibility
+    figure.figsize: [12, 8]
+    figure.dpi: 150
+    axes.titlesize: 16
+    axes.labelsize: 14
+    legend.fontsize: 12
+    # Enhanced grid for data quality analysis
+    grid.alpha: 0.8
+    grid.linewidth: 0.8
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+  versioned: true
+
+# Model performance comparison with dynamic condition resolution
+training_model_performance_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/training/model_performance_comparison.png
+  purpose: presentation
+  condition_param: model_type
+  style_params:
+    # Professional presentation styling
+    figure.figsize: [14, 10]
+    figure.dpi: 200
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.grid: true
+    axes.axisbelow: true
+    # Enhanced marker visibility for model comparison
+    lines.markersize: 8
+    lines.markeredgewidth: 1.5
+    lines.linewidth: 3.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.2
+    facecolor: white
+  versioned: true
+
+# Hyperparameter optimization visualization with complex conditions
+training_hyperparameter_optimization:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/training/hyperparameter_optimization_results.png
+  purpose: exploration
+  condition_param: model_algorithm
+  style_params:
+    # Scientific analysis styling optimized for hyperparameter space
+    figure.figsize: [16, 12]
+    figure.dpi: 150
+    axes.titleweight: bold
+    axes.titlesize: 18
+    # Color palette for multidimensional parameter space
+    image.cmap: viridis
+    axes.facecolor: "#FAFAFA"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    transparent: false
+    format: png
+  versioned: true
+
+# Cross-validation results with statistical significance indicators
+training_cross_validation_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/training/cross_validation_performance.png
+  purpose: presentation
+  condition_param: validation_score
+  style_params:
+    # Statistical analysis presentation styling
+    figure.figsize: [12, 9]
+    figure.dpi: 200
+    # Error bar styling for confidence intervals
+    errorbar.capsize: 5
+    errorbar.capthick: 2
+    # Box plot styling for distribution analysis
+    boxplot.flierprops.marker: "x"
+    boxplot.flierprops.markersize: 8
+    boxplot.boxprops.linewidth: 2
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    edgecolor: none
+  versioned: true
+
+# Feature importance analysis with advanced styling
+training_feature_importance:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/training/feature_importance_analysis.png
+  purpose: exploration
+  condition_param: model_name
+  style_params:
+    # Feature analysis specific styling
+    figure.figsize: [10, 14]  # Tall format for feature lists
+    figure.dpi: 150
+    axes.titlesize: 16
+    xtick.labelrotation: 45
+    ytick.labelsize: 10
+    # Bar chart specific styling
+    patch.linewidth: 0.5
+    patch.edgecolor: black
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.3
+  versioned: true
+
+# Model convergence tracking with environment-specific conditions
+training_convergence_monitoring:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/training/model_convergence_tracking.png
+  purpose: exploration
+  condition_param: training_environment
+  style_params:
+    # Time series analysis styling
+    figure.figsize: [14, 8]
+    figure.dpi: 150
+    axes.grid: true
+    grid.alpha: 0.7
+    lines.linewidth: 2.5
+    # Convergence specific markers
+    lines.marker: "o"
+    lines.markersize: 4
+    lines.markerfacecolor: "white"
+    lines.markeredgewidth: 1.5
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    format: png
+  versioned: true
+
+# ==============================================================================
+# INFERENCE PIPELINE DATASETS
+# ==============================================================================
+
+# Prediction quality analysis with confidence level resolution
+inference_prediction_quality:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/inference/prediction_quality_analysis.png
+  purpose: presentation
+  condition_param: confidence_level
+  style_params:
+    # Quality analysis presentation styling
+    figure.figsize: [12, 8]
+    figure.dpi: 200
+    axes.titlesize: 16
+    axes.labelsize: 14
+    # Confidence interval styling
+    fill.alpha: 0.3
+    lines.linewidth: 2.5
+    # Quality threshold indicators
+    axhline.linewidth: 2
+    axhline.linestyle: "--"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+  versioned: true
+
+# Batch vs real-time prediction comparison
+inference_prediction_comparison:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/inference/batch_vs_realtime_comparison.png
+  purpose: presentation
+  condition_param: prediction_type
+  style_params:
+    # Comparative analysis styling
+    figure.figsize: [14, 10]
+    figure.dpi: 200
+    axes.spines.top: false
+    axes.spines.right: false
+    # Comparison specific styling
+    lines.linewidth: 3.0
+    lines.markersize: 8
+    legend.loc: "best"
+    legend.framealpha: 0.9
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.15
+  versioned: true
+
+# Model drift detection with environment context
+inference_model_drift_detection:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/inference/model_drift_analysis.png
+  purpose: exploration
+  condition_param: inference_environment
+  style_params:
+    # Monitoring dashboard styling
+    figure.figsize: [16, 10]
+    figure.dpi: 150
+    # Time series monitoring styling
+    axes.grid: true
+    grid.alpha: 0.6
+    grid.linestyle: ":"
+    # Drift threshold indicators
+    axhline.color: red
+    axhline.linewidth: 2.5
+    axhline.alpha: 0.8
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    format: png
+  versioned: true
+
+# Performance metrics tracking with quality indicators
+inference_performance_metrics:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/inference/performance_metrics_tracking.png
+  purpose: presentation
+  condition_param: quality_status
+  style_params:
+    # Metrics dashboard styling
+    figure.figsize: [12, 9]
+    figure.dpi: 200
+    axes.titleweight: bold
+    axes.titlesize: 16
+    # Metrics specific styling
+    lines.linewidth: 2.5
+    lines.marker: "s"
+    lines.markersize: 6
+    # Color coding for performance levels
+    scatter.s: 100
+    scatter.alpha: 0.8
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+  versioned: true
+
+# A/B testing results with statistical significance
+inference_ab_testing_results:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/inference/ab_testing_statistical_analysis.png
+  purpose: presentation
+  condition_param: significance_level
+  style_params:
+    # Statistical testing presentation styling
+    figure.figsize: [14, 8]
+    figure.dpi: 200
+    # Statistical significance indicators
+    errorbar.capsize: 6
+    errorbar.capthick: 2.5
+    errorbar.elinewidth: 2
+    # Significance level styling
+    text.fontsize: 12
+    text.fontweight: bold
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.2
+  versioned: true
+
+# ==============================================================================
+# REPORTING PIPELINE DATASETS
+# ==============================================================================
+
+# Executive summary visualizations for C-level reporting
+reporting_executive_summary:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/reporting/executive_summary_dashboard.png
+  purpose: publication
+  condition_param: report_type
+  style_params:
+    # Executive presentation styling
+    figure.figsize: [16, 12]
+    figure.dpi: 300
+    axes.titlesize: 20
+    axes.labelsize: 16
+    # Clean, professional styling
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.spines.left: false
+    axes.spines.bottom: false
+    # Minimal grid for clarity
+    axes.grid: false
+    # Large, clear fonts
+    font.size: 14
+    font.weight: normal
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+    format: pdf
+  versioned: true
+
+# Technical deep-dive analysis for data science teams
+reporting_technical_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/reporting/technical_deep_dive_analysis.png
+  purpose: publication
+  condition_param: report_section
+  style_params:
+    # Technical documentation styling
+    figure.figsize: [14, 16]  # Tall format for detailed analysis
+    figure.dpi: 300
+    axes.titlesize: 18
+    axes.labelsize: 14
+    # Detailed grid for technical analysis
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 0.5
+    # Code/data styling
+    font.family: ["DejaVu Sans Mono", "Courier New", "monospace"]
+    font.size: 11
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.3
+    format: pdf
+  versioned: true
+
+# Model performance benchmarking for publications
+reporting_performance_benchmarks:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/reporting/performance_benchmark_comparison.png
+  purpose: publication
+  condition_param: target_audience
+  style_params:
+    # Academic/scientific publication styling
+    figure.figsize: [12, 8]
+    figure.dpi: 300
+    # Journal-quality styling
+    axes.linewidth: 1.5
+    axes.edgecolor: black
+    # Clear, publication-ready fonts
+    font.family: ["Times New Roman", "serif"]
+    font.size: 12
+    axes.titlesize: 14
+    axes.labelsize: 12
+    # Minimal, professional appearance
+    axes.spines.top: false
+    axes.spines.right: false
+  save_args:
+    dpi: 600  # High resolution for publications
+    bbox_inches: tight
+    format: pdf
+    transparent: false
+  versioned: true
+
+# Business impact analysis with ROI calculations
+reporting_business_impact:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/reporting/business_impact_analysis.png
+  purpose: presentation
+  condition_param: reporting_environment
+  style_params:
+    # Business presentation styling
+    figure.figsize: [14, 10]
+    figure.dpi: 200
+    # Professional business styling
+    axes.titlesize: 18
+    axes.labelsize: 14
+    # Currency/financial styling
+    axes.ticklabelsize: 12
+    # Clear value communication
+    lines.linewidth: 3.5
+    lines.markersize: 8
+    bars.edgewidth: 1.5
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    format: png
+  versioned: true
+
+# ==============================================================================
+# EXPERIMENTAL ANALYSIS DATASETS
+# ==============================================================================
+
+# Multi-algorithm comparison study with experimental conditions
+experimental_algorithm_comparison:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/experiments/algorithm_comparison_study.png
+  purpose: exploration
+  condition_param: experimental_group
+  style_params:
+    # Experimental analysis styling
+    figure.figsize: [16, 12]
+    figure.dpi: 150
+    # Multi-panel comparison styling
+    axes.titlesize: 16
+    axes.labelsize: 13
+    # Experimental condition differentiation
+    lines.linewidth: 2.5
+    lines.markersize: 7
+    # Statistical comparison styling
+    errorbar.capsize: 4
+    errorbar.capthick: 1.5
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.25
+  versioned: true
+
+# Statistical significance validation across conditions
+experimental_significance_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/experiments/statistical_significance_validation.png
+  purpose: publication
+  condition_param: p_value
+  style_params:
+    # Statistical validation publication styling
+    figure.figsize: [12, 10]
+    figure.dpi: 300
+    # Statistical significance styling
+    axes.titlesize: 16
+    axes.labelsize: 14
+    # P-value visualization styling
+    text.fontsize: 11
+    text.color: black
+    # Significance indicators
+    scatter.s: 120
+    scatter.alpha: 0.8
+    scatter.edgecolors: black
+  save_args:
+    dpi: 600  # Publication quality
+    bbox_inches: tight
+    format: pdf
+    transparent: false
+  versioned: true
+
+# Treatment group analysis with effect size quantification
+experimental_treatment_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/experiments/treatment_group_analysis.png
+  purpose: publication
+  condition_param: group_id
+  style_params:
+    # Treatment group comparison styling
+    figure.figsize: [14, 9]
+    figure.dpi: 300
+    # Group differentiation styling
+    axes.titlesize: 16
+    axes.labelsize: 14
+    # Effect size visualization
+    bars.edgewidth: 1.5
+    bars.alpha: 0.8
+    # Confidence interval styling
+    errorbar.capsize: 5
+    errorbar.elinewidth: 2
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    format: pdf
+  versioned: true
+
+# ==============================================================================
+# ENVIRONMENT-SPECIFIC ADVANCED CONFIGURATIONS
+# ==============================================================================
+
+# Development environment debugging visualizations
+debug_model_internals:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/debug/model_internal_analysis.png
+  purpose: exploration
+  condition_param: model_name
+  style_params:
+    # Debug-specific styling for detailed analysis
+    figure.figsize: [20, 16]  # Large format for detailed debugging
+    figure.dpi: 100  # Lower DPI for faster rendering during development
+    # Debug grid for precise analysis
+    axes.grid: true
+    grid.alpha: 1.0
+    grid.linewidth: 0.8
+    grid.linestyle: "-"
+    # Enhanced visibility for debugging
+    lines.linewidth: 3.0
+    lines.markersize: 10
+    # Debug annotations
+    text.fontsize: 10
+    text.color: red
+  save_args:
+    dpi: 150  # Optimized for development speed
+    bbox_inches: tight
+    format: png
+  versioned: false  # No versioning for debug outputs
+
+# Staging environment validation plots
+staging_model_validation:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/model_validation_results.png
+  purpose: presentation
+  condition_param: validation_level
+  style_params:
+    # Staging validation styling
+    figure.figsize: [14, 10]
+    figure.dpi: 200
+    # Validation-specific styling
+    axes.titlesize: 16
+    axes.labelsize: 14
+    # Quality assurance indicators
+    lines.linewidth: 2.5
+    lines.marker: "D"
+    lines.markersize: 6
+    # Threshold indicators
+    axhline.linewidth: 2
+    axhline.color: orange
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+  versioned: true
+
+# Production monitoring dashboards
+production_monitoring_dashboard:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/production/monitoring_dashboard.png
+  purpose: presentation
+  condition_param: performance_level
+  style_params:
+    # Production monitoring styling
+    figure.figsize: [18, 12]
+    figure.dpi: 300
+    # Dashboard styling for production monitoring
+    axes.titlesize: 18
+    axes.labelsize: 15
+    # Real-time monitoring indicators
+    lines.linewidth: 3.0
+    lines.marker: "o"
+    lines.markersize: 5
+    # Alert threshold styling
+    axhline.linewidth: 3
+    axhline.color: red
+    axhline.alpha: 0.8
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+  versioned: true
+
+# ==============================================================================
+# ADVANCED MULTI-PURPOSE OUTPUT CONFIGURATIONS
+# ==============================================================================
+
+# Exploratory data analysis with flexible condition resolution
+eda_comprehensive_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/eda/comprehensive_data_analysis.png
+  purpose: exploration
+  condition_param: data_quality_condition
+  style_params:
+    # EDA-optimized styling
+    figure.figsize: [16, 20]  # Large vertical format for comprehensive analysis
+    figure.dpi: 150
+    # Multi-plot styling
+    axes.titlesize: 14
+    axes.labelsize: 12
+    # Data exploration styling
+    hist.bins: 50
+    hist.alpha: 0.8
+    scatter.alpha: 0.6
+    scatter.s: 25
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.3
+  versioned: true
+
+# Presentation-ready summary visualizations
+presentation_summary_visuals:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/presentation/executive_summary_visuals.png
+  purpose: presentation
+  condition_param: target_audience
+  style_params:
+    # Executive presentation styling
+    figure.figsize: [16, 9]  # Widescreen format for presentations
+    figure.dpi: 200
+    # Presentation-optimized styling
+    axes.titlesize: 20
+    axes.labelsize: 16
+    font.size: 14
+    # High contrast for projection
+    axes.edgecolor: black
+    axes.linewidth: 2
+    lines.linewidth: 4
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    format: png
+  versioned: true
+
+# Publication-quality figures with journal standards
+publication_journal_figures:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/publication/journal_quality_figures.pdf
+  purpose: publication
+  condition_param: significance_level
+  style_params:
+    # Journal publication styling
+    figure.figsize: [8, 6]  # Standard journal column width
+    figure.dpi: 300
+    # Academic publication styling
+    font.family: ["Times New Roman", "serif"]
+    font.size: 10
+    axes.titlesize: 12
+    axes.labelsize: 10
+    # Minimal, professional styling
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.linewidth: 1
+    lines.linewidth: 1.5
+    # Grayscale compatibility
+    axes.prop_cycle: cycler('color', ['black', 'gray', 'darkgray'])
+  save_args:
+    dpi: 600  # High resolution for print
+    bbox_inches: tight
+    format: pdf
+    transparent: false
+  versioned: true
+
+# ==============================================================================
+# SOPHISTICATED CONDITION PARAMETER EXAMPLES
+# ==============================================================================
+
+# Dynamic condition resolution based on pipeline run metadata
+dynamic_condition_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/advanced/dynamic_condition_example.png
+  purpose: exploration
+  condition_param: experimental_conditions.control.condition_id
+  style_params:
+    # Example of nested parameter resolution
+    figure.figsize: [12, 8]
+    figure.dpi: 150
+    axes.titlesize: 16
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+
+# Template-based condition resolution for experimental design
+template_condition_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/advanced/template_condition_example.png
+  purpose: exploration
+  condition_param: condition_parameter_mapping.experimental_conditions.group_id
+  style_params:
+    # Template parameter resolution demonstration
+    figure.figsize: [10, 8]
+    figure.dpi: 150
+    axes.titlesize: 14
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+
+# Complex hierarchical condition resolution
+hierarchical_condition_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/advanced/hierarchical_condition_example.png
+  purpose: presentation
+  condition_param: experimental_scenarios.algorithm_comparison_study.conditions.baseline_comparison.condition_id
+  style_params:
+    # Hierarchical condition resolution demonstration
+    figure.figsize: [14, 10]
+    figure.dpi: 200
+    axes.titlesize: 16
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+
+# ==============================================================================
+# PERFORMANCE OPTIMIZATION EXAMPLES
+# ==============================================================================
+
+# Cache-optimized repeated visualizations
+cache_optimized_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/performance/cache_optimized_example.png
+  purpose: exploration
+  condition_param: model_type
+  style_params:
+    # Optimized for style cache performance
+    figure.figsize: [12, 8]
+    figure.dpi: 150
+    # Minimal style parameters for cache efficiency
+    axes.titlesize: 14
+    lines.linewidth: 2
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: false  # No versioning for performance testing
+
+# Concurrent pipeline visualization example
+concurrent_pipeline_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/performance/concurrent_pipeline_example.png
+  purpose: exploration
+  condition_param: training_environment
+  style_params:
+    # Thread-safe styling configuration
+    figure.figsize: [10, 6]
+    figure.dpi: 150
+    axes.titlesize: 14
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+
+# ==============================================================================
+# ERROR HANDLING AND FALLBACK EXAMPLES
+# ==============================================================================
+
+# Graceful fallback demonstration
+fallback_styling_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/fallback/graceful_fallback_example.png
+  purpose: exploration
+  condition_param: undefined_condition_parameter
+  style_params:
+    # Fallback styling when condition parameter is missing
+    figure.figsize: [10, 6]
+    figure.dpi: 150
+    axes.titlesize: 14
+    # Explicit fallback styling
+    color: gray
+    linestyle: "--"
+    marker: "o"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+
+# Configuration validation example
+config_validation_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/validation/config_validation_example.png
+  purpose: exploration
+  condition_param: model_type
+  style_params:
+    # Comprehensive parameter validation example
+    figure.figsize: [12, 8]
+    figure.dpi: 150
+    axes.titlesize: 16
+    axes.labelsize: 14
+    # Validated style parameters
+    lines.linewidth: 2.5
+    lines.markersize: 6
+    axes.grid: true
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+  versioned: true
+
+# ==============================================================================
+# COMPREHENSIVE INTEGRATION EXAMPLES
+# ==============================================================================
+
+# Full pipeline integration showcase
+full_integration_showcase:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/integration/full_pipeline_showcase.png
+  purpose: publication
+  condition_param: experimental_scenarios.deployment_validation_study.environment_conditions.production_validation.condition_id
+  style_params:
+    # Comprehensive integration demonstration
+    figure.figsize: [16, 12]
+    figure.dpi: 300
+    # Publication-quality styling
+    axes.titlesize: 18
+    axes.labelsize: 16
+    font.size: 14
+    # Professional appearance
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.grid: true
+    grid.alpha: 0.7
+  save_args:
+    dpi: 600
+    bbox_inches: tight
+    format: pdf
+    transparent: false
+  versioned: true
+
+# Enterprise workflow automation example
+enterprise_workflow_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/enterprise/workflow_automation_example.png
+  purpose: presentation
+  condition_param: condition_parameter_mapping.reporting_conditions.reporting_environment
+  style_params:
+    # Enterprise-grade automation demonstration
+    figure.figsize: [18, 14]
+    figure.dpi: 300
+    # Corporate presentation styling
+    axes.titlesize: 20
+    axes.labelsize: 18
+    font.size: 16
+    # Professional branding-ready styling
+    figure.facecolor: white
+    axes.facecolor: "#FAFAFA"
+    axes.edgecolor: "#333333"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+    format: png
+  versioned: true
+
+# ==============================================================================
+# METADATA AND DOCUMENTATION EXAMPLES
+# ==============================================================================
+
+# Advanced metadata tracking example
+metadata_tracking_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/metadata/advanced_metadata_tracking.png
+  purpose: exploration
+  condition_param: metadata.example_metadata.purpose
+  style_params:
+    # Metadata-driven styling example
+    figure.figsize: [12, 8]
+    figure.dpi: 150
+    axes.titlesize: 16
+    # Metadata visualization styling
+    text.fontsize: 12
+    axes.grid: true
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+
+# Configuration compliance validation
+compliance_validation_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/compliance/validation_example.png
+  purpose: exploration
+  condition_param: metadata.compliance.figregistry_version
+  style_params:
+    # Compliance validation demonstration
+    figure.figsize: [10, 6]
+    figure.dpi: 150
+    axes.titlesize: 14
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+
+# ==============================================================================
+# END OF ADVANCED CATALOG CONFIGURATION
+# ==============================================================================
+
+# This catalog demonstrates the full spectrum of figregistry-kedro capabilities,
+# showcasing sophisticated condition-based styling, complex parameter resolution,
+# multi-purpose output management, and enterprise-grade versioning integration.
+# 
+# Key achievements demonstrated:
+# - Zero-touch figure management through automated catalog operations
+# - Sophisticated experimental design support with complex condition hierarchies
+# - Multi-environment deployment patterns (development, staging, production)
+# - Publication-ready output generation with journal-quality styling
+# - Performance-optimized configurations for large-scale pipeline execution
+# - Comprehensive error handling and graceful fallback mechanisms
+# - Enterprise-grade metadata tracking and compliance validation
+#
+# This configuration serves as both a functional catalog for the advanced example
+# project and a comprehensive reference for implementing sophisticated FigRegistry
+# integration patterns in production Kedro workflows.
