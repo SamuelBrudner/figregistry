@@ -1,0 +1,51 @@
+metric_type,instrument_id,measurement_value,pass_fail_status,qc_category,timestamp,operator,threshold_value,units,notes
+calibration,HPLC_001,98.5,PASS,calibration,2024-01-15 09:30:00,analyst_1,95.0,percent_accuracy,Standard calibration run within spec
+calibration,HPLC_001,97.2,PASS,calibration,2024-01-15 14:30:00,analyst_1,95.0,percent_accuracy,Afternoon calibration check
+calibration,HPLC_002,94.8,FAIL,calibration,2024-01-15 10:15:00,analyst_2,95.0,percent_accuracy,Below threshold - requires recalibration
+calibration,LC_MS_001,99.1,PASS,calibration,2024-01-15 08:45:00,analyst_3,95.0,percent_accuracy,Excellent calibration performance
+calibration,LC_MS_002,96.7,PASS,calibration,2024-01-15 11:20:00,analyst_3,95.0,percent_accuracy,Within acceptable range
+validation,HPLC_001,0.02,PASS,validation,2024-01-15 09:45:00,analyst_1,0.05,rsd_percent,Repeatability validation
+validation,HPLC_001,0.03,PASS,validation,2024-01-15 14:45:00,analyst_1,0.05,rsd_percent,Second validation run
+validation,HPLC_002,0.07,FAIL,validation,2024-01-15 10:30:00,analyst_2,0.05,rsd_percent,High variability detected
+validation,LC_MS_001,0.01,PASS,validation,2024-01-15 09:00:00,analyst_3,0.05,rsd_percent,Excellent precision
+validation,LC_MS_002,0.04,PASS,validation,2024-01-15 11:35:00,analyst_3,0.05,rsd_percent,Good precision performance
+control_check,HPLC_001,102.3,PASS,control_check,2024-01-15 10:00:00,analyst_1,105.0,percent_recovery,QC sample within range
+control_check,HPLC_001,101.8,PASS,control_check,2024-01-15 15:00:00,analyst_1,105.0,percent_recovery,Consistent recovery
+control_check,HPLC_002,107.2,FAIL,control_check,2024-01-15 10:45:00,analyst_2,105.0,percent_recovery,Recovery too high
+control_check,LC_MS_001,98.9,PASS,control_check,2024-01-15 09:15:00,analyst_3,105.0,percent_recovery,Good recovery performance
+control_check,LC_MS_002,103.5,PASS,control_check,2024-01-15 11:50:00,analyst_3,105.0,percent_recovery,Acceptable recovery
+drift_monitoring,HPLC_001,5.12,PASS,drift_monitoring,2024-01-15 12:00:00,analyst_1,5.20,retention_time_min,Retention time stable
+drift_monitoring,HPLC_001,5.15,PASS,drift_monitoring,2024-01-15 16:00:00,analyst_1,5.20,retention_time_min,Slight drift but acceptable
+drift_monitoring,HPLC_002,5.23,FAIL,drift_monitoring,2024-01-15 12:30:00,analyst_2,5.20,retention_time_min,Retention time drift detected
+drift_monitoring,LC_MS_001,4.98,PASS,drift_monitoring,2024-01-15 12:15:00,analyst_3,5.20,retention_time_min,Good temporal stability
+drift_monitoring,LC_MS_002,5.05,PASS,drift_monitoring,2024-01-15 13:00:00,analyst_3,5.20,retention_time_min,Minor acceptable drift
+calibration,GC_MS_001,97.8,PASS,calibration,2024-01-16 09:00:00,analyst_4,95.0,percent_accuracy,GC-MS calibration check
+calibration,GC_MS_001,96.3,PASS,calibration,2024-01-16 14:00:00,analyst_4,95.0,percent_accuracy,Afternoon recalibration
+validation,GC_MS_001,0.03,PASS,validation,2024-01-16 09:15:00,analyst_4,0.05,rsd_percent,Method validation run
+control_check,GC_MS_001,99.7,PASS,control_check,2024-01-16 09:30:00,analyst_4,105.0,percent_recovery,Standard recovery check
+drift_monitoring,GC_MS_001,8.45,PASS,drift_monitoring,2024-01-16 12:00:00,analyst_4,8.50,retention_time_min,GC retention stable
+calibration,UV_VIS_001,98.9,PASS,calibration,2024-01-16 08:30:00,analyst_5,95.0,percent_accuracy,UV-Vis calibration
+calibration,UV_VIS_002,93.2,FAIL,calibration,2024-01-16 08:45:00,analyst_5,95.0,percent_accuracy,Below spec - maintenance needed
+validation,UV_VIS_001,0.02,PASS,validation,2024-01-16 08:45:00,analyst_5,0.05,rsd_percent,Excellent method precision
+validation,UV_VIS_002,0.08,FAIL,validation,2024-01-16 09:00:00,analyst_5,0.05,rsd_percent,High variability - investigate
+control_check,UV_VIS_001,101.2,PASS,control_check,2024-01-16 09:00:00,analyst_5,105.0,percent_recovery,Good recovery performance
+control_check,UV_VIS_002,109.8,FAIL,control_check,2024-01-16 09:15:00,analyst_5,105.0,percent_recovery,Recovery out of range
+drift_monitoring,UV_VIS_001,550.2,PASS,drift_monitoring,2024-01-16 12:30:00,analyst_5,552.0,wavelength_nm,Wavelength accuracy good
+drift_monitoring,UV_VIS_002,553.1,FAIL,drift_monitoring,2024-01-16 12:45:00,analyst_5,552.0,wavelength_nm,Wavelength drift detected
+calibration,ICP_MS_001,99.4,PASS,calibration,2024-01-17 09:00:00,analyst_6,95.0,percent_accuracy,ICP-MS calibration excellent
+validation,ICP_MS_001,0.015,PASS,validation,2024-01-17 09:15:00,analyst_6,0.05,rsd_percent,Outstanding precision
+control_check,ICP_MS_001,98.1,PASS,control_check,2024-01-17 09:30:00,analyst_6,105.0,percent_recovery,Recovery within spec
+drift_monitoring,ICP_MS_001,7.23,PASS,drift_monitoring,2024-01-17 12:00:00,analyst_6,7.30,counts_per_second,Signal stability good
+calibration,FTIR_001,97.1,PASS,calibration,2024-01-17 10:00:00,analyst_7,95.0,percent_accuracy,FTIR calibration check
+calibration,FTIR_001,94.3,FAIL,calibration,2024-01-17 15:00:00,analyst_7,95.0,percent_accuracy,Calibration drift - recalibrate
+validation,FTIR_001,0.04,PASS,validation,2024-01-17 10:15:00,analyst_7,0.05,rsd_percent,Method precision acceptable
+control_check,FTIR_001,103.8,PASS,control_check,2024-01-17 10:30:00,analyst_7,105.0,percent_recovery,Good analytical recovery
+drift_monitoring,FTIR_001,1652.8,PASS,drift_monitoring,2024-01-17 13:00:00,analyst_7,1655.0,wavenumber_cm1,Peak position stable
+calibration,XRF_001,96.8,PASS,calibration,2024-01-18 08:00:00,analyst_8,95.0,percent_accuracy,XRF morning calibration
+validation,XRF_001,0.035,PASS,validation,2024-01-18 08:15:00,analyst_8,0.05,rsd_percent,Good measurement precision
+control_check,XRF_001,102.7,PASS,control_check,2024-01-18 08:30:00,analyst_8,105.0,percent_recovery,Standard recovery achieved
+drift_monitoring,XRF_001,45.2,PASS,drift_monitoring,2024-01-18 12:00:00,analyst_8,46.0,counts_per_second,Count rate stable
+calibration,NMR_400_001,98.3,PASS,calibration,2024-01-18 09:30:00,analyst_9,95.0,percent_accuracy,NMR calibration successful
+validation,NMR_400_001,0.025,PASS,validation,2024-01-18 09:45:00,analyst_9,0.05,rsd_percent,Excellent reproducibility
+control_check,NMR_400_001,99.8,PASS,control_check,2024-01-18 10:00:00,analyst_9,105.0,percent_recovery,Near-perfect recovery
+drift_monitoring,NMR_400_001,399.89,PASS,drift_monitoring,2024-01-18 13:30:00,analyst_9,400.00,mhz_frequency,Frequency lock stable
