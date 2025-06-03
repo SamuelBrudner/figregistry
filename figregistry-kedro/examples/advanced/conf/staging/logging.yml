@@ -1,0 +1,412 @@
+# FigRegistry-Kedro Advanced Example: Staging Environment Logging Configuration
+# 
+# This staging logging configuration provides production-like log levels, enterprise-grade 
+# audit trails, and staging-specific monitoring patterns for comprehensive validation of 
+# FigRegistry integration operations prior to production deployment.
+#
+# The configuration enables:
+# - Production-like error handling with staging-appropriate detail levels
+# - Enhanced monitoring of FigRegistry integration components (hooks, datasets, config bridge)
+# - Staging-specific audit trails supporting production deployment validation
+# - Enterprise compliance requirements and comprehensive monitoring workflows
+# - Thorough validation of configuration bridge, dataset operations, and lifecycle hooks
+
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  # Production-like formatter with staging validation details
+  production_like:
+    format: "[%(asctime)s] %(levelname)s - %(name)s - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  
+  # Detailed staging formatter for comprehensive validation
+  staging_detailed:
+    format: "[%(asctime)s] %(levelname)s - %(name)s:%(lineno)d - %(funcName)s() - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  
+  # Enterprise audit trail formatter for compliance
+  audit_trail:
+    format: "[%(asctime)s] AUDIT - %(levelname)s - %(name)s - User:staging - Action:%(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  
+  # Performance monitoring formatter for operation timing
+  performance:
+    format: "[%(asctime)s] PERF - %(name)s - %(message)s - Duration:%(duration)sms"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  
+  # Security event formatter for enterprise compliance
+  security:
+    format: "[%(asctime)s] SECURITY - %(levelname)s - %(name)s - Event:%(message)s - Source:%(pathname)s:%(lineno)d"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+handlers:
+  # Console handler with production-like output for real-time monitoring
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: production_like
+    stream: ext://sys.stdout
+  
+  # Detailed console handler for staging validation
+  console_detailed:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: staging_detailed
+    stream: ext://sys.stdout
+    filters: [staging_detail_filter]
+  
+  # Main application log file with production-like patterns
+  app_file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: production_like
+    filename: logs/staging_application.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 10
+    encoding: utf8
+  
+  # Detailed staging validation log file
+  staging_validation:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: staging_detailed
+    filename: logs/staging_validation.log
+    maxBytes: 52428800  # 50MB
+    backupCount: 5
+    encoding: utf8
+  
+  # Enterprise audit trail log file for compliance
+  audit_trail:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: audit_trail
+    filename: logs/staging_audit_trail.log
+    maxBytes: 20971520  # 20MB
+    backupCount: 20
+    encoding: utf8
+  
+  # Performance monitoring log file
+  performance_monitor:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: performance
+    filename: logs/staging_performance.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+    encoding: utf8
+  
+  # Security events log file for enterprise compliance
+  security_events:
+    class: logging.handlers.RotatingFileHandler
+    level: WARNING
+    formatter: security
+    filename: logs/staging_security.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 10
+    encoding: utf8
+  
+  # Error-only log file for production readiness validation
+  error_only:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: production_like
+    filename: logs/staging_errors.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 15
+    encoding: utf8
+
+filters:
+  # Filter for staging-specific detail logging
+  staging_detail_filter:
+    (): __main__.StagingDetailFilter
+  
+  # Filter for performance monitoring
+  performance_filter:
+    (): __main__.PerformanceFilter
+  
+  # Filter for security event detection
+  security_filter:
+    (): __main__.SecurityFilter
+
+loggers:
+  # Root logger with production-like baseline
+  "":
+    level: INFO
+    handlers: [console, app_file, error_only]
+    propagate: false
+  
+  # === FigRegistry-Kedro Integration Components ===
+  
+  # FigRegistry Kedro Hooks - Lifecycle Integration Monitoring
+  figregistry_kedro.hooks:
+    level: DEBUG
+    handlers: [console_detailed, staging_validation, audit_trail, performance_monitor]
+    propagate: false
+    qualname: figregistry_kedro.hooks
+  
+  # FigRegistry Kedro Datasets - Figure Processing Monitoring  
+  figregistry_kedro.datasets:
+    level: DEBUG
+    handlers: [console_detailed, staging_validation, audit_trail, performance_monitor]
+    propagate: false
+    qualname: figregistry_kedro.datasets
+  
+  # FigRegistry Kedro Config Bridge - Configuration Integration Monitoring
+  figregistry_kedro.config:
+    level: DEBUG
+    handlers: [console_detailed, staging_validation, audit_trail, performance_monitor]
+    propagate: false
+    qualname: figregistry_kedro.config
+  
+  # FigRegistry Kedro Package Root - General Plugin Monitoring
+  figregistry_kedro:
+    level: INFO
+    handlers: [console, app_file, staging_validation, audit_trail]
+    propagate: false
+    qualname: figregistry_kedro
+  
+  # === Kedro Framework Components ===
+  
+  # Kedro Runner - Pipeline Execution Monitoring
+  kedro.runner:
+    level: INFO
+    handlers: [console, app_file, staging_validation, performance_monitor]
+    propagate: false
+    qualname: kedro.runner
+  
+  # Kedro Data Catalog - Dataset Operations Monitoring
+  kedro.io:
+    level: INFO
+    handlers: [console, app_file, staging_validation, audit_trail]
+    propagate: false
+    qualname: kedro.io
+  
+  # Kedro Configuration - Config Loading Monitoring
+  kedro.config:
+    level: INFO
+    handlers: [console, app_file, staging_validation, audit_trail]
+    propagate: false
+    qualname: kedro.config
+  
+  # Kedro Hooks - Hook System Monitoring
+  kedro.framework.hooks:
+    level: DEBUG
+    handlers: [console_detailed, staging_validation, audit_trail]
+    propagate: false
+    qualname: kedro.framework.hooks
+  
+  # Kedro Context - Framework Context Monitoring
+  kedro.framework.context:
+    level: INFO
+    handlers: [console, app_file, staging_validation, audit_trail]
+    propagate: false
+    qualname: kedro.framework.context
+  
+  # === FigRegistry Core Components ===
+  
+  # FigRegistry Core - Base Library Monitoring
+  figregistry:
+    level: INFO
+    handlers: [console, app_file, staging_validation, audit_trail]
+    propagate: false
+    qualname: figregistry
+  
+  # FigRegistry Config - Configuration System Monitoring
+  figregistry.config:
+    level: DEBUG
+    handlers: [console_detailed, staging_validation, audit_trail]
+    propagate: false
+    qualname: figregistry.config
+  
+  # FigRegistry Style - Style Management Monitoring
+  figregistry.style:
+    level: DEBUG
+    handlers: [console_detailed, staging_validation, audit_trail, performance_monitor]
+    propagate: false
+    qualname: figregistry.style
+  
+  # FigRegistry Output - Figure Saving Monitoring
+  figregistry.output:
+    level: DEBUG
+    handlers: [console_detailed, staging_validation, audit_trail, performance_monitor]
+    propagate: false
+    qualname: figregistry.output
+  
+  # === Third-Party Dependencies ===
+  
+  # Matplotlib - Figure Backend Monitoring
+  matplotlib:
+    level: WARNING
+    handlers: [console, app_file, staging_validation]
+    propagate: false
+    qualname: matplotlib
+  
+  # Pydantic - Configuration Validation Monitoring
+  pydantic:
+    level: INFO
+    handlers: [console, app_file, staging_validation, security_events]
+    propagate: false
+    qualname: pydantic
+  
+  # PyYAML - YAML Processing Monitoring
+  yaml:
+    level: WARNING
+    handlers: [console, app_file, staging_validation, security_events]
+    propagate: false
+    qualname: yaml
+  
+  # === Enterprise Security and Compliance ===
+  
+  # Security Events Logger for Enterprise Compliance
+  security:
+    level: WARNING
+    handlers: [security_events, audit_trail, console]
+    propagate: false
+    qualname: security
+  
+  # Performance Monitoring Logger for SLA Validation
+  performance:
+    level: INFO
+    handlers: [performance_monitor, staging_validation]
+    propagate: false
+    qualname: performance
+  
+  # Audit Trail Logger for Enterprise Compliance
+  audit:
+    level: INFO
+    handlers: [audit_trail, app_file]
+    propagate: false
+    qualname: audit
+  
+  # === Example Project Pipeline Components ===
+  
+  # Advanced Example Pipelines - Application Logic Monitoring
+  figregistry_kedro_advanced_example:
+    level: INFO
+    handlers: [console, app_file, staging_validation, audit_trail]
+    propagate: false
+    qualname: figregistry_kedro_advanced_example
+  
+  # Training Pipeline - ML Training Process Monitoring
+  figregistry_kedro_advanced_example.pipelines.training:
+    level: DEBUG
+    handlers: [console_detailed, staging_validation, audit_trail, performance_monitor]
+    propagate: false
+    qualname: figregistry_kedro_advanced_example.pipelines.training
+  
+  # Inference Pipeline - ML Inference Process Monitoring
+  figregistry_kedro_advanced_example.pipelines.inference:
+    level: DEBUG
+    handlers: [console_detailed, staging_validation, audit_trail, performance_monitor]
+    propagate: false
+    qualname: figregistry_kedro_advanced_example.pipelines.inference
+  
+  # Reporting Pipeline - Report Generation Monitoring
+  figregistry_kedro_advanced_example.pipelines.reporting:
+    level: DEBUG
+    handlers: [console_detailed, staging_validation, audit_trail, performance_monitor]
+    propagate: false
+    qualname: figregistry_kedro_advanced_example.pipelines.reporting
+  
+  # === Staging Environment Specific Loggers ===
+  
+  # Deployment Validation Logger
+  staging.deployment:
+    level: DEBUG
+    handlers: [staging_validation, audit_trail, console_detailed]
+    propagate: false
+    qualname: staging.deployment
+  
+  # Integration Testing Logger
+  staging.integration:
+    level: DEBUG
+    handlers: [staging_validation, audit_trail, performance_monitor]
+    propagate: false
+    qualname: staging.integration
+  
+  # Production Readiness Assessment Logger
+  staging.readiness:
+    level: INFO
+    handlers: [staging_validation, audit_trail, console]
+    propagate: false
+    qualname: staging.readiness
+  
+  # Migration Validation Logger
+  staging.migration:
+    level: DEBUG
+    handlers: [staging_validation, audit_trail, console_detailed]
+    propagate: false
+    qualname: staging.migration
+
+# === Enterprise Monitoring and Alerting Configuration ===
+
+# Custom Logging Configuration for Enterprise Patterns
+monitoring:
+  # Performance threshold monitoring for staging validation
+  performance_thresholds:
+    hook_registration: 5    # milliseconds
+    dataset_save: 100      # milliseconds  
+    config_bridge: 50      # milliseconds
+    style_resolution: 10   # milliseconds
+    figure_generation: 200 # milliseconds
+  
+  # Alert thresholds for staging environment monitoring
+  alert_thresholds:
+    error_rate: 0.05       # 5% error rate threshold
+    warning_rate: 0.10     # 10% warning rate threshold  
+    performance_degradation: 1.5  # 50% performance degradation
+  
+  # Audit trail requirements for enterprise compliance
+  audit_requirements:
+    configuration_changes: true
+    dataset_operations: true
+    hook_lifecycle_events: true
+    security_events: true
+    performance_metrics: true
+  
+  # Staging-specific monitoring patterns
+  staging_monitoring:
+    production_readiness_validation: true
+    comprehensive_integration_testing: true
+    migration_pathway_validation: true
+    enterprise_compliance_verification: true
+
+# === Documentation and Compliance Notes ===
+#
+# This staging logging configuration supports:
+#
+# 1. Production-Like Validation:
+#    - INFO level baseline matching production patterns
+#    - Comprehensive error handling and logging
+#    - Performance monitoring for SLA validation
+#
+# 2. Staging-Specific Enhancement:
+#    - DEBUG level for FigRegistry integration components
+#    - Detailed validation logging for production readiness assessment
+#    - Comprehensive audit trails for enterprise compliance
+#
+# 3. Enterprise Monitoring:
+#    - Multiple specialized log files for different monitoring aspects
+#    - Audit trail capabilities for compliance requirements
+#    - Security event logging for enterprise standards
+#    - Performance monitoring for operation timing validation
+#
+# 4. FigRegistry-Kedro Integration Focus:
+#    - Specialized loggers for hooks, datasets, and config bridge
+#    - Lifecycle event monitoring for validation workflows
+#    - Configuration change tracking for audit requirements
+#
+# 5. Staging-to-Production Migration Support:
+#    - Production-like baseline with validation enhancements
+#    - Migration pathway validation logging
+#    - Comprehensive readiness assessment capabilities
+#    - Enterprise compliance verification workflows
+#
+# Log File Locations:
+# - logs/staging_application.log: Main application log (production-like)
+# - logs/staging_validation.log: Detailed validation and debugging
+# - logs/staging_audit_trail.log: Enterprise audit trail
+# - logs/staging_performance.log: Performance monitoring metrics
+# - logs/staging_security.log: Security events and compliance
+# - logs/staging_errors.log: Error-only log for issue tracking
