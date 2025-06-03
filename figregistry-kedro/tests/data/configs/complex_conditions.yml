@@ -1,0 +1,792 @@
+# Complex Configuration for Advanced Condition-Based Styling Testing
+# This configuration file provides sophisticated condition mappings, nested hierarchies,
+# and advanced styling patterns for comprehensive testing of FigRegistry's condition
+# resolution system within Kedro integration workflows.
+#
+# Key Testing Scenarios:
+# - Complex condition mappings with nested hierarchies and pattern matching (F-002)
+# - Wildcard condition patterns and regular expression-based condition matching
+# - Nested style inheritance configurations testing hierarchical style resolution
+# - Complex rcParams combinations with conditional application and override patterns
+# - Multi-dimensional condition mappings supporting experimental parameter combinations
+# - Performance-optimized condition caching for complex condition resolution scenarios
+# - Advanced output configurations with conditional path generation and naming patterns
+
+figregistry_version: "0.3.0"
+
+# =============================================================================
+# HIERARCHICAL STYLE INHERITANCE SYSTEM
+# =============================================================================
+# Testing nested inheritance patterns where styles build upon base styles
+# with sophisticated override mechanisms and pattern-based matching
+
+styles:
+  # =============================================================================
+  # BASE LEVEL STYLES - Foundation for inheritance testing
+  # =============================================================================
+  
+  # Primary baseline conditions for all experiments
+  baseline:
+    color: "#1f77b4"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 8
+    alpha: 0.9
+    zorder: 5
+    label: "Baseline"
+    # Advanced rcParams for comprehensive testing
+    "axes.linewidth": 1.5
+    "axes.edgecolor": "#000000"
+    "axes.labelcolor": "#000000"
+    "axes.spines.top": false
+    "axes.spines.right": false
+    "font.family": "DejaVu Sans"
+    "font.size": 12
+    "legend.frameon": true
+    "legend.shadow": false
+    "legend.fancybox": true
+    "legend.loc": "best"
+    
+  # Control group with distinct styling
+  control:
+    color: "#2ca02c"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 7
+    alpha: 0.85
+    zorder: 4
+    label: "Control"
+    "axes.linewidth": 1.2
+    "axes.labelcolor": "#2ca02c"
+    "font.weight": "normal"
+    "legend.loc": "upper right"
+    
+  # Treatment group with enhanced visibility
+  treatment:
+    color: "#ff7f0e"
+    marker: "^"
+    linestyle: "--"
+    linewidth: 3.0
+    markersize: 9
+    alpha: 0.95
+    zorder: 6
+    label: "Treatment"
+    "axes.linewidth": 2.0
+    "axes.labelcolor": "#ff7f0e"
+    "font.weight": "bold"
+    "legend.loc": "upper left"
+    
+  # =============================================================================
+  # WILDCARD PATTERN MATCHING - Testing complex pattern resolution
+  # =============================================================================
+  
+  # Exploratory analysis patterns - catch-all for exploration
+  "exploratory_*":
+    color: "#d62728"
+    marker: "x"
+    linestyle: ":"
+    linewidth: 1.5
+    markersize: 6
+    alpha: 0.7
+    zorder: 1
+    label: "Exploratory"
+    "axes.linewidth": 0.8
+    "axes.labelcolor": "#666666"
+    "font.size": 10
+    "legend.loc": "lower right"
+    "grid.alpha": 0.3
+    
+  # Validation patterns - testing and validation scenarios
+  "validation_*":
+    color: "#9467bd"
+    marker: "v"
+    linestyle: "-."
+    linewidth: 2.0
+    markersize: 7
+    alpha: 0.8
+    zorder: 3
+    label: "Validation"
+    "axes.linewidth": 1.3
+    "axes.labelcolor": "#9467bd"
+    "font.style": "italic"
+    "legend.loc": "center right"
+    
+  # Experimental conditions with dose patterns
+  "experiment_dose_*":
+    color: "#8c564b"
+    marker: "D"
+    linestyle: "-"
+    linewidth: 2.2
+    markersize: 8
+    alpha: 0.9
+    zorder: 5
+    label: "Dose Study"
+    "axes.linewidth": 1.4
+    "axes.labelcolor": "#8c564b"
+    "font.weight": "medium"
+    "legend.loc": "center left"
+    
+  # Time series analysis patterns
+  "timeseries_*":
+    color: "#e377c2"
+    marker: "+"
+    linestyle: "-"
+    linewidth: 1.8
+    markersize: 10
+    alpha: 0.85
+    zorder: 2
+    label: "Time Series"
+    "axes.linewidth": 1.1
+    "axes.labelcolor": "#e377c2"
+    "legend.loc": "lower left"
+    "grid.linestyle": "--"
+    "grid.linewidth": 0.5
+    
+  # =============================================================================
+  # NESTED HIERARCHICAL CONDITIONS - Multi-level pattern matching
+  # =============================================================================
+  
+  # Specific experimental conditions with inheritance
+  experiment_dose_low:
+    # Inherits from experiment_dose_* pattern but overrides specific properties
+    color: "#ffbb78"  # Lighter orange for low dose
+    marker: "o"       # Circle for low dose
+    linewidth: 1.8    # Thinner line for low dose
+    alpha: 0.7        # Lower alpha for subtlety
+    label: "Low Dose"
+    "font.size": 11
+    "legend.loc": "upper right"
+    
+  experiment_dose_medium:
+    color: "#ff7f0e"  # Medium orange for medium dose
+    marker: "s"       # Square for medium dose
+    linewidth: 2.2    # Medium line weight
+    alpha: 0.8
+    label: "Medium Dose"
+    "font.size": 12
+    "legend.loc": "center"
+    
+  experiment_dose_high:
+    color: "#d62728"  # Red for high dose
+    marker: "^"       # Triangle for high dose
+    linewidth: 2.8    # Thick line for high dose
+    alpha: 0.95       # High alpha for prominence
+    label: "High Dose"
+    "font.size": 13
+    "font.weight": "bold"
+    "legend.loc": "upper left"
+    
+  # Time-series specific conditions with complex patterns
+  timeseries_daily:
+    color: "#ff9999"
+    marker: "."
+    linestyle: "-"
+    linewidth: 1.5
+    markersize: 4
+    alpha: 0.8
+    label: "Daily Data"
+    "grid.alpha": 0.4
+    "axes.xmargin": 0.02
+    
+  timeseries_weekly:
+    color: "#cc6666"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.9
+    label: "Weekly Data"
+    "grid.alpha": 0.3
+    "axes.xmargin": 0.05
+    
+  timeseries_monthly:
+    color: "#993333"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 1.0
+    label: "Monthly Data"
+    "grid.alpha": 0.2
+    "axes.xmargin": 0.1
+    
+  # =============================================================================
+  # COMPLEX MULTI-DIMENSIONAL CONDITIONS
+  # =============================================================================
+  
+  # Combination conditions for complex experimental designs
+  "baseline_control_*":
+    color: "#2ca02c"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 7
+    alpha: 0.8
+    zorder: 4
+    label: "Baseline Control"
+    "axes.spines.top": false
+    "axes.spines.right": false
+    "legend.framealpha": 0.9
+    
+  "baseline_treatment_*":
+    color: "#ff7f0e"
+    marker: "o"
+    linestyle: "--"
+    linewidth: 2.0
+    markersize: 7
+    alpha: 0.8
+    zorder: 5
+    label: "Baseline Treatment"
+    "axes.spines.top": false
+    "axes.spines.right": false
+    "legend.framealpha": 0.9
+    
+  # Phase-specific conditions
+  "phase1_*":
+    color: "#1f77b4"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Phase 1"
+    "axes.titlesize": 14
+    "axes.labelsize": 12
+    
+  "phase2_*":
+    color: "#ff7f0e"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Phase 2"
+    "axes.titlesize": 15
+    "axes.labelsize": 13
+    
+  "phase3_*":
+    color: "#2ca02c"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Phase 3"
+    "axes.titlesize": 16
+    "axes.labelsize": 14
+    
+  # =============================================================================
+  # PERFORMANCE TESTING CONDITIONS - Large configuration sets
+  # =============================================================================
+  
+  # Generate many conditions for cache performance testing
+  "perf_test_condition_001":
+    color: "#1f77b4"
+    marker: "o"
+    linewidth: 1.5
+    label: "Performance Test 001"
+    
+  "perf_test_condition_002":
+    color: "#ff7f0e"
+    marker: "s"
+    linewidth: 1.6
+    label: "Performance Test 002"
+    
+  "perf_test_condition_003":
+    color: "#2ca02c"
+    marker: "^"
+    linewidth: 1.7
+    label: "Performance Test 003"
+    
+  "perf_test_condition_004":
+    color: "#d62728"
+    marker: "v"
+    linewidth: 1.8
+    label: "Performance Test 004"
+    
+  "perf_test_condition_005":
+    color: "#9467bd"
+    marker: "D"
+    linewidth: 1.9
+    label: "Performance Test 005"
+    
+  # Additional performance conditions with pattern matching
+  "perf_wildcard_*":
+    color: "#8c564b"
+    marker: "+"
+    linewidth: 2.0
+    alpha: 0.6
+    label: "Performance Wildcard"
+    
+  "cache_test_*":
+    color: "#e377c2"
+    marker: "x"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Cache Test"
+    
+  # =============================================================================
+  # PUBLICATION AND PRESENTATION STYLES
+  # =============================================================================
+  
+  # Publication-ready styles with high contrast
+  "publication_*":
+    color: "#000000"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 1.0
+    zorder: 10
+    label: "Publication"
+    "font.family": "serif"
+    "font.size": 14
+    "axes.linewidth": 2.0
+    "axes.edgecolor": "#000000"
+    "legend.frameon": true
+    "legend.shadow": true
+    "legend.fancybox": false
+    "grid.alpha": 0.5
+    "grid.linewidth": 1.0
+    
+  # Presentation styles with enhanced visibility
+  "presentation_*":
+    color: "#1f77b4"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 3.0
+    markersize: 10
+    alpha: 1.0
+    zorder: 8
+    label: "Presentation"
+    "font.family": "sans-serif"
+    "font.size": 16
+    "font.weight": "bold"
+    "axes.linewidth": 2.5
+    "axes.labelsize": 18
+    "axes.titlesize": 20
+    "legend.fontsize": 14
+    "grid.alpha": 0.3
+    
+  # =============================================================================
+  # SPECIALIZED ANALYSIS CONDITIONS
+  # =============================================================================
+  
+  # Statistical analysis conditions
+  "stats_regression":
+    color: "#ff1744"
+    marker: None
+    linestyle: "-"
+    linewidth: 3.0
+    alpha: 0.9
+    label: "Regression Line"
+    "axes.axisbelow": true
+    
+  "stats_confidence_interval":
+    color: "#ff1744"
+    marker: None
+    linestyle: "-"
+    linewidth: 1.0
+    alpha: 0.3
+    label: "95% CI"
+    "axes.axisbelow": true
+    
+  "stats_prediction_interval":
+    color: "#ff1744"
+    marker: None
+    linestyle: "--"
+    linewidth: 1.0
+    alpha: 0.2
+    label: "95% PI"
+    "axes.axisbelow": true
+    
+  # Machine learning analysis patterns
+  "ml_training_*":
+    color: "#4caf50"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Training"
+    "grid.alpha": 0.2
+    
+  "ml_validation_*":
+    color: "#ff9800"
+    marker: "s"
+    linestyle: "--"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Validation"
+    "grid.alpha": 0.2
+    
+  "ml_test_*":
+    color: "#f44336"
+    marker: "^"
+    linestyle: "-."
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Test"
+    "grid.alpha": 0.2
+
+# =============================================================================
+# ADVANCED PALETTE DEFINITIONS FOR COMPLEX STYLING
+# =============================================================================
+palettes:
+  # Default palette for general use
+  default:
+    - "#1f77b4"
+    - "#ff7f0e" 
+    - "#2ca02c"
+    - "#d62728"
+    - "#9467bd"
+    - "#8c564b"
+    - "#e377c2"
+    - "#7f7f7f"
+    - "#bcbd22"
+    - "#17becf"
+    
+  # High contrast palette for presentations
+  high_contrast:
+    - "#000000"
+    - "#ffffff"
+    - "#ff0000"
+    - "#00ff00"
+    - "#0000ff"
+    - "#ffff00"
+    - "#ff00ff"
+    - "#00ffff"
+    
+  # Colorblind-safe palette
+  colorblind_safe:
+    - "#0173b2"
+    - "#de8f05"
+    - "#029e73"
+    - "#d55e00"
+    - "#cc78bc"
+    - "#ca9161"
+    - "#fbafe4"
+    - "#949494"
+    
+  # Sequential palette for dose-response studies
+  dose_response:
+    - "#fff7ec"
+    - "#fee8c8"
+    - "#fdd49e"
+    - "#fdbb84"
+    - "#fc8d59"
+    - "#ef6548"
+    - "#d7301f"
+    - "#b30000"
+    - "#7f0000"
+    
+  # Diverging palette for before/after comparisons
+  diverging:
+    - "#8e0152"
+    - "#c51b7d"
+    - "#de77ae"
+    - "#f1b6da"
+    - "#fde0ef"
+    - "#e6f5d0"
+    - "#b8e186"
+    - "#7fbc41"
+    - "#4d9221"
+    - "#276419"
+    
+  # Experimental phases palette
+  phases:
+    - "#e8f4fd"  # Phase 0 - very light blue
+    - "#b3d9f2"  # Phase 1 - light blue
+    - "#7cb8e8"  # Phase 2 - medium blue
+    - "#4682b4"  # Phase 3 - steel blue
+    - "#1e4d72"  # Phase 4 - dark blue
+    
+  # Time series palette
+  temporal:
+    - "#ffffd4"  # Start - very light yellow
+    - "#fee391"  # Early - light yellow
+    - "#fec44f"  # Mid-early - yellow-orange
+    - "#fe9929"  # Mid - orange
+    - "#ec7014"  # Mid-late - dark orange
+    - "#cc4c02"  # Late - red-orange
+    - "#8c2d04"  # End - dark red
+
+# =============================================================================
+# SOPHISTICATED OUTPUT CONFIGURATION WITH CONDITIONAL PATTERNS
+# =============================================================================
+outputs:
+  # Base path with environment-aware structure
+  base_path: "figures/complex_testing"
+  
+  # Advanced path aliases supporting nested structures
+  path_aliases:
+    # Standard aliases
+    expl: "01_exploratory"
+    eda: "01_exploratory"
+    val: "02_validation"
+    validate: "02_validation"
+    pres: "03_presentation"
+    present: "03_presentation"
+    pub: "04_publication"
+    publish: "04_publication"
+    
+    # Complex experimental structure aliases
+    baseline: "experiments/baseline"
+    phase1: "experiments/phase1"
+    phase2: "experiments/phase2"
+    phase3: "experiments/phase3"
+    dose_low: "experiments/dose_response/low"
+    dose_med: "experiments/dose_response/medium"
+    dose_high: "experiments/dose_response/high"
+    
+    # Analysis-specific aliases
+    stats: "analysis/statistical"
+    ml: "analysis/machine_learning"
+    ts: "analysis/time_series"
+    perf: "testing/performance"
+    cache: "testing/cache"
+    
+    # Temporal aliases
+    daily: "time_series/daily"
+    weekly: "time_series/weekly"
+    monthly: "time_series/monthly"
+    quarterly: "time_series/quarterly"
+    
+  # Complex timestamp format with condition awareness
+  timestamp_format: "{purpose}_{condition}_{name}_{ts:%Y%m%d_%H%M%S}"
+  
+  # Slug format for complex naming
+  slug_format: "{purpose}_{condition}_{analysis_type}_{name}"
+  
+  # Multiple format support with conditional selection
+  default_format: "png"
+  formats: ["png", "pdf", "svg", "eps"]
+  
+  # High-quality output settings
+  dpi: 300
+  bbox_inches: "tight"
+  pad_inches: 0.1
+  facecolor: "white"
+  edgecolor: "none"
+  transparent: false
+  
+  # Metadata embedding for complex tracking
+  metadata: true
+  
+  # Advanced figure sizing based on purpose
+  figure_sizes:
+    exploratory: [8, 6]
+    validation: [10, 7]
+    presentation: [12, 9]
+    publication: [10, 8]
+    
+  # DPI settings by purpose
+  dpi_settings:
+    exploratory: 150
+    validation: 200
+    presentation: 300
+    publication: 300
+    
+# =============================================================================
+# COMPREHENSIVE DEFAULT SETTINGS WITH CONDITIONAL OVERRIDES
+# =============================================================================
+defaults:
+  # Base figure configuration
+  figure_size: [10, 8]
+  
+  # Typography settings
+  font_family: "DejaVu Sans"
+  font_size: 12
+  title_size: 16
+  label_size: 14
+  tick_size: 10
+  legend_size: 12
+  
+  # Line and marker defaults
+  line_width: 2.0
+  marker_size: 8
+  
+  # Color and palette defaults
+  color_cycle: "default"
+  
+  # Grid configuration
+  grid: true
+  grid_alpha: 0.3
+  grid_linestyle: "-"
+  grid_linewidth: 0.8
+  
+  # Spine visibility and styling
+  spine_visibility:
+    top: false
+    right: false
+    bottom: true
+    left: true
+  spine_linewidth: 1.5
+  spine_color: "#000000"
+  
+  # Tick configuration
+  tick_direction: "out"
+  tick_length: 4
+  tick_width: 1.0
+  
+  # Legend configuration
+  legend_frameon: true
+  legend_fancybox: true
+  legend_shadow: false
+  legend_framealpha: 0.9
+  legend_edgecolor: "#000000"
+  
+  # Axes configuration
+  axes_linewidth: 1.5
+  axes_edgecolor: "#000000"
+  axes_labelcolor: "#000000"
+  axes_titleweight: "bold"
+  
+  # Margins and spacing
+  axes_xmargin: 0.05
+  axes_ymargin: 0.05
+  figure_autolayout: true
+  
+  # Subplot parameters
+  subplot_left: 0.125
+  subplot_bottom: 0.11
+  subplot_right: 0.9
+  subplot_top: 0.88
+  subplot_wspace: 0.2
+  subplot_hspace: 0.2
+
+# =============================================================================
+# KEDRO-SPECIFIC CONFIGURATION FOR INTEGRATION TESTING
+# =============================================================================
+kedro:
+  # Versioning and experiment tracking
+  enable_versioning: true
+  
+  # Performance and caching
+  cache_styling: true
+  cache_size: 1000
+  cache_ttl: 3600  # 1 hour
+  
+  # Parallel execution support
+  parallel_execution: true
+  max_workers: 4
+  
+  # Debug and monitoring
+  debug_mode: false
+  performance_monitoring: true
+  log_level: "INFO"
+  
+  # Validation settings
+  validation_enabled: true
+  strict_validation: true
+  
+  # Dataset-specific configuration
+  dataset_defaults:
+    save_args:
+      bbox_inches: "tight"
+      dpi: 300
+      facecolor: "white"
+    load_args: {}
+    
+  # Hook configuration
+  hooks:
+    enable_figregistry_hooks: true
+    hook_timing: true
+    
+  # Integration settings
+  config_merge_strategy: "deep"
+  override_precedence: "kedro_first"
+  
+  # Condition resolution settings
+  condition_resolution:
+    enable_wildcards: true
+    enable_regex: false
+    case_sensitive: true
+    fallback_style: "default"
+    
+  # Performance optimization
+  optimization:
+    preload_styles: true
+    lazy_loading: true
+    memory_limit: "1GB"
+    
+# =============================================================================
+# METADATA FOR TESTING AND DOCUMENTATION
+# =============================================================================
+metadata:
+  project_name: "figregistry-kedro-complex-testing"
+  description: |
+    Complex configuration file for comprehensive testing of FigRegistry-Kedro
+    integration capabilities including advanced condition resolution, pattern
+    matching, style inheritance, and performance optimization scenarios.
+  version: "1.0.0"
+  author: "FigRegistry-Kedro Test Suite"
+  created: "2024-01-01T00:00:00Z"
+  updated: "2024-01-15T12:30:00Z"
+  
+  # Testing scenarios covered
+  test_scenarios:
+    - "Complex condition mappings with nested hierarchies"
+    - "Wildcard pattern matching and condition resolution"
+    - "Nested style inheritance and hierarchical override patterns"
+    - "Complex rcParams combinations and conditional application"
+    - "Multi-dimensional experimental condition testing"
+    - "Performance-optimized condition caching scenarios"
+    - "Advanced output configuration with conditional path generation"
+    - "Publication and presentation styling workflows"
+    - "Statistical and machine learning analysis patterns"
+    - "Time series and temporal analysis configurations"
+    
+  # Performance testing parameters
+  performance_targets:
+    style_lookup_time: "< 1ms"
+    cache_hit_rate: "> 95%"
+    memory_usage: "< 100MB"
+    config_load_time: "< 100ms"
+    
+  # Validation requirements
+  validation_requirements:
+    - "All color values must be valid hex codes or named colors"
+    - "All marker symbols must be valid matplotlib markers"
+    - "All rcParams must be valid matplotlib parameters"
+    - "All condition patterns must resolve correctly"
+    - "All wildcard patterns must match appropriately"
+    
+  # Integration testing notes
+  integration_notes: |
+    This configuration is designed to stress-test the FigRegistry-Kedro
+    integration across multiple dimensions:
+    
+    1. Condition Resolution: Tests complex pattern matching and inheritance
+    2. Performance: Validates caching and lookup performance under load
+    3. Style Application: Ensures proper rcParams application and override
+    4. Output Management: Tests complex path generation and file naming
+    5. Kedro Integration: Validates hook lifecycle and dataset operations
+    
+    The configuration contains deliberately complex scenarios to validate
+    robust handling of edge cases and performance optimization under
+    realistic production workloads.
+    
+  # Usage examples
+  usage_examples:
+    basic_condition: "baseline"
+    wildcard_condition: "exploratory_initial_analysis"
+    nested_condition: "experiment_dose_high"
+    complex_condition: "phase2_validation_ml_training"
+    performance_condition: "perf_test_condition_001"
+    
+  tags:
+    - "testing"
+    - "kedro"
+    - "figregistry"
+    - "integration"
+    - "performance"
+    - "complex"
+    - "hierarchical"
+    - "patterns"
+    - "inheritance"
+    - "caching"
