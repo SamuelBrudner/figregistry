@@ -1,0 +1,556 @@
+# =============================================================================
+# Local Development Catalog - FigRegistry-Kedro Advanced Example
+# =============================================================================
+# Optimized catalog configuration for rapid development, debugging, and testing
+# of FigRegistry-Kedro integration features. This configuration prioritizes
+# development speed, debugging visibility, and efficient iteration while
+# maintaining compatibility with the advanced example's comprehensive patterns.
+#
+# Key Optimizations for Local Development:
+# - Simplified dataset configurations for faster iteration (F-005)
+# - Debug-friendly parameters enabling detailed operation visibility (Section 3.6.1)
+# - Streamlined condition resolution for rapid styling validation (F-002)
+# - Development-optimized output formats and resolutions for speed
+# - Enhanced logging and monitoring for plugin functionality debugging
+# - Local file paths optimized for development workflow efficiency
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Development-Optimized Data Inputs
+# -----------------------------------------------------------------------------
+# Simplified dataset configurations for rapid development iteration
+
+sample_data:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/sample_data.csv
+  load_args:
+    sep: ","
+    index_col: 0
+
+training_data:
+  type: pandas.CSVDataSet
+  filepath: data/02_intermediate/training_data.csv
+  versioned: false                                       # Disable versioning for speed
+  load_args:
+    sep: ","
+
+# -----------------------------------------------------------------------------
+# Simplified Model Outputs for Development
+# -----------------------------------------------------------------------------
+# Basic model artifacts without versioning for rapid iteration
+
+trained_model:
+  type: pickle.PickleDataSet
+  filepath: data/06_models/dev_trained_model.pkl
+  versioned: false                                       # Speed optimization
+
+model_metrics:
+  type: json.JSONDataSet
+  filepath: data/07_model_output/dev_metrics.json
+  versioned: false
+
+# =============================================================================
+# Development-Optimized FigRegistry Dataset Configurations
+# =============================================================================
+# Streamlined FigureDataSet entries designed for rapid development testing,
+# debugging validation, and efficient plugin functionality verification.
+# Each entry balances feature demonstration with development speed optimization.
+
+# -----------------------------------------------------------------------------
+# Core Integration Development Testing
+# -----------------------------------------------------------------------------
+# Essential datasets for validating basic FigRegistry-Kedro integration
+
+# Primary development figure - minimal configuration for fast iteration
+dev_primary_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/primary_analysis.png
+  purpose: exploratory                                   # Simple purpose for speed
+  condition_param: experiment_condition                  # Basic condition resolution
+  save_args:
+    dpi: 100                                            # Lower resolution for speed
+    bbox_inches: tight
+    format: png                                         # Single format for efficiency
+  # Result: Fast iteration with basic FigRegistry styling applied
+
+# Debug-enabled figure for plugin functionality validation
+debug_integration_test:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/debug_test.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+    metadata:
+      Debug_Mode: "enabled"                             # Metadata for debugging
+      Development: "true"
+      Test_Purpose: "plugin_validation"
+  # Result: Enhanced debugging visibility for integration testing
+
+# Rapid condition testing for styling validation
+condition_test_rapid:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/condition_test_{condition}.png
+  purpose: exploratory
+  condition_param: experiment_phase                      # Test different condition resolution
+  save_args:
+    dpi: 100
+    format: png
+  # Result: Quick validation of condition-based styling with dynamic naming
+
+# -----------------------------------------------------------------------------
+# Development Performance Testing
+# -----------------------------------------------------------------------------
+# Optimized configurations for performance validation during development
+
+# Style resolution performance validation (development optimized)
+dev_style_performance:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/perf/style_speed.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  save_args:
+    dpi: 75                                             # Minimal resolution for speed testing
+    optimize: false                                     # Disable PNG optimization for speed
+    metadata:
+      Performance_Test: "Style Resolution"
+      Target_Speed: "<1ms"
+      Environment: "development"
+  # Result: Fast performance validation without output optimization overhead
+
+# Save operation efficiency testing
+dev_save_performance:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/perf/save_speed.png
+  purpose: exploratory
+  condition_param: model_type
+  save_args:
+    dpi: 75
+    metadata:
+      Performance_Test: "Save Operation Speed"
+      Target_Overhead: "<5%"
+      Environment: "development"
+  # Result: Rapid save operation validation for development workflow
+
+# Cache efficiency validation
+dev_cache_test:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/perf/cache_test.png
+  purpose: exploratory
+  condition_param: experiment_condition                  # Same condition as primary for cache hit
+  save_args:
+    dpi: 75
+    metadata:
+      Test_Type: "Cache Performance"
+      Cache_Expected: "hit"
+  # Result: Validates style caching performance in development
+
+# -----------------------------------------------------------------------------
+# Configuration Bridge Development Testing
+# -----------------------------------------------------------------------------
+# Datasets specifically for testing configuration bridge functionality
+
+# Basic configuration bridge validation
+dev_config_bridge:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/config/bridge_test.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  save_args:
+    dpi: 100
+    metadata:
+      Config_Test: "Bridge Integration"
+      Config_Source: "kedro_managed"
+  # Result: Validates FigRegistryConfigBridge operation
+
+# Parameter resolution debugging
+dev_param_resolution:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/config/param_debug.png
+  purpose: exploratory
+  condition_param: experiment_phase
+  save_args:
+    dpi: 100
+    metadata:
+      Debug_Type: "Parameter Resolution"
+      Expected_Condition: "training"
+  # Result: Debug parameter resolution from pipeline context
+
+# Style override testing in development
+dev_style_override:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/config/style_override.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  style_params:
+    # Simple style overrides for testing hierarchy
+    color: "#E74C3C"                                    # Red override for testing
+    marker: "o"                                         # Circle markers
+    linewidth: 1.5                                      # Standard line width
+  save_args:
+    dpi: 100
+    metadata:
+      Test_Type: "Style Override"
+      Override_Applied: "true"
+  # Result: Validates style parameter override hierarchy
+
+# -----------------------------------------------------------------------------
+# Error Handling Development Testing
+# -----------------------------------------------------------------------------
+# Simplified error scenarios for debugging robustness
+
+# Missing condition parameter handling
+dev_missing_condition:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/errors/missing_condition.png
+  purpose: exploratory
+  condition_param: nonexistent_param                     # Intentionally missing parameter
+  save_args:
+    dpi: 100
+    metadata:
+      Error_Test: "Missing Condition Parameter"
+      Expected_Fallback: "exploratory_purpose"
+  # Result: Tests graceful fallback to purpose when condition missing
+
+# Invalid condition resolution
+dev_invalid_condition:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/errors/invalid_condition.png
+  purpose: exploratory
+  condition_param: experiment_condition                  # Valid param but may resolve to invalid condition
+  save_args:
+    dpi: 100
+    metadata:
+      Error_Test: "Invalid Condition Resolution"
+      Fallback_Expected: "true"
+  # Result: Tests handling of invalid condition values
+
+# -----------------------------------------------------------------------------
+# Development Workflow Optimization
+# -----------------------------------------------------------------------------
+# Configurations optimized for common development workflows
+
+# Rapid iteration figure for active development
+dev_iteration:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/iteration/current.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  save_args:
+    dpi: 75                                             # Minimal DPI for maximum speed
+    format: png
+    optimize: false                                     # No optimization for speed
+  versioned: false                                      # No versioning for rapid iteration
+  # Result: Fastest possible figure generation for development loops
+
+# Debugging output with enhanced metadata
+dev_debug_enhanced:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/debug/enhanced_{condition}.png
+  purpose: exploratory
+  condition_param: experiment_phase
+  save_args:
+    dpi: 100
+    metadata:
+      Debug_Enhanced: "true"
+      Condition_Resolved: "{condition}"                 # Dynamic metadata
+      Pipeline_Stage: "development"
+      Timestamp: "auto"
+  # Result: Rich debugging information for development analysis
+
+# Local comparison testing
+dev_comparison:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/comparison/local_test.png
+  purpose: exploratory
+  condition_param: model_type
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+    metadata:
+      Comparison_Type: "Local Development"
+      Model_Condition: "{condition}"
+  # Result: Quick comparison testing during development
+
+# -----------------------------------------------------------------------------
+# Plugin Feature Validation (Development)
+# -----------------------------------------------------------------------------
+# Streamlined feature testing for plugin development validation
+
+# Thread safety development testing
+dev_thread_safety:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/features/thread_test.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  save_args:
+    dpi: 100
+    metadata:
+      Thread_Safety_Test: "enabled"
+      Concurrent_Safe: "true"
+  # Result: Validates thread-safe operation in development
+
+# Versioning integration (selective for development)
+dev_versioning_test:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/features/versioning_check.png
+  purpose: exploratory
+  condition_param: experiment_phase
+  versioned: true                                        # Enable only for this specific test
+  save_args:
+    dpi: 100
+    metadata:
+      Versioning_Test: "kedro_integration"
+      Version_Expected: "timestamped"
+  # Result: Selective versioning test without global performance impact
+
+# Multi-condition rapid testing
+dev_multi_condition:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/features/multi_condition.png
+  purpose: exploratory
+  condition_param: analysis_stage
+  save_args:
+    dpi: 100
+    metadata:
+      Multi_Condition_Test: "true"
+      Stage_Resolution: "{condition}"
+  # Result: Tests multiple condition resolution scenarios
+
+# -----------------------------------------------------------------------------
+# Development Quality Validation
+# -----------------------------------------------------------------------------
+# Quality checks optimized for development speed
+
+# Basic quality validation
+dev_quality_check:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/quality/basic_check.png
+  purpose: presentation                                  # Test higher quality purpose
+  condition_param: experiment_condition
+  save_args:
+    dpi: 150                                            # Moderate DPI for quality check
+    format: png
+    metadata:
+      Quality_Test: "basic_validation"
+      Purpose_Quality: "presentation"
+  # Result: Basic quality validation with presentation-level styling
+
+# Style consistency development check
+dev_consistency:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/quality/consistency.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  style_params:
+    # Minimal style consistency testing
+    figure.facecolor: "#FAFAFA"                         # Light background for development
+  save_args:
+    dpi: 100
+    metadata:
+      Consistency_Test: "style_application"
+      Background_Override: "applied"
+  # Result: Validates consistent style application in development
+
+# -----------------------------------------------------------------------------
+# Local Development Utilities
+# -----------------------------------------------------------------------------
+# Utility datasets for development workflow support
+
+# Development dashboard summary
+dev_dashboard:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/utils/dashboard.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  save_args:
+    dpi: 100
+    format: png
+    metadata:
+      Dashboard_Type: "development_summary"
+      Quick_Overview: "true"
+  # Result: Development dashboard for quick overview
+
+# Local testing sandbox
+dev_sandbox:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/sandbox/test_{condition}.png
+  purpose: exploratory
+  condition_param: experiment_phase
+  save_args:
+    dpi: 75                                             # Maximum speed for sandbox testing
+    metadata:
+      Sandbox_Mode: "true"
+      Experimental: "true"
+  # Result: Unrestricted testing environment for development
+
+# Development migration testing
+dev_migration_after:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/migration/figregistry_enabled.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  save_args:
+    dpi: 100
+    metadata:
+      Migration_Test: "enabled_mode"
+      Comparison_Available: "true"
+  # Result: Tests migration patterns in development environment
+
+# -----------------------------------------------------------------------------
+# Performance Monitoring (Development Optimized)
+# -----------------------------------------------------------------------------
+# Lightweight performance monitoring for development
+
+# Lightweight performance tracking
+dev_perf_monitor:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/monitor/performance.png
+  purpose: exploratory
+  condition_param: model_type
+  save_args:
+    dpi: 75
+    metadata:
+      Monitor_Type: "lightweight_performance"
+      Overhead_Tracking: "enabled"
+      Environment: "development"
+  # Result: Lightweight performance monitoring without heavy overhead
+
+# Cache hit rate monitoring
+dev_cache_monitor:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/monitor/cache_stats.png
+  purpose: exploratory
+  condition_param: experiment_condition                  # Repeated condition for cache testing
+  save_args:
+    dpi: 75
+    metadata:
+      Monitor_Type: "cache_hit_rate"
+      Cache_Test: "repeated_condition"
+  # Result: Monitors cache efficiency during development
+
+# =============================================================================
+# Development Environment Specific Configurations
+# =============================================================================
+# Special configurations that only make sense in local development
+
+# Rapid prototype testing
+dev_prototype:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/prototype/quick_test.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  save_args:
+    dpi: 50                                             # Ultra-low DPI for maximum speed
+    format: png
+    metadata:
+      Prototype_Mode: "ultra_fast"
+      Quality: "minimal"
+  versioned: false
+  # Result: Ultra-fast prototyping for immediate feedback
+
+# Development regression testing
+dev_regression:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/regression/baseline.png
+  purpose: exploratory
+  condition_param: experiment_phase
+  save_args:
+    dpi: 100
+    metadata:
+      Regression_Test: "baseline_comparison"
+      Development_Safe: "true"
+  # Result: Regression testing safe for development environment
+
+# Local integration validation
+dev_integration_final:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev/integration/final_validation.png
+  purpose: presentation                                  # Higher quality for final validation
+  condition_param: experiment_condition
+  style_params:
+    # Final validation with modest quality enhancement
+    figure.dpi: 150                                     # Moderate enhancement
+    font.size: 11                                       # Slightly larger fonts
+  save_args:
+    dpi: 150
+    bbox_inches: tight
+    metadata:
+      Integration_Test: "final_validation"
+      Quality_Level: "enhanced_development"
+  versioned: true                                        # Enable versioning for final validation
+  # Result: Final integration validation with moderate quality enhancement
+
+# =============================================================================
+# Development Guidelines and Usage Notes
+# =============================================================================
+#
+# Local Development Optimizations:
+#
+# 1. Performance Optimizations:
+#    - DPI reduced to 75-100 for faster generation (vs 150-300 in production)
+#    - Single PNG format instead of multiple formats
+#    - Versioning disabled for most datasets to reduce overhead
+#    - PNG optimization disabled for speed
+#
+# 2. Debug Enhancements:
+#    - Rich metadata for debugging and validation
+#    - Enhanced error testing scenarios
+#    - Cache performance monitoring
+#    - Thread safety validation
+#
+# 3. Development Workflow:
+#    - Rapid iteration datasets with minimal configuration
+#    - Sandbox environments for experimental testing
+#    - Performance monitoring without heavy overhead
+#    - Migration testing for development validation
+#
+# 4. Configuration Bridge Testing:
+#    - Parameter resolution debugging
+#    - Style override validation
+#    - Configuration source verification
+#    - Error handling robustness testing
+#
+# 5. Quality Assurance:
+#    - Selective quality validation for critical paths
+#    - Consistency checking with minimal overhead
+#    - Regression testing safe for development
+#    - Integration validation with enhanced quality
+#
+# 6. Error Handling Validation:
+#    - Missing parameter scenarios
+#    - Invalid condition resolution
+#    - Graceful fallback testing
+#    - Robustness validation
+#
+# 7. Plugin Feature Testing:
+#    - Thread safety validation
+#    - Versioning integration (selective)
+#    - Multi-condition resolution
+#    - Cache efficiency monitoring
+#
+# 8. Development Environment Specific:
+#    - Ultra-fast prototyping mode
+#    - Lightweight monitoring
+#    - Local-only configurations
+#    - Development-safe testing
+#
+# Speed vs Quality Trade-offs:
+# - Local: 75-100 DPI, PNG only, minimal metadata
+# - Development validation: 100-150 DPI, moderate quality
+# - Final validation: 150 DPI, enhanced quality with versioning
+#
+# Debugging Features:
+# - Rich metadata for operation tracking
+# - Performance monitoring built-in
+# - Error scenario testing
+# - Cache efficiency validation
+#
+# Development Workflow Integration:
+# - Compatible with base catalog structure
+# - Overrides base settings for speed
+# - Maintains plugin functionality testing
+# - Supports advanced example patterns
+#
+# =============================================================================
