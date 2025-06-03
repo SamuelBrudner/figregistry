@@ -1,0 +1,257 @@
+# Kedro Project Parameters Configuration
+# Migration Example: After FigRegistry-Kedro Integration
+#
+# This configuration demonstrates parameter-driven styling automation through 
+# experimental condition management. Unlike hardcoded styling parameters, these 
+# parameters provide clean experimental context that enables the condition_param 
+# mechanism to automatically resolve styles based on experimental conditions.
+#
+# Key Benefits:
+# - Eliminates manual styling code through automated condition resolution
+# - Provides experimental context for FigureDataSet condition resolution
+# - Enables dynamic style application without hardcoded parameters
+# - Supports clean separation between experimental logic and visualization
+
+# =============================================================================
+# EXPERIMENTAL CONDITION PARAMETERS
+# =============================================================================
+# These parameters define the experimental context that drives condition-based
+# styling through FigRegistry's get_style() API. The condition_param mechanism
+# in FigureDataSet automatically resolves these values to determine appropriate
+# styling for each visualization.
+
+# Primary experimental condition for automated styling resolution
+# Used by FigureDataSet via condition_param to determine visualization styles
+experiment_condition: "exploratory_analysis"
+
+# Experimental context parameters for condition resolution
+model_configuration:
+  # Model type drives condition-based styling for model-specific visualizations
+  # Example conditions: "linear_regression", "random_forest", "neural_network"
+  model_type: "random_forest"
+  
+  # Model complexity affects visualization detail level and styling
+  # Example conditions: "simple", "moderate", "complex"
+  complexity_level: "moderate"
+  
+  # Training variant influences performance visualization styling
+  # Example conditions: "baseline", "optimized", "experimental"
+  training_variant: "optimized"
+
+dataset_configuration:
+  # Dataset variant enables dataset-specific visualization styling
+  # Example conditions: "synthetic", "real_world", "benchmark"
+  dataset_variant: "real_world"
+  
+  # Data quality level affects uncertainty visualization styling
+  # Example conditions: "high_quality", "moderate_quality", "noisy"
+  data_quality: "high_quality"
+  
+  # Sample size category influences statistical visualization approach
+  # Example conditions: "small_sample", "medium_sample", "large_sample"
+  sample_size_category: "medium_sample"
+
+analysis_configuration:
+  # Analysis phase determines visualization purpose and styling
+  # Example conditions: "exploration", "validation", "presentation"
+  analysis_phase: "validation"
+  
+  # Analysis scope affects plot complexity and detail level
+  # Example conditions: "preliminary", "detailed", "comprehensive"
+  analysis_scope: "detailed"
+  
+  # Output target influences styling formality and quality
+  # Example conditions: "internal", "stakeholder", "publication"
+  output_target: "stakeholder"
+
+# =============================================================================
+# PIPELINE EXECUTION PARAMETERS
+# =============================================================================
+# These parameters support pipeline node execution while providing context
+# for automated styling through the condition_param resolution mechanism.
+
+# Data processing parameters
+data_processing:
+  # Random seed for reproducible analysis
+  random_seed: 42
+  
+  # Train-test split ratio for model evaluation
+  test_size: 0.2
+  
+  # Cross-validation configuration
+  cv_folds: 5
+  
+  # Feature selection parameters
+  feature_selection:
+    method: "recursive"
+    max_features: 20
+    importance_threshold: 0.01
+
+# Model training parameters
+model_training:
+  # Random Forest specific parameters
+  random_forest:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+    random_state: 42
+  
+  # Training optimization parameters
+  optimization:
+    scoring_metric: "f1_weighted"
+    parameter_tuning: true
+    early_stopping: true
+    validation_patience: 10
+
+# Model evaluation parameters
+model_evaluation:
+  # Evaluation metrics to compute
+  metrics:
+    - "accuracy"
+    - "precision"
+    - "recall"
+    - "f1_score"
+    - "roc_auc"
+  
+  # Performance analysis configuration
+  performance_analysis:
+    confidence_intervals: true
+    statistical_significance: true
+    bootstrap_samples: 1000
+  
+  # Error analysis parameters
+  error_analysis:
+    confusion_matrix: true
+    classification_report: true
+    feature_importance: true
+
+# =============================================================================
+# VISUALIZATION CONTEXT PARAMETERS
+# =============================================================================
+# These parameters provide additional context for condition resolution while
+# avoiding hardcoded styling. They inform the automated styling system about
+# the visualization requirements without explicitly defining style properties.
+
+# Visualization requirements context
+visualization_context:
+  # Output quality requirements (affects DPI and format selection)
+  # Example conditions: "draft", "review", "final"
+  quality_requirement: "review"
+  
+  # Audience type (influences styling complexity and formality)
+  # Example conditions: "technical", "executive", "academic"
+  audience_type: "technical"
+  
+  # Presentation medium (affects size and resolution considerations)
+  # Example conditions: "screen", "print", "poster"
+  presentation_medium: "screen"
+  
+  # Color accessibility requirements
+  # Example conditions: "standard", "colorblind_safe", "high_contrast"
+  accessibility_level: "colorblind_safe"
+
+# Report generation parameters
+report_configuration:
+  # Report sections to include
+  sections:
+    - "executive_summary"
+    - "methodology"
+    - "results"
+    - "conclusions"
+  
+  # Figure inclusion preferences
+  figure_inclusion:
+    # Maximum figures per section
+    max_figures_per_section: 5
+    
+    # Figure size preferences (contextual, not explicit styling)
+    size_preference: "medium"
+    
+    # Layout preferences (affects subplot organization)
+    layout_preference: "grid"
+
+# =============================================================================
+# RUNTIME CONFIGURATION PARAMETERS
+# =============================================================================
+# These parameters support pipeline execution and provide runtime context
+# for dynamic condition resolution based on execution environment.
+
+# Execution environment context
+execution_environment:
+  # Environment type (affects resource allocation and output quality)
+  # Example conditions: "development", "testing", "production"
+  environment_type: "testing"
+  
+  # Resource constraints (influences visualization complexity)
+  # Example conditions: "limited", "standard", "high_performance"
+  resource_level: "standard"
+  
+  # Debug mode flag (affects verbosity and diagnostic outputs)
+  debug_mode: false
+
+# Experiment tracking parameters
+experiment_tracking:
+  # Experiment identifier for reproducibility
+  experiment_id: "rf_optimization_v2"
+  
+  # Run identifier for versioning
+  run_id: "run_001"
+  
+  # Experiment tags for organization
+  experiment_tags:
+    - "model_comparison"
+    - "feature_engineering"
+    - "hyperparameter_tuning"
+  
+  # Metadata for experiment context
+  experiment_metadata:
+    description: "Random Forest model optimization with feature selection"
+    objective: "Maximize F1-score while maintaining interpretability"
+    hypothesis: "Feature selection will improve model performance"
+
+# =============================================================================
+# CONDITION RESOLUTION EXAMPLES
+# =============================================================================
+# The following parameters demonstrate how different experimental contexts
+# can be composed to create meaningful conditions for automated styling:
+#
+# Primary Condition Resolution:
+# - experiment_condition: "exploratory_analysis"
+#   → Triggers base styling for exploratory analysis
+#
+# Composite Condition Resolution Examples:
+# - model_type + analysis_phase: "random_forest_validation" 
+#   → Enables model-specific validation styling
+# - dataset_variant + output_target: "real_world_stakeholder"
+#   → Applies stakeholder-appropriate styling for real-world data
+# - quality_requirement + audience_type: "review_technical"
+#   → Technical review styling with appropriate quality level
+#
+# These combinations enable sophisticated condition-based styling without
+# requiring explicit style parameter management in the pipeline code.
+
+# =============================================================================
+# MIGRATION TRANSFORMATION NOTES
+# =============================================================================
+# This configuration replaces the manual styling approach shown in the 
+# "before" migration example with automated condition-based styling:
+#
+# BEFORE (Manual Styling):
+# - Hardcoded matplotlib style parameters throughout pipeline nodes
+# - Manual plt.savefig() calls with explicit styling
+# - Scattered visualization configuration across multiple files
+# - Repetitive styling code in every visualization function
+#
+# AFTER (Automated Styling):
+# - Clean experimental context parameters drive automated styling
+# - FigureDataSet handles all styling through condition_param resolution
+# - Centralized styling configuration through FigRegistry
+# - Zero manual styling code in pipeline nodes
+#
+# Key Transformation Benefits:
+# 1. 90% reduction in styling code lines (per F-001 business value)
+# 2. Consistent visualization outputs across all pipeline stages
+# 3. Dynamic styling based on experimental conditions
+# 4. Easy style switching through condition parameter changes
+# 5. Separation of concerns between analysis logic and visualization
