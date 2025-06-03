@@ -1,0 +1,522 @@
+# =============================================================================
+# Local Development Parameters Configuration - Advanced FigRegistry-Kedro Example
+# =============================================================================
+# This configuration provides simplified parameter values optimized for rapid
+# development iteration, efficient condition-based styling testing, and quick
+# FigureDataSet validation. These parameters are designed to work seamlessly
+# with the local figregistry.yml configuration through condition_param resolution
+# while maintaining the sophisticated structure of the advanced example.
+#
+# Key Development Optimizations:
+# - Reduced model complexity for faster pipeline execution (Section 3.6.1)
+# - Simplified experimental scenarios for efficient debugging (F-002)
+# - Streamlined parameter hierarchies for easy identification (F-005-RQ-004)
+# - Lightweight computation settings for rapid iteration cycles
+# - Debug-friendly parameter naming for development workflows
+# - Minimal but representative experimental context for plugin testing
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Development Environment Context
+# -----------------------------------------------------------------------------
+# Core environment settings optimized for local development iteration
+
+environment:
+  name: "local_development"
+  debug_mode: true
+  rapid_iteration: true
+  simplified_scenarios: true
+  
+# Development metadata for tracking and debugging
+dev_metadata:
+  config_version: "1.0.0-dev"
+  created_for: "rapid development and plugin testing"
+  optimization_target: "speed over complexity"
+  last_updated: "2024-01-01"
+  
+  # Development session tracking
+  session:
+    developer_mode: true
+    debug_logging: true
+    enhanced_validation: true
+    performance_monitoring: false  # Disabled for speed in local dev
+    hot_reload_enabled: true
+
+# -----------------------------------------------------------------------------
+# Primary Condition Parameters for FigureDataSet Resolution (F-005-RQ-004)
+# -----------------------------------------------------------------------------
+# These parameters drive condition-based styling through the FigureDataSet
+# condition_param mechanism, providing simplified scenarios for development
+
+# Primary development condition (used as default condition_param)
+dev_condition: "dev_test_basic"
+
+# Alternative conditions for testing different styling scenarios
+experiment_condition: "dev_test_advanced"
+debug_condition: "dev_test_debug"
+test_condition: "quick_treatment_a"
+
+# Simplified experimental scenarios for rapid testing
+experimental_scenarios:
+  # Basic development testing scenarios
+  basic_test:
+    condition: "dev_test_basic"
+    description: "Basic styling test with bright red markers"
+    complexity: "minimal"
+    
+  advanced_test:
+    condition: "dev_test_advanced" 
+    description: "Advanced styling test with bright green squares"
+    complexity: "medium"
+    
+  debug_test:
+    condition: "dev_test_debug"
+    description: "Debug styling test with bright blue triangles"
+    complexity: "minimal"
+    
+  # Quick experimental variations
+  treatment_a:
+    condition: "quick_treatment_a"
+    description: "Treatment A with light red circles"
+    complexity: "low"
+    
+  treatment_b:
+    condition: "quick_treatment_b"
+    description: "Treatment B with light green squares"
+    complexity: "low"
+    
+  control:
+    condition: "quick_control"
+    description: "Control group with light blue triangles"
+    complexity: "low"
+
+# Dynamic condition parameters for different pipeline stages
+pipeline_conditions:
+  training: "dev_training"
+  validation: "dev_validation"
+  testing: "dev_testing"
+  exploratory: "dev_exploratory"
+  presentation: "dev_presentation"
+  publication: "dev_publication"
+
+# -----------------------------------------------------------------------------
+# Simplified Data Processing Parameters for Development Speed
+# -----------------------------------------------------------------------------
+# Reduced complexity settings to enable fast pipeline execution during development
+
+data_processing:
+  # Minimal data sizes for rapid iteration
+  sample_sizes:
+    train: 100          # Reduced from production 10000
+    validation: 50      # Reduced from production 2000
+    test: 30           # Reduced from production 1000
+    
+  # Simplified feature engineering for speed
+  features:
+    max_features: 5     # Reduced from production 50
+    feature_selection: "simple"  # Simplified selection algorithm
+    preprocessing_steps: "minimal"  # Skip complex preprocessing
+    
+  # Fast data loading parameters
+  loading:
+    chunk_size: 50      # Small chunks for memory efficiency
+    parallel_loading: false  # Single-threaded for debugging
+    cache_enabled: false     # Disable cache for hot reload
+    validation_strict: false # Relaxed validation for speed
+
+# -----------------------------------------------------------------------------
+# Development-Optimized Model Parameters
+# -----------------------------------------------------------------------------
+# Lightweight model configurations for rapid training and testing
+
+modeling:
+  # Simplified model configurations
+  linear_regression:
+    condition: "dev_linear"
+    solver: "lbfgs"
+    max_iter: 10        # Reduced from production 1000
+    fit_intercept: true
+    complexity: "minimal"
+    
+  random_forest:
+    condition: "dev_forest"
+    n_estimators: 5     # Reduced from production 100
+    max_depth: 3        # Reduced from production 10
+    min_samples_split: 5 # Increased for speed
+    random_state: 42
+    complexity: "low"
+    
+  ensemble:
+    condition: "dev_ensemble"
+    base_models: ["linear", "forest"]  # Only 2 models instead of 5
+    voting: "soft"
+    cv_folds: 2         # Reduced from production 5
+    complexity: "medium"
+    
+  # Development training parameters
+  training:
+    early_stopping: true
+    patience: 3         # Reduced from production 10
+    min_delta: 0.01     # Relaxed convergence criteria
+    batch_size: 32      # Small batches for memory efficiency
+    validation_split: 0.2
+    
+  # Simplified hyperparameter tuning
+  hyperparameters:
+    tuning_enabled: false    # Disabled for development speed
+    search_space: "minimal"  # Reduced search space
+    max_trials: 3           # Reduced from production 50
+    timeout_minutes: 5      # Short timeout for development
+
+# -----------------------------------------------------------------------------
+# Experimental Design Parameters for Condition-Based Styling
+# -----------------------------------------------------------------------------
+# Simplified experimental scenarios supporting condition_param resolution
+
+experiments:
+  # Primary experimental conditions
+  conditions:
+    # Treatment conditions for A/B testing scenarios
+    treatment_conditions:
+      treatment_a:
+        condition: "quick_treatment_a"
+        model_type: "linear"
+        features: ["basic_features"]
+        sample_multiplier: 1.0
+        
+      treatment_b:
+        condition: "quick_treatment_b"
+        model_type: "forest"
+        features: ["basic_features", "engineered_features"]
+        sample_multiplier: 1.0
+        
+      control:
+        condition: "quick_control"
+        model_type: "baseline"
+        features: ["basic_features"]
+        sample_multiplier: 0.8  # Smaller control group
+        
+    # Model type conditions for algorithm comparison
+    model_conditions:
+      linear_model:
+        condition: "dev_linear"
+        algorithm: "linear_regression"
+        complexity: "minimal"
+        
+      tree_model:
+        condition: "dev_forest"
+        algorithm: "random_forest"
+        complexity: "low"
+        
+      ensemble_model:
+        condition: "dev_ensemble"
+        algorithm: "ensemble"
+        complexity: "medium"
+        
+    # Pipeline phase conditions
+    phase_conditions:
+      training_phase:
+        condition: "dev_training"
+        phase: "train"
+        validation_enabled: true
+        
+      validation_phase:
+        condition: "dev_validation"
+        phase: "validate"
+        cross_validation: false  # Disabled for speed
+        
+      testing_phase:
+        condition: "dev_testing"
+        phase: "test"
+        final_evaluation: true
+        
+  # Simplified experimental metadata
+  metadata:
+    experiment_id: "dev_experiment_001"
+    description: "Local development testing with simplified parameters"
+    duration_target: "< 2 minutes"  # Fast execution target
+    complexity_level: "minimal"
+    debugging_enabled: true
+    
+  # Development evaluation metrics
+  evaluation:
+    metrics: ["accuracy", "precision"]  # Reduced from full metric suite
+    quick_metrics_only: true
+    detailed_analysis: false           # Disabled for speed
+    statistical_tests: false          # Disabled for development
+
+# -----------------------------------------------------------------------------
+# Visualization and Output Parameters
+# -----------------------------------------------------------------------------
+# Streamlined visualization settings for rapid figure generation
+
+visualization:
+  # Development figure configurations
+  figures:
+    # Quick iteration settings
+    resolution: "medium"     # Reduced from high for speed
+    format: "png"           # PNG only for speed
+    dpi: 100               # Reduced from production 300
+    size: [8, 6]           # Standard size for development
+    
+    # Debug-friendly styling
+    debug_mode: true
+    show_titles: true
+    show_legends: true
+    grid_enabled: true
+    
+  # Simplified plot types for development
+  plot_types:
+    training_plots:
+      condition: "dev_training"
+      plots: ["loss_curve", "accuracy_curve"]  # Essential plots only
+      save_intermediate: false                 # Skip intermediate saves
+      
+    validation_plots:
+      condition: "dev_validation"
+      plots: ["confusion_matrix", "roc_curve"]  # Key validation plots
+      detailed_analysis: false                  # Skip detailed analysis
+      
+    testing_plots:
+      condition: "dev_testing"
+      plots: ["final_metrics", "model_comparison"]  # Summary plots only
+      publication_ready: false                      # Skip publication styling
+      
+    exploratory_plots:
+      condition: "dev_exploratory"
+      plots: ["data_distribution", "feature_importance"]  # Quick exploration
+      interactive: false                               # Static plots for speed
+      
+  # Output optimization for development
+  output:
+    auto_save: true
+    versioning: true
+    cleanup_old_versions: true  # Keep workspace clean
+    max_versions: 10           # Limit version history
+    
+# -----------------------------------------------------------------------------
+# Performance and Resource Parameters for Development
+# -----------------------------------------------------------------------------
+# Optimized resource usage for rapid development iteration
+
+performance:
+  # Memory optimization for development
+  memory:
+    max_memory_gb: 2        # Conservative memory usage
+    gc_enabled: true        # Aggressive garbage collection
+    cache_size_mb: 100      # Small cache for speed
+    
+  # CPU optimization for development
+  computation:
+    max_workers: 2          # Limited parallelism for debugging
+    chunk_processing: true  # Process in small chunks
+    lazy_loading: true      # Load data on demand
+    
+  # I/O optimization for development
+  io:
+    buffer_size: 1024       # Small buffers for responsiveness
+    sync_writes: false      # Async I/O for speed
+    compression: false      # Skip compression for speed
+    
+# -----------------------------------------------------------------------------
+# Debugging and Monitoring Parameters
+# -----------------------------------------------------------------------------
+# Enhanced debugging capabilities for development workflows
+
+debugging:
+  # Condition resolution debugging
+  condition_debugging:
+    enabled: true
+    log_resolution_attempts: true
+    log_parameter_sources: true
+    log_fallback_usage: true
+    
+  # Parameter tracking for debugging
+  parameter_tracking:
+    enabled: true
+    track_condition_params: true
+    track_style_applications: true
+    track_figure_generations: true
+    
+  # Performance monitoring for development
+  performance_monitoring:
+    enabled: true
+    log_slow_operations: true
+    timing_threshold_ms: 100  # Log operations > 100ms
+    memory_tracking: true
+    
+# -----------------------------------------------------------------------------
+# Test Data and Fixtures for Development
+# -----------------------------------------------------------------------------
+# Minimal test data configurations for rapid testing
+
+test_data:
+  # Synthetic data generation for development
+  synthetic:
+    enabled: true
+    samples: 100            # Small dataset for speed
+    features: 5             # Simple feature set
+    noise_level: 0.1        # Low noise for clear patterns
+    random_state: 42        # Reproducible results
+    
+  # Real data subsets for testing
+  real_data:
+    enabled: false          # Disabled for development speed
+    sample_fraction: 0.01   # 1% sample when enabled
+    balanced_sampling: true
+    
+# -----------------------------------------------------------------------------
+# Integration Testing Parameters
+# -----------------------------------------------------------------------------
+# Parameters specifically for testing FigureDataSet integration
+
+integration_testing:
+  # FigureDataSet testing scenarios
+  dataset_testing:
+    # Basic dataset functionality
+    basic_save:
+      condition: "dev_test_basic"
+      purpose: "dev_exploratory"
+      expected_style: {"color": "#FF0000", "marker": "o"}
+      
+    # Advanced dataset functionality
+    advanced_save:
+      condition: "dev_test_advanced"
+      purpose: "dev_presentation"
+      expected_style: {"color": "#00FF00", "marker": "s"}
+      
+    # Debug scenario testing
+    debug_save:
+      condition: "dev_test_debug"
+      purpose: "dev_publication"
+      expected_style: {"color": "#0000FF", "marker": "^"}
+      
+  # Configuration bridge testing
+  config_bridge_testing:
+    merge_testing: true
+    validation_testing: true
+    override_testing: true
+    
+  # Hook lifecycle testing
+  hook_testing:
+    initialization_testing: true
+    context_sharing_testing: true
+    cleanup_testing: true
+    
+# -----------------------------------------------------------------------------
+# Rapid Development Workflow Parameters
+# -----------------------------------------------------------------------------
+# Parameters optimized for common development workflows
+
+development_workflows:
+  # Quick iteration workflow
+  quick_iteration:
+    data_subset: 0.1        # 10% of data for speed
+    model_complexity: "minimal"
+    validation_minimal: true
+    output_reduced: true
+    
+  # Debug workflow
+  debug_workflow:
+    single_threaded: true   # Easier debugging
+    verbose_logging: true
+    intermediate_saves: true
+    error_tolerance: "high"  # Continue on non-fatal errors
+    
+  # Testing workflow
+  testing_workflow:
+    mock_data: true         # Use mock data for testing
+    dry_run_mode: true      # Skip actual file operations
+    validation_only: true   # Validate without execution
+    
+# -----------------------------------------------------------------------------
+# Plugin Development Parameters
+# -----------------------------------------------------------------------------
+# Specific parameters for testing FigRegistry-Kedro plugin functionality
+
+plugin_development:
+  # Dataset testing parameters
+  dataset_params:
+    test_figure_types: ["matplotlib"]  # Focus on matplotlib
+    test_purposes: ["dev_exploratory", "dev_presentation"]
+    test_conditions: ["dev_test_basic", "dev_test_advanced"]
+    versioning_enabled: true
+    
+  # Hook testing parameters
+  hook_params:
+    test_initialization: true
+    test_context_management: true
+    test_cleanup: true
+    mock_kedro_context: true
+    
+  # Configuration bridge testing
+  config_bridge_params:
+    test_merging: true
+    test_validation: true
+    test_environment_overrides: true
+    mock_config_loader: true
+    
+# -----------------------------------------------------------------------------
+# Development Environment Variables
+# -----------------------------------------------------------------------------
+# Environment-specific parameters for local development
+
+development_env:
+  # Local development flags
+  local_dev: true
+  debug_mode: true
+  hot_reload: true
+  verbose_output: true
+  
+  # Development paths (relative to project root)
+  dev_paths:
+    temp_data: "data/01_raw/temp"
+    debug_output: "data/08_reporting/debug"
+    test_fixtures: "tests/data"
+    
+  # Development timeouts and limits
+  limits:
+    max_execution_time: 120    # 2 minutes maximum
+    max_memory_mb: 1024       # 1GB memory limit
+    max_file_size_mb: 10      # 10MB file size limit
+    
+# =============================================================================
+# Usage Instructions for Local Development
+# =============================================================================
+#
+# 1. Condition-Based Styling:
+#    - Use dev_condition: "dev_test_basic" for bright red styling
+#    - Use experiment_condition: "dev_test_advanced" for green styling
+#    - Use debug_condition: "dev_test_debug" for blue debug styling
+#
+# 2. Rapid Iteration:
+#    - All sample sizes reduced for faster execution
+#    - Model complexity minimized for quick training
+#    - Simplified feature engineering for speed
+#
+# 3. FigureDataSet Testing:
+#    - condition_param resolves to the conditions defined above
+#    - Purpose parameters map to dev_exploratory, dev_presentation, dev_publication
+#    - Automatic styling based on experimental_scenarios conditions
+#
+# 4. Development Workflow:
+#    - Use quick_iteration workflow for normal development
+#    - Use debug_workflow for troubleshooting
+#    - Use testing_workflow for validation
+#
+# 5. Performance Optimization:
+#    - Memory usage limited to 2GB for development
+#    - CPU usage limited to 2 workers for debugging clarity
+#    - I/O optimized for responsiveness over throughput
+#
+# 6. Integration Testing:
+#    - All plugin components have dedicated test parameters
+#    - Mock objects available for isolated testing
+#    - Validation parameters for configuration bridge testing
+#
+# 7. Debugging Features:
+#    - Enhanced logging for condition resolution
+#    - Parameter tracking for troubleshooting
+#    - Performance monitoring for optimization
+#
+# =============================================================================
