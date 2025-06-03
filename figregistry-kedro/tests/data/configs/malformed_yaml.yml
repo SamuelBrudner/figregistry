@@ -1,0 +1,283 @@
+# =============================================================================
+# INTENTIONALLY MALFORMED YAML FOR TESTING
+# =============================================================================
+# This file contains deliberately malformed YAML content designed to test
+# configuration error handling, parser robustness, and security validation
+# per Section 6.6.8.1 of the technical specification.
+#
+# DO NOT FIX THE ERRORS IN THIS FILE - THEY ARE INTENTIONAL FOR TESTING
+#
+# Test Categories:
+# 1. YAML Syntax Errors - Invalid YAML structure and formatting
+# 2. Security Vulnerabilities - YAML injection vectors and path traversal
+# 3. Schema Violations - Invalid configuration structure per Pydantic models
+# 4. Type Safety Violations - Incorrect data types for configuration fields
+# 5. Parser Edge Cases - Unicode issues, encoding problems, and special characters
+# 6. Path Injection Attacks - Malicious file system path specifications
+# 7. Configuration Structure Problems - Missing required fields and malformed sections
+# =============================================================================
+
+# YAML SYNTAX ERRORS - Invalid YAML structure and parsing issues
+# =============================================================================
+
+# Syntax Error 1: Missing closing quote and invalid indentation
+figregistry_version: "0.3.0
+styles:
+  control:
+    color: "#1f77b4"
+    marker: "o"
+  # Invalid nested structure with inconsistent indentation
+  treatment:
+    color: "#ff7f0e
+      marker: "s"
+    linewidth: 2.0
+      alpha: 0.8  # Wrong indentation level
+
+# Syntax Error 2: Duplicate keys (YAML injection vector)
+palettes:
+  default: ["#1f77b4", "#ff7f0e", "#2ca02c"]
+  default: ["#000000", "#ffffff"]  # Duplicate key - last value wins
+  default: !!python/object/apply:subprocess.check_output [["ls", "/"]]  # Code injection attempt
+
+# Syntax Error 3: Unmatched brackets and braces
+outputs:
+  base_path: "figures"
+  path_aliases: {
+    "expl": "exploratory",
+    "pres": "presentation"
+    # Missing closing brace
+  formats: [
+    "png",
+    "pdf"
+    # Missing closing bracket
+  dpi: 300
+
+# Syntax Error 4: Invalid Unicode and encoding issues
+defaults:
+  figure_size: [10, 6]
+  font_family: "DejaVu Sans\uDC80"  # Invalid Unicode surrogate
+  title: "Test Figure \x00 with null byte"  # Null byte injection
+  label_prefix: "\u202E\u0041\u0042"  # Right-to-left override attack
+
+# SECURITY VULNERABILITIES - YAML injection and code execution attempts
+# =============================================================================
+
+# Security Test 1: Python object deserialization attack
+dangerous_config: !!python/object/apply:os.system ["rm -rf /"]
+
+# Security Test 2: File inclusion attack
+file_inclusion: !!python/object/apply:builtins.open ["../../../etc/passwd", "r"]
+
+# Security Test 3: Module import injection
+import_attack: !!python/name:subprocess.call
+
+# Security Test 4: Arbitrary code execution via lambda
+code_exec: !!python/object/apply:builtins.eval ["__import__('os').system('echo malicious')"]
+
+# Security Test 5: Class instantiation attack
+class_attack: !!python/object:subprocess.Popen
+  - ["cat", "/etc/passwd"]
+
+# PATH TRAVERSAL AND INJECTION ATTACKS
+# =============================================================================
+
+# Path Traversal Test 1: Directory traversal in base_path
+malicious_outputs:
+  base_path: "../../../etc"  # Directory traversal attack
+  
+# Path Traversal Test 2: Absolute path override
+path_injection:
+  base_path: "/etc/passwd"  # Absolute path injection
+  
+# Path Traversal Test 3: Symlink exploitation
+symlink_attack:
+  base_path: "figures/../../../usr/bin"
+  
+# Path Traversal Test 4: Windows path injection
+windows_injection:
+  base_path: "..\\..\\..\\Windows\\System32"
+  
+# Path Traversal Test 5: Null byte injection in paths
+null_byte_path:
+  base_path: "figures\x00../../../etc"
+
+# SCHEMA VIOLATIONS - Invalid configuration structure
+# =============================================================================
+
+# Schema Error 1: Invalid styles structure (not a dictionary)
+invalid_styles: "this should be a dictionary"
+
+# Schema Error 2: Missing required figregistry_version
+# (figregistry_version intentionally omitted above)
+
+# Schema Error 3: Invalid color format injection
+color_injection:
+  styles:
+    malicious:
+      color: "javascript:alert('xss')"  # XSS-like injection
+      marker: "<script>alert('xss')</script>"  # Script injection
+      
+# Schema Error 4: Invalid numeric types with injection
+numeric_injection:
+  styles:
+    control:
+      linewidth: "eval('1+1')"  # Code injection in numeric field
+      markersize: "subprocess.call(['ls'])"  # Command injection
+      alpha: "import os; os.system('pwd')"  # Python code injection
+
+# TYPE SAFETY VIOLATIONS - Incorrect data types
+# =============================================================================
+
+# Type Error 1: String where boolean expected
+type_violations:
+  defaults:
+    grid: "maybe"  # Should be boolean
+    spine_visibility: "all"  # Should be dictionary
+    
+# Type Error 2: Invalid numeric values
+invalid_numbers:
+  styles:
+    test:
+      linewidth: "not_a_number"
+      alpha: "infinite"
+      markersize: "NaN"
+      
+# Type Error 3: Object where primitive expected
+object_injection:
+  outputs:
+    dpi: {"toString": "function() { return 300; }"}  # Object injection
+    
+# Type Error 4: Array where string expected
+array_injection:
+  defaults:
+    font_family: ["eval", "malicious", "code"]
+
+# PARSER EDGE CASES - Special characters and encoding
+# =============================================================================
+
+# Edge Case 1: Tab characters mixed with spaces (invalid indentation)
+tab_indentation:
+\tbase_path: "figures"  # Tab character
+  \tdpi: 300  # Mixed tab and spaces
+  
+# Edge Case 2: Extremely long line (potential buffer overflow)
+long_line:
+  description: "A" * 10000  # Very long string
+
+# Edge Case 3: Nested structures with circular references
+circular_ref: &anchor
+  self_ref: *anchor  # Circular reference
+
+# Edge Case 4: Special YAML values that could cause issues
+special_values:
+  null_value: null
+  bool_true: true
+  bool_false: false
+  infinity: .inf
+  negative_infinity: -.inf
+  not_a_number: .nan
+  
+# Edge Case 5: Binary data injection
+binary_injection: !!binary |
+  R0lGODlhDAAMAIQAAP//9/X29Pv8+vj5+fb29Pn5+ff39fn6+v
+  
+# Edge Case 6: Complex nested structures with malformed syntax
+deeply_nested:
+  level1:
+    level2:
+      level3:
+        level4: {
+          "key1": "value1"
+          "key2": "value2"  # Missing comma
+          "key3": unquoted_value  # Unquoted string
+        }
+
+# ADDITIONAL MALFORMED STRUCTURES
+# =============================================================================
+
+# Malformed anchors and references
+bad_anchor: &bad_anchor
+  value: "test"
+invalid_ref: *nonexistent_anchor  # Reference to non-existent anchor
+
+# Invalid escape sequences
+escape_issues:
+  bad_escape: "Invalid escape \q sequence"
+  incomplete_escape: "Incomplete escape \"
+
+# Complex nesting with syntax errors
+complex_malformed:
+  styles:
+    condition_1:
+      color: "#1f77b4"
+      properties:
+        - linewidth: 2.0
+        - marker: "o"
+        - invalid_property: {
+            nested: "value"
+            missing_comma: "error"
+            incomplete: 
+        }
+    # Missing proper indentation
+  condition_2:
+  color: "#ff0000"
+  
+# Invalid YAML directives
+%YAML 1.2  # Directive not at beginning of document
+%TAG ! tag:example.com,2000:app/
+---
+
+# Document separator in wrong location
+document_separator_error:
+  key: "value"
+---  # Unexpected document separator
+  another_key: "another_value"
+  
+# Flow sequence and mapping errors
+flow_errors:
+  bad_sequence: [item1, item2, missing_bracket
+  bad_mapping: {key1: value1, key2: value2, missing_brace
+  
+# Multiple line string with improper formatting
+multiline_error: |
+  This is a multiline string
+    with improper indentation
+  and inconsistent formatting
+      that should cause parsing issues
+
+# Recursive structure that could cause stack overflow
+recursive: &recursive_anchor
+  child: *recursive_anchor
+  
+# Empty documents and malformed separators
+---
+# Empty document
+---
+malformed_document_start
+  key: value  # Missing colon in document start
+
+# Invalid comment placement
+styles # This comment placement is invalid
+  control:
+    color: "#1f77b4"  # Valid comment
+    marker # Invalid comment placement: "o"
+    
+# Malformed list continuation
+list_continuation:
+  items:
+    - item1
+    - item2
+  - item3  # Wrong indentation for list continuation
+  
+# Invalid key duplication with different types
+duplicate_type_conflict:
+  test_key: "string_value"
+  test_key: 123  # Duplicate with different type
+  test_key: ["array", "value"]  # Duplicate with array type
+
+# Final malformed structure - incomplete YAML
+incomplete_yaml:
+  final_test:
+    incomplete_structure:
+      missing_value:
+# File ends abruptly without completing the structure
