@@ -1,0 +1,494 @@
+# Production Parameters Configuration
+# Enterprise-Grade Experimental Parameters for figregistry-kedro Advanced Example
+# 
+# This configuration provides production-optimized parameter sets designed for 
+# enterprise deployment scenarios with high-performance model training, 
+# automated condition-based styling resolution, and enterprise workflow 
+# orchestration support.
+#
+# Performance Targets:
+# - Support <5ms configuration bridge resolution (Section 4.5.1.1)
+# - Enable efficient condition_param resolution for FigureDataSet (F-005-RQ-004)
+# - Maintain enterprise data processing standards with production complexity
+# - Support automated workflow orchestration per Section 0.2.5
+#
+# Enterprise Compliance:
+# - Production-appropriate parameter complexity per F-002 requirements
+# - Enterprise validation scenarios for automated styling workflows
+# - Production deployment pattern support per Section 8.6.1.2
+
+# ==============================================================================
+# PRODUCTION METADATA AND ENVIRONMENT CONFIGURATION
+# ==============================================================================
+# Enterprise environment identification and deployment metadata
+environment:
+  name: "production"
+  deployment_tier: "enterprise"
+  compliance_level: "production_grade"
+  performance_profile: "high_throughput"
+  last_validated: "2024-production-release"
+
+# Production deployment configuration
+deployment:
+  infrastructure: "enterprise_kubernetes"
+  scaling_mode: "horizontal"
+  resource_tier: "production_optimized"
+  monitoring_enabled: true
+  audit_logging: true
+
+# ==============================================================================
+# ENTERPRISE EXPERIMENTAL CONDITION PARAMETERS
+# ==============================================================================
+# Production-grade experimental conditions supporting automated condition_param
+# resolution for FigRegistry styling automation per F-002 requirements
+
+# Machine Learning Pipeline Experiment Conditions
+# These parameters are resolved by FigureDataSet condition_param for automated styling
+ml_experiment_conditions:
+  # Training phase conditions (production complexity)
+  training_phase:
+    baseline: "production_baseline"          # Maps to production_baseline style
+    optimized: "production_optimized"       # Maps to production_optimized style
+    critical_path: "production_critical"    # Maps to production_critical style
+    hyperparameter_sweep: "ml_training"     # Maps to ml_training style
+    cross_validation: "ml_validation"       # Maps to ml_validation style
+    
+  # Model performance evaluation conditions
+  performance_evaluation:
+    target_performance: "performance_target"     # Maps to performance_target style
+    actual_performance: "performance_actual"     # Maps to performance_actual style
+    sla_threshold: "performance_sla"            # Maps to performance_sla style
+    benchmark_comparison: "ml_validation"        # Maps to ml_validation style
+    
+  # Inference pipeline conditions
+  inference_phase:
+    production_inference: "ml_inference"         # Maps to ml_inference style
+    batch_processing: "production_optimized"    # Maps to production_optimized style
+    real_time_serving: "production_critical"    # Maps to production_critical style
+    model_monitoring: "performance_actual"      # Maps to performance_actual style
+
+# Enterprise Reporting Conditions
+# Support for executive and stakeholder reporting workflows
+reporting_conditions:
+  # Executive dashboard conditions
+  executive_reporting:
+    summary_view: "executive_summary"          # Maps to executive_summary style
+    kpi_dashboard: "stakeholder_report"       # Maps to stakeholder_report style
+    performance_review: "technical_analysis"  # Maps to technical_analysis style
+    
+  # Stakeholder communication conditions  
+  stakeholder_communication:
+    quarterly_review: "stakeholder_report"    # Maps to stakeholder_report style
+    project_status: "technical_analysis"     # Maps to technical_analysis style
+    risk_assessment: "production_critical"   # Maps to production_critical style
+    
+  # Technical documentation conditions
+  technical_documentation:
+    architecture_review: "technical_analysis"  # Maps to technical_analysis style
+    performance_analysis: "performance_actual" # Maps to performance_actual style
+    system_monitoring: "performance_sla"       # Maps to performance_sla style
+
+# ==============================================================================
+# HIGH-PERFORMANCE MODEL TRAINING PARAMETERS
+# ==============================================================================
+# Enterprise-grade model configuration optimized for production pipeline
+# execution with computational efficiency per Section 8.5.2.1
+
+# Advanced Model Architecture Parameters
+model_architecture:
+  # Primary production model configuration
+  neural_network:
+    layers: [512, 256, 128, 64, 32]
+    activation: "relu"
+    dropout_rate: 0.2
+    batch_normalization: true
+    regularization_l2: 0.001
+    learning_rate: 0.001
+    optimizer: "adam"
+    
+  # Production-optimized ensemble configuration
+  ensemble:
+    n_estimators: 100
+    max_depth: 12
+    min_samples_split: 10
+    min_samples_leaf: 5
+    subsample: 0.8
+    learning_rate: 0.1
+    random_state: 42
+    
+  # High-performance gradient boosting
+  gradient_boosting:
+    n_estimators: 200
+    max_depth: 8
+    min_samples_split: 20
+    min_samples_leaf: 10
+    learning_rate: 0.1
+    subsample: 0.9
+    max_features: "sqrt"
+    random_state: 42
+
+# Production Training Configuration
+training_config:
+  # Enterprise training parameters
+  batch_size: 256                    # Production-optimized batch size
+  epochs: 100                        # Enterprise validation epochs
+  early_stopping_patience: 15       # Production stability control
+  validation_split: 0.2             # Enterprise validation ratio
+  cross_validation_folds: 5         # Production validation folds
+  
+  # Performance optimization settings
+  performance:
+    enable_mixed_precision: true    # Production GPU optimization
+    distributed_training: true      # Enterprise scaling support
+    checkpoint_frequency: 10        # Production checkpoint strategy
+    memory_optimization: true       # Enterprise resource management
+    
+  # Production monitoring configuration
+  monitoring:
+    log_frequency: 100              # Enterprise logging frequency
+    metric_tracking: true           # Production metric collection
+    performance_profiling: true    # Enterprise performance monitoring
+    resource_monitoring: true      # Production resource tracking
+
+# Production Hyperparameter Optimization
+hyperparameter_optimization:
+  # Bayesian optimization configuration (production complexity)
+  bayesian_search:
+    n_calls: 50                     # Enterprise search iterations
+    n_initial_points: 10           # Production initialization
+    acquisition_function: "EI"     # Expected Improvement
+    random_state: 42               # Production reproducibility
+    
+  # Grid search fallback (enterprise validation)
+  grid_search:
+    cv_folds: 3                    # Production cross-validation
+    scoring: "f1_weighted"         # Enterprise evaluation metric
+    n_jobs: -1                     # Production parallelization
+    
+  # Random search configuration (production baseline)
+  random_search:
+    n_iter: 30                     # Enterprise iteration count
+    cv_folds: 3                    # Production validation
+    random_state: 42               # Production reproducibility
+
+# ==============================================================================
+# ENTERPRISE DATA PROCESSING PARAMETERS
+# ==============================================================================
+# Production-grade data processing configuration supporting enterprise
+# data processing standards and automated workflow orchestration
+
+# Feature Engineering Configuration
+feature_engineering:
+  # Production feature selection parameters
+  feature_selection:
+    method: "recursive_feature_elimination"
+    n_features_to_select: 50       # Enterprise feature count
+    step: 5                        # Production elimination step
+    cv_folds: 3                    # Enterprise validation
+    scoring: "f1_weighted"         # Production evaluation metric
+    
+  # Enterprise dimensionality reduction
+  dimensionality_reduction:
+    method: "pca"
+    n_components: 0.95             # Production variance retention
+    random_state: 42               # Enterprise reproducibility
+    
+  # Production scaling configuration
+  scaling:
+    method: "standard"             # Enterprise standardization
+    feature_range: [0, 1]          # Production range normalization
+    
+  # Enterprise categorical encoding
+  categorical_encoding:
+    method: "one_hot"              # Production encoding strategy
+    drop_first: false              # Enterprise feature retention
+    handle_unknown: "ignore"       # Production robustness
+
+# Production Data Validation Parameters
+data_validation:
+  # Enterprise data quality thresholds
+  quality_thresholds:
+    missing_data_threshold: 0.1    # Production missing data limit
+    outlier_threshold: 3.0         # Enterprise outlier detection
+    correlation_threshold: 0.95    # Production correlation limit
+    variance_threshold: 0.01       # Enterprise variance minimum
+    
+  # Production validation rules
+  validation_rules:
+    enforce_schema: true           # Enterprise schema validation
+    check_data_drift: true         # Production drift detection
+    validate_distributions: true   # Enterprise distribution validation
+    monitor_feature_importance: true # Production feature monitoring
+    
+  # Enterprise audit requirements
+  audit_configuration:
+    log_validation_results: true   # Production audit logging
+    generate_quality_reports: true # Enterprise quality reporting
+    track_data_lineage: true      # Production lineage tracking
+    enable_alerting: true         # Enterprise alerting system
+
+# ==============================================================================
+# PRODUCTION PIPELINE ORCHESTRATION PARAMETERS
+# ==============================================================================
+# Enterprise workflow orchestration supporting automated condition-based
+# styling and production deployment patterns per Section 0.2.5
+
+# Production Pipeline Configuration
+pipeline_orchestration:
+  # Enterprise execution parameters
+  execution:
+    parallel_nodes: 4              # Production parallelization
+    memory_limit: "8GB"            # Enterprise memory allocation
+    timeout_minutes: 120           # Production timeout limit
+    retry_attempts: 3              # Enterprise retry strategy
+    
+  # Production scheduling configuration
+  scheduling:
+    execution_frequency: "daily"   # Enterprise execution cadence
+    maintenance_window: "02:00"    # Production maintenance schedule
+    monitoring_interval: "15min"   # Enterprise monitoring frequency
+    
+  # Enterprise resource management
+  resource_management:
+    cpu_limit: "4000m"             # Production CPU allocation
+    memory_request: "6GB"          # Enterprise memory request
+    storage_quota: "100GB"         # Production storage allocation
+    
+  # Production error handling
+  error_handling:
+    error_tolerance: "low"         # Enterprise error tolerance
+    notification_channels: ["email", "slack"] # Production alerting
+    escalation_policy: "immediate" # Enterprise escalation
+    recovery_strategy: "rollback"  # Production recovery
+
+# Advanced Figure Generation Parameters
+figure_generation:
+  # Production figure specifications
+  figure_specs:
+    default_size: [12, 8]          # Enterprise figure dimensions
+    high_res_dpi: 300              # Production resolution
+    publication_dpi: 600           # Enterprise publication quality
+    web_dpi: 150                   # Production web optimization
+    
+  # Enterprise styling overrides
+  styling_overrides:
+    font_family: "Arial"           # Enterprise font standard
+    title_size: 16                 # Production title sizing
+    label_size: 12                 # Enterprise label sizing
+    legend_size: 11                # Production legend sizing
+    
+  # Production output configuration
+  output_config:
+    save_formats: ["png", "pdf"]   # Enterprise output formats
+    compression_level: 6           # Production file optimization
+    transparency: false            # Enterprise background standard
+    bbox_inches: "tight"           # Production layout optimization
+
+# ==============================================================================
+# ENTERPRISE EXPERIMENTAL SCENARIOS
+# ==============================================================================
+# Production-appropriate experimental scenarios demonstrating enterprise
+# complexity for condition-based styling per Section 4.1.1.1 requirements
+
+# Machine Learning Experiment Scenarios
+ml_experimental_scenarios:
+  # Production A/B testing scenario
+  ab_testing_experiment:
+    experiment_name: "production_model_comparison"
+    condition_param: "ml_experiment_conditions.training_phase.baseline"
+    control_group: "production_baseline"
+    treatment_group: "production_optimized"
+    sample_size: 10000
+    significance_level: 0.05
+    power: 0.8
+    
+  # Enterprise hyperparameter optimization scenario
+  hyperparameter_optimization_experiment:
+    experiment_name: "enterprise_hyperparameter_sweep"
+    condition_param: "ml_experiment_conditions.training_phase.hyperparameter_sweep"
+    search_space:
+      learning_rate: [0.001, 0.01, 0.1]
+      batch_size: [128, 256, 512]
+      dropout_rate: [0.1, 0.2, 0.3]
+    optimization_metric: "f1_weighted"
+    
+  # Production cross-validation scenario
+  cross_validation_experiment:
+    experiment_name: "production_model_validation"
+    condition_param: "ml_experiment_conditions.training_phase.cross_validation"
+    cv_strategy: "stratified_k_fold"
+    n_splits: 5
+    random_state: 42
+    scoring_metrics: ["accuracy", "precision", "recall", "f1_weighted"]
+
+# Enterprise Performance Monitoring Scenarios
+performance_monitoring_scenarios:
+  # Production SLA monitoring scenario
+  sla_monitoring_experiment:
+    experiment_name: "enterprise_sla_tracking"
+    condition_param: "ml_experiment_conditions.performance_evaluation.sla_threshold"
+    target_latency: 100  # milliseconds
+    target_throughput: 1000  # requests/second
+    target_accuracy: 0.95
+    monitoring_window: "24h"
+    
+  # Enterprise resource utilization scenario
+  resource_utilization_experiment:
+    experiment_name: "production_resource_optimization"
+    condition_param: "ml_experiment_conditions.performance_evaluation.actual_performance"
+    cpu_utilization_target: 70  # percentage
+    memory_utilization_target: 80  # percentage
+    storage_utilization_target: 75  # percentage
+    
+  # Production load testing scenario
+  load_testing_experiment:
+    experiment_name: "enterprise_load_testing"
+    condition_param: "ml_experiment_conditions.inference_phase.real_time_serving"
+    concurrent_users: [100, 500, 1000, 2000]
+    ramp_up_duration: "5min"
+    test_duration: "30min"
+    success_criteria: "95% requests under 500ms"
+
+# ==============================================================================
+# PRODUCTION ENVIRONMENT OVERRIDES
+# ==============================================================================
+# Production-specific parameter overrides supporting enterprise deployment
+# patterns and compliance requirements per Section 8.6.1.2
+
+# Enterprise Security Configuration
+security_overrides:
+  # Production authentication parameters
+  authentication:
+    token_expiry: 3600             # Enterprise token lifetime (seconds)
+    session_timeout: 1800          # Production session timeout (seconds)
+    max_login_attempts: 3          # Enterprise security limit
+    
+  # Enterprise encryption parameters
+  encryption:
+    algorithm: "AES-256"           # Production encryption standard
+    key_rotation_days: 90          # Enterprise key rotation policy
+    
+  # Production access control
+  access_control:
+    role_based_access: true        # Enterprise RBAC enabled
+    audit_access_logs: true        # Production access auditing
+    ip_whitelist_enabled: true     # Enterprise network security
+
+# Enterprise Compliance Configuration
+compliance_overrides:
+  # Production data retention
+  data_retention:
+    model_artifacts_days: 2555     # Enterprise retention (7 years)
+    training_data_days: 1825       # Production retention (5 years)
+    logs_days: 365                 # Enterprise log retention (1 year)
+    figures_days: 1825             # Production figure retention (5 years)
+    
+  # Enterprise audit requirements
+  audit_requirements:
+    enable_model_lineage: true     # Production model tracking
+    track_data_lineage: true       # Enterprise data tracking
+    log_parameter_changes: true    # Production change logging
+    generate_compliance_reports: true # Enterprise compliance reporting
+    
+  # Production privacy controls
+  privacy_controls:
+    enable_data_anonymization: true # Enterprise privacy protection
+    pii_detection_enabled: true    # Production PII detection
+    gdpr_compliance: true          # Enterprise GDPR compliance
+    ccpa_compliance: true          # Production CCPA compliance
+
+# Enterprise Monitoring Configuration
+monitoring_overrides:
+  # Production alerting thresholds
+  alerting_thresholds:
+    error_rate_threshold: 0.01     # Enterprise error rate (1%)
+    latency_p95_threshold: 500     # Production latency threshold (ms)
+    cpu_utilization_threshold: 80  # Enterprise CPU threshold (%)
+    memory_utilization_threshold: 85 # Production memory threshold (%)
+    
+  # Enterprise dashboard configuration
+  dashboard_config:
+    refresh_interval: 60           # Production refresh rate (seconds)
+    retention_period: 90           # Enterprise dashboard retention (days)
+    enable_real_time_alerts: true  # Production real-time alerting
+    
+  # Production health checks
+  health_checks:
+    endpoint_check_interval: 30    # Enterprise endpoint monitoring (seconds)
+    database_check_interval: 60   # Production database monitoring (seconds)
+    storage_check_interval: 300   # Enterprise storage monitoring (seconds)
+
+# ==============================================================================
+# PRODUCTION PERFORMANCE OPTIMIZATION PARAMETERS
+# ==============================================================================
+# Enterprise-grade performance parameters optimized for production deployment
+# efficiency and automated workflow execution
+
+# Production Caching Configuration
+caching_optimization:
+  # Enterprise cache configuration
+  cache_config:
+    redis_cluster_enabled: true    # Production cache clustering
+    cache_ttl_seconds: 3600        # Enterprise cache lifetime
+    max_cache_size: "2GB"          # Production cache limit
+    eviction_policy: "lru"         # Enterprise eviction strategy
+    
+  # Production model caching
+  model_caching:
+    enable_model_cache: true       # Enterprise model caching
+    model_cache_size: "1GB"        # Production model cache limit
+    cache_compression: true        # Enterprise compression enabled
+    
+  # Enterprise feature caching
+  feature_caching:
+    enable_feature_cache: true     # Production feature caching
+    feature_cache_ttl: 7200        # Enterprise feature cache lifetime (seconds)
+    cache_warming_enabled: true    # Production cache warming
+
+# Production Database Configuration
+database_optimization:
+  # Enterprise connection pooling
+  connection_pooling:
+    max_connections: 50            # Production connection limit
+    min_connections: 10            # Enterprise minimum connections
+    connection_timeout: 30         # Production timeout (seconds)
+    idle_timeout: 300              # Enterprise idle timeout (seconds)
+    
+  # Production query optimization
+  query_optimization:
+    enable_query_cache: true       # Enterprise query caching
+    slow_query_threshold: 1000     # Production slow query limit (ms)
+    explain_analyze_enabled: true  # Enterprise query analysis
+    
+  # Enterprise indexing strategy
+  indexing_strategy:
+    auto_index_creation: true      # Production auto-indexing
+    index_maintenance_enabled: true # Enterprise index maintenance
+    statistics_update_frequency: "daily" # Production statistics update
+
+# Production Scaling Parameters
+scaling_optimization:
+  # Enterprise auto-scaling
+  auto_scaling:
+    min_replicas: 2                # Production minimum instances
+    max_replicas: 20               # Enterprise maximum instances
+    target_cpu_utilization: 70    # Production CPU target (%)
+    target_memory_utilization: 75 # Enterprise memory target (%)
+    scale_up_cooldown: 300         # Production scale-up cooldown (seconds)
+    scale_down_cooldown: 600       # Enterprise scale-down cooldown (seconds)
+    
+  # Production load balancing
+  load_balancing:
+    strategy: "round_robin"        # Enterprise load balancing strategy
+    health_check_interval: 30      # Production health check (seconds)
+    health_check_timeout: 5        # Enterprise health check timeout (seconds)
+    sticky_sessions: false         # Production session affinity
+
+# Production optimization complete - supporting:
+# - Enterprise experimental condition parameters with production complexity
+# - High-performance model parameters optimized for production pipeline execution  
+# - Production-specific parameter values for condition_param resolution
+# - Enterprise experimental scenarios for condition-based styling automation
+# - Production-optimized parameter sets for efficient pipeline execution
+# - Enterprise-grade parameter hierarchies for automated workflow orchestration
+# - Production-specific overrides for enterprise deployment patterns and compliance
