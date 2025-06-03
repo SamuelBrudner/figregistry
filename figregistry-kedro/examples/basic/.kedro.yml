@@ -1,0 +1,35 @@
+# Kedro project configuration for figregistry-kedro basic example
+# This file defines the project metadata, package structure, and settings
+# required for proper Kedro project initialization and pipeline discovery
+
+# Project identification
+project_name: "FigRegistry Kedro Basic Example"
+package_name: "figregistry_kedro_basic_example"
+
+# Source code structure
+source_dir: "src"
+
+# Kedro framework compatibility
+kedro_init_version: "0.18.0"
+kedro_version: ">=0.18.0,<0.20.0"
+
+# Project configuration
+tools: ""
+example_pipeline: "True"
+
+# Environment settings
+default_environment: "base"
+config_source: "conf"
+
+# Package structure settings
+pipelines_package: "pipelines"
+main_module: "__main__"
+
+# Basic example specific settings
+description: "Minimal demonstration project showing figregistry-kedro integration with automated figure styling and management"
+purpose: "demonstration"
+integration_features:
+  - "FigureDataSet for automated figure styling"
+  - "FigRegistryHooks for lifecycle integration"
+  - "Zero-touch figure management eliminating manual plt.savefig() calls"
+  - "Condition-based styling through pipeline parameters"
