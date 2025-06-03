@@ -1,0 +1,61 @@
+qc_id,qc_type,instrument,metric_name,value,threshold,threshold_type,pass_fail,experiment_condition,measurement_date,analyst,notes,severity_level,department
+QC_001,calibration,HPLC_A,retention_time_drift,0.05,0.1,upper,pass,treatment_group_a,2024-01-15,analyst_smith,Standard calibration check,low,analytical_chemistry
+QC_002,calibration,HPLC_A,peak_area_precision,2.1,5.0,upper,pass,treatment_group_a,2024-01-15,analyst_smith,Precision within limits,low,analytical_chemistry
+QC_003,calibration,HPLC_A,baseline_noise,0.8,2.0,upper,pass,treatment_group_a,2024-01-15,analyst_smith,Acceptable noise level,low,analytical_chemistry
+QC_004,validation,HPLC_A,accuracy_percent,98.5,95.0,lower,pass,treatment_group_a,2024-01-15,analyst_jones,Method validation check,medium,analytical_chemistry
+QC_005,validation,HPLC_A,recovery_percent,102.1,98.0,lower,pass,treatment_group_a,2024-01-15,analyst_jones,Recovery within spec,medium,analytical_chemistry
+QC_006,control_check,HPLC_A,system_suitability,1.05,1.2,upper,pass,treatment_group_a,2024-01-15,analyst_brown,Daily system check,high,analytical_chemistry
+QC_007,calibration,LC_MS_B,mass_accuracy_ppm,2.3,5.0,upper,pass,treatment_group_b,2024-01-16,analyst_smith,Mass accuracy check,medium,mass_spectrometry
+QC_008,calibration,LC_MS_B,signal_intensity,85000,80000,lower,pass,treatment_group_b,2024-01-16,analyst_smith,Signal intensity OK,low,mass_spectrometry
+QC_009,calibration,LC_MS_B,resolution_fwhm,0.4,0.5,upper,pass,treatment_group_b,2024-01-16,analyst_smith,Resolution acceptable,low,mass_spectrometry
+QC_010,validation,LC_MS_B,linearity_r2,0.998,0.995,lower,pass,treatment_group_b,2024-01-16,analyst_davis,Excellent linearity,low,mass_spectrometry
+QC_011,validation,LC_MS_B,detection_limit_ng,0.8,1.0,upper,pass,treatment_group_b,2024-01-16,analyst_davis,Detection limit met,medium,mass_spectrometry
+QC_012,control_check,LC_MS_B,internal_standard_cv,3.2,5.0,upper,pass,treatment_group_b,2024-01-16,analyst_wilson,IS variation acceptable,high,mass_spectrometry
+QC_013,calibration,UV_VIS_C,wavelength_accuracy,0.2,0.5,upper,pass,control_group,2024-01-17,analyst_taylor,Wavelength calibration,low,spectroscopy
+QC_014,calibration,UV_VIS_C,absorbance_linearity,0.9985,0.998,lower,pass,control_group,2024-01-17,analyst_taylor,Linear response OK,low,spectroscopy
+QC_015,calibration,UV_VIS_C,stray_light_percent,0.05,0.1,upper,pass,control_group,2024-01-17,analyst_taylor,Minimal stray light,low,spectroscopy
+QC_016,validation,UV_VIS_C,precision_rsd,1.8,3.0,upper,pass,control_group,2024-01-17,analyst_garcia,Good precision,medium,spectroscopy
+QC_017,validation,UV_VIS_C,accuracy_bias,1.2,2.0,upper,pass,control_group,2024-01-17,analyst_garcia,Low bias observed,medium,spectroscopy
+QC_018,control_check,UV_VIS_C,baseline_stability,0.001,0.002,upper,pass,control_group,2024-01-17,analyst_martinez,Stable baseline,high,spectroscopy
+QC_019,calibration,GC_MS_D,retention_index,1205.3,1200.0,absolute_tolerance,pass,combined_groups,2024-01-18,analyst_smith,RI within tolerance,medium,gas_chromatography
+QC_020,calibration,GC_MS_D,peak_symmetry,1.08,1.2,upper,pass,combined_groups,2024-01-18,analyst_smith,Symmetric peaks,low,gas_chromatography
+QC_021,calibration,GC_MS_D,column_efficiency,8500,8000,lower,pass,combined_groups,2024-01-18,analyst_smith,Good column performance,low,gas_chromatography
+QC_022,validation,GC_MS_D,method_precision,2.1,3.0,upper,pass,combined_groups,2024-01-18,analyst_rodriguez,Acceptable precision,medium,gas_chromatography
+QC_023,validation,GC_MS_D,matrix_effect,108.5,110.0,upper,pass,combined_groups,2024-01-18,analyst_rodriguez,Minimal matrix effect,medium,gas_chromatography
+QC_024,control_check,GC_MS_D,system_pressure,12.5,15.0,upper,pass,combined_groups,2024-01-18,analyst_lee,Normal system pressure,high,gas_chromatography
+QC_025,calibration,HPLC_A,retention_time_drift,0.12,0.1,upper,fail,treatment_group_a,2024-01-19,analyst_smith,Drift exceeds limit,high,analytical_chemistry
+QC_026,calibration,HPLC_A,peak_area_precision,5.8,5.0,upper,fail,treatment_group_a,2024-01-19,analyst_smith,Precision failure - investigate,high,analytical_chemistry
+QC_027,validation,LC_MS_B,mass_accuracy_ppm,5.9,5.0,upper,fail,treatment_group_b,2024-01-19,analyst_davis,Mass accuracy drift,high,mass_spectrometry
+QC_028,validation,LC_MS_B,detection_limit_ng,1.2,1.0,upper,fail,treatment_group_b,2024-01-19,analyst_davis,Detection limit degraded,high,mass_spectrometry
+QC_029,control_check,UV_VIS_C,baseline_stability,0.0025,0.002,upper,fail,control_group,2024-01-19,analyst_martinez,Baseline instability,critical,spectroscopy
+QC_030,validation,GC_MS_D,method_precision,3.5,3.0,upper,fail,combined_groups,2024-01-19,analyst_rodriguez,Precision out of spec,high,gas_chromatography
+QC_031,calibration,FTIR_E,wavenumber_accuracy,0.8,1.0,upper,pass,treatment_group_a,2024-01-20,analyst_chen,Wavenumber calibration,low,vibrational_spectroscopy
+QC_032,calibration,FTIR_E,signal_noise_ratio,450,400,lower,pass,treatment_group_a,2024-01-20,analyst_chen,Good S/N ratio,low,vibrational_spectroscopy
+QC_033,calibration,FTIR_E,resolution_cm1,0.5,1.0,upper,pass,treatment_group_a,2024-01-20,analyst_chen,Excellent resolution,low,vibrational_spectroscopy
+QC_034,validation,FTIR_E,reproducibility_rsd,1.5,2.5,upper,pass,treatment_group_a,2024-01-20,analyst_patel,Good reproducibility,medium,vibrational_spectroscopy
+QC_035,control_check,FTIR_E,detector_linearity,0.9992,0.999,lower,pass,treatment_group_a,2024-01-20,analyst_kim,Linear detector response,high,vibrational_spectroscopy
+QC_036,calibration,NMR_F,chemical_shift_ref,0.02,0.05,upper,pass,treatment_group_b,2024-01-21,analyst_johnson,Chemical shift ref OK,medium,nmr_spectroscopy
+QC_037,calibration,NMR_F,line_width_hz,0.8,1.0,upper,pass,treatment_group_b,2024-01-21,analyst_johnson,Sharp line width,low,nmr_spectroscopy
+QC_038,calibration,NMR_F,spinning_stability,0.02,0.05,upper,pass,treatment_group_b,2024-01-21,analyst_johnson,Stable spinning,low,nmr_spectroscopy
+QC_039,validation,NMR_F,quantitation_accuracy,99.2,98.0,lower,pass,treatment_group_b,2024-01-21,analyst_wang,Accurate quantitation,medium,nmr_spectroscopy
+QC_040,control_check,NMR_F,probe_tuning_ratio,1.2,1.5,upper,pass,treatment_group_b,2024-01-21,analyst_nguyen,Probe well tuned,high,nmr_spectroscopy
+QC_041,calibration,ICP_MS_G,sensitivity_cps_ppb,12500,10000,lower,pass,control_group,2024-01-22,analyst_thompson,High sensitivity,low,elemental_analysis
+QC_042,calibration,ICP_MS_G,background_cps,15,20,upper,pass,control_group,2024-01-22,analyst_thompson,Low background,low,elemental_analysis
+QC_043,calibration,ICP_MS_G,mass_resolution,0.7,0.8,upper,pass,control_group,2024-01-22,analyst_thompson,Good mass resolution,low,elemental_analysis
+QC_044,validation,ICP_MS_G,interference_percent,2.1,5.0,upper,pass,control_group,2024-01-22,analyst_clark,Minimal interference,medium,elemental_analysis
+QC_045,validation,ICP_MS_G,recovery_spike,98.8,95.0,lower,pass,control_group,2024-01-22,analyst_clark,Good spike recovery,medium,elemental_analysis
+QC_046,control_check,ICP_MS_G,plasma_stability,0.8,1.0,upper,pass,control_group,2024-01-22,analyst_miller,Stable plasma,high,elemental_analysis
+QC_047,calibration,XRD_H,peak_position_2theta,28.44,28.5,absolute_tolerance,pass,combined_groups,2024-01-23,analyst_anderson,Peak position accurate,medium,crystallography
+QC_048,calibration,XRD_H,peak_intensity_counts,8750,8000,lower,pass,combined_groups,2024-01-23,analyst_anderson,Good peak intensity,low,crystallography
+QC_049,calibration,XRD_H,peak_width_fwhm,0.12,0.15,upper,pass,combined_groups,2024-01-23,analyst_anderson,Sharp diffraction peaks,low,crystallography
+QC_050,validation,XRD_H,crystallinity_percent,87.3,85.0,lower,pass,combined_groups,2024-01-23,analyst_white,High crystallinity,medium,crystallography
+QC_051,validation,XRD_H,phase_purity,95.2,95.0,lower,pass,combined_groups,2024-01-23,analyst_white,Phase pure sample,medium,crystallography
+QC_052,control_check,XRD_H,instrument_alignment,0.02,0.03,upper,pass,combined_groups,2024-01-23,analyst_hall,Instrument aligned,high,crystallography
+QC_053,calibration,HPLC_A,injection_precision,1.8,3.0,upper,pass,treatment_group_a,2024-01-24,analyst_smith,Injection reproducible,low,analytical_chemistry
+QC_054,calibration,LC_MS_B,electrospray_voltage,3200,3500,upper,pass,treatment_group_b,2024-01-24,analyst_davis,ESI voltage stable,low,mass_spectrometry
+QC_055,validation,UV_VIS_C,detection_linearity,0.9994,0.999,lower,pass,control_group,2024-01-24,analyst_garcia,Linear detection,low,spectroscopy
+QC_056,control_check,GC_MS_D,carrier_gas_flow,1.2,1.5,upper,pass,combined_groups,2024-01-24,analyst_rodriguez,Gas flow stable,high,gas_chromatography
+QC_057,calibration,FTIR_E,atmospheric_correction,98.5,95.0,lower,pass,treatment_group_a,2024-01-25,analyst_chen,Atmosphere corrected,medium,vibrational_spectroscopy
+QC_058,validation,NMR_F,temperature_stability,0.1,0.2,upper,pass,treatment_group_b,2024-01-25,analyst_johnson,Temperature stable,medium,nmr_spectroscopy
+QC_059,control_check,ICP_MS_G,torch_position,1.0,1.2,upper,pass,control_group,2024-01-25,analyst_thompson,Torch optimized,high,elemental_analysis
+QC_060,validation,XRD_H,background_subtraction,95.8,95.0,lower,pass,combined_groups,2024-01-25,analyst_anderson,Background clean,medium,crystallography
