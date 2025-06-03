@@ -1,639 +1,943 @@
 # Configuration Guide
 
-This guide provides comprehensive information on configuring the figregistry-kedro plugin to integrate FigRegistry's visualization management capabilities with Kedro machine learning pipelines.
+This comprehensive guide covers configuration management for the figregistry-kedro plugin, including YAML configuration merging, environment-specific settings, and Kedro catalog integration. The plugin provides seamless integration between Kedro's ConfigLoader system and FigRegistry's condition-based styling through the FigRegistryConfigBridge component.
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [Configuration Architecture](#configuration-architecture)
-- [YAML Configuration Files](#yaml-configuration-files)
+- [Configuration Bridge Architecture](#configuration-bridge-architecture)
 - [Environment-Specific Configuration](#environment-specific-configuration)
 - [Kedro Catalog Integration](#kedro-catalog-integration)
+- [FigureDataSet Configuration](#figuredataset-configuration)
 - [Hook Registration](#hook-registration)
-- [Configuration Precedence](#configuration-precedence)
+- [Configuration Precedence Rules](#configuration-precedence-rules)
 - [Advanced Configuration](#advanced-configuration)
+- [Performance Considerations](#performance-considerations)
 - [Troubleshooting](#troubleshooting)
 
 ## Overview
 
-The figregistry-kedro plugin provides seamless integration between FigRegistry's configuration-driven visualization system and Kedro's catalog-based data pipeline architecture. The integration introduces three key configuration components:
+The figregistry-kedro plugin introduces a unified configuration system that bridges Kedro's environment-specific configuration management with FigRegistry's condition-based styling system. This integration enables:
 
-1. **FigRegistryConfigBridge**: Merges Kedro and FigRegistry configurations
-2. **FigureDataSet**: Custom Kedro dataset with FigRegistry parameters
-3. **FigRegistryHooks**: Lifecycle hooks for configuration initialization
+- **Seamless Configuration Merging**: Automatic merging of `figregistry.yaml` with Kedro project configurations
+- **Environment-Specific Overrides**: Support for development, staging, and production-specific styling parameters
+- **Type-Safe Validation**: Pydantic-based validation ensuring configuration correctness across both systems
+- **Performance Optimization**: Configuration caching with <10ms merging overhead
+- **Zero-Touch Integration**: Automatic initialization through Kedro's lifecycle hooks
 
-## Configuration Architecture
+## Configuration Bridge Architecture
 
-The plugin uses a layered configuration approach that respects both Kedro and FigRegistry conventions:
+The `FigRegistryConfigBridge` serves as the translation layer between Kedro's ConfigLoader and FigRegistry's YAML-based configuration management. This bridge enables unified configuration management while maintaining the design principles of both frameworks.
+
+### Core Components
 
 ```mermaid
 graph TD
     A[Kedro ConfigLoader] --> B[FigRegistryConfigBridge]
-    C[figregistry.yml] --> B
-    D[Environment Configs] --> A
-    B --> E[Merged Configuration]
-    E --> F[FigureDataSet]
-    E --> G[Style Resolution]
+    C[figregistry.yaml] --> B
+    B --> D[Configuration Merging]
+    D --> E[Pydantic Validation]
+    E --> F[FigRegistry Initialization]
+    F --> G[Style Resolution]
     
-    style B fill:#9c27b0,color:#fff
+    style B fill:#e3f2fd
+    style D fill:#c8e6c9
     style E fill:#c8e6c9
 ```
 
-### Configuration Flow
+### Configuration Sources
 
-1. **Initialization**: FigRegistryHooks trigger configuration merging during pipeline startup
-2. **Loading**: ConfigBridge combines Kedro environment configs with figregistry.yml
-3. **Validation**: Pydantic validates merged configuration against FigRegistry schema
-4. **Application**: FigureDataSet uses merged config for automatic styling and output
+The bridge merges configuration from multiple sources with defined precedence:
 
-## YAML Configuration Files
-
-### Base FigRegistry Configuration
-
-Create `conf/base/figregistry.yml` in your Kedro project to define core FigRegistry settings:
-
-```yaml
-# conf/base/figregistry.yml
-figregistry_version: ">=0.3.0"
-
-# Condition-based styling definitions
-condition_styles:
-  training:
-    color: "#2E86AB"
-    marker: "o"
-    linestyle: "-"
-    label: "Training Data"
-  
-  validation:
-    color: "#A23B72"
-    marker: "s"
-    linestyle: "--"
-    label: "Validation Data"
-  
-  test:
-    color: "#F18F01"
-    marker: "^"
-    linestyle: ":"
-    label: "Test Data"
-  
-  # Wildcard patterns for flexible matching
-  "model_*":
-    color: "#C73E1D"
-    marker: "D"
-    linestyle: "-."
-
-# Output path configurations
-paths:
-  base_dir: "data/08_reporting"
-  
-  # Path aliases for different purposes
-  aliases:
-    expl: "exploratory"
-    pres: "presentation" 
-    pub: "publication"
-
-# File naming configuration
-naming:
-  timestamp_format: "%Y%m%d_%H%M%S"
-  filename_template: "{name}_{ts}"
-
-# Default styling palettes
-palettes:
-  default:
-    colors: ["#2E86AB", "#A23B72", "#F18F01", "#C73E1D"]
-    markers: ["o", "s", "^", "D"]
-    linestyles: ["-", "--", ":", "-."]
-
-# Metadata for output files
-metadata:
-  author: "Data Science Team"
-  project: "Kedro ML Pipeline"
-  include_timestamp: true
-```
-
-### Kedro-Specific Configuration Extensions
-
-Add Kedro-specific configurations to support pipeline integration:
-
-```yaml
-# conf/base/figregistry.yml (continued)
-
-# Kedro integration settings
-kedro:
-  # Dataset configuration defaults
-  dataset_defaults:
-    purpose: "expl"  # Default purpose for FigureDataSet
-    dpi: 300
-    format: "png"
-  
-  # Hook configuration
-  hooks:
-    auto_init: true
-    log_operations: true
-    context_injection: true
-  
-  # Catalog integration
-  catalog:
-    versioning_enabled: true
-    layer_mapping:
-      reporting: "pub"
-      intermediate: "expl"
-      primary: "pres"
-```
+1. **Standalone figregistry.yaml**: Traditional FigRegistry configuration file
+2. **Kedro Base Configuration**: `conf/base/figregistry.yml`
+3. **Environment-Specific Overrides**: `conf/local/figregistry.yml`, `conf/production/figregistry.yml`
+4. **Runtime Parameters**: Pipeline-specific overrides through catalog configuration
 
 ## Environment-Specific Configuration
 
-The plugin supports Kedro's environment-specific configuration patterns, allowing different settings for development, staging, and production environments.
+### Directory Structure
 
-### Local Development Environment
-
-```yaml
-# conf/local/figregistry.yml
-paths:
-  base_dir: "data/08_reporting/dev"
-
-naming:
-  filename_template: "dev_{name}_{ts}"
-
-kedro:
-  hooks:
-    log_operations: true  # Enable verbose logging in development
-  
-  dataset_defaults:
-    dpi: 150  # Lower DPI for faster development cycles
+```
+kedro-project/
+├── conf/
+│   ├── base/
+│   │   ├── catalog.yml
+│   │   ├── parameters.yml
+│   │   └── figregistry.yml          # Base FigRegistry config
+│   ├── local/
+│   │   ├── credentials.yml
+│   │   └── figregistry.yml          # Development overrides
+│   ├── staging/
+│   │   └── figregistry.yml          # Staging environment config
+│   └── production/
+│       └── figregistry.yml          # Production environment config
+├── figregistry.yaml                 # Optional standalone config
+└── src/
 ```
 
-### Production Environment
+### Base Configuration (conf/base/figregistry.yml)
 
 ```yaml
-# conf/production/figregistry.yml
-paths:
-  base_dir: "/opt/ml/output/figures"
-
-naming:
-  filename_template: "prod_{name}_{ts}"
-
-kedro:
-  hooks:
-    log_operations: false  # Reduce logging in production
+# Base FigRegistry configuration for all environments
+styles:
+  exploratory:
+    figure.figsize: [10, 6]
+    figure.dpi: 100
+    axes.grid: true
+    axes.spines.top: false
+    axes.spines.right: false
   
-  dataset_defaults:
-    dpi: 300
-    format: "pdf"  # High-quality outputs for production
+  presentation:
+    figure.figsize: [12, 8]
+    figure.dpi: 150
+    font.size: 14
+    axes.labelsize: 16
+    axes.titlesize: 18
+  
+  publication:
+    figure.figsize: [8, 6]
+    figure.dpi: 300
+    font.family: serif
+    font.size: 12
+    axes.linewidth: 1.5
+
+palettes:
+  default:
+    colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
+  
+  colorblind_safe:
+    colors: ['#1b9e77', '#d95f02', '#7570b3', '#e7298a']
+
+outputs:
+  base_path: data/08_reporting
+  create_subdirs: true
+  timestamp_format: "%Y%m%d_%H%M%S"
+  
+defaults:
+  purpose: exploratory
+  format: png
+  bbox_inches: tight
+  
+# Kedro-specific configuration
+kedro:
+  catalog_integration:
+    auto_register_datasets: true
+    versioning_enabled: true
+  
+  hook_settings:
+    auto_initialize: true
+    enable_performance_monitoring: false
+    fallback_on_error: true
 ```
 
-### Staging Environment
+### Environment-Specific Overrides
+
+#### Development Environment (conf/local/figregistry.yml)
 
 ```yaml
-# conf/staging/figregistry.yml
-paths:
-  base_dir: "s3://ml-artifacts/staging/figures"
-
-condition_styles:
-  # Override specific styles for staging validation
-  validation:
-    color: "#FF6B6B"  # Different color for staging visibility
-
+# Development environment overrides
+styles:
+  exploratory:
+    figure.dpi: 72  # Lower DPI for faster rendering
+    
+outputs:
+  base_path: data/08_reporting/dev
+  
+defaults:
+  format: png  # PNG for quick iteration
+  
 kedro:
-  dataset_defaults:
-    purpose: "pres"  # Default to presentation quality in staging
+  hook_settings:
+    enable_performance_monitoring: true  # Enable monitoring in development
+```
+
+#### Production Environment (conf/production/figregistry.yml)
+
+```yaml
+# Production environment overrides
+styles:
+  presentation:
+    figure.dpi: 300  # High DPI for production
+  
+  publication:
+    figure.dpi: 600  # Ultra-high DPI for publications
+    
+outputs:
+  base_path: /opt/data/reports
+  create_subdirs: true
+  
+defaults:
+  format: pdf  # PDF for production outputs
+  transparent: false
+  
+kedro:
+  catalog_integration:
+    versioning_enabled: true
+  
+  hook_settings:
+    enable_performance_monitoring: false
+    fallback_on_error: false  # Strict error handling in production
+```
+
+#### Staging Environment (conf/staging/figregistry.yml)
+
+```yaml
+# Staging environment for testing production-like settings
+styles:
+  presentation:
+    figure.dpi: 200
+    
+outputs:
+  base_path: /tmp/staging_reports
+  
+defaults:
+  format: pdf
+  
+kedro:
+  hook_settings:
+    enable_performance_monitoring: true
+    fallback_on_error: false
 ```
 
 ## Kedro Catalog Integration
 
-### FigureDataSet Configuration
+### FigureDataSet in Data Catalog
 
-Configure FigureDataSet entries in your Kedro catalog with FigRegistry-specific parameters:
+The plugin integrates with Kedro's data catalog through the `FigureDataSet` custom dataset type, which applies FigRegistry styling automatically during figure save operations.
+
+#### Basic Catalog Configuration (catalog.yml)
 
 ```yaml
-# conf/base/catalog.yml
-
-# Basic figure output with automatic styling
-training_accuracy_plot:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/training_accuracy.png
-  purpose: expl
-  condition_param: "data_split"  # Resolve condition from pipeline parameters
-  
-# Advanced configuration with style overrides
-model_performance_comparison:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/model_comparison.pdf
-  purpose: pub
-  condition_param: "model_type"
-  style_params:
-    dpi: 300
-    bbox_inches: "tight"
-    facecolor: "white"
-  versioned: true
-
-# Multiple outputs with different purposes
+# Exploratory analysis figures
 exploratory_plots:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/exploration/{condition}.png
-  purpose: expl
-  condition_param: "experiment_name"
-  
-presentation_figures:
-  type: figregistry_kedro.datasets.FigureDataSet  
-  filepath: data/08_reporting/presentation/{condition}.svg
-  purpose: pres
-  condition_param: "experiment_name"
-  style_params:
-    format: "svg"
-    transparent: true
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/exploratory/{default_run_id}_analysis.png
+  purpose: exploratory
+
+# Presentation-ready figures
+presentation_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/presentation/{default_run_id}_results.pdf
+  purpose: presentation
+  save_args:
+    bbox_inches: tight
+    transparent: false
+
+# Publication-quality figures  
+publication_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/publication/{default_run_id}_figure_{version}.pdf
+  purpose: publication
+  save_args:
+    dpi: 600
+    format: pdf
+    bbox_inches: tight
 ```
 
-### FigureDataSet Parameters
+#### Advanced Catalog Configuration with Dynamic Conditions
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `type` | string | Yes | Must be `figregistry_kedro.datasets.FigureDataSet` |
-| `filepath` | string | Yes | Output file path (supports templating) |
-| `purpose` | string | No | Output purpose: `expl`, `pres`, or `pub` (default: `expl`) |
-| `condition_param` | string | No | Pipeline parameter name for condition resolution |
-| `style_params` | dict | No | Override styling parameters for this dataset |
-| `versioned` | bool | No | Enable Kedro versioning (default: `false`) |
+```yaml
+# Dynamic condition resolution from pipeline parameters
+experiment_results:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/experiments/{default_run_id}_{params:experiment_name}.png
+  purpose: presentation
+  condition_param: experiment_condition  # Resolved from pipeline parameters
+  style_params:
+    # Dataset-specific style overrides
+    figure.facecolor: white
+    axes.facecolor: '#f8f9fa'
+  save_args:
+    dpi: 300
+    bbox_inches: tight
 
-### Condition Parameter Resolution
+# Multi-condition styling based on model type and dataset
+model_comparison:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/models/{params:model_type}_{params:dataset_name}.pdf
+  purpose: publication
+  condition_param: model_dataset_combination
+  style_params:
+    figure.figsize: [12, 8]
+    font.family: serif
+  save_args:
+    format: pdf
+    dpi: 600
+    transparent: false
 
-The `condition_param` enables dynamic styling based on pipeline execution context:
+# Versioned datasets with automatic styling
+training_curves:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/training/{default_run_id}_curves.png
+  purpose: exploratory
+  versioned: true  # Enable Kedro's built-in versioning
+  condition_param: training_regime
+```
+
+#### Environment-Specific Catalog Overrides
+
+```yaml
+# In conf/local/catalog.yml - development overrides
+exploratory_plots:
+  filepath: data/08_reporting/dev/exploratory_{default_run_id}.png
+  save_args:
+    dpi: 100  # Lower DPI for development
+
+# In conf/production/catalog.yml - production overrides  
+publication_plots:
+  filepath: /opt/data/reports/production/figures_{default_run_id}.pdf
+  save_args:
+    dpi: 600
+    format: pdf
+```
+
+## FigureDataSet Configuration
+
+### Configuration Parameters
+
+The `FigureDataSet` provides comprehensive configuration options for automated figure styling and persistence:
+
+#### Core Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `filepath` | `str` | **Required** | Output file path for the figure. Supports Kedro templating (`{default_run_id}`, `{params:name}`) |
+| `purpose` | `str` | `"exploratory"` | Output categorization for style selection: `exploratory`, `presentation`, or `publication` |
+| `condition_param` | `str` | `None` | Parameter name for dynamic condition resolution from pipeline context |
+| `style_params` | `Dict[str, Any]` | `{}` | Dataset-specific styling overrides that take precedence over condition-based styles |
+| `save_args` | `Dict[str, Any]` | `{}` | Additional arguments passed to matplotlib's `savefig` method |
+| `load_args` | `Dict[str, Any]` | `{}` | Additional arguments for figure loading (currently unused) |
+| `version` | `str` | `None` | Dataset version for Kedro's versioning system |
+
+#### Style Parameters
+
+Style parameters support all matplotlib rcParams with additional FigRegistry-specific options:
+
+```yaml
+style_params:
+  # Figure properties
+  figure.figsize: [12, 8]
+  figure.dpi: 300
+  figure.facecolor: white
+  figure.edgecolor: none
+  
+  # Axes properties
+  axes.grid: true
+  axes.spines.top: false
+  axes.spines.right: false
+  axes.linewidth: 1.5
+  axes.labelsize: 14
+  axes.titlesize: 16
+  
+  # Font properties
+  font.family: sans-serif
+  font.size: 12
+  font.weight: normal
+  
+  # Line and marker properties
+  lines.linewidth: 2.0
+  lines.markersize: 8
+  
+  # Color and palette
+  axes.prop_cycle: "cycler('color', ['#1f77b4', '#ff7f0e', '#2ca02c'])"
+```
+
+#### Save Arguments
+
+Common matplotlib `savefig` arguments supported through `save_args`:
+
+```yaml
+save_args:
+  dpi: 300                    # Resolution in dots per inch
+  format: pdf                 # Output format (png, pdf, svg, eps, ps)
+  bbox_inches: tight         # Bounding box optimization
+  transparent: false         # Transparent background
+  facecolor: auto           # Figure face color
+  edgecolor: none           # Figure edge color
+  orientation: portrait     # Page orientation for PDF
+  papertype: letter         # Paper size for PDF
+  pad_inches: 0.1           # Padding around figure
+  metadata:                 # PDF/PS metadata
+    Title: "Analysis Results"
+    Author: "Data Science Team"
+    Subject: "Experimental Analysis"
+    Keywords: "machine learning, visualization"
+    Creator: "figregistry-kedro"
+```
+
+### Dynamic Condition Resolution
+
+The `condition_param` enables dynamic style selection based on pipeline parameters:
+
+#### Pipeline Parameters (parameters.yml)
+
+```yaml
+# Experiment configuration
+experiment_condition: "high_learning_rate"
+model_type: "random_forest"
+dataset_name: "customer_data"
+training_regime: "extended"
+
+# Combined conditions for complex styling
+model_dataset_combination: "random_forest_customer_data"
+```
+
+#### Corresponding Style Configuration (figregistry.yml)
+
+```yaml
+styles:
+  # Simple condition-based styling
+  high_learning_rate:
+    lines.color: '#d62728'  # Red for high learning rate
+    lines.linewidth: 3.0
+    
+  low_learning_rate:
+    lines.color: '#2ca02c'  # Green for low learning rate
+    lines.linewidth: 2.0
+  
+  # Complex combined conditions  
+  random_forest_customer_data:
+    figure.figsize: [14, 10]
+    axes.grid: true
+    lines.marker: 'o'
+    lines.markersize: 6
+    
+  # Training regime specific styles
+  extended:
+    figure.figsize: [16, 12]
+    axes.labelsize: 16
+    font.size: 14
+```
+
+#### Pipeline Node Example
 
 ```python
-# In your pipeline node
-def create_model_plot(model_results, parameters):
-    """Generate model performance plot."""
+def create_training_plot(training_data: pd.DataFrame) -> Figure:
+    """Create training curve visualization.
+    
+    The condition will be automatically resolved from parameters
+    and appropriate styling applied during catalog save.
+    """
     fig, ax = plt.subplots()
     
-    # Plot your results
-    ax.plot(model_results['epochs'], model_results['accuracy'])
-    ax.set_title('Model Performance')
+    # Create the plot content
+    ax.plot(training_data['epoch'], training_data['loss'], label='Training Loss')
+    ax.plot(training_data['epoch'], training_data['val_loss'], label='Validation Loss')
     
-    # No manual styling needed - FigureDataSet handles it automatically
-    # Styling resolved from parameters[condition_param] value
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Loss')
+    ax.legend()
+    ax.set_title('Training Progress')
+    
+    # No manual styling or saving - handled automatically by FigureDataSet
     return fig
-
-# Pipeline definition
-def create_pipeline(**kwargs):
-    return Pipeline([
-        node(
-            func=create_model_plot,
-            inputs=["model_results", "parameters"],
-            outputs="training_accuracy_plot",  # References catalog entry
-            name="plot_training_accuracy"
-        )
-    ])
 ```
 
 ## Hook Registration
 
 ### Basic Hook Registration
 
-Register FigRegistryHooks in your Kedro project settings:
+Add FigRegistry hooks to your Kedro project's `settings.py`:
 
 ```python
-# src/your_project/settings.py
+# src/project_name/settings.py
+
 from figregistry_kedro.hooks import FigRegistryHooks
 
-# Basic registration
+# Basic hook registration
 HOOKS = (FigRegistryHooks(),)
+
+# Or with existing hooks
+HOOKS = (
+    FigRegistryHooks(),
+    # ... other hooks
+)
 ```
 
 ### Advanced Hook Configuration
 
-Configure hooks with custom parameters:
-
 ```python
-# src/your_project/settings.py
+# src/project_name/settings.py
+
 from figregistry_kedro.hooks import FigRegistryHooks
 
-# Advanced configuration
+# Configure hook behavior
 HOOKS = (
     FigRegistryHooks(
-        auto_init=True,           # Automatically initialize FigRegistry
-        log_operations=True,      # Log configuration operations
-        context_injection=True,   # Inject config into pipeline context
-        config_path="conf/figregistry.yml"  # Custom config path
+        auto_initialize=True,                    # Automatically initialize FigRegistry
+        enable_performance_monitoring=True,     # Enable detailed timing logs
+        fallback_on_error=True,                 # Continue if initialization fails
+        max_initialization_time=0.005           # 5ms maximum initialization time
     ),
 )
 ```
 
-### Hook Integration with Existing Hooks
+### Hook Configuration Options
 
-Combine with other Kedro hooks:
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `auto_initialize` | `bool` | `True` | Automatically initialize FigRegistry configuration during pipeline startup |
+| `enable_performance_monitoring` | `bool` | `False` | Enable detailed performance timing logs for optimization |
+| `fallback_on_error` | `bool` | `True` | Continue pipeline execution if FigRegistry initialization fails |
+| `max_initialization_time` | `float` | `0.005` | Maximum allowed initialization time in seconds (5ms default) |
+
+### Hook Lifecycle Events
+
+The hooks integrate with Kedro's lifecycle through specific events:
 
 ```python
-# src/your_project/settings.py
-from kedro.framework.hooks import hook_impl
-from figregistry_kedro.hooks import FigRegistryHooks
-from your_project.hooks import ProjectHooks
+# Automatic lifecycle integration - no manual configuration required
 
-class CombinedHooks:
-    """Custom hooks that work alongside FigRegistry."""
-    
+class FigRegistryHooks:
     @hook_impl
-    def before_pipeline_run(self, run_params, pipeline, catalog):
-        """Custom pre-pipeline logic."""
-        # Your custom logic here
-        pass
-
-HOOKS = (
-    FigRegistryHooks(),
-    ProjectHooks(),
-    CombinedHooks(),
-)
+    def after_config_loaded(self, context: KedroContext, config_loader: ConfigLoader):
+        """Initialize configuration bridge after Kedro config is loaded."""
+        # Creates FigRegistryConfigBridge
+        # Merges figregistry.yaml with Kedro configurations
+        # Validates merged configuration
+        
+    @hook_impl  
+    def before_pipeline_run(self, run_params: Dict[str, Any], pipeline: Pipeline, catalog: DataCatalog):
+        """Initialize FigRegistry before pipeline execution."""
+        # Initializes FigRegistry with merged configuration
+        # Sets up pipeline context for dynamic condition resolution
+        # Registers active pipeline for state tracking
+        
+    @hook_impl
+    def after_pipeline_run(self, run_params: Dict[str, Any], pipeline: Pipeline, catalog: DataCatalog):
+        """Clean up after pipeline execution."""
+        # Unregisters pipeline from active tracking
+        # Performs optional cleanup operations
 ```
 
-## Configuration Precedence
+## Configuration Precedence Rules
 
-The plugin follows a clear precedence hierarchy for configuration merging:
+The configuration bridge implements a clear hierarchy for resolving configuration conflicts:
 
 ### Precedence Order (Highest to Lowest)
 
-1. **Environment-specific overrides** (`conf/{env}/figregistry.yml`)
-2. **Dataset-specific style_params** (in catalog configuration)
-3. **Base Kedro configuration** (`conf/base/figregistry.yml`)
-4. **FigRegistry defaults** (built-in defaults)
+1. **Runtime Style Parameters**: `style_params` in FigureDataSet configuration
+2. **Environment-Specific Kedro Config**: `conf/{environment}/figregistry.yml`
+3. **Base Kedro Configuration**: `conf/base/figregistry.yml`
+4. **Standalone FigRegistry Config**: `figregistry.yaml`
+5. **FigRegistry Defaults**: Built-in default values
 
 ### Merging Behavior
 
+#### Deep Merging for Nested Objects
+
 ```yaml
-# Example: How configurations merge
-
 # Base configuration (conf/base/figregistry.yml)
-condition_styles:
-  training:
-    color: "#2E86AB"
-    marker: "o"
-
-paths:
-  base_dir: "data/08_reporting"
+styles:
+  exploratory:
+    figure.figsize: [10, 6]
+    figure.dpi: 100
+    axes.grid: true
 
 # Environment override (conf/production/figregistry.yml)  
-condition_styles:
-  training:
-    marker: "s"  # Overrides base marker, keeps base color
+styles:
+  exploratory:
+    figure.dpi: 300  # Override DPI only
+    font.size: 12    # Add new property
 
-paths:
-  base_dir: "/opt/ml/output"  # Completely overrides base path
+# Merged result:
+styles:
+  exploratory:
+    figure.figsize: [10, 6]  # Preserved from base
+    figure.dpi: 300          # Overridden by environment
+    axes.grid: true          # Preserved from base  
+    font.size: 12           # Added by environment
+```
 
-# Result: Merged configuration
-condition_styles:
-  training:
-    color: "#2E86AB"    # From base
-    marker: "s"         # From production override
+#### List Replacement (No Merging)
 
-paths:
-  base_dir: "/opt/ml/output"  # From production override
+```yaml
+# Base configuration
+palettes:
+  default:
+    colors: ['#1f77b4', '#ff7f0e', '#2ca02c']
+
+# Environment override
+palettes:
+  default:
+    colors: ['#d62728', '#9467bd']  # Completely replaces base colors
+
+# Merged result (lists are replaced, not merged):
+palettes:
+  default:
+    colors: ['#d62728', '#9467bd']  # Environment list wins
+```
+
+#### Runtime Parameter Override Example
+
+```yaml
+# Catalog configuration with style_params
+experiment_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/results.png
+  purpose: presentation
+  style_params:
+    figure.dpi: 600      # Highest precedence - overrides all other sources
+    font.family: serif
 ```
 
 ## Advanced Configuration
 
-### Custom Configuration Bridge
+### Multi-Environment Project Setup
 
-For advanced scenarios, you can extend the configuration bridge:
-
-```python
-# Custom configuration bridge
-from figregistry_kedro.config import FigRegistryConfigBridge
-from kedro.config import ConfigLoader
-
-class CustomConfigBridge(FigRegistryConfigBridge):
-    """Extended configuration bridge with custom logic."""
-    
-    def merge_configs(self, kedro_config, figregistry_config):
-        """Custom merging logic."""
-        # Add your custom merging logic here
-        merged = super().merge_configs(kedro_config, figregistry_config)
-        
-        # Apply custom transformations
-        merged = self._apply_custom_transforms(merged)
-        
-        return merged
-    
-    def _apply_custom_transforms(self, config):
-        """Apply project-specific configuration transforms."""
-        # Example: Dynamic path generation based on environment
-        if self.environment == "production":
-            config["paths"]["base_dir"] = f"/opt/ml/{config['metadata']['project']}"
-        
-        return config
-```
-
-### Dynamic Condition Resolution
-
-Implement dynamic condition resolution for complex scenarios:
-
-```python
-# Advanced condition parameter resolution
-def advanced_plotting_node(data, parameters, context):
-    """Node with dynamic condition resolution."""
-    fig, ax = plt.subplots()
-    
-    # Generate plot
-    ax.plot(data['x'], data['y'])
-    
-    # Dynamic condition based on data characteristics
-    condition = determine_condition(data, parameters)
-    
-    # Store condition in context for FigureDataSet
-    context.params["dynamic_condition"] = condition
-    
-    return fig
-
-def determine_condition(data, parameters):
-    """Determine styling condition based on data and parameters."""
-    if parameters.get("model_type") == "neural_network":
-        if len(data) > 10000:
-            return "large_neural_network"
-        else:
-            return "small_neural_network"
-    else:
-        return parameters.get("model_type", "default")
-```
-
-### Conditional Dataset Configuration
-
-Use Kedro's conditional configuration for complex scenarios:
+For complex projects with multiple deployment environments:
 
 ```yaml
-# conf/base/catalog.yml with conditional configuration
-{% if cookiecutter.include_advanced_plots %}
-advanced_analysis_plot:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/advanced_analysis.png
-  purpose: pub
-  condition_param: "analysis_type"
-  style_params:
-    dpi: 600
-    format: "pdf"
-{% endif %}
+# conf/base/figregistry.yml - Common baseline
+styles:
+  base_style: &base_style
+    figure.figsize: [10, 6]
+    axes.grid: true
+    axes.spines.top: false
+    axes.spines.right: false
 
-# Environment-specific dataset variations
-{% if globals.env == "production" %}
-production_dashboard:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: /opt/ml/dashboard/live_metrics.svg
-  purpose: pres
-  condition_param: "dashboard_type"
-{% endif %}
+  exploratory:
+    <<: *base_style
+    figure.dpi: 100
+    
+  presentation:
+    <<: *base_style  
+    figure.dpi: 200
+    font.size: 14
+    
+  publication:
+    <<: *base_style
+    figure.dpi: 300
+    font.family: serif
+
+# conf/local/figregistry.yml - Development
+styles:
+  exploratory:
+    figure.dpi: 72      # Fast rendering for development
+  
+kedro:
+  hook_settings:
+    enable_performance_monitoring: true
+
+# conf/staging/figregistry.yml - Staging
+styles:
+  presentation:
+    figure.dpi: 250     # Production-like but slightly lower
+    
+outputs:
+  base_path: /tmp/staging_reports
+
+# conf/production/figregistry.yml - Production  
+styles:
+  presentation:
+    figure.dpi: 300
+  publication:
+    figure.dpi: 600
+    
+outputs:
+  base_path: /opt/production_reports
+  
+kedro:
+  hook_settings:
+    fallback_on_error: false  # Strict error handling
 ```
+
+### Conditional Configuration with YAML Anchors
+
+```yaml
+# Advanced YAML features for configuration management
+
+# Define reusable style components
+_style_components:
+  high_dpi: &high_dpi
+    figure.dpi: 300
+    
+  publication_fonts: &pub_fonts
+    font.family: serif
+    font.size: 12
+    axes.labelsize: 14
+    
+  clean_axes: &clean_axes
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.grid: true
+    axes.grid.alpha: 0.3
+
+# Compose styles from components
+styles:
+  exploratory:
+    figure.figsize: [10, 6]
+    figure.dpi: 100
+    <<: *clean_axes
+    
+  presentation:
+    figure.figsize: [12, 8]
+    <<: [*high_dpi, *clean_axes]
+    font.size: 14
+    
+  publication:
+    figure.figsize: [8, 6]
+    <<: [*high_dpi, *pub_fonts, *clean_axes]
+    figure.dpi: 600  # Override the high_dpi setting
+```
+
+### Performance Optimization Configuration
+
+```yaml
+# Optimize for high-volume figure generation
+kedro:
+  catalog_integration:
+    auto_register_datasets: true
+    versioning_enabled: false      # Disable for performance
+    
+  hook_settings:
+    auto_initialize: true
+    enable_performance_monitoring: false  # Disable overhead
+    max_initialization_time: 0.003        # Stricter timing
+    
+# Cache-friendly configuration
+defaults:
+  enable_concurrent_access: true
+  validation_enabled: true
+  
+# Optimize style resolution
+styles:
+  # Use simple, cache-friendly condition names
+  fast_preview:
+    figure.dpi: 72
+    figure.figsize: [8, 6]
+    
+  standard_output:
+    figure.dpi: 150
+    figure.figsize: [10, 6]
+```
+
+## Performance Considerations
+
+### Configuration Caching
+
+The configuration bridge implements aggressive caching to meet performance requirements:
+
+- **Configuration Merging**: <10ms overhead per pipeline run
+- **Style Resolution**: <1ms per figure for cached styles
+- **Memory Usage**: <2MB for complex enterprise configurations
+- **Thread Safety**: Lock-free read operations for parallel execution
+
+### Cache Configuration
+
+```yaml
+# Configure caching behavior in figregistry.yml
+kedro:
+  performance:
+    enable_configuration_cache: true
+    cache_size: 1000                    # Maximum cached configurations
+    style_cache_size: 1000             # Maximum cached styles
+    enable_concurrent_access: true      # Thread-safe operations
+```
+
+### Performance Monitoring
+
+Enable detailed performance monitoring in development:
+
+```python
+# settings.py for development environment
+HOOKS = (
+    FigRegistryHooks(
+        enable_performance_monitoring=True,
+        max_initialization_time=0.005
+    ),
+)
+```
+
+Monitor performance through logs:
+
+```log
+DEBUG:figregistry_kedro.config:Configuration merging completed in 2.34ms
+DEBUG:figregistry_kedro.datasets:Style resolution completed in 0.89ms
+DEBUG:figregistry_kedro.hooks:Hook operation 'before_pipeline_run' completed in 4.12ms
+```
+
+### Optimization Best Practices
+
+1. **Use Simple Condition Names**: Short, alphanumeric condition names improve cache performance
+2. **Minimize Style Overrides**: Reduce `style_params` usage for better caching
+3. **Environment-Specific Tuning**: Lower DPI in development, higher in production
+4. **Batch Operations**: Group similar figures to benefit from style caching
+5. **Disable Monitoring**: Turn off performance monitoring in production
 
 ## Troubleshooting
 
 ### Common Configuration Issues
 
-#### Configuration Not Loading
+#### Configuration Not Found
 
-**Problem**: FigRegistry configuration not being applied to figures.
-
-**Solution**: Verify hook registration and configuration paths:
-
-```bash
-# Check if hooks are registered
-grep -r "FigRegistryHooks" src/*/settings.py
-
-# Verify configuration file exists
-ls -la conf/base/figregistry.yml
-
-# Check configuration validation
-kedro run --pipeline=your_pipeline --params="log_level:DEBUG"
+```log
+WARNING:figregistry_kedro.config:Failed to load FigRegistry config from Kedro: 'figregistry'
 ```
 
-#### Style Resolution Failures
+**Solution**: Ensure configuration files are properly named and located:
+- `conf/base/figregistry.yml` (recommended)
+- `figregistry.yaml` (fallback)
 
-**Problem**: Conditions not resolving to expected styles.
+#### Validation Errors
 
-**Solution**: Debug condition parameter resolution:
+```log
+ERROR:figregistry_kedro.config:Configuration validation failed with 2 errors: 
+[{'field': 'styles.exploratory.figure.figsize', 'message': 'value is not a valid list', 'type': 'type_error.list'}]
+```
+
+**Solution**: Check YAML syntax and value types:
+```yaml
+# Incorrect
+styles:
+  exploratory:
+    figure.figsize: "10, 6"  # String instead of list
+
+# Correct  
+styles:
+  exploratory:
+    figure.figsize: [10, 6]  # Proper list syntax
+```
+
+#### Missing Dependencies
+
+```log
+ImportWarning: FigRegistry not found. Please ensure figregistry>=0.3.0 is installed.
+```
+
+**Solution**: Install required dependencies:
+```bash
+pip install figregistry>=0.3.0 kedro>=0.18.0,<0.20.0
+```
+
+#### Hook Registration Issues
+
+```log
+ERROR:kedro.framework.session:Hook 'FigRegistryHooks' could not be loaded.
+```
+
+**Solution**: Verify hook registration in `settings.py`:
+```python
+# Correct import and registration
+from figregistry_kedro.hooks import FigRegistryHooks
+
+HOOKS = (FigRegistryHooks(),)
+```
+
+### Performance Issues
+
+#### Slow Configuration Loading
+
+```log
+WARNING:figregistry_kedro.config:Configuration merging took 15.23ms, exceeding 10ms target
+```
+
+**Solutions**:
+1. Reduce configuration complexity
+2. Enable caching: `enable_caching=True`
+3. Optimize YAML structure to minimize deep nesting
+
+#### Cache Miss Issues
+
+```log
+DEBUG:figregistry_kedro.datasets:Style resolution cache miss for condition 'dynamic_condition_xyz'
+```
+
+**Solutions**:
+1. Use consistent, simple condition names
+2. Avoid dynamic condition generation if possible
+3. Increase cache size in configuration
+
+### Environment-Specific Issues
+
+#### Environment Detection Problems
+
+**Check current environment**:
+```python
+from kedro.framework.context import load_context
+
+context = load_context(".")
+print(f"Current environment: {context.environment}")
+```
+
+**Force specific environment**:
+```bash
+kedro run --env production
+```
+
+#### Configuration Override Not Applied
+
+**Debug configuration merging**:
+```python
+from figregistry_kedro.config import FigRegistryConfigBridge
+
+bridge = FigRegistryConfigBridge(environment="production")
+config = bridge.get_merged_config()
+print(config.dict())
+```
+
+### Integration Issues
+
+#### Kedro Catalog Integration
+
+**Verify dataset registration**:
+```python
+from kedro.framework.context import load_context
+
+context = load_context(".")
+catalog = context.catalog
+
+# Check if FigureDataSet is properly registered
+if 'your_figure_dataset' in catalog.list():
+    dataset = catalog._get_dataset('your_figure_dataset')
+    print(f"Dataset type: {type(dataset)}")
+```
+
+#### Style Application Problems
+
+**Manual style testing**:
+```python
+import figregistry
+from figregistry_kedro.config import init_config
+
+# Initialize configuration
+config = init_config()
+
+# Test style resolution
+style = figregistry.get_style("your_condition")
+print(f"Resolved style: {style}")
+```
+
+### Debug Mode
+
+Enable comprehensive debugging:
 
 ```python
-# Add debug logging to your nodes
+# settings.py
 import logging
-logger = logging.getLogger(__name__)
 
-def debug_plotting_node(data, parameters):
-    condition_value = parameters.get("condition_param_name")
-    logger.info(f"Resolving condition: {condition_value}")
-    
-    # Create your plot
-    fig, ax = plt.subplots()
-    # ... plot creation ...
-    
-    return fig
-```
+# Enable debug logging for figregistry-kedro
+logging.getLogger('figregistry_kedro').setLevel(logging.DEBUG)
 
-#### Environment Configuration Conflicts
-
-**Problem**: Environment-specific settings not being applied correctly.
-
-**Solution**: Check configuration precedence:
-
-```bash
-# View merged configuration
-kedro registry describe
-
-# Test specific environment
-kedro run --env=production --params="debug_config:true"
-```
-
-### Validation Errors
-
-#### Schema Validation Failures
-
-```yaml
-# Common validation issues and fixes
-
-# ❌ Invalid: Missing required version
-condition_styles:
-  training:
-    color: "blue"
-
-# ✅ Valid: Include required version
-figregistry_version: ">=0.3.0"
-condition_styles:
-  training:
-    color: "blue"
-
-# ❌ Invalid: Invalid color format  
-condition_styles:
-  training:
-    color: "not-a-color"
-
-# ✅ Valid: Use hex or named colors
-condition_styles:
-  training:
-    color: "#2E86AB"  # or "blue"
-```
-
-#### Dataset Configuration Errors
-
-```yaml
-# ❌ Invalid: Missing required type
-training_plot:
-  filepath: data/plots/training.png
-  
-# ✅ Valid: Include required type
-training_plot:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/plots/training.png
-
-# ❌ Invalid: Invalid purpose value
-model_plot:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/plots/model.png
-  purpose: "invalid_purpose"
-  
-# ✅ Valid: Use valid purpose values
-model_plot:
-  type: figregistry_kedro.datasets.FigureDataSet  
-  filepath: data/plots/model.png
-  purpose: "pub"  # expl, pres, or pub
-```
-
-### Performance Optimization
-
-#### Configuration Caching
-
-The plugin automatically caches merged configurations for performance. To optimize:
-
-```python
-# In your settings.py - configure caching behavior
 HOOKS = (
     FigRegistryHooks(
-        cache_config=True,        # Enable configuration caching
-        cache_ttl=3600,          # Cache TTL in seconds
-        lazy_loading=True        # Load configuration only when needed
+        enable_performance_monitoring=True,
+        fallback_on_error=False  # Fail fast for debugging
     ),
 )
 ```
 
-#### Large Configuration Files
-
-For projects with large configuration files:
-
-```yaml
-# Split configurations into multiple files
-# conf/base/figregistry/
-#   ├── main.yml
-#   ├── styles.yml
-#   └── paths.yml
-
-# Main configuration
-figregistry_version: ">=0.3.0"
-
-# Include other files
-includes:
-  - "figregistry/styles.yml"
-  - "figregistry/paths.yml"
-```
-
 ### Getting Help
 
-If you encounter issues not covered in this guide:
+For additional support:
 
-1. **Check the logs**: Enable debug logging to see detailed configuration operations
-2. **Validate configuration**: Use Kedro's built-in configuration validation
-3. **Review examples**: Check the example projects in the `examples/` directory
-4. **Submit issues**: Report bugs or request features on GitHub
+1. **Check Logs**: Enable debug logging to identify specific issues
+2. **Validate Configuration**: Use the configuration bridge directly to test merging
+3. **Test Components**: Verify individual components (hooks, datasets, config bridge) separately
+4. **GitHub Issues**: Report bugs or request features at the project repository
+5. **Kedro Documentation**: Refer to official Kedro documentation for catalog and hook specifications
 
-For additional support, consult the [API Reference](api/index.md) and [Installation Guide](installation.md).
+---
+
+This guide covers the comprehensive configuration options for figregistry-kedro. For additional examples and advanced usage patterns, see the [examples directory](../examples/) in the project repository.
