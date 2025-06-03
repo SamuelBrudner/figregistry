@@ -1,0 +1,588 @@
+# Advanced Kedro Catalog Configuration for FigureDataSet Testing
+# =============================================================
+#
+# This catalog provides comprehensive test scenarios for sophisticated FigRegistry-Kedro
+# integration validation, covering F-005 advanced requirements including:
+#
+# - Complex parameter combinations for comprehensive FigureDataSet testing
+# - Multi-dimensional condition resolution patterns and style override capabilities
+# - Complex parameter extraction from Kedro pipeline context 
+# - Sophisticated dataset dependencies and parameter inheritance patterns
+# - Advanced save_args configurations with custom rcParams and matplotlib styling
+# - Complex filepath patterns with template variable substitution
+# - Nested parameter structures for complex condition extraction testing
+#
+# Test Coverage:
+# - F-005-RQ-001: Dataset interception and styling application
+# - F-005-RQ-002: Kedro versioning compatibility testing
+# - F-005-RQ-003: Parameter validation scenarios
+# - F-005-RQ-004: Context injection for conditional styling
+#
+# Performance Requirements Validation:
+# - <5% overhead compared to manual matplotlib operations
+# - <1ms style resolution per condition lookup
+# - Thread-safe operation for parallel pipeline execution
+
+# =============================================================================
+# SECTION 1: COMPLEX CONDITION RESOLUTION TESTING
+# =============================================================================
+
+# Multi-dimensional condition parameter testing with hierarchical resolution
+advanced_multi_condition_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/advanced/multi_condition_analysis.png
+  purpose: presentation
+  condition_param: experiment.analysis.visualization_type
+  style_params:
+    # Complex rcParams overrides for dataset-specific styling
+    figure.dpi: 300
+    figure.facecolor: '#fafafa'
+    figure.edgecolor: '#333333'
+    axes.titlesize: 16
+    axes.labelsize: 14
+    axes.titleweight: bold
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.grid: true
+    axes.grid.alpha: 0.3
+    legend.frameon: false
+    legend.loc: 'upper right'
+    font.family: 'DejaVu Sans'
+    mathtext.fontset: 'dejavuserif'
+  save_args:
+    bbox_inches: tight
+    pad_inches: 0.1
+    transparent: false
+    metadata:
+      Title: 'Advanced Multi-Condition Analysis'
+      Creator: 'FigRegistry-Kedro Advanced Testing'
+      Subject: 'Complex Condition Resolution Validation'
+
+# Nested parameter extraction with complex condition patterns
+hierarchical_condition_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/advanced/hierarchical_{experiment.config.run_id}_results.png
+  purpose: publication
+  condition_param: experiment.config.analysis.condition_stack.primary_condition
+  style_params:
+    # Publication-grade styling with complex overrides
+    font.size: 12
+    font.family: 'serif'
+    axes.titlesize: 14
+    axes.labelsize: 12
+    axes.linewidth: 1.2
+    lines.linewidth: 1.5
+    lines.markersize: 6
+    xtick.labelsize: 10
+    ytick.labelsize: 10
+    legend.fontsize: 10
+    figure.figsize: [8, 6]
+    savefig.dpi: 600
+    # Custom color cycle for publication
+    axes.prop_cycle: !color_cycle ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd']
+  save_args:
+    format: png
+    bbox_inches: tight
+    pad_inches: 0.05
+    facecolor: white
+    edgecolor: none
+    optimize: true
+    metadata:
+      Keywords: 'hierarchical, conditions, publication'
+      Author: 'FigRegistry Advanced Testing Framework'
+  versioned: true
+
+# Complex condition fallback testing with pattern matching
+pattern_matching_condition_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/advanced/pattern_match/{params:experiment_pattern}_{condition}.svg
+  purpose: exploratory
+  condition_param: dynamic_conditions.pattern_matched_condition
+  style_params:
+    # Vector graphics optimized styling
+    figure.dpi: 'figure'
+    savefig.transparent: true
+    axes.facecolor: 'none'
+    figure.facecolor: 'none'
+    text.usetex: false  # Disable LaTeX for broader compatibility
+    font.sans-serif: ['Arial', 'DejaVu Sans', 'Liberation Sans']
+    axes.unicode_minus: false  # Fix minus signs in SVG
+  save_args:
+    format: svg
+    bbox_inches: tight
+    transparent: true
+    metadata:
+      Creator: 'FigRegistry-Kedro Pattern Testing'
+
+# =============================================================================
+# SECTION 2: ADVANCED PARAMETER INHERITANCE AND DEPENDENCY TESTING
+# =============================================================================
+
+# Complex parameter inheritance with dataset dependency chains
+master_analysis_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/advanced/master_analysis_{params:analysis_timestamp}.pdf
+  purpose: publication
+  condition_param: master_analysis.global_condition
+  style_params:
+    # Master styling template for inheritance
+    figure.dpi: 600
+    figure.figsize: [12, 8]
+    font.family: 'serif'
+    font.size: 14
+    axes.titlesize: 18
+    axes.labelsize: 16
+    axes.linewidth: 1.5
+    xtick.major.size: 8
+    ytick.major.size: 8
+    xtick.minor.size: 4
+    ytick.minor.size: 4
+    legend.fontsize: 14
+    legend.title_fontsize: 16
+    # Complex grid configuration
+    axes.grid: true
+    axes.grid.which: 'both'
+    grid.alpha: 0.2
+    grid.linewidth: 0.5
+    grid.linestyle: ':'
+  save_args:
+    format: pdf
+    bbox_inches: tight
+    pad_inches: 0.1
+    metadata:
+      Title: 'Master Analysis Results'
+      Creator: 'FigRegistry-Kedro Advanced Framework'
+      Subject: 'Parameter Inheritance Validation'
+      Keywords: 'master, analysis, inheritance, advanced'
+  versioned: true
+
+# Derived figure inheriting and overriding master parameters
+derived_subplot_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/advanced/derived_subplot_{params:subplot_id}.png
+  purpose: presentation
+  condition_param: derived_analysis.subplot_condition
+  style_params:
+    # Inherit master settings with specific overrides
+    _inherit_from: master_analysis_figure
+    figure.figsize: [10, 6]  # Override master figsize
+    figure.dpi: 300  # Lower DPI for presentation
+    font.size: 12  # Smaller font for subplots
+    axes.titlesize: 14
+    axes.labelsize: 12
+    # Subplot-specific styling
+    subplot.hspace: 0.3
+    subplot.wspace: 0.2
+    axes.spines.top: false
+    axes.spines.right: false
+  save_args:
+    format: png
+    bbox_inches: tight
+    dpi: 300
+    transparent: false
+    metadata:
+      Title: 'Derived Subplot Analysis'
+      Creator: 'FigRegistry-Kedro Inheritance Testing'
+
+# Complex dependency chain with conditional parameter resolution
+dependency_chain_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/advanced/dependency_{params:chain_level}_{condition_param}.png
+  purpose: exploratory
+  condition_param: dependency_chain.resolved_condition
+  style_params:
+    # Conditional styling based on dependency resolution
+    figure.dpi: !conditional
+      condition_source: dependency_chain.quality_level
+      high: 300
+      medium: 200
+      low: 150
+      default: 100
+    font.size: !conditional
+      condition_source: dependency_chain.target_audience
+      expert: 10
+      general: 12
+      presentation: 14
+      default: 12
+    # Complex color mapping
+    axes.prop_cycle: !conditional
+      condition_source: dependency_chain.data_type
+      experimental: !color_cycle ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3']
+      observational: !color_cycle ['#ff7f00', '#ffff33', '#a65628', '#f781bf']
+      simulation: !color_cycle ['#1b9e77', '#d95f02', '#7570b3', '#e7298a']
+      default: !color_cycle ['#666666', '#999999', '#cccccc', '#000000']
+  save_args:
+    bbox_inches: tight
+    pad_inches: 0.05
+    optimize: true
+
+# =============================================================================
+# SECTION 3: ADVANCED VERSIONING AND CONTEXT INJECTION TESTING
+# =============================================================================
+
+# Complex versioned dataset with metadata injection
+versioned_experiment_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/experiment_{params:experiment_id}/results.png
+  purpose: publication
+  condition_param: experiment_metadata.versioned_condition
+  style_params:
+    # Version-aware styling with metadata integration
+    figure.dpi: 300
+    figure.figsize: [10, 8]
+    font.family: 'sans-serif'
+    axes.titlesize: 16
+    # Dynamic title with version information
+    axes.title: "Experiment {params:experiment_id} - Version {version} Results"
+    # Conditional watermark based on version status
+    text.watermark: !conditional
+      condition_source: version_metadata.status
+      draft: 'DRAFT - {version}'
+      review: 'UNDER REVIEW - {version}'
+      final: ''
+      default: 'PRELIMINARY - {version}'
+  save_args:
+    bbox_inches: tight
+    metadata:
+      Experiment_ID: '{params:experiment_id}'
+      Version: '{version}'
+      Pipeline_Run_ID: '{context:run_id}'
+      Timestamp: '{context:timestamp}'
+      Git_Commit: '{context:git_commit}'
+  versioned: true
+  version_format: 'YYYY-MM-DD_HH-mm-ss.SSS'
+
+# Multi-environment configuration with context-sensitive parameters
+multi_environment_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/{env}/multi_env_results_{params:env_specific_id}.png
+  purpose: !env_conditional
+    development: exploratory
+    staging: presentation  
+    production: publication
+    default: exploratory
+  condition_param: environment_config.{env}.condition_override
+  style_params:
+    # Environment-specific styling overrides
+    figure.dpi: !env_conditional
+      development: 150  # Fast rendering for dev
+      staging: 200     # Medium quality for testing
+      production: 300  # High quality for prod
+      default: 150
+    font.size: !env_conditional
+      development: 10
+      staging: 12
+      production: 14
+      default: 12
+    # Development-specific debug styling
+    _debug_mode: !env_conditional
+      development: true
+      default: false
+    axes.spines.color: !conditional
+      condition_source: _debug_mode
+      true: '#ff0000'  # Red spines in debug mode
+      default: '#000000'
+  save_args:
+    bbox_inches: tight
+    metadata:
+      Environment: '{env}'
+      Debug_Mode: '{_debug_mode}'
+      Generation_Context: '{context:generation_source}'
+
+# =============================================================================
+# SECTION 4: PERFORMANCE AND THREADING TESTING
+# =============================================================================
+
+# High-throughput figure generation with performance constraints
+high_performance_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/high_throughput_{params:batch_id}_{params:figure_index}.png
+  purpose: exploratory
+  condition_param: performance_test.throughput_condition
+  style_params:
+    # Optimized styling for performance testing
+    figure.dpi: 150  # Balanced quality/speed
+    agg.path.chunksize: 20000  # Optimize for large datasets
+    figure.max_open_warning: 0  # Suppress warnings during batch processing
+    # Minimal styling for speed
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.grid: false
+    legend.frameon: false
+  save_args:
+    bbox_inches: tight
+    optimize: true
+    # Performance metadata tracking
+    metadata:
+      Batch_ID: '{params:batch_id}'
+      Figure_Index: '{params:figure_index}'
+      Performance_Target: '<5% overhead'
+      Threading_Safe: true
+
+# Concurrent processing test figure with thread-safe operations
+concurrent_processing_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/concurrent/thread_{params:thread_id}_figure_{params:sequence}.png
+  purpose: presentation
+  condition_param: concurrent_test.thread_local_condition
+  style_params:
+    # Thread-safe styling configuration
+    figure.dpi: 200
+    backend: 'Agg'  # Thread-safe backend
+    interactive: false
+    # Thread-specific coloring for testing isolation
+    axes.prop_cycle: !thread_safe_color_cycle
+      base_colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
+      thread_offset: '{params:thread_id}'
+  save_args:
+    bbox_inches: tight
+    metadata:
+      Thread_ID: '{params:thread_id}'
+      Sequence_Number: '{params:sequence}'
+      Concurrency_Level: '{context:max_workers}'
+      Thread_Safety_Validated: true
+
+# =============================================================================
+# SECTION 5: EDGE CASE AND ERROR TESTING SCENARIOS
+# =============================================================================
+
+# Complex error handling with graceful degradation
+error_handling_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/errors/error_test_{params:error_scenario}.png
+  purpose: exploratory
+  condition_param: error_tests.{params:error_scenario}.condition
+  style_params:
+    # Fallback styling with error recovery
+    figure.dpi: !error_safe_value
+      preferred: 300
+      fallback: 100
+      minimum: 72
+    font.family: !error_safe_list
+      preferred: ['DejaVu Sans', 'Arial']
+      fallback: ['sans-serif']
+      system_default: ['default']
+    # Error-specific debug information
+    _error_scenario: '{params:error_scenario}'
+    _fallback_mode: !conditional
+      condition_source: error_tests.{params:error_scenario}.severity
+      critical: 'minimal_styling'
+      warning: 'reduced_styling' 
+      info: 'full_styling'
+      default: 'full_styling'
+  save_args:
+    bbox_inches: tight
+    # Error context metadata
+    metadata:
+      Error_Scenario: '{params:error_scenario}'
+      Fallback_Applied: '{_fallback_mode}'
+      Recovery_Strategy: 'graceful_degradation'
+  error_handling:
+    style_resolution_failure: 'use_defaults'
+    parameter_missing: 'skip_and_warn'
+    file_permission_error: 'retry_with_temp'
+
+# Boundary condition testing with extreme parameter values
+boundary_condition_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/boundaries/boundary_test_{params:boundary_type}.png
+  purpose: exploratory
+  condition_param: boundary_tests.extreme_conditions.{params:boundary_type}
+  style_params:
+    # Extreme value testing
+    figure.dpi: !boundary_test
+      min_value: 10
+      max_value: 1200
+      test_value: '{params:dpi_test_value}'
+      default: 100
+    figure.figsize: !boundary_test
+      min_value: [1, 1]
+      max_value: [50, 50]
+      test_value: '{params:figsize_test_value}'
+      default: [8, 6]
+    font.size: !boundary_test
+      min_value: 1
+      max_value: 72
+      test_value: '{params:fontsize_test_value}'
+      default: 12
+  save_args:
+    bbox_inches: tight
+    metadata:
+      Boundary_Type: '{params:boundary_type}'
+      Test_Values: '{params:test_values}'
+      Validation_Result: 'passed'
+
+# =============================================================================
+# SECTION 6: INTEGRATION AND COMPATIBILITY TESTING
+# =============================================================================
+
+# Cross-framework compatibility testing
+compatibility_test_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/compatibility/framework_test_{params:framework_version}.png
+  purpose: presentation
+  condition_param: compatibility_tests.framework_matrix.kedro_{params:kedro_version}.figregistry_{params:figregistry_version}
+  style_params:
+    # Framework-specific compatibility settings
+    figure.dpi: 200
+    backend: 'Agg'
+    # Version-specific feature flags
+    _kedro_version: '{params:kedro_version}'
+    _figregistry_version: '{params:figregistry_version}'
+    _compatibility_mode: !version_compatibility
+      kedro_version: '{params:kedro_version}'
+      figregistry_version: '{params:figregistry_version}'
+      compatibility_matrix: 'compatibility_tests.framework_matrix'
+  save_args:
+    bbox_inches: tight
+    metadata:
+      Kedro_Version: '{params:kedro_version}'
+      FigRegistry_Version: '{params:figregistry_version}'
+      Compatibility_Level: '{_compatibility_mode}'
+      Test_Framework: 'Advanced Integration Testing'
+
+# Plugin ecosystem integration testing
+plugin_ecosystem_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/ecosystem/plugin_integration_{params:plugin_set}.png
+  purpose: publication
+  condition_param: ecosystem_tests.plugin_interactions.{params:plugin_set}
+  style_params:
+    # Plugin ecosystem compatibility
+    figure.dpi: 300
+    # Plugin-aware styling
+    _active_plugins: '{params:active_plugins}'
+    _plugin_conflicts: '{params:plugin_conflicts}'
+    # Conditional styling based on plugin environment
+    axes.style: !plugin_conditional
+      mlflow_active: 'mlflow_compatible'
+      wandb_active: 'wandb_compatible'
+      tensorboard_active: 'tensorboard_compatible'
+      default: 'standard'
+  save_args:
+    format: png
+    bbox_inches: tight
+    metadata:
+      Active_Plugins: '{params:active_plugins}'
+      Plugin_Conflicts: '{params:plugin_conflicts}'
+      Integration_Status: 'validated'
+      Ecosystem_Version: 'v2.0'
+
+# =============================================================================
+# SECTION 7: ADVANCED TEMPLATE AND PATTERN TESTING
+# =============================================================================
+
+# Dynamic template resolution with complex substitution patterns
+template_resolution_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/templates/{params:template_category}/{params:analysis_type}/result_{params:timestamp}_{params:researcher_id}.{params:output_format}
+  purpose: !template_resolution
+    template: '{params:purpose_template}'
+    variables:
+      research_phase: '{params:research_phase}'
+      output_type: '{params:output_type}'
+    mapping:
+      'initial_exploration': 'exploratory'
+      'analysis_presentation': 'presentation'
+      'final_publication': 'publication'
+    default: 'exploratory'
+  condition_param: template_conditions.{params:template_category}.{params:analysis_type}.resolved_condition
+  style_params:
+    # Template-driven styling with complex inheritance
+    _template_base: '{params:style_template_base}'
+    _style_inheritance: !template_style_inheritance
+      base_template: '{_template_base}'
+      category_overrides: 'templates.{params:template_category}.style_overrides'
+      analysis_specific: 'templates.{params:analysis_type}.style_mods'
+    # Resolved styling from template system
+    figure.dpi: !template_value
+      source: '{_style_inheritance}'
+      path: 'figure.dpi'
+      default: 200
+    font.family: !template_value
+      source: '{_style_inheritance}'
+      path: 'typography.font_family'
+      default: 'sans-serif'
+  save_args:
+    format: '{params:output_format}'
+    bbox_inches: tight
+    metadata:
+      Template_Category: '{params:template_category}'
+      Analysis_Type: '{params:analysis_type}'
+      Style_Template: '{_template_base}'
+      Resolution_Chain: '{_style_inheritance}'
+
+# Advanced condition pattern matching with regex and wildcards
+pattern_matching_advanced_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/patterns/pattern_match_{params:pattern_id}.png
+  purpose: exploratory
+  condition_param: advanced_patterns.complex_matching.{params:pattern_type}
+  style_params:
+    # Complex pattern-based styling resolution
+    _pattern_matchers: !pattern_configuration
+      regex_patterns:
+        - pattern: '^experiment_(\d+)_trial_(\d+)$'
+          style_template: 'experiment_trial_style'
+          groups: ['experiment_id', 'trial_id']
+        - pattern: '^analysis_([a-z]+)_phase_([0-9]+)$'
+          style_template: 'analysis_phase_style'  
+          groups: ['analysis_type', 'phase_number']
+      wildcard_patterns:
+        - pattern: 'pilot_*_results'
+          style_template: 'pilot_study_style'
+        - pattern: '*_validation_*'
+          style_template: 'validation_study_style'
+      fallback_strategy: 'default_exploratory_style'
+    
+    # Pattern-resolved styling
+    figure.dpi: !pattern_resolved_value
+      patterns: '{_pattern_matchers}'
+      condition: '{condition_param}'
+      style_path: 'figure.dpi'
+      default: 150
+    
+    axes.prop_cycle: !pattern_resolved_value
+      patterns: '{_pattern_matchers}'
+      condition: '{condition_param}'
+      style_path: 'color_cycle'
+      default: !color_cycle ['#1f77b4', '#ff7f0e', '#2ca02c']
+      
+  save_args:
+    bbox_inches: tight
+    metadata:
+      Pattern_Type: '{params:pattern_type}'
+      Pattern_ID: '{params:pattern_id}'
+      Matched_Pattern: !pattern_match_result
+        patterns: '{_pattern_matchers}'
+        condition: '{condition_param}'
+      Resolved_Style: !pattern_style_name
+        patterns: '{_pattern_matchers}'
+        condition: '{condition_param}'
+
+# =============================================================================
+# END OF ADVANCED CATALOG CONFIGURATION
+# =============================================================================
+
+# This advanced catalog configuration provides comprehensive testing coverage for:
+# 
+# 1. F-005-RQ-001: Complex FigureDataSet integration with automatic styling
+# 2. F-005-RQ-002: Advanced Kedro versioning compatibility scenarios  
+# 3. F-005-RQ-003: Sophisticated parameter validation and error handling
+# 4. F-005-RQ-004: Multi-dimensional context injection and conditional styling
+#
+# Performance validation targets:
+# - Style resolution: <1ms per condition lookup
+# - Dataset overhead: <5% compared to manual matplotlib operations
+# - Memory efficiency: Linear scaling with configuration complexity
+# - Thread safety: Full compatibility with Kedro parallel runners
+#
+# Advanced features tested:
+# - Complex parameter inheritance and dependency chains
+# - Multi-environment configuration with conditional overrides
+# - Pattern matching and template resolution systems
+# - Error handling with graceful degradation strategies
+# - Plugin ecosystem integration and compatibility validation
+# - High-throughput and concurrent processing scenarios
+# - Boundary condition testing with extreme parameter values
+# - Cross-framework compatibility across version matrices
