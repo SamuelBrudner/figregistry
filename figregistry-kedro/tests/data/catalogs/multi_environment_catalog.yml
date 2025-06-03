@@ -1,0 +1,412 @@
+# Multi-Environment Kedro Catalog Configuration
+# 
+# This catalog file demonstrates environment-specific FigureDataSet configurations
+# for testing configuration precedence and environment override scenarios.
+# Supports testing of conf/base and conf/local configuration patterns with
+# environment-specific parameter overrides and catalog entry variations.
+#
+# Requirements:
+# - F-007-RQ-002: Environment-specific configuration precedence for FigureDataSet parameters
+# - F-007: Configuration merging behavior across conf/base and conf/local scenarios
+# - Multi-environment deployment support with consistent catalog behavior
+# - Environment-specific parameter override testing
+
+# =============================================================================
+# BASE ENVIRONMENT CATALOG ENTRIES
+# =============================================================================
+# These entries represent typical conf/base/catalog.yml configurations
+# that provide organization-wide defaults for all environments
+
+# Basic exploratory figure with environment-agnostic defaults
+exploratory_analysis_base:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/01_raw/exploratory/${env}_analysis.png"
+  purpose: exploratory
+  condition_param: "${params:experiment_type}"
+  style_params:
+    figure.figsize: [10, 6]
+    axes.grid: true
+    font.size: 12
+  save_args:
+    dpi: 150
+    bbox_inches: tight
+    format: png
+  metadata:
+    data_source: "base_configuration"
+    environment: "${env}"
+    created_by: "multi_environment_test"
+
+# Presentation figure with template variable substitution
+presentation_metrics_base:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/08_reporting/metrics/${env}_presentation_metrics.pdf"
+  purpose: presentation
+  condition_param: "${params:model_variant}"
+  style_params:
+    figure.figsize: [12, 8]
+    axes.titlesize: 16
+    axes.labelsize: 14
+    font.family: sans-serif
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    format: pdf
+    facecolor: white
+  versioned: false
+  metadata:
+    target_audience: "stakeholders"
+    quality_level: "presentation"
+
+# Publication-ready figure with complex parameter extraction
+publication_results_base:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/08_reporting/publication/${env}_results_${params:manuscript_version}.svg"
+  purpose: publication
+  condition_param: "${params:statistical_method}"
+  style_params:
+    figure.figsize: [8, 6]
+    font.size: 11
+    font.family: serif
+    axes.spines.top: false
+    axes.spines.right: false
+    legend.frameon: false
+  save_args:
+    dpi: 600
+    bbox_inches: tight
+    format: svg
+    transparent: true
+  versioned: true
+  metadata:
+    journal_requirements: true
+    peer_review_ready: true
+
+# =============================================================================
+# ENVIRONMENT-SPECIFIC OVERRIDE PATTERNS
+# =============================================================================
+# These entries demonstrate how environment-specific configurations
+# override base configurations to test precedence rules
+
+# Local development override for exploratory analysis
+exploratory_analysis_local:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/tmp/debug/${env}_exploratory_debug.png"
+  purpose: exploratory
+  condition_param: "${params:debug_condition}"
+  style_params:
+    figure.figsize: [8, 5]  # Smaller for dev environment
+    axes.grid: true
+    font.size: 10  # Smaller font for dev
+    axes.edgecolor: red  # Debug indicator
+  save_args:
+    dpi: 100  # Lower DPI for faster dev cycles
+    bbox_inches: tight
+    format: png
+  metadata:
+    data_source: "local_override"
+    environment: "${env}"
+    debug_mode: true
+
+# Staging environment with intermediate quality settings
+presentation_metrics_staging:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/08_reporting/staging/${env}_metrics_review.pdf"
+  purpose: presentation
+  condition_param: "${params:staging_variant}"
+  style_params:
+    figure.figsize: [10, 7]  # Intermediate size
+    axes.titlesize: 15
+    axes.labelsize: 13
+    font.family: sans-serif
+    figure.facecolor: "#f8f9fa"  # Light staging background
+  save_args:
+    dpi: 200  # Intermediate DPI
+    bbox_inches: tight
+    format: pdf
+    facecolor: "#f8f9fa"
+  metadata:
+    target_audience: "review_team"
+    quality_level: "staging_review"
+
+# Production environment with strict quality controls
+publication_results_production:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/08_reporting/final/${env}_final_results_v${params:release_version}.svg"
+  purpose: publication
+  condition_param: "${params:production_method}"
+  style_params:
+    figure.figsize: [8, 6]
+    font.size: 11
+    font.family: "Times New Roman"  # Production font requirement
+    axes.spines.top: false
+    axes.spines.right: false
+    legend.frameon: false
+    axes.linewidth: 1.2  # Thicker lines for production
+  save_args:
+    dpi: 1200  # Ultra-high DPI for production
+    bbox_inches: tight
+    format: svg
+    transparent: true
+    metadata: true  # Include metadata in production files
+  versioned: true
+  metadata:
+    journal_requirements: true
+    peer_review_ready: true
+    production_quality: true
+    compliance_checked: true
+
+# =============================================================================
+# CONDITIONAL ENVIRONMENT CONFIGURATIONS
+# =============================================================================
+# These entries test environment-conditional logic and complex parameter patterns
+
+# Multi-environment training plot with conditional parameters
+model_training_plot:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/02_intermediate/training/${env}_training_${params:experiment_id}.png"
+  purpose: "${env_purpose:exploratory}"  # Default to exploratory, can be overridden
+  condition_param: "${params:training_config.algorithm}_${env}"
+  style_params:
+    figure.figsize: "${plot_size:${env}}"  # Environment-specific plot sizes
+    axes.grid: "${grid_enabled:${env}}"
+    font.size: "${font_size:${env}}"
+    line.linewidth: "${line_width:${env}}"
+  save_args:
+    dpi: "${output_dpi:${env}}"
+    bbox_inches: tight
+    format: "${output_format:${env}}"
+  metadata:
+    experiment_tracking: true
+    environment_specific: true
+
+# Validation metrics with environment inheritance
+validation_metrics:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/03_primary/validation/${env}_validation_${params:model_version}.pdf"
+  purpose: "${validation_purpose:presentation}"
+  condition_param: "${params:validation_scenario}_${params:data_split}"
+  style_params:
+    figure.figsize: [9, 6]
+    axes.titlesize: "${title_size:${env}}"
+    axes.labelsize: "${label_size:${env}}"
+    font.family: "${font_family:${env}}"
+    colors: "${color_scheme:${env}}"
+  save_args:
+    dpi: "${validation_dpi:${env}}"
+    bbox_inches: tight
+    format: pdf
+  versioned: "${enable_versioning:${env}}"
+  metadata:
+    validation_type: "cross_validation"
+    environment_context: "${env}"
+
+# Performance comparison with complex condition resolution
+performance_comparison:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/08_reporting/comparison/${env}_performance_${params:comparison_id}.svg"
+  purpose: "${comparison_purpose:${env}}"
+  condition_param: "${params:model_a}_vs_${params:model_b}_${params:metric_type}"
+  style_params:
+    figure.figsize: "${comparison_size:${env}}"
+    axes.spines.top: "${spines_top:${env}}"
+    axes.spines.right: "${spines_right:${env}}"
+    legend.loc: "${legend_position:${env}}"
+    grid.alpha: "${grid_alpha:${env}}"
+  save_args:
+    dpi: "${comparison_dpi:${env}}"
+    bbox_inches: tight
+    format: svg
+    transparent: "${transparent_bg:${env}}"
+  metadata:
+    comparison_type: "performance_benchmark"
+    baseline_model: "${params:baseline_model}"
+    test_environment: "${env}"
+
+# =============================================================================
+# INHERITANCE AND PRECEDENCE TESTING PATTERNS
+# =============================================================================
+# These entries specifically test configuration inheritance and precedence rules
+
+# Base configuration with full parameter set
+baseline_experiment:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/experiments/baseline/${env}_baseline.png"
+  purpose: exploratory
+  condition_param: "${params:baseline_condition}"
+  style_params:
+    figure.figsize: [10, 8]
+    axes.grid: true
+    font.size: 12
+    line.linewidth: 2.0
+    marker.size: 6
+    legend.fontsize: 10
+    axes.titlesize: 14
+    axes.labelsize: 12
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+    format: png
+    facecolor: white
+    edgecolor: none
+  versioned: false
+  metadata:
+    experiment_type: "baseline"
+    parameter_source: "base_config"
+
+# Override configuration testing selective parameter inheritance
+baseline_experiment_override:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/experiments/override/${env}_baseline_override.png"
+  purpose: presentation  # Override purpose
+  condition_param: "${params:override_condition}"  # Override condition
+  style_params:
+    # Inherit most from base, override specific parameters
+    figure.figsize: [12, 9]  # Override size
+    font.size: 14  # Override font size
+    line.linewidth: 2.5  # Override line width
+    # axes.grid inherits from base (true)
+    # marker.size inherits from base (6)
+    # legend.fontsize inherits from base (10)
+    axes.titlesize: 16  # Override title size
+    # axes.labelsize inherits from base (12)
+  save_args:
+    dpi: 300  # Override DPI
+    format: pdf  # Override format
+    # bbox_inches inherits from base (tight)
+    # facecolor inherits from base (white)
+    # edgecolor inherits from base (none)
+  versioned: true  # Override versioning
+  metadata:
+    experiment_type: "override_test"
+    parameter_source: "override_config"
+    inheritance_test: true
+
+# =============================================================================
+# ENVIRONMENT VARIABLE TEMPLATE TESTING
+# =============================================================================
+# These entries test complex template variable patterns and substitution
+
+# Complex template variables with nested substitution
+complex_template_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/${data_layer:02_intermediate}/${figure_category:analysis}/${env}_${params:project_name}_${params:timestamp}.${output_ext:png}"
+  purpose: "${figure_purpose:${env}}"
+  condition_param: "${params:condition_prefix}_${env}_${params:condition_suffix}"
+  style_params:
+    figure.figsize: "${figure_dimensions:${env}}"
+    axes.grid: "${grid_config:${env}}"
+    font.size: "${typography:${env}.size}"
+    font.family: "${typography:${env}.family}"
+    line.linewidth: "${line_config:${env}.width}"
+    line.linestyle: "${line_config:${env}.style}"
+    marker.size: "${marker_config:${env}.size}"
+    marker.alpha: "${marker_config:${env}.alpha}"
+  save_args:
+    dpi: "${output_config:${env}.dpi}"
+    bbox_inches: "${output_config:${env}.bbox}"
+    format: "${output_config:${env}.format}"
+    facecolor: "${output_config:${env}.facecolor}"
+    transparent: "${output_config:${env}.transparent}"
+  versioned: "${versioning_config:${env}}"
+  metadata:
+    template_complexity: "high"
+    substitution_levels: 3
+    environment_dependencies: ["env", "params", "output_config", "typography"]
+
+# Fallback configuration with default value patterns
+fallback_configuration:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path:data}/fallback/${env:development}_fallback_${params:run_id:default}.png"
+  purpose: "${purpose:exploratory}"
+  condition_param: "${params:condition:default_condition}"
+  style_params:
+    figure.figsize: "${figsize:[8, 6]}"
+    axes.grid: "${grid:true}"
+    font.size: "${fontsize:12}"
+    axes.spines.top: "${spines_top:false}"
+    axes.spines.right: "${spines_right:false}"
+  save_args:
+    dpi: "${dpi:150}"
+    bbox_inches: "${bbox:tight}"
+    format: "${format:png}"
+  metadata:
+    fallback_test: true
+    default_values_used: true
+
+# =============================================================================
+# ERROR HANDLING AND EDGE CASE TESTING
+# =============================================================================
+# These entries test error handling and edge cases in environment configuration
+
+# Configuration with potential conflicts
+conflict_resolution_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/conflicts/${env}_conflict_test.png"
+  purpose: "${conflicting_purpose:exploratory}"  # May conflict with environment
+  condition_param: "${params:conflict_condition}"
+  style_params:
+    figure.figsize: "${conflicting_size:[10, 6]}"  # May conflict with environment
+    axes.grid: "${conflicting_grid:true}"
+    font.size: "${conflicting_font:12}"
+  save_args:
+    dpi: "${conflicting_dpi:150}"
+    format: "${conflicting_format:png}"
+  metadata:
+    conflict_test: true
+    resolution_strategy: "environment_precedence"
+
+# Missing parameter graceful degradation
+graceful_degradation_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path:./data}/degradation/${env:test}_graceful.png"
+  purpose: "${missing_purpose:exploratory}"  # Missing parameter with fallback
+  condition_param: "${params:missing_condition:default}"
+  style_params:
+    figure.figsize: "${missing_figsize:[8, 6]}"
+    axes.grid: "${missing_grid:true}"
+    font.size: "${missing_fontsize:10}"
+  save_args:
+    dpi: "${missing_dpi:100}"
+    format: "${missing_format:png}"
+  metadata:
+    degradation_test: true
+    fallback_strategy: "default_values"
+
+# =============================================================================
+# PERFORMANCE AND CACHING TESTING
+# =============================================================================
+# These entries test performance implications of environment-specific configurations
+
+# High-frequency figure generation test
+high_frequency_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/performance/${env}_freq_test_${params:iteration}.png"
+  purpose: "${perf_purpose:exploratory}"
+  condition_param: "${params:perf_condition}_${params:iteration}"
+  style_params:
+    figure.figsize: "${perf_figsize:[6, 4]}"
+    axes.grid: "${perf_grid:false}"  # Disabled for performance
+    font.size: "${perf_fontsize:10}"
+  save_args:
+    dpi: "${perf_dpi:100}"  # Lower DPI for performance
+    bbox_inches: tight
+    format: png
+  metadata:
+    performance_test: true
+    optimization_level: "${env}"
+
+# Configuration caching test
+caching_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${base_path}/cache/${env}_cache_test_${params:cache_key}.png"
+  purpose: "${cache_purpose:exploratory}"
+  condition_param: "${params:cache_condition}"
+  style_params:
+    figure.figsize: "${cache_figsize:[8, 6]}"
+    axes.grid: "${cache_grid:true}"
+    font.size: "${cache_fontsize:12}"
+  save_args:
+    dpi: "${cache_dpi:150}"
+    format: "${cache_format:png}"
+  metadata:
+    caching_test: true
+    cache_strategy: "${env}_optimized"
