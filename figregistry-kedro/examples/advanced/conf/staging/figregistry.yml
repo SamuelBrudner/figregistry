@@ -1,0 +1,732 @@
+# Staging Environment FigRegistry Configuration
+# Advanced FigRegistry-Kedro Example - Production-like Validation Environment
+#
+# This staging configuration provides enterprise-grade figure styling and management
+# capabilities that mirror production complexity while maintaining staging-specific 
+# safety measures and comprehensive validation mechanisms.
+#
+# Purpose: Enable thorough validation of production deployment scenarios through
+# realistic experimental contexts, comprehensive condition-based styling testing,
+# and enterprise-appropriate output management with staging safety measures.
+#
+# Key Features:
+# - Production-like styling complexity with staging validation labels
+# - Enhanced audit trails and logging for deployment testing
+# - Staging-specific safety mechanisms and rollback capabilities
+# - Comprehensive condition mappings supporting complex experimental scenarios
+# - Enterprise-grade output configurations with staging path management
+
+# ==============================================================================
+# FIGREGISTRY VERSION AND METADATA
+# ==============================================================================
+# Version constraint per F-001-RQ-002 validation requirements
+figregistry_version: ">=0.3.0"
+
+# Enhanced staging metadata for production readiness validation
+metadata:
+  environment: "staging"
+  deployment_tier: "enterprise_validation"
+  production_mirroring: true
+  safety_level: "comprehensive"
+  audit_enabled: true
+  validation_mode: "extensive"
+  created_by: "figregistry-kedro-advanced-example"
+  purpose: "production_readiness_testing"
+  compliance_level: "enterprise"
+
+# ==============================================================================
+# STAGING-SPECIFIC KEDRO INTEGRATION SETTINGS
+# ==============================================================================
+# Enhanced Kedro integration configuration supporting comprehensive staging
+# validation per F-007 configuration bridge requirements
+kedro:
+  # Staging-specific configuration bridge settings
+  config_bridge:
+    enable_enhanced_logging: true
+    audit_trail_enabled: true
+    validation_verbose: true
+    performance_monitoring: true
+    merge_conflict_resolution: "strict"
+    environment_specific_overrides: true
+    production_compatibility_mode: true
+    
+  # Advanced parameter resolution for staging validation
+  parameter_resolution:
+    enable_deep_parameter_mapping: true
+    condition_param_validation: "comprehensive"
+    nested_parameter_support: true
+    experimental_context_injection: true
+    staging_safety_checks: true
+    
+  # Staging deployment validation settings
+  deployment_validation:
+    enable_production_simulation: true
+    resource_usage_monitoring: true
+    performance_regression_detection: true
+    configuration_merge_testing: true
+    hook_registration_validation: true
+
+# ==============================================================================
+# ENTERPRISE-GRADE PURPOSE DEFINITIONS
+# ==============================================================================
+# Production-like purpose configurations with staging-specific validation
+# mechanisms per F-004 automated output management requirements
+purposes:
+  # Exploratory analysis with staging validation enhancements
+  exploratory:
+    description: "Exploratory data analysis with staging validation features"
+    base_path: "data/08_reporting/staging/exploratory"
+    naming_pattern: "{environment}_{ts}_{name}_exploratory_v{version}"
+    formats: ["png", "pdf"]
+    dpi: 150  # Staging preview quality
+    validation_enabled: true
+    audit_trail: true
+    safety_checks:
+      max_file_size_mb: 50
+      auto_cleanup_enabled: true
+      retention_days: 30
+    rcParams:
+      figure.figsize: [12, 8]
+      figure.facecolor: "white"
+      axes.facecolor: "#f8f9fa"  # Staging background indicator
+      axes.grid: true
+      axes.grid.alpha: 0.3
+      font.size: 11
+      axes.titlesize: 14
+      axes.labelsize: 12
+      legend.fontsize: 10
+      xtick.labelsize: 10
+      ytick.labelsize: 10
+      lines.linewidth: 2
+      lines.markersize: 8
+      
+  # Presentation quality with production-like complexity
+  presentation:
+    description: "Presentation-ready figures with enterprise styling"
+    base_path: "data/08_reporting/staging/presentation"
+    naming_pattern: "{environment}_{ts}_{name}_presentation_v{version}"
+    formats: ["png", "pdf", "svg"]
+    dpi: 300  # Production-grade quality
+    validation_enabled: true
+    audit_trail: true
+    safety_checks:
+      max_file_size_mb: 100
+      auto_cleanup_enabled: true
+      retention_days: 90
+      backup_enabled: true
+    rcParams:
+      figure.figsize: [14, 10]
+      figure.facecolor: "white"
+      axes.facecolor: "white"
+      axes.spines.top: false
+      axes.spines.right: false
+      axes.spines.left: true
+      axes.spines.bottom: true
+      axes.grid: true
+      axes.grid.alpha: 0.2
+      font.family: ["DejaVu Sans", "Arial", "sans-serif"]
+      font.size: 12
+      axes.titlesize: 16
+      axes.labelsize: 14
+      legend.fontsize: 12
+      xtick.labelsize: 11
+      ytick.labelsize: 11
+      lines.linewidth: 2.5
+      lines.markersize: 9
+      
+  # Publication quality with staging validation
+  publication:
+    description: "Publication-ready figures with comprehensive validation"
+    base_path: "data/08_reporting/staging/publication"
+    naming_pattern: "{environment}_{ts}_{name}_publication_v{version}"
+    formats: ["pdf", "png", "svg", "eps"]
+    dpi: 600  # Publication quality with staging validation
+    validation_enabled: true
+    audit_trail: true
+    safety_checks:
+      max_file_size_mb: 200
+      auto_cleanup_enabled: false  # Preserve publication figures
+      retention_days: 365
+      backup_enabled: true
+      version_control_integration: true
+    rcParams:
+      figure.figsize: [10, 7]
+      figure.facecolor: "white"
+      axes.facecolor: "white"
+      axes.spines.top: false
+      axes.spines.right: false
+      axes.linewidth: 1.2
+      axes.grid: false
+      font.family: ["Computer Modern", "Times", "serif"]
+      font.size: 10
+      axes.titlesize: 12
+      axes.labelsize: 11
+      legend.fontsize: 9
+      xtick.labelsize: 9
+      ytick.labelsize: 9
+      lines.linewidth: 1.5
+      lines.markersize: 6
+      text.usetex: false  # Disabled for staging compatibility
+
+# ==============================================================================
+# ADVANCED COLOR PALETTES
+# ==============================================================================
+# Enterprise-grade color palettes supporting complex experimental scenarios
+# with staging-specific validation and production-like complexity
+palettes:
+  # Primary enterprise palette for staging validation
+  staging_enterprise:
+    description: "Enterprise color scheme with staging validation indicators"
+    colors: 
+      - "#1f77b4"  # Professional blue
+      - "#ff7f0e"  # Enterprise orange
+      - "#2ca02c"  # Success green
+      - "#d62728"  # Alert red
+      - "#9467bd"  # Corporate purple
+      - "#8c564b"  # Earth brown
+      - "#e377c2"  # Accent pink
+      - "#7f7f7f"  # Neutral gray
+      - "#bcbd22"  # Highlight yellow
+      - "#17becf"  # Cyan accent
+    validation_enabled: true
+    accessibility_compliant: true
+    
+  # Production-like gradient palette for complex visualizations
+  staging_gradient:
+    description: "Gradient palette for complex multi-dimensional visualizations"
+    colors:
+      - "#393b79"  # Deep blue
+      - "#5254a3"  # Medium blue
+      - "#6b6ecf"  # Light blue
+      - "#9c9ede"  # Pale blue
+      - "#637939"  # Deep green
+      - "#8ca252"  # Medium green
+      - "#b5cf6b"  # Light green
+      - "#cedb9c"  # Pale green
+    gradient_support: true
+    interpolation_method: "linear"
+    validation_enabled: true
+    
+  # High-contrast palette for staging validation visibility
+  staging_validation:
+    description: "High-contrast colors for staging validation scenarios"
+    colors:
+      - "#000080"  # Navy blue
+      - "#FF4500"  # Orange red
+      - "#32CD32"  # Lime green
+      - "#8B0000"  # Dark red
+      - "#4B0082"  # Indigo
+      - "#FF1493"  # Deep pink
+      - "#00CED1"  # Dark turquoise
+      - "#556B2F"  # Dark olive green
+    high_contrast: true
+    validation_emphasis: true
+    accessibility_aaa_compliant: true
+
+# ==============================================================================
+# COMPREHENSIVE DEFAULT STYLING
+# ==============================================================================
+# Production-grade default styling parameters with staging-specific
+# enhancements and comprehensive validation support
+defaults:
+  # Default purpose for unspecified outputs
+  purpose: "exploratory"
+  
+  # Staging-specific default behavior
+  staging_behavior:
+    enable_validation_watermarks: true
+    auto_generate_metadata: true
+    performance_monitoring: true
+    resource_usage_tracking: true
+    
+  # Default styling with production-like complexity
+  style:
+    color: "#1f77b4"  # Default enterprise blue
+    linestyle: "-"
+    linewidth: 2.5
+    marker: "o"
+    markersize: 8
+    alpha: 0.8
+    
+  # Enhanced default rcParams for staging validation
+  rcParams:
+    # Figure configuration
+    figure.figsize: [12, 8]
+    figure.facecolor: "white"
+    figure.edgecolor: "none"
+    figure.dpi: 150
+    figure.autolayout: true
+    
+    # Axes configuration with staging indicators
+    axes.facecolor: "#f8f9fa"  # Light staging background
+    axes.edgecolor: "#cccccc"
+    axes.linewidth: 1.0
+    axes.grid: true
+    axes.grid.alpha: 0.3
+    axes.axisbelow: true
+    axes.spines.top: false
+    axes.spines.right: false
+    
+    # Font configuration for enterprise presentations
+    font.family: ["DejaVu Sans", "Arial", "sans-serif"]
+    font.size: 11
+    font.weight: "normal"
+    
+    # Tick configuration
+    xtick.major.size: 6
+    xtick.minor.size: 3
+    ytick.major.size: 6
+    ytick.minor.size: 3
+    xtick.labelsize: 10
+    ytick.labelsize: 10
+    
+    # Legend configuration
+    legend.frameon: true
+    legend.fancybox: true
+    legend.shadow: false
+    legend.framealpha: 0.9
+    legend.facecolor: "white"
+    legend.edgecolor: "#cccccc"
+    
+    # Line and marker defaults
+    lines.linewidth: 2.0
+    lines.markersize: 8
+    lines.markeredgewidth: 1.0
+    
+    # Color cycle using enterprise palette
+    axes.prop_cycle: !expr |
+      cycler('color', ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', 
+                      '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf'])
+
+# ==============================================================================
+# COMPREHENSIVE CONDITION-BASED STYLING
+# ==============================================================================
+# Enterprise-grade condition mappings supporting complex experimental scenarios
+# per F-002 condition-based styling requirements with staging validation
+styles:
+  # Primary staging validation conditions
+  staging_enterprise_ml_pipeline:
+    description: "Primary ML pipeline staging validation styling"
+    color: "#1f77b4"
+    linestyle: "-"
+    linewidth: 3.0
+    marker: "o"
+    markersize: 10
+    alpha: 0.9
+    label: "Staging ML Pipeline"
+    validation_tags: ["primary", "ml_pipeline", "staging"]
+    rcParams:
+      axes.titleweight: "bold"
+      legend.title: "Staging ML Pipeline Validation"
+      
+  staging_inference_validation:
+    description: "Inference pipeline validation styling"
+    color: "#ff7f0e"
+    linestyle: "--"
+    linewidth: 2.5
+    marker: "s"
+    markersize: 9
+    alpha: 0.85
+    label: "Staging Inference"
+    validation_tags: ["secondary", "inference", "staging"]
+    rcParams:
+      axes.title: "Inference Validation Results"
+      
+  staging_error_recovery:
+    description: "Error recovery and fallback scenario styling"
+    color: "#d62728"
+    linestyle: ":"
+    linewidth: 2.0
+    marker: "^"
+    markersize: 8
+    alpha: 0.8
+    label: "Error Recovery"
+    validation_tags: ["fallback", "error_handling", "staging"]
+    rcParams:
+      axes.facecolor: "#fff5f5"  # Light red background for errors
+      
+  # Complex experimental context conditions
+  production_readiness_testing:
+    description: "Production readiness validation styling"
+    color: "#2ca02c"
+    linestyle: "-"
+    linewidth: 2.8
+    marker: "D"
+    markersize: 8
+    alpha: 0.9
+    label: "Production Ready"
+    validation_tags: ["production", "readiness", "validation"]
+    rcParams:
+      axes.grid.alpha: 0.2
+      legend.loc: "upper right"
+      
+  comprehensive_enterprise_staging:
+    description: "Comprehensive enterprise staging validation"
+    color: "#9467bd"
+    linestyle: "-."
+    linewidth: 2.3
+    marker: "p"
+    markersize: 9
+    alpha: 0.85
+    label: "Enterprise Staging"
+    validation_tags: ["comprehensive", "enterprise", "staging"]
+    rcParams:
+      axes.spines.linewidth: 1.5
+      
+  # Training pipeline conditions with production-like complexity
+  production_like_training:
+    description: "Production-like training pipeline styling"
+    color: "#8c564b"
+    linestyle: "-"
+    linewidth: 2.5
+    marker: "h"
+    markersize: 8
+    alpha: 0.9
+    label: "Training Pipeline"
+    validation_tags: ["training", "production_like", "ml"]
+    rcParams:
+      figure.titleweight: "bold"
+      axes.labelweight: "bold"
+      
+  production_like_inference:
+    description: "Production-like inference pipeline styling"
+    color: "#e377c2"
+    linestyle: "--"
+    linewidth: 2.2
+    marker: "X"
+    markersize: 9
+    alpha: 0.85
+    label: "Inference Pipeline"
+    validation_tags: ["inference", "production_like", "ml"]
+    
+  # Performance and monitoring conditions
+  degraded_performance_testing:
+    description: "Degraded performance testing scenario styling"
+    color: "#7f7f7f"
+    linestyle: ":"
+    linewidth: 1.8
+    marker: "v"
+    markersize: 7
+    alpha: 0.7
+    label: "Degraded Performance"
+    validation_tags: ["performance", "degraded", "testing"]
+    rcParams:
+      axes.facecolor: "#f5f5f5"  # Gray background for degraded scenarios
+      
+  # Validation scenario conditions
+  basic_validation:
+    description: "Basic functionality validation styling"
+    color: "#bcbd22"
+    linestyle: "-"
+    linewidth: 2.0
+    marker: "+"
+    markersize: 10
+    alpha: 0.8
+    label: "Basic Validation"
+    validation_tags: ["basic", "validation", "functional"]
+    
+  integration_validation:
+    description: "Integration testing validation styling"
+    color: "#17becf"
+    linestyle: "--"
+    linewidth: 2.4
+    marker: "*"
+    markersize: 11
+    alpha: 0.85
+    label: "Integration Test"
+    validation_tags: ["integration", "validation", "testing"]
+    
+  production_readiness:
+    description: "Production readiness assessment styling"
+    color: "#2ca02c"
+    linestyle: "-"
+    linewidth: 3.0
+    marker: "o"
+    markersize: 10
+    alpha: 0.95
+    label: "Production Ready"
+    validation_tags: ["production", "readiness", "assessment"]
+    rcParams:
+      axes.titlesize: 16
+      axes.titleweight: "bold"
+      legend.framealpha: 1.0
+
+# ==============================================================================
+# ENHANCED OUTPUT CONFIGURATION
+# ==============================================================================
+# Enterprise-grade output management with staging-specific safety measures
+# and comprehensive audit trails per F-004 output management requirements
+outputs:
+  # Base output configuration with staging safety
+  base_path: "data/08_reporting/staging"
+  
+  # Staging-specific directory structure
+  directory_structure:
+    enable_environment_prefixes: true
+    create_date_subdirectories: true
+    enable_purpose_separation: true
+    auto_create_directories: true
+    
+  # Enhanced naming conventions for staging validation
+  naming:
+    timestamp_format: "%Y%m%d_%H%M%S"
+    include_environment: true
+    include_version: true
+    include_validation_tags: true
+    pattern: "staging_{ts}_{name}_{purpose}_v{version}"
+    
+  # Comprehensive file management with staging safety
+  file_management:
+    enable_versioning: true
+    auto_backup: true
+    compression_enabled: false  # Disabled for staging debugging
+    metadata_generation: true
+    checksum_validation: true
+    
+  # Staging-specific safety measures
+  safety_measures:
+    max_file_size_mb: 100
+    max_files_per_directory: 1000
+    auto_cleanup_enabled: true
+    retention_policy:
+      exploratory_days: 30
+      presentation_days: 90
+      publication_days: 365
+    backup_policy:
+      enable_automated_backup: true
+      backup_frequency: "daily"
+      backup_retention_days: 30
+      
+  # Enhanced audit and monitoring
+  audit_trail:
+    enable_detailed_logging: true
+    log_file_operations: true
+    log_configuration_changes: true
+    log_performance_metrics: true
+    log_resource_usage: true
+    log_validation_results: true
+    
+  # Production-like monitoring with staging adaptations
+  monitoring:
+    enable_performance_tracking: true
+    enable_resource_monitoring: true
+    enable_error_tracking: true
+    alert_thresholds:
+      file_size_mb: 75
+      generation_time_seconds: 30
+      disk_usage_percent: 80
+    
+  # Format-specific configurations
+  formats:
+    png:
+      dpi: 300
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      optimize: true
+      
+    pdf:
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      backend_pdf_ps: "pdf"
+      
+    svg:
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      svg_fonttype: "path"
+      
+    eps:
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      eps_level: 3
+
+# ==============================================================================
+# STAGING DEPLOYMENT VALIDATION SETTINGS
+# ==============================================================================
+# Enterprise-grade validation and testing configuration supporting
+# comprehensive staging deployment per Section 8.3 CI/CD requirements
+validation:
+  # Comprehensive validation framework
+  framework:
+    enable_comprehensive_validation: true
+    validation_level: "enterprise"
+    performance_benchmarking: true
+    regression_testing: true
+    compatibility_testing: true
+    
+  # Staging-specific validation scenarios
+  scenarios:
+    configuration_merge_testing: true
+    hook_registration_validation: true
+    dataset_operation_validation: true
+    example_project_execution: true
+    cross_platform_compatibility: true
+    
+  # Performance validation thresholds
+  performance_thresholds:
+    max_dataset_save_overhead_percent: 5
+    max_style_resolution_ms: 1
+    max_config_merge_ms: 10
+    max_hook_execution_ms: 50
+    max_figure_generation_seconds: 30
+    
+  # Enterprise compliance validation
+  compliance:
+    security_validation: true
+    dependency_scanning: true
+    code_quality_standards: "enterprise"
+    documentation_completeness: true
+    accessibility_compliance: true
+    
+  # Staging safety validation
+  safety_validation:
+    resource_limit_testing: true
+    error_handling_validation: true
+    fallback_mechanism_testing: true
+    rollback_procedure_validation: true
+    data_integrity_checking: true
+
+# ==============================================================================
+# ADVANCED EXPERIMENTAL INTEGRATION
+# ==============================================================================
+# Integration settings supporting complex experimental scenarios from
+# staging parameters.yml with comprehensive condition mapping support
+experimental_integration:
+  # Parameter mapping for condition resolution
+  parameter_mapping:
+    enable_nested_resolution: true
+    support_complex_conditions: true
+    enable_dynamic_evaluation: true
+    validation_on_resolution: true
+    
+  # Experimental condition contexts
+  condition_contexts:
+    ml_pipeline_context:
+      primary_condition: "staging_enterprise_ml_pipeline"
+      secondary_condition: "production_like_training"
+      fallback_condition: "basic_validation"
+      
+    inference_context:
+      primary_condition: "staging_inference_validation"
+      secondary_condition: "production_like_inference"
+      fallback_condition: "basic_validation"
+      
+    validation_context:
+      primary_condition: "comprehensive_enterprise_staging"
+      secondary_condition: "integration_validation"
+      fallback_condition: "basic_validation"
+      
+  # Advanced styling parameter support
+  styling_parameters:
+    enable_parameter_interpolation: true
+    support_conditional_styling: true
+    enable_dynamic_palette_selection: true
+    validation_on_style_application: true
+    
+  # Complex experimental scenario support
+  scenario_support:
+    multi_condition_experiments: true
+    hierarchical_condition_resolution: true
+    cross_condition_validation: true
+    scenario_specific_overrides: true
+
+# ==============================================================================
+# MONITORING AND OBSERVABILITY
+# ==============================================================================
+# Enterprise monitoring and observability configuration supporting
+# staging deployment validation and production readiness assessment
+monitoring:
+  # Application performance monitoring
+  apm:
+    enable_metrics_collection: true
+    enable_distributed_tracing: false  # Simplified for staging
+    enable_error_tracking: true
+    enable_performance_profiling: true
+    
+  # Infrastructure monitoring for staging
+  infrastructure:
+    enable_resource_tracking: true
+    enable_memory_monitoring: true
+    enable_cpu_monitoring: true
+    enable_disk_monitoring: true
+    
+  # Business metrics for validation
+  business_metrics:
+    track_pipeline_success_rate: true
+    track_figure_generation_metrics: true
+    track_styling_performance: true
+    track_configuration_merge_performance: true
+    
+  # Staging-specific monitoring
+  staging_monitoring:
+    enable_validation_metrics: true
+    enable_safety_mechanism_monitoring: true
+    enable_rollback_testing: true
+    enable_production_comparison: true
+    
+  # Alert configuration for staging
+  alerts:
+    performance_degradation_threshold: 20  # percent
+    error_rate_threshold: 5  # percent
+    resource_usage_threshold: 80  # percent
+    validation_failure_threshold: 10  # percent
+    
+  # Logging configuration
+  logging:
+    level: "INFO"
+    enable_structured_logging: true
+    enable_correlation_ids: true
+    enable_performance_logging: true
+    enable_audit_logging: true
+    log_retention_days: 90
+
+# ==============================================================================
+# ENVIRONMENT-SPECIFIC OVERRIDES
+# ==============================================================================
+# Staging-specific overrides supporting comprehensive testing and production
+# migration validation while maintaining staging safety mechanisms
+environment_overrides:
+  # Staging environment identification
+  environment_info:
+    name: "staging"
+    tier: "enterprise_validation"
+    production_mirroring: true
+    safety_enabled: true
+    
+  # Resource overrides for staging safety
+  resource_limits:
+    max_memory_usage_gb: 16
+    max_cpu_cores: 8
+    max_execution_time_minutes: 90
+    max_file_size_mb: 100
+    max_concurrent_operations: 10
+    
+  # Production migration preparation
+  migration_preparation:
+    enable_production_compatibility_mode: true
+    enable_schema_validation_strict: true
+    enable_performance_regression_detection: true
+    enable_backward_compatibility_testing: true
+    
+  # Staging safety overrides
+  safety_overrides:
+    enable_debug_logging: true
+    enable_extensive_validation: true
+    enable_performance_monitoring_verbose: true
+    enable_automatic_rollback_on_failure: true
+    enable_resource_limit_enforcement: true
+    
+  # Enhanced validation for staging
+  enhanced_validation:
+    enable_comprehensive_testing: true
+    enable_integration_validation: true
+    enable_cross_platform_testing: true
+    enable_compatibility_matrix_testing: true
+    enable_example_project_validation: true
