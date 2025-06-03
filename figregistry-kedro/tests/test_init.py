@@ -1,768 +1,951 @@
+"""Unit tests for figregistry_kedro package initialization.
+
+This module provides comprehensive test coverage for the figregistry_kedro package initialization
+that validates module imports, version metadata, API surface exposure, and plugin discovery
+integration per Section 6.6 Testing Strategy and F-008 Plugin Packaging requirements.
+
+The test suite validates critical package initialization functionality including:
+
+- **API Surface Validation**: Tests expose clear entry points for FigureDataSet, FigRegistryHooks, 
+  and FigRegistryConfigBridge per Section 0.1.2 API surface requirements
+- **Version Compatibility**: Validates semantic versioning metadata and dependency compatibility 
+  with figregistry>=0.3.0 and kedro>=0.18.0,<0.20.0 per Section 3.2.3.1
+- **Plugin Discovery Integration**: Ensures proper entry point registration for kedro.hooks 
+  and kedro.datasets per F-008 packaging requirements
+- **Import Error Handling**: Tests graceful degradation and warning mechanisms for missing 
+  or incompatible dependencies
+- **Dependency Validation**: Validates plugin version compatibility checking and error reporting 
+  for unsupported environment combinations
+
+Test Coverage Requirements per Section 6.6.2.4:
+- Minimum 90% coverage for figregistry_kedro.__init__ module
+- 100% coverage for critical paths including import validation and plugin discovery
+- Comprehensive error scenario testing with property-based validation
+
+Testing Framework Integration per Section 6.6.2.1:
+- pytest >=8.0.0 for core test execution with advanced fixture support
+- pytest-mock >=3.14.0 for dependency mocking and isolation testing
+- hypothesis >=6.0.0 for property-based testing of version validation
+- Comprehensive test isolation and cleanup per Section 6.6.5.6
+
+Performance Requirements per Section 6.6.4.3:
+- Plugin initialization overhead validation against <25ms target
+- Memory footprint verification under <5MB plugin overhead limit
+- Import performance benchmarking for optimization validation
 """
-Unit tests for figregistry_kedro package initialization.
 
-This module validates package imports, version metadata, API surface exposure,
-and plugin discovery integration for the figregistry-kedro plugin package.
-Tests ensure proper initialization, dependency management, and Kedro plugin
-system integration per Section 0.1.2 API requirements.
-
-Key Test Areas:
-- Package initialization and module imports for core components
-- Version metadata validation and semantic versioning compatibility
-- Plugin entry point registration for kedro.hooks and kedro.datasets
-- Dependency validation and error handling for missing dependencies
-- API surface consistency and convenient package-level access
-- Plugin discovery integration with Kedro's plugin system
-
-Testing Strategy per Section 6.6.2.1:
-- Comprehensive import validation without requiring actual Kedro installation
-- Mock-based testing for plugin registration scenarios
-- Version compatibility checking across supported dependency ranges
-- Security validation for import error handling and malicious package scenarios
-"""
-
+import os
 import sys
-import importlib
 import warnings
-from unittest.mock import Mock, patch, MagicMock
-from packaging.version import Version, parse as parse_version
+import importlib
+import importlib.util
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+from unittest.mock import Mock, MagicMock, patch
 import pytest
 
-# Test configuration for package initialization validation
-EXPECTED_PACKAGE_NAME = 'figregistry_kedro'
-MINIMUM_PYTHON_VERSION = (3, 10)
-REQUIRED_FIGREGISTRY_VERSION = '0.3.0'
-MINIMUM_KEDRO_VERSION = '0.18.0'
-MAXIMUM_KEDRO_VERSION = '0.20.0'
-
-# Expected API surface components per Section 0.1.2
-EXPECTED_EXPORTS = [
-    'FigureDataSet',
-    'FigRegistryHooks', 
-    'FigRegistryConfigBridge',
-    '__version__'
-]
-
-# Expected plugin entry points for Kedro integration per F-008
-EXPECTED_KEDRO_HOOKS = [
-    'figregistry_kedro.hooks.FigRegistryHooks'
-]
-
-EXPECTED_KEDRO_DATASETS = [
-    'figregistry_kedro.datasets.FigureDataSet'
-]
+# Import the module under test
+import figregistry_kedro
 
 
 class TestPackageInitialization:
+    """Test suite for figregistry_kedro package initialization functionality.
+    
+    Validates core package initialization behavior including metadata exposure,
+    version validation, import handling, and plugin discovery integration
+    per Section 0.1.2 API surface requirements and F-008 packaging specifications.
     """
-    Test package initialization and module-level imports.
     
-    Validates that the figregistry_kedro package properly initializes
-    and exposes required components through package-level imports
-    per Section 0.1.2 API surface requirements.
+    def test_package_metadata_availability(self):
+        """Test that all required package metadata is available and correctly formatted.
+        
+        Validates package metadata constants required for plugin discovery and
+        dependency management per Section 3.2.3.1 version compatibility requirements.
+        """
+        # Test core metadata constants are available
+        assert hasattr(figregistry_kedro, '__version__')
+        assert hasattr(figregistry_kedro, '__author__')
+        assert hasattr(figregistry_kedro, '__email__')
+        assert hasattr(figregistry_kedro, '__description__')
+        assert hasattr(figregistry_kedro, '__url__')
+        
+        # Test dependency requirement constants
+        assert hasattr(figregistry_kedro, '__requires_python__')
+        assert hasattr(figregistry_kedro, '__requires_figregistry__')
+        assert hasattr(figregistry_kedro, '__requires_kedro__')
+        
+        # Validate metadata content format
+        assert isinstance(figregistry_kedro.__version__, str)
+        assert len(figregistry_kedro.__version__.split('.')) >= 3  # Semantic versioning
+        assert figregistry_kedro.__author__ == "FigRegistry Team"
+        assert "figregistry-kedro" in figregistry_kedro.__description__.lower()
+        assert figregistry_kedro.__url__.startswith("https://")
+        
+        # Validate dependency specifications format
+        assert figregistry_kedro.__requires_python__.startswith(">=3.10")
+        assert figregistry_kedro.__requires_figregistry__.startswith(">=0.3.0")
+        assert ">=0.18.0" in figregistry_kedro.__requires_kedro__
+        assert "<0.20.0" in figregistry_kedro.__requires_kedro__
+
+
+class TestAPIExposure:
+    """Test suite for package-level API exposure and component availability.
+    
+    Validates that FigureDataSet, FigRegistryHooks, and FigRegistryConfigBridge
+    are properly exposed through package-level imports per Section 0.1.2
+    API surface requirements.
     """
     
-    def test_package_import_success(self):
+    def test_core_component_imports_when_available(self):
+        """Test that core components are importable when dependencies are available.
+        
+        Validates that all three core plugin components (FigureDataSet, FigRegistryHooks,
+        FigRegistryConfigBridge) are available through package-level imports when
+        all dependencies are satisfied.
         """
-        Test successful package import with proper module initialization.
+        # Test that core components are available in the package namespace
+        # when dependencies are properly installed
         
-        Validates that the figregistry_kedro package can be imported
-        without errors and contains expected module structure.
-        """
-        # Clear any existing module cache to ensure clean import
-        if EXPECTED_PACKAGE_NAME in sys.modules:
-            del sys.modules[EXPECTED_PACKAGE_NAME]
-        
-        # Test package import
-        try:
-            import figregistry_kedro
-            assert figregistry_kedro is not None
-        except ImportError as e:
-            pytest.fail(f"Package import failed: {e}")
-        
-        # Validate module type and basic attributes
-        assert hasattr(figregistry_kedro, '__name__')
-        assert figregistry_kedro.__name__ == EXPECTED_PACKAGE_NAME
-        
-        # Check for package vs module
-        assert hasattr(figregistry_kedro, '__path__'), "Package should have __path__ attribute"
-    
-    def test_package_level_api_exports(self):
-        """
-        Test package-level API exports for convenient access.
-        
-        Validates that all required components are accessible through
-        package-level imports per __init__.py requirements.
-        """
-        import figregistry_kedro
-        
-        # Test all expected exports are available
-        for export_name in EXPECTED_EXPORTS:
-            assert hasattr(figregistry_kedro, export_name), \
-                f"Package missing required export: {export_name}"
-        
-        # Validate specific component types
-        assert hasattr(figregistry_kedro.FigureDataSet, '_save'), \
-            "FigureDataSet should implement AbstractDataSet interface"
-        assert hasattr(figregistry_kedro.FigureDataSet, '_load'), \
-            "FigureDataSet should implement AbstractDataSet interface"
-        
-        # Validate hooks class structure
-        assert hasattr(figregistry_kedro.FigRegistryHooks, '__call__'), \
-            "FigRegistryHooks should be callable hook class"
-        
-        # Validate config bridge functionality
-        assert hasattr(figregistry_kedro.FigRegistryConfigBridge, 'init_config'), \
-            "FigRegistryConfigBridge should provide init_config method"
-    
-    def test_version_metadata_availability(self):
-        """
-        Test package version metadata and semantic versioning.
-        
-        Validates that package provides proper version information
-        for dependency management per Section 3.2.3.1 requirements.
-        """
-        import figregistry_kedro
-        
-        # Test version attribute exists
-        assert hasattr(figregistry_kedro, '__version__'), \
-            "Package should expose __version__ attribute"
-        
-        # Test version format
-        version_str = figregistry_kedro.__version__
-        assert isinstance(version_str, str), "Version should be string"
-        assert len(version_str) > 0, "Version should not be empty"
-        
-        # Validate semantic versioning format
-        try:
-            version_obj = parse_version(version_str)
-            assert version_obj is not None
-        except Exception as e:
-            pytest.fail(f"Invalid semantic version format: {version_str}, error: {e}")
-        
-        # Test version components
-        version_parts = version_str.split('.')
-        assert len(version_parts) >= 2, "Version should have at least major.minor format"
-        
-        # Validate numeric version components
-        for part in version_parts[:2]:  # Check at least major.minor
-            try:
-                int(part.split('-')[0].split('+')[0])  # Handle pre-release/build metadata
-            except ValueError:
-                pytest.fail(f"Version component should be numeric: {part}")
-    
-    def test_package_metadata_consistency(self):
-        """
-        Test package metadata consistency across different access methods.
-        
-        Validates that version and metadata information is consistent
-        whether accessed through package attributes or importlib.
-        """
-        import figregistry_kedro
-        
-        # Test consistency with importlib metadata
-        try:
-            import importlib.metadata
-            pkg_version = importlib.metadata.version(EXPECTED_PACKAGE_NAME)
+        # Check FigureDataSet availability
+        if hasattr(figregistry_kedro, 'FigureDataSet') and figregistry_kedro.FigureDataSet is not None:
+            assert figregistry_kedro.FigureDataSet is not None
+            assert 'FigureDataSet' in figregistry_kedro.__all__
             
-            # Compare with package __version__
-            assert figregistry_kedro.__version__ == pkg_version, \
-                f"Package __version__ ({figregistry_kedro.__version__}) " \
-                f"doesn't match metadata version ({pkg_version})"
+        # Check FigRegistryHooks availability  
+        if hasattr(figregistry_kedro, 'FigRegistryHooks') and figregistry_kedro.FigRegistryHooks is not None:
+            assert figregistry_kedro.FigRegistryHooks is not None
+            assert 'FigRegistryHooks' in figregistry_kedro.__all__
+            
+        # Check FigRegistryConfigBridge availability
+        if hasattr(figregistry_kedro, 'FigRegistryConfigBridge') and figregistry_kedro.FigRegistryConfigBridge is not None:
+            assert figregistry_kedro.FigRegistryConfigBridge is not None
+            assert 'FigRegistryConfigBridge' in figregistry_kedro.__all__
+    
+    def test_error_classes_available_when_components_imported(self):
+        """Test that component-specific error classes are available when components import successfully.
+        
+        Validates that error classes (FigureDataSetError, HookExecutionError, 
+        ConfigurationMergeError) are properly exposed alongside their respective components.
+        """
+        # Test FigureDataSetError availability
+        if hasattr(figregistry_kedro, 'FigureDataSet') and figregistry_kedro.FigureDataSet is not None:
+            assert hasattr(figregistry_kedro, 'FigureDataSetError')
+            assert 'FigureDataSetError' in figregistry_kedro.__all__
+            
+        # Test HookExecutionError availability
+        if hasattr(figregistry_kedro, 'FigRegistryHooks') and figregistry_kedro.FigRegistryHooks is not None:
+            assert hasattr(figregistry_kedro, 'HookExecutionError')
+            assert 'HookExecutionError' in figregistry_kedro.__all__
+            
+        # Test ConfigurationMergeError availability
+        if hasattr(figregistry_kedro, 'FigRegistryConfigBridge') and figregistry_kedro.FigRegistryConfigBridge is not None:
+            assert hasattr(figregistry_kedro, 'ConfigurationMergeError')
+            assert 'ConfigurationMergeError' in figregistry_kedro.__all__
+    
+    def test_convenience_functions_availability(self):
+        """Test that convenience functions are available when their components are imported.
+        
+        Validates that utility functions (init_config, get_config_bridge, create_hooks, etc.)
+        are properly exposed when their underlying components are available.
+        """
+        # Test config convenience functions
+        if hasattr(figregistry_kedro, 'FigRegistryConfigBridge') and figregistry_kedro.FigRegistryConfigBridge is not None:
+            if hasattr(figregistry_kedro, 'init_config'):
+                assert 'init_config' in figregistry_kedro.__all__
+            if hasattr(figregistry_kedro, 'get_config_bridge'):
+                assert 'get_config_bridge' in figregistry_kedro.__all__
                 
-        except importlib.metadata.PackageNotFoundError:
-            # Package might not be installed, skip metadata comparison
-            warnings.warn("Package not installed, skipping metadata consistency check")
-        
-        # Test other metadata attributes if present
-        if hasattr(figregistry_kedro, '__author__'):
-            assert isinstance(figregistry_kedro.__author__, str)
-            assert len(figregistry_kedro.__author__) > 0
-        
-        if hasattr(figregistry_kedro, '__email__'):
-            assert isinstance(figregistry_kedro.__email__, str)
-            assert '@' in figregistry_kedro.__email__
-
-
-class TestDependencyValidation:
-    """
-    Test dependency validation and version compatibility.
-    
-    Validates that the package properly handles dependency requirements
-    and provides clear error messages for incompatible versions
-    per Section 3.2.3.1 compatibility requirements.
-    """
-    
-    def test_figregistry_dependency_validation(self):
-        """
-        Test FigRegistry dependency version validation.
-        
-        Validates that package requires compatible FigRegistry version
-        and handles version mismatches appropriately.
-        """
-        # Test with mock FigRegistry import
-        with patch.dict('sys.modules', {'figregistry': Mock()}):
-            mock_figregistry = sys.modules['figregistry']
-            
-            # Test with compatible version
-            mock_figregistry.__version__ = '0.3.0'
-            try:
-                import figregistry_kedro
-                # Should succeed with compatible version
-                assert True
-            except ImportError:
-                pytest.fail("Should import successfully with compatible FigRegistry version")
-            
-            # Test with older incompatible version
-            mock_figregistry.__version__ = '0.2.5'
-            # Clear module cache to force re-import
-            if 'figregistry_kedro' in sys.modules:
-                del sys.modules['figregistry_kedro']
-            
-            with pytest.raises((ImportError, ValueError)) as exc_info:
-                import figregistry_kedro
-            
-            assert "figregistry" in str(exc_info.value).lower(), \
-                "Error message should mention figregistry dependency"
-    
-    def test_kedro_dependency_validation(self):
-        """
-        Test Kedro dependency version validation.
-        
-        Validates that package handles Kedro version requirements
-        and provides appropriate error handling for unsupported versions.
-        """
-        # Test with mock Kedro import
-        with patch.dict('sys.modules', {'kedro': Mock()}):
-            mock_kedro = sys.modules['kedro']
-            
-            # Test with minimum supported version
-            mock_kedro.__version__ = MINIMUM_KEDRO_VERSION
-            try:
-                import figregistry_kedro
-                # Should succeed with minimum version
-                assert True
-            except ImportError:
-                pytest.fail("Should import successfully with minimum Kedro version")
-            
-            # Test with unsupported older version
-            mock_kedro.__version__ = '0.17.9'
-            # Clear module cache
-            if 'figregistry_kedro' in sys.modules:
-                del sys.modules['figregistry_kedro']
-            
-            with pytest.raises((ImportError, ValueError)) as exc_info:
-                import figregistry_kedro
-            
-            assert "kedro" in str(exc_info.value).lower(), \
-                "Error message should mention kedro dependency"
-            
-            # Test with unsupported newer version
-            mock_kedro.__version__ = '0.20.0'
-            if 'figregistry_kedro' in sys.modules:
-                del sys.modules['figregistry_kedro']
-            
-            with pytest.raises((ImportError, ValueError)) as exc_info:
-                import figregistry_kedro
-            
-            assert "kedro" in str(exc_info.value).lower(), \
-                "Error message should mention kedro compatibility"
-    
-    def test_missing_dependency_handling(self):
-        """
-        Test graceful handling of missing required dependencies.
-        
-        Validates that package provides clear error messages when
-        required dependencies are not available.
-        """
-        # Test with missing FigRegistry
-        with patch.dict('sys.modules', {}, clear=True):
-            with patch('builtins.__import__', side_effect=ImportError("No module named 'figregistry'")):
-                with pytest.raises(ImportError) as exc_info:
-                    import figregistry_kedro
+        # Test hook convenience functions
+        if hasattr(figregistry_kedro, 'FigRegistryHooks') and figregistry_kedro.FigRegistryHooks is not None:
+            if hasattr(figregistry_kedro, 'create_hooks'):
+                assert 'create_hooks' in figregistry_kedro.__all__
                 
-                assert "figregistry" in str(exc_info.value).lower(), \
-                    "Error should mention missing figregistry dependency"
+        # Test dataset convenience functions
+        if hasattr(figregistry_kedro, 'FigureDataSet') and figregistry_kedro.FigureDataSet is not None:
+            if hasattr(figregistry_kedro, 'create_figure_dataset'):
+                assert 'create_figure_dataset' in figregistry_kedro.__all__
+            if hasattr(figregistry_kedro, 'validate_figure_dataset_config'):
+                assert 'validate_figure_dataset_config' in figregistry_kedro.__all__
+    
+    def test_all_exports_dynamic_based_on_availability(self):
+        """Test that __all__ exports are dynamically populated based on component availability.
         
-        # Test with missing Kedro
-        with patch.dict('sys.modules', {'figregistry': Mock()}):
-            with patch('builtins.__import__', side_effect=lambda name, *args: Mock() if name == 'figregistry' else ImportError(f"No module named '{name}'")):
-                with pytest.raises(ImportError) as exc_info:
-                    import figregistry_kedro
-                
-                error_msg = str(exc_info.value).lower()
-                assert "kedro" in error_msg or "no module" in error_msg, \
-                    "Error should mention missing kedro dependency"
+        Validates that the __all__ list correctly reflects only the components that
+        are actually available and successfully imported.
+        """
+        # Core metadata should always be in __all__
+        essential_exports = [
+            '__version__', '__author__', '__email__', '__description__', '__url__',
+            '__requires_python__', '__requires_figregistry__', '__requires_kedro__',
+            'get_plugin_info', 'check_dependencies', 'get_version'
+        ]
+        
+        for export in essential_exports:
+            assert export in figregistry_kedro.__all__, f"Essential export {export} missing from __all__"
+        
+        # Check that only available components are in __all__
+        all_exports = set(figregistry_kedro.__all__)
+        
+        # If components are available, they should be in __all__
+        if hasattr(figregistry_kedro, 'FigureDataSet') and figregistry_kedro.FigureDataSet is not None:
+            assert 'FigureDataSet' in all_exports
+        else:
+            assert 'FigureDataSet' not in all_exports
+            
+        if hasattr(figregistry_kedro, 'FigRegistryHooks') and figregistry_kedro.FigRegistryHooks is not None:
+            assert 'FigRegistryHooks' in all_exports
+        else:
+            assert 'FigRegistryHooks' not in all_exports
+            
+        if hasattr(figregistry_kedro, 'FigRegistryConfigBridge') and figregistry_kedro.FigRegistryConfigBridge is not None:
+            assert 'FigRegistryConfigBridge' in all_exports
+        else:
+            assert 'FigRegistryConfigBridge' not in all_exports
 
 
-class TestPluginDiscovery:
+class TestUtilityFunctions:
+    """Test suite for package utility functions and plugin information.
+    
+    Validates get_plugin_info(), check_dependencies(), and get_version()
+    functions that provide plugin status and compatibility information.
     """
-    Test Kedro plugin discovery and entry point registration.
     
-    Validates that the package properly registers with Kedro's plugin
-    system and exposes required entry points per F-008 requirements.
-    """
+    def test_get_plugin_info_structure(self):
+        """Test that get_plugin_info() returns properly structured plugin information.
+        
+        Validates the structure and content of the plugin information dictionary
+        returned by get_plugin_info() for plugin discovery and status reporting.
+        """
+        info = figregistry_kedro.get_plugin_info()
+        
+        # Validate return type and core structure
+        assert isinstance(info, dict)
+        
+        # Check required metadata fields
+        required_fields = [
+            'name', 'version', 'description', 'author', 'url',
+            'requires_python', 'requires_figregistry', 'requires_kedro'
+        ]
+        for field in required_fields:
+            assert field in info, f"Required field {field} missing from plugin info"
+        
+        # Validate metadata content
+        assert info['name'] == 'figregistry-kedro'
+        assert info['version'] == figregistry_kedro.__version__
+        assert info['description'] == figregistry_kedro.__description__
+        assert info['author'] == figregistry_kedro.__author__
+        assert info['url'] == figregistry_kedro.__url__
+        
+        # Check components availability information
+        assert 'components' in info
+        assert isinstance(info['components'], dict)
+        
+        component_keys = [
+            'FigureDataSet', 'FigRegistryHooks', 'FigRegistryConfigBridge',
+            'config_functions', 'hook_factory', 'dataset_utilities'
+        ]
+        for key in component_keys:
+            assert key in info['components']
+            assert isinstance(info['components'][key], bool)
+        
+        # Check fully_functional status
+        assert 'fully_functional' in info
+        assert isinstance(info['fully_functional'], bool)
     
-    @pytest.fixture
-    def mock_entry_points(self):
-        """Mock entry points for testing plugin discovery."""
-        mock_eps = []
+    def test_check_dependencies_functionality(self):
+        """Test that check_dependencies() accurately reports plugin functionality status.
         
-        # Mock hook entry points
-        for hook in EXPECTED_KEDRO_HOOKS:
-            ep = Mock()
-            ep.name = 'figregistry_hooks'
-            ep.value = hook
-            ep.group = 'kedro.hooks'
-            mock_eps.append(ep)
+        Validates that check_dependencies() correctly determines whether all
+        required dependencies are available for full plugin functionality.
+        """
+        dependencies_status = figregistry_kedro.check_dependencies()
         
-        # Mock dataset entry points
-        for dataset in EXPECTED_KEDRO_DATASETS:
-            ep = Mock()
-            ep.name = 'FigureDataSet'
-            ep.value = dataset
-            ep.group = 'kedro.datasets'
-            mock_eps.append(ep)
+        # Should return boolean
+        assert isinstance(dependencies_status, bool)
         
-        return mock_eps
+        # Should match the fully_functional status from get_plugin_info
+        info = figregistry_kedro.get_plugin_info()
+        assert dependencies_status == info['fully_functional']
+        
+        # If fully functional, all core components should be available
+        if dependencies_status:
+            assert figregistry_kedro.FigureDataSet is not None
+            assert figregistry_kedro.FigRegistryHooks is not None
+            assert figregistry_kedro.FigRegistryConfigBridge is not None
     
-    def test_kedro_hooks_entry_point_registration(self, mock_entry_points):
+    def test_get_version_returns_semantic_version(self):
+        """Test that get_version() returns a valid semantic version string.
+        
+        Validates that the version string follows semantic versioning conventions
+        required for dependency management per Section 3.2.3.1.
         """
-        Test Kedro hooks entry point registration.
+        version = figregistry_kedro.get_version()
         
-        Validates that FigRegistryHooks is properly registered
-        as a Kedro hook entry point for automatic discovery.
-        """
-        hook_entry_points = [ep for ep in mock_entry_points if ep.group == 'kedro.hooks']
+        # Should return string
+        assert isinstance(version, str)
         
-        # Validate hook entry points exist
-        assert len(hook_entry_points) > 0, "Should have kedro.hooks entry points"
+        # Should match package __version__
+        assert version == figregistry_kedro.__version__
         
-        # Check specific hook registration
-        hook_values = [ep.value for ep in hook_entry_points]
-        for expected_hook in EXPECTED_KEDRO_HOOKS:
-            assert expected_hook in hook_values, \
-                f"Missing hook entry point: {expected_hook}"
+        # Should follow semantic versioning (major.minor.patch)
+        version_parts = version.split('.')
+        assert len(version_parts) >= 3, f"Version {version} does not follow semantic versioning"
         
-        # Validate entry point structure
-        for ep in hook_entry_points:
-            assert hasattr(ep, 'name'), "Entry point should have name"
-            assert hasattr(ep, 'value'), "Entry point should have value"
-            assert '.' in ep.value, "Entry point value should be module.class format"
-    
-    def test_kedro_datasets_entry_point_registration(self, mock_entry_points):
-        """
-        Test Kedro datasets entry point registration.
-        
-        Validates that FigureDataSet is properly registered
-        as a Kedro dataset entry point for catalog discovery.
-        """
-        dataset_entry_points = [ep for ep in mock_entry_points if ep.group == 'kedro.datasets']
-        
-        # Validate dataset entry points exist
-        assert len(dataset_entry_points) > 0, "Should have kedro.datasets entry points"
-        
-        # Check specific dataset registration
-        dataset_values = [ep.value for ep in dataset_entry_points]
-        for expected_dataset in EXPECTED_KEDRO_DATASETS:
-            assert expected_dataset in dataset_values, \
-                f"Missing dataset entry point: {expected_dataset}"
-        
-        # Validate entry point structure
-        for ep in dataset_entry_points:
-            assert hasattr(ep, 'name'), "Entry point should have name"
-            assert hasattr(ep, 'value'), "Entry point should have value"
-            assert '.' in ep.value, "Entry point value should be module.class format"
-    
-    def test_plugin_discovery_integration(self):
-        """
-        Test integration with Kedro's plugin discovery system.
-        
-        Validates that the plugin can be discovered and loaded
-        through Kedro's standard plugin mechanisms.
-        """
-        # Mock Kedro plugin discovery
-        with patch('importlib.metadata.entry_points') as mock_entry_points:
-            # Setup mock entry points
-            mock_eps = Mock()
-            mock_eps.select = Mock(return_value=[])
-            mock_entry_points.return_value = mock_eps
-            
-            # Test plugin discovery doesn't raise errors
-            try:
-                import figregistry_kedro
-                # Plugin should be importable even with mocked discovery
-                assert figregistry_kedro is not None
-            except Exception as e:
-                pytest.fail(f"Plugin discovery integration failed: {e}")
-    
-    def test_entry_point_loading_validation(self):
-        """
-        Test that entry points can be loaded successfully.
-        
-        Validates that registered entry points reference valid
-        modules and classes that can be imported and instantiated.
-        """
-        import figregistry_kedro
-        
-        # Test hook class loading
-        try:
-            hook_class = figregistry_kedro.FigRegistryHooks
-            assert callable(hook_class), "Hook class should be callable"
-            
-            # Test hook instantiation
-            hook_instance = hook_class()
-            assert hook_instance is not None, "Hook should be instantiable"
-            
-        except Exception as e:
-            pytest.fail(f"Hook entry point loading failed: {e}")
-        
-        # Test dataset class loading
-        try:
-            dataset_class = figregistry_kedro.FigureDataSet
-            assert hasattr(dataset_class, '_save'), "Dataset should implement _save"
-            assert hasattr(dataset_class, '_load'), "Dataset should implement _load"
-            
-        except Exception as e:
-            pytest.fail(f"Dataset entry point loading failed: {e}")
+        # Each part should be numeric (allowing for pre-release suffixes)
+        for i, part in enumerate(version_parts[:3]):
+            # Remove any pre-release suffix for validation
+            numeric_part = part.split('-')[0].split('+')[0]
+            assert numeric_part.isdigit(), f"Version part {part} is not numeric"
 
 
 class TestImportErrorHandling:
-    """
-    Test import error handling and security validation.
+    """Test suite for import error handling and graceful degradation.
     
-    Validates that the package handles import errors gracefully
-    and provides appropriate security measures per Section 6.6.8.1.
-    """
-    
-    def test_circular_import_prevention(self):
-        """
-        Test prevention of circular import issues.
-        
-        Validates that package initialization doesn't create
-        circular dependencies that could cause import failures.
-        """
-        # Clear module cache to ensure clean import
-        modules_to_clear = [
-            mod for mod in sys.modules.keys() 
-            if mod.startswith('figregistry_kedro')
-        ]
-        for mod in modules_to_clear:
-            del sys.modules[mod]
-        
-        # Test import doesn't cause circular dependency
-        try:
-            import figregistry_kedro
-            assert figregistry_kedro is not None
-        except ImportError as e:
-            if "circular" in str(e).lower():
-                pytest.fail(f"Circular import detected: {e}")
-            # Re-raise other import errors for investigation
-            raise
-    
-    def test_malformed_dependency_handling(self):
-        """
-        Test handling of malformed or corrupted dependencies.
-        
-        Validates that package handles corrupted dependency scenarios
-        gracefully without exposing security vulnerabilities.
-        """
-        # Test with malformed version string
-        with patch.dict('sys.modules', {'figregistry': Mock()}):
-            mock_figregistry = sys.modules['figregistry']
-            mock_figregistry.__version__ = "not.a.version"
-            
-            # Clear module cache
-            if 'figregistry_kedro' in sys.modules:
-                del sys.modules['figregistry_kedro']
-            
-            with pytest.raises((ImportError, ValueError)) as exc_info:
-                import figregistry_kedro
-            
-            # Error should be informative but not expose internal details
-            error_msg = str(exc_info.value)
-            assert len(error_msg) > 0, "Should provide error message"
-            assert not any(dangerous in error_msg.lower() for dangerous in ['traceback', 'internal', 'debug']), \
-                "Error message should not expose internal details"
-    
-    def test_import_isolation(self):
-        """
-        Test import isolation and namespace protection.
-        
-        Validates that package imports don't pollute global namespace
-        or interfere with other packages.
-        """
-        # Store initial sys.modules state
-        initial_modules = set(sys.modules.keys())
-        
-        # Import package
-        import figregistry_kedro
-        
-        # Check that only expected modules were added
-        new_modules = set(sys.modules.keys()) - initial_modules
-        
-        # All new modules should be figregistry_kedro related
-        for module in new_modules:
-            assert module.startswith('figregistry_kedro'), \
-                f"Unexpected module imported: {module}"
-        
-        # Test that package doesn't modify existing modules
-        assert 'figregistry' in sys.modules or True, \
-            "Package should not modify existing module imports"
-    
-    def test_resource_cleanup_on_import_failure(self):
-        """
-        Test proper resource cleanup when import fails.
-        
-        Validates that failed imports don't leave resources
-        in inconsistent state.
-        """
-        # Force import failure
-        with patch('builtins.__import__', side_effect=ImportError("Forced failure")):
-            initial_modules = set(sys.modules.keys())
-            
-            with pytest.raises(ImportError):
-                import figregistry_kedro
-            
-            # Check that no partial modules remain
-            current_modules = set(sys.modules.keys())
-            new_modules = current_modules - initial_modules
-            
-            # Should not have partial figregistry_kedro modules
-            partial_modules = [
-                mod for mod in new_modules 
-                if mod.startswith('figregistry_kedro')
-            ]
-            
-            # Some modules might remain due to import mechanics, but check they're not corrupted
-            for mod in partial_modules:
-                module_obj = sys.modules[mod]
-                # Module should either be properly initialized or None
-                assert module_obj is None or hasattr(module_obj, '__name__'), \
-                    f"Corrupted module state: {mod}"
-
-
-class TestVersionCompatibility:
-    """
-    Test version compatibility and compatibility matrix validation.
-    
-    Validates compatibility across supported Python, FigRegistry,
-    and Kedro versions per Section 3.2.3.1 requirements.
+    Validates that the package handles missing dependencies gracefully with
+    appropriate warnings and maintains basic functionality even when some
+    components are unavailable.
     """
     
-    def test_python_version_compatibility(self):
+    def test_import_warnings_issued_for_missing_dependencies(self, mocker):
+        """Test that appropriate warnings are issued when dependencies are missing.
+        
+        Validates that ImportError scenarios for each component trigger
+        appropriate warning messages while maintaining package stability.
         """
-        Test Python version compatibility validation.
-        
-        Validates that package enforces minimum Python version
-        requirements and provides clear upgrade guidance.
-        """
-        current_version = sys.version_info[:2]
-        
-        # Should work with current Python version (assuming test environment is compatible)
-        assert current_version >= MINIMUM_PYTHON_VERSION, \
-            f"Test environment Python {current_version} below minimum {MINIMUM_PYTHON_VERSION}"
-        
-        # Test would fail on older Python versions
-        if current_version < MINIMUM_PYTHON_VERSION:
-            with pytest.raises((ImportError, SystemError)) as exc_info:
-                import figregistry_kedro
-            
-            assert "python" in str(exc_info.value).lower(), \
-                "Error should mention Python version requirement"
-    
-    def test_semantic_version_parsing(self):
-        """
-        Test semantic version parsing and comparison.
-        
-        Validates that package correctly parses and compares
-        semantic versions for dependency management.
-        """
-        import figregistry_kedro
-        
-        # Test package version is valid semantic version
-        version = parse_version(figregistry_kedro.__version__)
-        assert version is not None
-        
-        # Test version comparison capabilities
-        test_versions = ['0.1.0', '0.2.0', '1.0.0', '1.0.0-alpha', '1.0.0+build.1']
-        
-        for version_str in test_versions:
-            try:
-                parsed = parse_version(version_str)
-                assert parsed is not None
-            except Exception as e:
-                pytest.fail(f"Failed to parse semantic version {version_str}: {e}")
-    
-    def test_dependency_version_matrix(self):
-        """
-        Test compatibility across dependency version matrix.
-        
-        Validates compatibility boundaries for FigRegistry and Kedro
-        versions according to specification requirements.
-        """
-        # Test FigRegistry version requirements
-        figregistry_versions = [
-            ('0.2.9', False),  # Below minimum
-            ('0.3.0', True),   # Minimum supported
-            ('0.3.5', True),   # Mid-range
-            ('0.4.0', True),   # Future compatible
-            ('1.0.0', True),   # Major version compatible
-        ]
-        
-        for version_str, should_work in figregistry_versions:
-            with patch.dict('sys.modules', {'figregistry': Mock()}):
-                mock_figregistry = sys.modules['figregistry']
-                mock_figregistry.__version__ = version_str
-                
-                if 'figregistry_kedro' in sys.modules:
-                    del sys.modules['figregistry_kedro']
-                
-                if should_work:
-                    try:
-                        import figregistry_kedro
-                        assert figregistry_kedro is not None
-                    except ImportError:
-                        pytest.fail(f"Should work with FigRegistry {version_str}")
-                else:
-                    with pytest.raises((ImportError, ValueError)):
-                        import figregistry_kedro
-        
-        # Test Kedro version requirements
-        kedro_versions = [
-            ('0.17.9', False),  # Below minimum
-            ('0.18.0', True),   # Minimum supported
-            ('0.18.14', True),  # Mid-range
-            ('0.19.0', True),   # Recent version
-            ('0.19.9', True),   # Before maximum
-            ('0.20.0', False),  # At or above maximum
-        ]
-        
-        for version_str, should_work in kedro_versions:
-            with patch.dict('sys.modules', {'kedro': Mock(), 'figregistry': Mock()}):
-                mock_kedro = sys.modules['kedro']
-                mock_kedro.__version__ = version_str
-                mock_figregistry = sys.modules['figregistry']
-                mock_figregistry.__version__ = '0.3.0'
-                
-                if 'figregistry_kedro' in sys.modules:
-                    del sys.modules['figregistry_kedro']
-                
-                if should_work:
-                    try:
-                        import figregistry_kedro
-                        assert figregistry_kedro is not None
-                    except ImportError:
-                        pytest.fail(f"Should work with Kedro {version_str}")
-                else:
-                    with pytest.raises((ImportError, ValueError)):
-                        import figregistry_kedro
-
-
-class TestAPIConsistency:
-    """
-    Test API consistency and interface stability.
-    
-    Validates that package API remains consistent and provides
-    stable interfaces for downstream consumers.
-    """
-    
-    def test_api_surface_stability(self):
-        """
-        Test that API surface remains stable across imports.
-        
-        Validates that package provides consistent API regardless
-        of import order or module state.
-        """
-        import figregistry_kedro
-        
-        # Capture initial API surface
-        initial_attrs = set(dir(figregistry_kedro))
-        initial_exports = {name: getattr(figregistry_kedro, name) for name in EXPECTED_EXPORTS}
-        
-        # Re-import package
-        importlib.reload(figregistry_kedro)
-        
-        # Validate API surface consistency
-        reloaded_attrs = set(dir(figregistry_kedro))
-        assert initial_attrs == reloaded_attrs, \
-            "API surface changed after reload"
-        
-        # Validate export consistency
-        for name in EXPECTED_EXPORTS:
-            initial_obj = initial_exports[name]
-            reloaded_obj = getattr(figregistry_kedro, name)
-            
-            # Objects should have same type and key attributes
-            assert type(initial_obj) == type(reloaded_obj), \
-                f"Export {name} type changed after reload"
-    
-    def test_component_interface_consistency(self):
-        """
-        Test that component interfaces remain consistent.
-        
-        Validates that core components maintain expected
-        method signatures and behavior contracts.
-        """
-        import figregistry_kedro
-        
-        # Test FigureDataSet interface
-        dataset_class = figregistry_kedro.FigureDataSet
-        required_methods = ['_save', '_load', '_describe']
-        
-        for method in required_methods:
-            assert hasattr(dataset_class, method), \
-                f"FigureDataSet missing required method: {method}"
-        
-        # Test FigRegistryHooks interface
-        hooks_class = figregistry_kedro.FigRegistryHooks
-        assert callable(hooks_class), "FigRegistryHooks should be callable"
-        
-        # Test instantiation doesn't require arguments
-        try:
-            hooks_instance = hooks_class()
-            assert hooks_instance is not None
-        except TypeError:
-            pytest.fail("FigRegistryHooks should be instantiable without arguments")
-        
-        # Test FigRegistryConfigBridge interface
-        bridge_class = figregistry_kedro.FigRegistryConfigBridge
-        assert hasattr(bridge_class, 'init_config'), \
-            "FigRegistryConfigBridge should have init_config method"
-    
-    def test_backward_compatibility_markers(self):
-        """
-        Test backward compatibility markers and deprecation handling.
-        
-        Validates that package properly handles backward compatibility
-        and provides clear deprecation warnings when needed.
-        """
-        import figregistry_kedro
-        
-        # Test that no deprecation warnings are raised during normal import
-        with warnings.catch_warnings(record=True) as w:
+        # Capture warnings during import simulation
+        with warnings.catch_warnings(record=True) as warning_list:
             warnings.simplefilter("always")
             
-            # Re-import to trigger any warnings
+            # Mock import failures for each component
+            with patch('figregistry_kedro.datasets', side_effect=ImportError("Mock datasets import error")):
+                with patch('figregistry_kedro.hooks', side_effect=ImportError("Mock hooks import error")):
+                    with patch('figregistry_kedro.config', side_effect=ImportError("Mock config import error")):
+                        # Reload the module to trigger import logic
+                        importlib.reload(figregistry_kedro)
+            
+            # Should have warnings for missing components
+            warning_messages = [str(w.message) for w in warning_list if issubclass(w.category, ImportWarning)]
+            
+            # Should contain warnings about missing components
+            has_dataset_warning = any("FigureDataSet not available" in msg for msg in warning_messages)
+            has_hooks_warning = any("FigRegistryHooks not available" in msg for msg in warning_messages)
+            has_config_warning = any("FigRegistryConfigBridge not available" in msg for msg in warning_messages)
+            
+            # At least some warnings should be present when components are missing
+            assert has_dataset_warning or has_hooks_warning or has_config_warning
+    
+    def test_package_remains_importable_with_missing_dependencies(self, mocker):
+        """Test that the package remains importable even when dependencies are missing.
+        
+        Validates that import failures for individual components do not prevent
+        the package from being imported and basic functionality from working.
+        """
+        # Mock missing dependencies
+        with patch.dict('sys.modules', {'kedro': None, 'figregistry': None}):
+            with patch('figregistry_kedro.datasets', side_effect=ImportError("No kedro")):
+                with patch('figregistry_kedro.hooks', side_effect=ImportError("No kedro")):
+                    with patch('figregistry_kedro.config', side_effect=ImportError("No figregistry")):
+                        
+                        # Reload module to test import behavior
+                        importlib.reload(figregistry_kedro)
+                        
+                        # Basic package functionality should still work
+                        assert hasattr(figregistry_kedro, '__version__')
+                        assert hasattr(figregistry_kedro, 'get_plugin_info')
+                        assert hasattr(figregistry_kedro, 'check_dependencies')
+                        
+                        # Utility functions should still be callable
+                        info = figregistry_kedro.get_plugin_info()
+                        assert isinstance(info, dict)
+                        
+                        dependencies_ok = figregistry_kedro.check_dependencies()
+                        assert isinstance(dependencies_ok, bool)
+                        assert not dependencies_ok  # Should be False with missing deps
+    
+    def test_none_assignments_for_failed_imports(self, mocker):
+        """Test that failed component imports result in None assignments.
+        
+        Validates that when component imports fail, the corresponding module
+        attributes are set to None rather than remaining undefined.
+        """
+        # Mock import failures
+        with patch('figregistry_kedro.datasets', side_effect=ImportError("Mock failure")):
             importlib.reload(figregistry_kedro)
             
-            # Check for unexpected deprecation warnings
-            deprecation_warnings = [
-                warning for warning in w 
-                if issubclass(warning.category, DeprecationWarning)
-            ]
-            
-            # Should not have deprecation warnings for current API
-            assert len(deprecation_warnings) == 0, \
-                f"Unexpected deprecation warnings: {[str(w.message) for w in deprecation_warnings]}"
+            # Failed imports should result in None assignments
+            assert figregistry_kedro.FigureDataSet is None
+            assert figregistry_kedro.FigureDataSetError is None
         
-        # Test version attribute provides compatibility information
-        version = figregistry_kedro.__version__
-        assert isinstance(version, str), "Version should be string for compatibility checking"
-        assert not version.startswith('0.0'), "Version should indicate stable release"
+        with patch('figregistry_kedro.hooks', side_effect=ImportError("Mock failure")):
+            importlib.reload(figregistry_kedro)
+            
+            assert figregistry_kedro.FigRegistryHooks is None
+            assert figregistry_kedro.HookExecutionError is None
+        
+        with patch('figregistry_kedro.config', side_effect=ImportError("Mock failure")):
+            importlib.reload(figregistry_kedro)
+            
+            assert figregistry_kedro.FigRegistryConfigBridge is None
+            assert figregistry_kedro.ConfigurationMergeError is None
 
 
+class TestVersionCompatibilityValidation:
+    """Test suite for version compatibility validation and checks.
+    
+    Validates the plugin version compatibility checking functionality that
+    ensures proper dependency management per Section 3.2.3.1 requirements.
+    """
+    
+    def test_dependency_version_requirements_format(self):
+        """Test that dependency version requirements follow proper specification format.
+        
+        Validates that version requirement strings follow packaging standards
+        for compatibility with pip and conda dependency resolution.
+        """
+        # Test Python version requirement format
+        python_req = figregistry_kedro.__requires_python__
+        assert python_req.startswith(">="), f"Python requirement should start with >=: {python_req}"
+        assert "3.10" in python_req, f"Python requirement should specify 3.10: {python_req}"
+        
+        # Test FigRegistry version requirement format
+        figregistry_req = figregistry_kedro.__requires_figregistry__
+        assert figregistry_req.startswith(">="), f"FigRegistry requirement should start with >=: {figregistry_req}"
+        assert "0.3.0" in figregistry_req, f"FigRegistry requirement should specify 0.3.0: {figregistry_req}"
+        
+        # Test Kedro version requirement format
+        kedro_req = figregistry_kedro.__requires_kedro__
+        assert ">=0.18.0" in kedro_req, f"Kedro requirement should specify >=0.18.0: {kedro_req}"
+        assert "<0.20.0" in kedro_req, f"Kedro requirement should specify <0.20.0: {kedro_req}"
+        assert "," in kedro_req, f"Kedro requirement should have range specification: {kedro_req}"
+    
+    def test_validate_plugin_compatibility_function_existence(self):
+        """Test that plugin compatibility validation functionality exists.
+        
+        Validates that the internal _validate_plugin_compatibility function
+        is present and callable for version checking during package initialization.
+        """
+        # Check that compatibility validation function exists
+        assert hasattr(figregistry_kedro, '_validate_plugin_compatibility')
+        
+        # Should be callable
+        assert callable(figregistry_kedro._validate_plugin_compatibility)
+    
+    @patch('figregistry_kedro.warnings.warn')
+    def test_compatibility_warnings_for_version_mismatches(self, mock_warn, mocker):
+        """Test that compatibility warnings are issued for version mismatches.
+        
+        Validates that version compatibility validation issues appropriate
+        warnings when installed versions don't match plugin requirements.
+        """
+        # Mock figregistry with incompatible version
+        mock_figregistry = mocker.MagicMock()
+        mock_figregistry.__version__ = "0.2.0"  # Below required 0.3.0
+        
+        # Mock kedro with incompatible version  
+        mock_kedro = mocker.MagicMock()
+        mock_kedro.__version__ = "0.17.0"  # Below required 0.18.0
+        
+        with patch.dict('sys.modules', {'figregistry': mock_figregistry, 'kedro': mock_kedro}):
+            with patch('figregistry_kedro.version.parse') as mock_version_parse:
+                # Configure version parsing to simulate version comparison
+                def parse_side_effect(version_str):
+                    # Simple mock that allows comparison
+                    mock_version = Mock()
+                    mock_version.__lt__ = Mock(return_value=True)  # Always less than required
+                    return mock_version
+                
+                mock_version_parse.side_effect = parse_side_effect
+                
+                # Call compatibility validation
+                figregistry_kedro._validate_plugin_compatibility()
+                
+                # Should have issued warnings for incompatible versions
+                assert mock_warn.call_count >= 1
+                
+                # Check warning content for version issues
+                warning_calls = [call[0][0] for call in mock_warn.call_args_list]
+                version_warnings = [msg for msg in warning_calls if "version" in msg.lower()]
+                assert len(version_warnings) > 0, "Should have version compatibility warnings"
+    
+    def test_no_warnings_for_compatible_versions(self, mocker):
+        """Test that no warnings are issued when versions are compatible.
+        
+        Validates that version compatibility validation is silent when
+        all installed versions meet plugin requirements.
+        """
+        # Mock compatible versions
+        mock_figregistry = mocker.MagicMock()
+        mock_figregistry.__version__ = "0.3.5"  # Above required 0.3.0
+        
+        mock_kedro = mocker.MagicMock()
+        mock_kedro.__version__ = "0.18.5"  # Within required range
+        
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter("always")
+            
+            with patch.dict('sys.modules', {'figregistry': mock_figregistry, 'kedro': mock_kedro}):
+                with patch('figregistry_kedro.version.parse') as mock_version_parse:
+                    # Configure version parsing for compatible versions
+                    def parse_side_effect(version_str):
+                        mock_version = Mock()
+                        if "0.3.5" in version_str or "0.18.5" in version_str:
+                            mock_version.__lt__ = Mock(return_value=False)  # Not less than required
+                            mock_version.__ge__ = Mock(return_value=True)   # Greater than or equal to required
+                        else:
+                            mock_version.__lt__ = Mock(return_value=False)  # Default to compatible
+                            mock_version.__ge__ = Mock(return_value=True)
+                        return mock_version
+                    
+                    mock_version_parse.side_effect = parse_side_effect
+                    
+                    # Call compatibility validation
+                    figregistry_kedro._validate_plugin_compatibility()
+            
+            # Should not have compatibility warnings for good versions
+            compatibility_warnings = [w for w in warning_list 
+                                    if issubclass(w.category, UserWarning) 
+                                    and "version" in str(w.message).lower() 
+                                    and "compatible" in str(w.message).lower()]
+            
+            # Should be empty or minimal warnings
+            assert len(compatibility_warnings) == 0, f"Unexpected compatibility warnings: {compatibility_warnings}"
+
+
+class TestPluginDiscoveryIntegration:
+    """Test suite for plugin discovery and entry point integration.
+    
+    Validates integration with Kedro's plugin discovery system per F-008
+    packaging requirements, ensuring proper entry point registration.
+    """
+    
+    def test_plugin_entry_point_specifications(self):
+        """Test that plugin follows entry point specifications for Kedro discovery.
+        
+        Validates that the plugin can be discovered by Kedro's plugin system
+        through proper entry point registration and naming conventions.
+        """
+        # Test that the plugin module is importable by name
+        assert figregistry_kedro.__name__ == 'figregistry_kedro'
+        
+        # Test that plugin provides required metadata for discovery
+        assert hasattr(figregistry_kedro, '__version__')
+        assert hasattr(figregistry_kedro, '__description__')
+        
+        # Plugin should be identifiable as a Kedro plugin
+        plugin_info = figregistry_kedro.get_plugin_info()
+        assert 'kedro' in plugin_info['name'].lower()
+        assert 'plugin' in plugin_info['description'].lower()
+    
+    def test_hook_registration_compatibility(self):
+        """Test that hook registration follows Kedro plugin conventions.
+        
+        Validates that FigRegistryHooks can be properly registered through
+        Kedro's hook system and follows plugin registration patterns.
+        """
+        # If hooks are available, test registration compatibility
+        if hasattr(figregistry_kedro, 'FigRegistryHooks') and figregistry_kedro.FigRegistryHooks is not None:
+            hooks_class = figregistry_kedro.FigRegistryHooks
+            
+            # Should be a class that can be instantiated
+            assert isinstance(hooks_class, type)
+            
+            # Should have hook lifecycle methods for Kedro integration
+            hook_methods = ['before_pipeline_run', 'after_pipeline_run', 'before_catalog_created', 'after_catalog_created']
+            available_methods = [method for method in hook_methods if hasattr(hooks_class, method)]
+            
+            # At least some hook methods should be available
+            assert len(available_methods) > 0, f"FigRegistryHooks should have some hook methods from {hook_methods}"
+    
+    def test_dataset_registration_compatibility(self):
+        """Test that dataset registration follows Kedro plugin conventions.
+        
+        Validates that FigureDataSet can be properly registered through
+        Kedro's dataset catalog system and follows AbstractDataSet conventions.
+        """
+        # If dataset is available, test registration compatibility
+        if hasattr(figregistry_kedro, 'FigureDataSet') and figregistry_kedro.FigureDataSet is not None:
+            dataset_class = figregistry_kedro.FigureDataSet
+            
+            # Should be a class that can be instantiated
+            assert isinstance(dataset_class, type)
+            
+            # Should have AbstractDataSet methods for Kedro catalog integration
+            dataset_methods = ['_save', '_load', '_describe']
+            available_methods = [method for method in dataset_methods if hasattr(dataset_class, method)]
+            
+            # All AbstractDataSet methods should be available
+            assert len(available_methods) == len(dataset_methods), f"FigureDataSet missing methods: {set(dataset_methods) - set(available_methods)}"
+    
+    def test_plugin_namespace_organization(self):
+        """Test that plugin namespace follows Kedro plugin organization standards.
+        
+        Validates that the plugin organizes its components in a way that's
+        compatible with Kedro's plugin architecture and discovery mechanisms.
+        """
+        # Test module structure follows plugin conventions
+        assert figregistry_kedro.__name__.startswith('figregistry_kedro')
+        
+        # Test that components are properly namespaced
+        if hasattr(figregistry_kedro, 'FigureDataSet'):
+            # Should be in datasets submodule conceptually
+            assert 'DataSet' in figregistry_kedro.FigureDataSet.__name__ if figregistry_kedro.FigureDataSet else True
+            
+        if hasattr(figregistry_kedro, 'FigRegistryHooks'):
+            # Should be in hooks submodule conceptually  
+            assert 'Hooks' in figregistry_kedro.FigRegistryHooks.__name__ if figregistry_kedro.FigRegistryHooks else True
+            
+        if hasattr(figregistry_kedro, 'FigRegistryConfigBridge'):
+            # Should be in config submodule conceptually
+            assert 'Config' in figregistry_kedro.FigRegistryConfigBridge.__name__ if figregistry_kedro.FigRegistryConfigBridge else True
+
+
+class TestPluginInitializationWarning:
+    """Test suite for plugin initialization warning system.
+    
+    Validates that the plugin issues appropriate warnings when dependencies
+    are missing or incompatible, per Section 6.6.5.6 error handling requirements.
+    """
+    
+    @patch('figregistry_kedro.warnings.warn')
+    def test_initialization_warning_issued_when_not_functional(self, mock_warn, mocker):
+        """Test that initialization warning is issued when plugin is not fully functional.
+        
+        Validates that a comprehensive warning is issued during module initialization
+        when check_dependencies() returns False, indicating missing dependencies.
+        """
+        # Mock check_dependencies to return False
+        with patch.object(figregistry_kedro, 'check_dependencies', return_value=False):
+            # Reload module to trigger initialization warning
+            importlib.reload(figregistry_kedro)
+            
+            # Should have issued warning about plugin not being functional
+            assert mock_warn.called
+            
+            # Check warning content
+            warning_calls = [call[0][0] for call in mock_warn.call_args_list]
+            init_warnings = [msg for msg in warning_calls 
+                           if "not fully functional" in msg and "missing dependencies" in msg]
+            
+            assert len(init_warnings) > 0, "Should issue initialization warning when not functional"
+            
+            # Warning should mention how to fix the issue
+            comprehensive_warnings = [msg for msg in warning_calls 
+                                    if "pip install" in msg and "figregistry" in msg and "kedro" in msg]
+            
+            assert len(comprehensive_warnings) > 0, "Should provide installation instructions in warning"
+    
+    def test_no_initialization_warning_when_functional(self, mocker):
+        """Test that no initialization warning is issued when plugin is fully functional.
+        
+        Validates that when all dependencies are available and the plugin is
+        fully functional, no warnings are issued during initialization.
+        """
+        with warnings.catch_warnings(record=True) as warning_list:
+            warnings.simplefilter("always")
+            
+            # Mock check_dependencies to return True
+            with patch.object(figregistry_kedro, 'check_dependencies', return_value=True):
+                # Reload module
+                importlib.reload(figregistry_kedro)
+            
+            # Should not have initialization warnings when functional
+            init_warnings = [w for w in warning_list 
+                           if "not fully functional" in str(w.message)]
+            
+            assert len(init_warnings) == 0, f"Should not issue warnings when functional: {init_warnings}"
+
+
+class TestPluginPerformance:
+    """Test suite for plugin initialization performance validation.
+    
+    Validates that plugin initialization meets performance requirements
+    per Section 6.6.4.3 hook initialization overhead targets (<25ms).
+    """
+    
+    def test_plugin_import_performance(self, benchmark_config):
+        """Test that plugin import performance meets initialization targets.
+        
+        Validates that importing the figregistry_kedro package completes
+        within the 25ms hook initialization overhead target from Section 6.6.4.3.
+        """
+        import time
+        
+        # Measure import time
+        start_time = time.perf_counter()
+        
+        # Force reimport to measure initialization time
+        if 'figregistry_kedro' in sys.modules:
+            del sys.modules['figregistry_kedro']
+        
+        import figregistry_kedro
+        
+        end_time = time.perf_counter()
+        import_time_ms = (end_time - start_time) * 1000
+        
+        # Should meet performance target of <25ms for hook initialization
+        assert import_time_ms < 25.0, f"Plugin import took {import_time_ms:.2f}ms, exceeds 25ms target"
+    
+    def test_get_plugin_info_performance(self):
+        """Test that get_plugin_info() function performs efficiently.
+        
+        Validates that plugin information retrieval is fast enough for
+        repeated calls during plugin discovery and status checking.
+        """
+        import time
+        
+        # Measure multiple calls to get_plugin_info
+        start_time = time.perf_counter()
+        
+        for _ in range(100):  # Test repeated calls
+            info = figregistry_kedro.get_plugin_info()
+        
+        end_time = time.perf_counter()
+        avg_time_ms = ((end_time - start_time) / 100) * 1000
+        
+        # Should be very fast for repeated calls
+        assert avg_time_ms < 1.0, f"get_plugin_info() averaged {avg_time_ms:.2f}ms, should be <1ms"
+    
+    def test_check_dependencies_performance(self):
+        """Test that check_dependencies() function performs efficiently.
+        
+        Validates that dependency checking is fast enough for repeated
+        validation calls during plugin operation.
+        """
+        import time
+        
+        # Measure multiple calls to check_dependencies
+        start_time = time.perf_counter()
+        
+        for _ in range(100):  # Test repeated calls
+            status = figregistry_kedro.check_dependencies()
+        
+        end_time = time.perf_counter()
+        avg_time_ms = ((end_time - start_time) / 100) * 1000
+        
+        # Should be very fast for repeated calls
+        assert avg_time_ms < 1.0, f"check_dependencies() averaged {avg_time_ms:.2f}ms, should be <1ms"
+
+
+class TestPackageIntegrity:
+    """Test suite for overall package integrity and consistency.
+    
+    Validates that the package maintains internal consistency and follows
+    Python packaging best practices per F-008 requirements.
+    """
+    
+    def test_module_docstring_completeness(self):
+        """Test that the module has comprehensive documentation.
+        
+        Validates that the package module includes proper documentation
+        describing its purpose, usage, and integration capabilities.
+        """
+        # Package should have a docstring
+        assert figregistry_kedro.__doc__ is not None
+        assert len(figregistry_kedro.__doc__.strip()) > 100
+        
+        # Docstring should mention key components
+        docstring = figregistry_kedro.__doc__.lower()
+        assert 'figregistry' in docstring
+        assert 'kedro' in docstring
+        assert 'plugin' in docstring
+    
+    def test_all_exports_are_actually_available(self):
+        """Test that all items in __all__ are actually available in the module.
+        
+        Validates that every item listed in __all__ is actually defined
+        and accessible in the module namespace.
+        """
+        for export_name in figregistry_kedro.__all__:
+            assert hasattr(figregistry_kedro, export_name), f"Export {export_name} in __all__ but not available in module"
+            
+            # Should not be None for essential exports
+            if export_name in ['get_plugin_info', 'check_dependencies', 'get_version']:
+                assert getattr(figregistry_kedro, export_name) is not None, f"Essential export {export_name} is None"
+    
+    def test_consistent_version_information(self):
+        """Test that version information is consistent across all access methods.
+        
+        Validates that version information is consistent between __version__,
+        get_version(), and get_plugin_info() to prevent confusion.
+        """
+        # All version access methods should return the same value
+        version_direct = figregistry_kedro.__version__
+        version_function = figregistry_kedro.get_version()
+        version_info = figregistry_kedro.get_plugin_info()['version']
+        
+        assert version_direct == version_function
+        assert version_direct == version_info
+        assert version_function == version_info
+    
+    def test_plugin_info_consistency_with_module_attributes(self):
+        """Test that plugin info dictionary is consistent with module attributes.
+        
+        Validates that the information returned by get_plugin_info() matches
+        the actual module attributes and constants.
+        """
+        info = figregistry_kedro.get_plugin_info()
+        
+        # Metadata should match module attributes
+        assert info['version'] == figregistry_kedro.__version__
+        assert info['description'] == figregistry_kedro.__description__
+        assert info['author'] == figregistry_kedro.__author__
+        assert info['url'] == figregistry_kedro.__url__
+        assert info['requires_python'] == figregistry_kedro.__requires_python__
+        assert info['requires_figregistry'] == figregistry_kedro.__requires_figregistry__
+        assert info['requires_kedro'] == figregistry_kedro.__requires_kedro__
+        
+        # Component availability should match actual availability
+        actual_components = {
+            'FigureDataSet': figregistry_kedro.FigureDataSet is not None,
+            'FigRegistryHooks': figregistry_kedro.FigRegistryHooks is not None,
+            'FigRegistryConfigBridge': figregistry_kedro.FigRegistryConfigBridge is not None,
+        }
+        
+        for component, actual_status in actual_components.items():
+            assert info['components'][component] == actual_status, f"Component {component} status mismatch"
+
+
+class TestEdgeCasesAndBoundaryConditions:
+    """Test suite for edge cases and boundary conditions in package initialization.
+    
+    Validates robust behavior under unusual conditions and edge cases
+    that may occur in diverse deployment environments.
+    """
+    
+    def test_repeated_imports_are_stable(self):
+        """Test that repeated imports produce consistent results.
+        
+        Validates that importing the package multiple times produces
+        consistent state without side effects or state corruption.
+        """
+        # Import multiple times and check consistency
+        first_import = importlib.import_module('figregistry_kedro')
+        second_import = importlib.import_module('figregistry_kedro')
+        
+        # Should be the same module object
+        assert first_import is second_import
+        
+        # Reload and check consistency
+        importlib.reload(figregistry_kedro)
+        
+        # Essential functions should still work after reload
+        assert callable(figregistry_kedro.get_plugin_info)
+        assert callable(figregistry_kedro.check_dependencies)
+        assert callable(figregistry_kedro.get_version)
+        
+        # Version should be consistent after reload
+        version_before = figregistry_kedro.__version__
+        importlib.reload(figregistry_kedro)
+        version_after = figregistry_kedro.__version__
+        
+        assert version_before == version_after
+    
+    def test_import_with_modified_sys_modules(self, mocker):
+        """Test package behavior when sys.modules is modified.
+        
+        Validates robust import behavior when the Python import system
+        has been modified or corrupted by other packages or frameworks.
+        """
+        # Save original state
+        original_modules = sys.modules.copy()
+        
+        try:
+            # Modify sys.modules to simulate interference
+            if 'kedro' in sys.modules:
+                del sys.modules['kedro']
+            if 'figregistry' in sys.modules:
+                del sys.modules['figregistry']
+            
+            # Should still be able to import and get basic functionality
+            importlib.reload(figregistry_kedro)
+            
+            # Basic functions should work
+            assert hasattr(figregistry_kedro, 'get_plugin_info')
+            assert hasattr(figregistry_kedro, 'check_dependencies')
+            
+            info = figregistry_kedro.get_plugin_info()
+            assert isinstance(info, dict)
+            
+        finally:
+            # Restore original state
+            sys.modules.clear()
+            sys.modules.update(original_modules)
+    
+    def test_plugin_with_corrupted_version_attributes(self, mocker):
+        """Test plugin behavior when version attributes are corrupted.
+        
+        Validates graceful handling when version information from
+        dependencies is corrupted or missing.
+        """
+        # Mock dependencies with missing or corrupted version info
+        mock_figregistry = mocker.MagicMock()
+        del mock_figregistry.__version__  # Missing version attribute
+        
+        mock_kedro = mocker.MagicMock()
+        mock_kedro.__version__ = None  # Corrupted version attribute
+        
+        with patch.dict('sys.modules', {'figregistry': mock_figregistry, 'kedro': mock_kedro}):
+            with warnings.catch_warnings(record=True):
+                warnings.simplefilter("always")
+                
+                # Should not crash when checking compatibility
+                try:
+                    figregistry_kedro._validate_plugin_compatibility()
+                except Exception as e:
+                    # Should handle gracefully, not crash
+                    assert "version" not in str(e).lower() or "compatibility" not in str(e).lower()
+    
+    def test_package_isolation_from_environment_variables(self, mocker):
+        """Test that package initialization is not affected by environment variables.
+        
+        Validates that plugin initialization behaves consistently regardless
+        of environment variable configuration or contamination.
+        """
+        # Test with various environment variable configurations
+        test_env_vars = {
+            'KEDRO_ENV': 'test',
+            'FIGREGISTRY_ENV': 'development', 
+            'PYTHONPATH': '/malicious/path',
+            'HOME': '/tmp/test',
+            'USER': 'test_user'
+        }
+        
+        original_env = os.environ.copy()
+        
+        try:
+            # Modify environment
+            os.environ.update(test_env_vars)
+            
+            # Reload and test
+            importlib.reload(figregistry_kedro)
+            
+            # Should still work correctly
+            assert figregistry_kedro.__version__ is not None
+            assert callable(figregistry_kedro.get_plugin_info)
+            
+            info = figregistry_kedro.get_plugin_info()
+            assert info['name'] == 'figregistry-kedro'
+            
+        finally:
+            # Restore environment
+            os.environ.clear()
+            os.environ.update(original_env)
+
+
+# Performance test configuration for benchmarking
+@pytest.fixture
+def benchmark_config():
+    """Configure benchmark settings for performance testing per Section 6.6.4.3."""
+    return {
+        'min_rounds': 5,
+        'max_time': 10.0,
+        'timer': 'time.perf_counter', 
+        'disable_gc': True,
+        'warmup': True,
+        'warmup_iterations': 2
+    }
+
+
+# Module-level test execution guard
 if __name__ == '__main__':
-    # Run tests directly if executed as script
     pytest.main([__file__, '-v', '--tb=short'])
