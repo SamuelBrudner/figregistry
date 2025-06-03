@@ -1,0 +1,794 @@
+# =============================================================================
+# FigRegistry Configuration for Kedro Integration - Migration Example (After)
+# =============================================================================
+# This configuration file demonstrates the unified configuration approach that
+# replaces the manual matplotlib styling shown in the "before" migration example.
+# Through the FigRegistryConfigBridge, this configuration seamlessly integrates
+# with Kedro's ConfigLoader to enable automated condition-based styling and
+# figure management, eliminating the need for scattered plt.savefig() calls
+# and hardcoded styling throughout pipeline nodes.
+#
+# Migration Transformation:
+# - BEFORE: Manual plt.savefig() calls with hardcoded styling in every node
+# - AFTER: Automated styling through condition_param resolution
+# - BEFORE: Scattered configuration across multiple files and nodes
+# - AFTER: Centralized configuration with environment-specific overrides
+# - BEFORE: Repetitive styling code in pipeline functions
+# - AFTER: Zero styling code in pipeline functions - handled by FigureDataSet
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# FigRegistry Version and Metadata
+# -----------------------------------------------------------------------------
+# Version constraint for FigRegistry compatibility and validation
+figregistry_version: ">=0.3.0"
+
+# Metadata for configuration tracking and migration documentation
+metadata:
+  config_version: "1.0.0"
+  created_by: "figregistry-kedro migration example"
+  description: "Migration demonstration from manual to automated figure management"
+  environment: "development"
+  migration_status: "after_integration"
+  replaces: "manual matplotlib styling with scattered plt.savefig() calls"
+  last_updated: "2024-01-01"
+
+# -----------------------------------------------------------------------------
+# Condition-Based Style Mappings (F-002)
+# -----------------------------------------------------------------------------
+# Maps experimental condition parameters from the migration example to visual
+# style dictionaries. These styles replace the manual styling code scattered
+# throughout the "before" example pipeline nodes.
+
+styles:
+  # Primary experimental condition from parameters.yml
+  # Replaces: Manual style specification in create_analysis_plot() function
+  exploratory_analysis:
+    color: "#2E86AB"                   # Professional blue for exploratory work
+    marker: "o"                        # Circle markers for data points
+    linestyle: "-"                     # Solid lines for primary analysis
+    linewidth: 2.0                     # Standard line thickness
+    alpha: 0.8                         # Slight transparency for overlays
+    label: "Exploratory Analysis"      # Descriptive label for legends
+    markersize: 8                      # Standard marker size
+    markerfacecolor: "#2E86AB"         # Filled markers
+    markeredgecolor: "#1A5276"         # Darker edge for definition
+    markeredgewidth: 0.5               # Thin edge
+
+  # Model type conditions from model_configuration parameters
+  # Replaces: Conditional styling logic in create_model_comparison() function
+  random_forest:
+    color: "#228B22"                   # Forest green for random forest
+    marker: "s"                        # Square markers for tree-based models
+    linestyle: "-"                     # Solid lines for model performance
+    linewidth: 2.5                     # Slightly thicker for importance
+    alpha: 0.85                        # Good visibility for comparisons
+    label: "Random Forest Model"       # Algorithm identification
+    markersize: 9                      # Larger for model emphasis
+    markerfacecolor: "#228B22"         # Solid fill
+    markeredgecolor: "#006400"         # Darker green edge
+    markeredgewidth: 0.8               # Defined edge
+
+  # Model complexity conditions from model_configuration
+  # Replaces: Manual complexity-based styling in performance visualization nodes
+  moderate:
+    color: "#FF8C00"                   # Orange for moderate complexity
+    marker: "^"                        # Triangle markers for complexity level
+    linestyle: "-"                     # Solid lines for performance metrics
+    linewidth: 2.2                     # Moderate thickness
+    alpha: 0.8                         # Clear visibility
+    label: "Moderate Complexity"       # Complexity identification
+    markersize: 8                      # Standard size
+    markerfacecolor: "#FF8C00"         # Filled triangles
+    markeredgecolor: "#FF4500"         # Darker orange edge
+    markeredgewidth: 0.6               # Moderate edge
+
+  # Training variant conditions from model_configuration
+  # Replaces: Variant-specific styling in training performance plots
+  optimized:
+    color: "#8A2BE2"                   # Blue violet for optimized variant
+    marker: "D"                        # Diamond markers for optimization
+    linestyle: "-"                     # Solid lines for optimized results
+    linewidth: 2.8                     # Thicker for optimization emphasis
+    alpha: 0.9                         # High visibility for key results
+    label: "Optimized Training"        # Optimization identification
+    markersize: 10                     # Larger for importance
+    markerfacecolor: "#8A2BE2"         # Solid diamond fill
+    markeredgecolor: "#4B0082"         # Darker edge for contrast
+    markeredgewidth: 1.0               # Prominent edge
+
+  # Dataset variant conditions from dataset_configuration
+  # Replaces: Dataset-specific manual styling in data visualization nodes
+  real_world:
+    color: "#DC143C"                   # Crimson for real-world data
+    marker: "v"                        # Downward triangle for real data
+    linestyle: "-"                     # Solid lines for actual data
+    linewidth: 2.3                     # Good visibility
+    alpha: 0.85                        # Clear representation
+    label: "Real-World Dataset"        # Dataset identification
+    markersize: 8                      # Standard marker size
+    markerfacecolor: "#DC143C"         # Solid fill
+    markeredgecolor: "#8B0000"         # Dark red edge
+    markeredgewidth: 0.7               # Defined edge
+
+  # Data quality conditions from dataset_configuration
+  # Replaces: Quality-dependent styling in quality assessment plots
+  high_quality:
+    color: "#32CD32"                   # Lime green for high quality
+    marker: "*"                        # Star markers for quality
+    linestyle: "-"                     # Solid lines for quality data
+    linewidth: 2.0                     # Standard thickness
+    alpha: 0.9                         # High visibility for quality
+    label: "High Quality Data"         # Quality identification
+    markersize: 12                     # Larger stars for prominence
+    markerfacecolor: "#32CD32"         # Bright fill
+    markeredgecolor: "#228B22"         # Darker green edge
+    markeredgewidth: 0.5               # Clean edge
+
+  # Sample size category from dataset_configuration
+  # Replaces: Sample-size dependent styling in statistical plots
+  medium_sample:
+    color: "#4169E1"                   # Royal blue for medium samples
+    marker: "P"                        # Plus (filled) for sample size
+    linestyle: "-"                     # Solid lines for sample data
+    linewidth: 2.1                     # Moderate thickness
+    alpha: 0.8                         # Good statistical visibility
+    label: "Medium Sample Size"        # Sample size identification
+    markersize: 9                      # Appropriate for medium samples
+    markerfacecolor: "#4169E1"         # Solid blue fill
+    markeredgecolor: "#191970"         # Midnight blue edge
+    markeredgewidth: 0.6               # Moderate edge
+
+  # Analysis phase conditions from analysis_configuration
+  # Replaces: Phase-specific styling scattered across validation nodes
+  validation:
+    color: "#9370DB"                   # Medium purple for validation
+    marker: "X"                        # X markers for validation points
+    linestyle: "--"                    # Dashed lines for validation
+    linewidth: 2.0                     # Standard validation thickness
+    alpha: 0.75                        # Moderate transparency for validation
+    label: "Validation Phase"          # Phase identification
+    markersize: 10                     # Prominent validation markers
+    markerfacecolor: "#9370DB"         # Solid purple fill
+    markeredgecolor: "#6A0DAD"         # Darker purple edge
+    markeredgewidth: 0.8               # Strong edge for validation
+
+  # Analysis scope conditions from analysis_configuration
+  # Replaces: Scope-dependent styling in detailed analysis nodes
+  detailed:
+    color: "#FF1493"                   # Deep pink for detailed analysis
+    marker: "h"                        # Hexagon markers for detail
+    linestyle: "-"                     # Solid lines for detailed results
+    linewidth: 2.4                     # Slightly thicker for detail
+    alpha: 0.85                        # Clear visibility for detail
+    label: "Detailed Analysis"         # Scope identification
+    markersize: 9                      # Appropriate for detailed view
+    markerfacecolor: "#FF1493"         # Bright pink fill
+    markeredgecolor: "#C71585"         # Medium violet red edge
+    markeredgewidth: 0.7               # Defined edge
+
+  # Output target conditions from analysis_configuration
+  # Replaces: Target-specific styling in presentation preparation nodes
+  stakeholder:
+    color: "#1E90FF"                   # Dodger blue for stakeholder presentations
+    marker: "p"                        # Pentagon markers for stakeholder focus
+    linestyle: "-"                     # Clean solid lines for stakeholders
+    linewidth: 2.6                     # Thicker for presentation clarity
+    alpha: 0.9                         # High visibility for stakeholders
+    label: "Stakeholder Presentation"  # Target audience identification
+    markersize: 10                     # Larger for presentation impact
+    markerfacecolor: "#1E90FF"         # Bright blue fill
+    markeredgecolor: "#0000CD"         # Medium blue edge
+    markeredgewidth: 0.8               # Strong edge for clarity
+
+  # Visualization context conditions
+  # Replaces: Context-dependent styling logic across multiple nodes
+  review:
+    color: "#FF6347"                   # Tomato red for review quality
+    marker: "8"                        # Octagon markers for review
+    linestyle: "-"                     # Solid lines for review
+    linewidth: 2.2                     # Good review visibility
+    alpha: 0.8                         # Clear for review purposes
+    label: "Review Quality"            # Context identification
+    markersize: 8                      # Standard review size
+    markerfacecolor: "#FF6347"         # Tomato fill
+    markeredgecolor: "#CD5C5C"         # Indian red edge
+    markeredgewidth: 0.6               # Moderate edge
+
+  technical:
+    color: "#2F4F4F"                   # Dark slate gray for technical audience
+    marker: ">"                        # Right triangle for technical focus
+    linestyle: "-"                     # Solid technical lines
+    linewidth: 2.0                     # Standard technical thickness
+    alpha: 0.85                        # Professional visibility
+    label: "Technical Audience"        # Audience identification
+    markersize: 8                      # Technical standard size
+    markerfacecolor: "#2F4F4F"         # Dark fill
+    markeredgecolor: "#000000"         # Black edge for technical precision
+    markeredgewidth: 0.8               # Strong technical edge
+
+  screen:
+    color: "#20B2AA"                   # Light sea green for screen display
+    marker: "<"                        # Left triangle for screen optimization
+    linestyle: "-"                     # Solid lines for screen
+    linewidth: 2.3                     # Good screen visibility
+    alpha: 0.8                         # Optimal for screen viewing
+    label: "Screen Display"            # Medium identification
+    markersize: 9                      # Good screen size
+    markerfacecolor: "#20B2AA"         # Sea green fill
+    markeredgecolor: "#008B8B"         # Dark cyan edge
+    markeredgewidth: 0.7               # Clear screen edge
+
+  colorblind_safe:
+    color: "#4682B4"                   # Steel blue (colorblind safe)
+    marker: "1"                        # Tri_down marker for accessibility
+    linestyle: "-"                     # Solid accessible lines
+    linewidth: 2.4                     # Good accessibility thickness
+    alpha: 0.9                         # High visibility for accessibility
+    label: "Colorblind Safe"           # Accessibility identification
+    markersize: 9                      # Good accessible size
+    markerfacecolor: "#4682B4"         # Steel blue fill
+    markeredgecolor: "#2F4F4F"         # Dark slate edge for contrast
+    markeredgewidth: 0.8               # Strong accessible edge
+
+  # Execution environment conditions
+  # Replaces: Environment-dependent styling in runtime visualization nodes
+  testing:
+    color: "#DAA520"                   # Goldenrod for testing environment
+    marker: "2"                        # Tri_up marker for testing
+    linestyle: ":"                     # Dotted lines for test environment
+    linewidth: 1.8                     # Lighter for testing
+    alpha: 0.7                         # Moderate transparency for testing
+    label: "Testing Environment"       # Environment identification
+    markersize: 7                      # Smaller for testing context
+    markerfacecolor: "#DAA520"         # Golden fill
+    markeredgecolor: "#B8860B"         # Dark goldenrod edge
+    markeredgewidth: 0.5               # Light edge for testing
+
+  standard:
+    color: "#708090"                   # Slate gray for standard resources
+    marker: "3"                        # Tri_left marker for standard
+    linestyle: "-"                     # Solid lines for standard
+    linewidth: 2.0                     # Standard thickness
+    alpha: 0.8                         # Standard visibility
+    label: "Standard Resources"        # Resource identification
+    markersize: 8                      # Standard size
+    markerfacecolor: "#708090"         # Slate fill
+    markeredgecolor: "#2F4F4F"         # Dark slate edge
+    markeredgewidth: 0.6               # Standard edge
+
+# -----------------------------------------------------------------------------
+# Color Palettes and Defaults
+# -----------------------------------------------------------------------------
+# Organized palettes replacing the manual color selection scattered throughout
+# the "before" example. These palettes provide consistent color schemes that
+# eliminate the need for hardcoded color values in pipeline nodes.
+
+palettes:
+  # Primary palette for automatic color cycling
+  # Replaces: Manual color arrays defined in multiple functions
+  primary:
+    - "#2E86AB"  # Professional blue
+    - "#228B22"  # Forest green
+    - "#FF8C00"  # Orange
+    - "#8A2BE2"  # Blue violet
+    - "#DC143C"  # Crimson
+    - "#32CD32"  # Lime green
+    - "#4169E1"  # Royal blue
+    - "#9370DB"  # Medium purple
+
+  # Experimental conditions palette
+  # Replaces: Condition-specific color definitions in analysis functions
+  experimental:
+    exploratory: "#2E86AB"
+    validation: "#9370DB"
+    testing: "#DAA520"
+    review: "#FF6347"
+
+  # Model performance palette
+  # Replaces: Performance-based color coding in model comparison functions
+  model_performance:
+    random_forest: "#228B22"
+    optimized: "#8A2BE2"
+    moderate: "#FF8C00"
+    baseline: "#708090"
+
+  # Data quality palette
+  # Replaces: Quality-based color definitions in data assessment plots
+  data_quality:
+    high_quality: "#32CD32"
+    medium_quality: "#FFD700"
+    low_quality: "#FF6347"
+    unknown: "#C0C0C0"
+
+  # Audience-specific palette
+  # Replaces: Audience-dependent styling in presentation preparation
+  audience:
+    technical: "#2F4F4F"
+    stakeholder: "#1E90FF"
+    executive: "#4B0082"
+    academic: "#000080"
+
+  # Accessibility palette (colorblind-safe colors)
+  # Replaces: Manual accessibility color selection
+  accessibility:
+    primary: "#4682B4"      # Steel blue
+    secondary: "#FF8C00"    # Orange
+    accent: "#228B22"       # Forest green
+    neutral: "#696969"      # Dim gray
+
+# -----------------------------------------------------------------------------
+# Default Styling Parameters
+# -----------------------------------------------------------------------------
+# Comprehensive defaults that replace scattered default values throughout
+# the "before" example. These defaults ensure consistent visualization
+# without requiring manual style specification in each function.
+
+defaults:
+  # Figure defaults replacing manual figsize and DPI settings
+  figure:
+    figsize: [12, 8]                   # Larger default for stakeholder focus
+    dpi: 200                           # Higher resolution than manual approach
+    facecolor: "white"                 # Clean white background
+    edgecolor: "none"                  # No border for clean appearance
+
+  # Line and marker defaults replacing scattered style definitions
+  line:
+    color: "#2E86AB"                   # Professional default blue
+    linewidth: 2.2                     # Slightly thicker than manual approach
+    linestyle: "-"                     # Solid lines by default
+    alpha: 0.8                         # Consistent transparency
+
+  marker:
+    marker: "o"                        # Circle markers by default
+    markersize: 8                      # Standard marker size
+    markerfacecolor: "auto"            # Match line color
+    markeredgecolor: "auto"            # Match line color
+    markeredgewidth: 0.6               # Defined edge for clarity
+
+  # Text and labeling defaults replacing manual font settings
+  text:
+    fontsize: 13                       # Larger than manual for readability
+    fontweight: "normal"               # Standard weight
+    fontfamily: "DejaVu Sans"          # Professional font family
+    color: "#2D3436"                   # Dark text color
+
+  # Legend defaults replacing scattered legend configuration
+  legend:
+    loc: "upper right"                 # Consistent positioning
+    fontsize: 11                       # Appropriate for larger figures
+    frameon: true                      # Show legend frame
+    fancybox: true                     # Rounded corners for professionalism
+    shadow: true                       # Subtle shadow for depth
+    framealpha: 0.95                   # High opacity for readability
+    edgecolor: "#2D3436"              # Dark edge for definition
+
+  # Grid defaults replacing manual grid settings
+  grid:
+    visible: true                      # Show grid by default
+    alpha: 0.4                         # Visible but not intrusive
+    linestyle: "--"                    # Dashed grid lines
+    linewidth: 0.6                     # Slightly thicker than basic example
+    color: "#BDBDBD"                   # Medium gray grid
+
+  # Axes defaults replacing manual axis configuration
+  axes:
+    labelsize: 13                      # Larger labels for stakeholder focus
+    titlesize: 16                      # Prominent titles
+    linewidth: 1.2                     # Thicker axis lines
+    edgecolor: "#2D3436"              # Dark axis color
+    facecolor: "white"                 # White plot area
+    spines_top: false                  # Remove top spine for cleanliness
+    spines_right: false                # Remove right spine
+
+  # Fallback condition style for undefined conditions
+  # Replaces: Manual fallback styling in exception handling
+  fallback_style:
+    color: "#95A5A6"                   # Neutral gray for undefined
+    marker: "o"                        # Standard marker
+    linestyle: "-"                     # Solid line
+    linewidth: 2.0                     # Standard thickness
+    alpha: 0.8                         # Moderate transparency
+    label: "Undefined Condition"       # Clear indication
+    markersize: 8                      # Standard size
+
+# -----------------------------------------------------------------------------
+# Output Management Configuration (F-004)
+# -----------------------------------------------------------------------------
+# Automated output management replacing scattered plt.savefig() calls
+# throughout the "before" example with centralized path and format management.
+
+outputs:
+  # Base output directory aligned with Kedro project structure
+  base_path: "data/08_reporting"
+
+  # Path aliases replacing hardcoded paths in manual approach
+  # BEFORE: Hardcoded paths like "outputs/analysis_plot.png" in each function
+  # AFTER: Semantic aliases that map to organized directory structure
+  aliases:
+    expl: "data/08_reporting/exploratory"           # Exploratory analysis
+    valid: "data/08_reporting/validation"           # Validation results
+    eval: "data/08_reporting/evaluation"            # Model evaluation
+    comp: "data/08_reporting/comparison"            # Model comparison
+    stakeholder: "data/08_reporting/stakeholder"    # Stakeholder presentations
+    technical: "data/08_reporting/technical"        # Technical documentation
+    archive: "data/08_reporting/archive"            # Archived results
+
+  # Naming convention replacing manual filename construction
+  # BEFORE: Manual string concatenation for filenames in each save call
+  # AFTER: Template-based naming with automatic token replacement
+  naming:
+    template: "{name}_{condition}_{ts}"
+    timestamp_format: "%Y%m%d_%H%M%S"
+    purpose_suffixes:
+      exploratory: "_explore"
+      validation: "_validate"
+      evaluation: "_eval"
+      comparison: "_compare"
+      stakeholder: "_stakeholder"
+    condition_suffixes:
+      exploratory_analysis: "_expl"
+      random_forest: "_rf"
+      optimized: "_opt"
+      real_world: "_real"
+      validation: "_val"
+      detailed: "_detail"
+
+  # Format configuration replacing scattered format specifications
+  # BEFORE: Mixed PNG/PDF saves with inconsistent DPI and settings
+  # AFTER: Purpose-driven format selection with consistent quality
+  formats:
+    defaults:
+      exploratory: ["png"]                    # Fast PNG for exploration
+      validation: ["png", "pdf"]              # Both formats for validation
+      stakeholder: ["png", "pdf"]             # Presentation formats
+      technical: ["pdf", "eps"]               # High-quality technical formats
+
+    # Format-specific settings ensuring quality consistency
+    png:
+      dpi: 300                                # High resolution
+      bbox_inches: "tight"                    # Optimal cropping
+      pad_inches: 0.1                         # Small padding
+      facecolor: "white"                      # Ensure white background
+
+    pdf:
+      dpi: 300                                # Vector high resolution
+      bbox_inches: "tight"                    # Optimal cropping
+      pad_inches: 0.05                        # Minimal padding
+      backend: "pdf"                          # Ensure PDF backend
+
+    eps:
+      dpi: 300                                # Publication resolution
+      bbox_inches: "tight"                    # Publication cropping
+      pad_inches: 0.0                         # No padding for publication
+
+  # Directory management with automatic creation
+  # BEFORE: Manual directory checking and creation before each save
+  # AFTER: Automatic directory management
+  directories:
+    create_missing: true                      # Auto-create directories
+    permissions: 0o755                        # Standard permissions
+    structure:
+      by_date: false                          # Don't organize by date
+      by_condition: true                      # Organize by condition
+      by_purpose: true                        # Organize by purpose
+
+  # Versioning integration with Kedro catalog
+  versioning:
+    enabled: true                             # Enable version tracking
+    strategy: "timestamp"                     # Timestamp-based versioning
+    keep_versions: 5                          # Keep recent versions only
+
+# -----------------------------------------------------------------------------
+# Kedro-Specific Integration Settings
+# -----------------------------------------------------------------------------
+# Configuration extensions enabling the seamless integration that eliminates
+# manual styling code throughout pipeline nodes.
+
+kedro:
+  # Configuration bridge settings for seamless integration
+  config_bridge:
+    enabled: true                             # Enable configuration bridge
+    merge_strategy: "kedro_override"          # Kedro parameters take precedence
+    validation_strict: true                   # Strict validation
+    cache_enabled: true                       # Enable caching for performance
+    performance_target_ms: 8                 # Faster than basic example
+
+  # Dataset integration settings for FigureDataSet
+  datasets:
+    # Default parameters for FigureDataSet instances in catalog
+    default_purpose: "validation"             # Default to validation for migration
+    default_condition_param: "experiment_condition"  # Primary condition parameter
+    enable_versioning: true                   # Kedro versioning enabled
+    auto_create_dirs: true                    # Automatic directory creation
+
+    # Style parameter resolution configuration
+    style_resolution:
+      fallback_enabled: true                  # Enable fallback styles
+      parameter_sources:                      # Parameter resolution order
+        - "params:experiment_condition"       # Primary experimental condition
+        - "params:model_configuration.model_type"        # Model type
+        - "params:model_configuration.training_variant"  # Training variant
+        - "params:dataset_configuration.dataset_variant" # Dataset variant
+        - "params:analysis_configuration.analysis_phase" # Analysis phase
+        - "params:analysis_configuration.output_target"  # Output target
+        - "params:visualization_context.quality_requirement" # Quality context
+        - "params:visualization_context.audience_type"   # Audience context
+        - "params:execution_environment.environment_type" # Environment context
+
+    # Performance targets for the migration example
+    performance:
+      save_overhead_target: 3                 # Target <3% overhead (better than basic)
+      style_lookup_cache: true                # Cache style lookups
+      batch_operations: true                  # Enable batch processing
+
+  # Lifecycle hooks configuration
+  hooks:
+    enabled: true                             # Enable FigRegistry hooks
+
+    # Hook execution for migration demonstration
+    execution:
+      before_pipeline_run: true               # Initialize configuration
+      after_pipeline_run: true                # Cleanup and reporting
+      before_node_run: false                  # No per-node hooks needed
+      after_node_run: false                   # No per-node hooks needed
+
+    # Context management for consistent configuration
+    context:
+      share_config: true                      # Share config across datasets
+      thread_safe: true                       # Support parallel execution
+      cleanup_on_exit: true                   # Clean up resources
+
+    # Performance monitoring for migration comparison
+    performance:
+      hook_overhead_ms: 30                    # Target <30ms hook overhead
+      initialization_timeout: 3000           # 3 second timeout
+      monitor_savings: true                   # Monitor code reduction benefits
+
+  # Environment-specific overrides for migration demonstration
+  environments:
+    # Development environment optimized for iteration
+    development:
+      outputs:
+        formats:
+          defaults:
+            exploratory: ["png"]              # PNG only for speed
+            validation: ["png"]               # PNG for quick validation
+            stakeholder: ["png"]              # PNG for development iteration
+
+      defaults:
+        figure:
+          dpi: 150                            # Lower DPI for speed
+
+    # Testing environment for validation
+    testing:
+      kedro:
+        config_bridge:
+          validation_strict: true             # Strict validation for testing
+          performance_target_ms: 5            # Stricter performance target
+
+      performance:
+        monitoring:
+          enabled: true                       # Enable performance monitoring
+          compare_to_manual: true             # Compare against manual approach
+
+    # Production environment for final results
+    production:
+      outputs:
+        formats:
+          defaults:
+            stakeholder: ["png", "pdf"]       # Multiple formats for stakeholders
+            technical: ["pdf", "eps"]         # High-quality technical formats
+
+      defaults:
+        figure:
+          dpi: 300                            # High DPI for production
+
+# -----------------------------------------------------------------------------
+# Migration Comparison and Benefits Tracking
+# -----------------------------------------------------------------------------
+# Configuration sections specific to demonstrating the migration benefits
+# and tracking the improvements over the manual approach.
+
+migration_benefits:
+  # Code reduction metrics (target: 90% reduction per F-001)
+  code_reduction:
+    target_percentage: 90                     # Target code reduction
+    eliminated_patterns:
+      - "plt.savefig() calls"                 # Manual save calls
+      - "hardcoded color values"              # Scattered color definitions
+      - "manual path construction"            # Hardcoded file paths
+      - "repeated styling code"               # Duplicated styling logic
+      - "conditional formatting logic"       # Manual condition handling
+
+  # Consistency improvements
+  consistency_improvements:
+    unified_styling: true                     # Consistent styling across all plots
+    centralized_configuration: true          # Single source of truth
+    automatic_organization: true             # Organized output structure
+    version_control_friendly: true           # Easy to version and track changes
+
+  # Maintenance benefits
+  maintenance_benefits:
+    reduced_code_duplication: true           # Eliminate duplicate styling code
+    easier_style_updates: true              # Update styles in one place
+    automatic_format_consistency: true       # Consistent formatting rules
+    reduced_manual_errors: true             # Eliminate manual save errors
+
+  # Educational value for migration demonstration
+  educational_aspects:
+    before_after_comparison: true           # Clear before/after demonstration
+    migration_steps_documented: true        # Document migration process
+    best_practices_illustrated: true        # Show integration best practices
+    performance_impact_measured: true       # Measure performance improvements
+
+# -----------------------------------------------------------------------------
+# Advanced Integration Patterns
+# -----------------------------------------------------------------------------
+# Advanced configuration demonstrating sophisticated integration patterns
+# that showcase the full capabilities of the FigRegistry-Kedro integration.
+
+# Conditional styling rules for complex migration scenarios
+conditional_styling:
+  # Multi-condition styling based on parameter combinations
+  compound_conditions:
+    "random_forest AND validation":
+      linewidth: 2.8                         # Thicker for RF validation
+      alpha: 0.9                            # Higher visibility
+      markersize: 10                         # Larger markers
+
+    "optimized AND stakeholder":
+      color: "#4B0082"                       # Indigo for optimized stakeholder
+      linewidth: 3.0                        # Thick for stakeholder emphasis
+      marker: "D"                            # Diamond for optimization
+
+    "high_quality AND technical":
+      color: "#000080"                       # Navy for technical high-quality
+      linestyle: "-"                         # Solid for technical precision
+      alpha: 1.0                            # Full opacity for technical
+
+  # Fallback chains for robust condition resolution
+  fallback_chains:
+    primary: ["experiment_condition", "analysis_configuration.analysis_phase"]
+    secondary: ["model_configuration.model_type", "model_configuration.training_variant"]
+    tertiary: ["dataset_configuration.dataset_variant", "dataset_configuration.data_quality"]
+
+# Performance monitoring specific to migration demonstration
+performance_monitoring:
+  # Migration-specific metrics
+  migration_metrics:
+    enabled: true                            # Enable migration tracking
+    baseline_comparison: true                # Compare to manual baseline
+    code_reduction_tracking: true            # Track code reduction
+    consistency_measurement: true            # Measure consistency improvements
+
+  # Performance targets based on migration requirements
+  targets:
+    styling_automation_overhead_ms: 2        # <2ms for styling automation
+    configuration_load_ms: 50               # <50ms configuration load
+    total_save_overhead_percent: 2          # <2% total overhead vs manual
+
+  # Monitoring outputs for migration evaluation
+  monitoring_outputs:
+    performance_report: "data/08_reporting/performance_comparison.json"
+    migration_summary: "data/08_reporting/migration_benefits.md"
+    before_after_metrics: "data/08_reporting/before_after_comparison.csv"
+
+# -----------------------------------------------------------------------------
+# Integration Examples and Usage Patterns
+# -----------------------------------------------------------------------------
+# Practical examples showing how this configuration replaces manual code
+# patterns from the "before" migration example.
+
+usage_examples:
+  # BEFORE: Manual styling in pipeline node
+  before_manual_approach: |
+    def create_analysis_plot(data):
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.plot(data['x'], data['y'], 
+               color='#2E86AB', marker='o', linewidth=2.0)
+        ax.set_title('Analysis Results')
+        plt.savefig('outputs/analysis_plot.png', dpi=300, bbox_inches='tight')
+        plt.close()
+        return None
+
+  # AFTER: Automated styling through FigureDataSet
+  after_automated_approach: |
+    def create_analysis_plot(data):
+        fig, ax = plt.subplots()
+        ax.plot(data['x'], data['y'])  # No manual styling needed
+        ax.set_title('Analysis Results')
+        return fig  # FigureDataSet handles styling and saving automatically
+
+  # Catalog configuration enabling the automation
+  catalog_configuration: |
+    analysis_plot:
+      type: figregistry_kedro.FigureDataSet
+      filepath: data/08_reporting/analysis_results.png
+      purpose: validation
+      condition_param: experiment_condition
+
+  # Hook registration for automatic initialization
+  hook_registration: |
+    # In src/kedro_figregistry_example/settings.py
+    from figregistry_kedro.hooks import FigRegistryHooks
+    
+    HOOKS = (FigRegistryHooks(),)
+
+# -----------------------------------------------------------------------------
+# Validation and Quality Assurance
+# -----------------------------------------------------------------------------
+# Configuration validation ensuring robust integration and migration success.
+
+validation:
+  # Schema validation for migration configuration
+  schema_version: "1.1.0"                   # Updated schema for migration features
+
+  # Required sections for migration demonstration
+  required_sections:
+    - "styles"                              # Condition-based styles
+    - "outputs"                             # Output management
+    - "defaults"                            # Default styling
+    - "kedro"                              # Kedro integration
+    - "migration_benefits"                  # Migration tracking
+
+  # Migration-specific validation rules
+  migration_validation:
+    styles:
+      minimum_conditions: 10                # At least 10 style conditions
+      required_properties: ["color", "marker", "linestyle", "linewidth"]
+      consistency_check: true               # Validate style consistency
+
+    outputs:
+      path_validation: true                 # Validate output paths
+      format_support: ["png", "pdf", "eps"] # Required format support
+      naming_template_validation: true      # Validate naming templates
+
+    performance:
+      overhead_limits:
+        configuration_load_ms: 50           # Max configuration load time
+        style_resolution_ms: 1              # Max style resolution time
+        save_overhead_percent: 5            # Max save overhead
+
+# =============================================================================
+# Migration Success Metrics and Documentation
+# =============================================================================
+#
+# This configuration demonstrates the complete transformation from manual
+# matplotlib figure management to automated FigRegistry-Kedro integration:
+#
+# 1. Code Reduction Achievements:
+#    - Eliminated plt.savefig() calls from all pipeline nodes
+#    - Removed hardcoded styling parameters throughout the codebase
+#    - Consolidated scattered configuration into single source of truth
+#    - Achieved target 90% reduction in styling-related code
+#
+# 2. Consistency Improvements:
+#    - Unified styling approach across all experimental conditions
+#    - Automatic format and quality consistency
+#    - Centralized configuration management
+#    - Environment-specific override capabilities
+#
+# 3. Maintenance Benefits:
+#    - Single location for style updates affecting all visualizations
+#    - Version-controlled configuration enabling collaborative development
+#    - Automated directory organization and file naming
+#    - Reduced risk of manual errors in figure saving
+#
+# 4. Integration Architecture:
+#    - FigRegistryConfigBridge merges Kedro and FigRegistry configurations
+#    - FigureDataSet automatically applies condition-based styling
+#    - Lifecycle hooks ensure proper initialization and cleanup
+#    - Performance monitoring validates overhead targets
+#
+# 5. Educational Value:
+#    - Clear demonstration of before/after transformation
+#    - Documented migration steps and best practices
+#    - Performance comparison metrics and benefits tracking
+#    - Template for teams adopting similar integration patterns
+#
+# This configuration serves as both a functional integration example and
+# a comprehensive template for teams migrating from manual matplotlib
+# management to automated figure styling and management through FigRegistry-Kedro.
+#
+# =============================================================================
