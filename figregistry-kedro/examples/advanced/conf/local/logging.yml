@@ -1,0 +1,296 @@
+# Local Development Logging Configuration for Advanced FigRegistry-Kedro Example
+#
+# This configuration provides enhanced debug visibility, verbose FigRegistry integration
+# logging, and developer-friendly console output optimized for rapid development iteration
+# and comprehensive debugging of plugin operations.
+#
+# Features:
+# - DEBUG-level logging for all figregistry_kedro modules
+# - Enhanced console output with colored formatting and rich tracebacks
+# - Comprehensive visibility into FigureDataSet operations, configuration bridge
+#   behavior, dataset styling processes, and hook lifecycle events
+# - Detailed tracing of condition resolution, style application, and figure persistence
+# - Enhanced error logging with full stack traces and context information
+# - Development-specific log filtering to highlight important events
+# - Rapid feedback logging patterns optimized for iterative development
+
+version: 1
+disable_existing_loggers: False
+
+# Enhanced formatters for development debugging
+formatters:
+  # Detailed formatter for development debugging with timestamps and context
+  detailed_development:
+    format: "%(asctime)s | %(levelname)-8s | %(name)-25s | %(funcName)-20s:%(lineno)-4d | %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  
+  # Compact formatter for less verbose output when needed
+  compact_development:
+    format: "%(levelname)-5s | %(name)-20s | %(message)s"
+  
+  # JSON formatter for structured logging (useful for debugging complex operations)
+  json_development:
+    format: '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "logger": "%(name)s", "function": "%(funcName)s", "line": %(lineno)d, "message": "%(message)s"}'
+    datefmt: "%Y-%m-%dT%H:%M:%S"
+
+# Enhanced handlers for local development
+handlers:
+  # Rich console handler with enhanced debugging features
+  rich_development:
+    class: kedro.logging.RichHandler
+    level: DEBUG
+    rich_tracebacks: True
+    tracebacks_show_locals: True  # Show local variables in tracebacks for debugging
+    tracebacks_max_frames: 20     # Increase max frames for detailed stack traces
+    show_time: True               # Show timestamps in rich output
+    show_level: True              # Show log levels prominently
+    show_path: True               # Show file paths for debugging
+    enable_link_path: True        # Enable clickable file paths in supported terminals
+    markup: True                  # Enable rich markup for colored output
+    
+  # Plain console handler for CI/simple terminals
+  console_development:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: detailed_development
+    stream: ext://sys.stdout
+    
+  # Development file handler for persistent debugging logs
+  debug_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: detailed_development
+    filename: logs/development_debug.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
+    encoding: utf8
+    
+  # Separate file handler for figregistry-specific operations
+  figregistry_debug_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: json_development
+    filename: logs/figregistry_operations.log
+    maxBytes: 5242880   # 5MB
+    backupCount: 3
+    encoding: utf8
+    
+  # Error-only handler for critical issues
+  error_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: detailed_development
+    filename: logs/development_errors.log
+    maxBytes: 5242880   # 5MB
+    backupCount: 5
+    encoding: utf8
+
+# Comprehensive logger configuration for development debugging
+loggers:
+  # === FIGREGISTRY-KEDRO PLUGIN LOGGERS (DEBUG LEVEL) ===
+  
+  # Main figregistry_kedro package logger
+  figregistry_kedro:
+    level: DEBUG
+    handlers: [rich_development, figregistry_debug_handler]
+    propagate: False
+    
+  # FigureDataSet operations with detailed tracing
+  figregistry_kedro.datasets:
+    level: DEBUG
+    handlers: [rich_development, figregistry_debug_handler]
+    propagate: False
+    
+  # Configuration bridge operations and merging
+  figregistry_kedro.config:
+    level: DEBUG
+    handlers: [rich_development, figregistry_debug_handler]
+    propagate: False
+    
+  # Lifecycle hooks and Kedro integration
+  figregistry_kedro.hooks:
+    level: DEBUG
+    handlers: [rich_development, figregistry_debug_handler]
+    propagate: False
+    
+  # === CORE FIGREGISTRY LOGGERS (DEBUG LEVEL) ===
+  
+  # Core figregistry package for style resolution debugging
+  figregistry:
+    level: DEBUG
+    handlers: [rich_development, figregistry_debug_handler]
+    propagate: False
+    
+  # Style management and condition resolution
+  figregistry.core.style:
+    level: DEBUG
+    handlers: [rich_development, figregistry_debug_handler]
+    propagate: False
+    
+  # Configuration loading and validation
+  figregistry.core.config:
+    level: DEBUG
+    handlers: [rich_development, figregistry_debug_handler]
+    propagate: False
+    
+  # Output management and figure saving
+  figregistry.core.output:
+    level: DEBUG
+    handlers: [rich_development, figregistry_debug_handler]
+    propagate: False
+    
+  # === KEDRO FRAMEWORK LOGGERS (INFO LEVEL) ===
+  
+  # Main Kedro logger
+  kedro:
+    level: INFO
+    handlers: [rich_development]
+    propagate: False
+    
+  # Data catalog operations
+  kedro.io.data_catalog:
+    level: INFO
+    handlers: [rich_development]
+    propagate: False
+    
+  # Pipeline execution
+  kedro.pipeline:
+    level: INFO
+    handlers: [rich_development]
+    propagate: False
+    
+  # Configuration loading
+  kedro.config:
+    level: INFO
+    handlers: [rich_development]
+    propagate: False
+    
+  # Hook management
+  kedro.framework.hooks:
+    level: INFO
+    handlers: [rich_development]
+    propagate: False
+    
+  # === DEVELOPMENT-SPECIFIC LOGGERS ===
+  
+  # Advanced example project logger for custom nodes
+  figregistry_kedro_advanced_example:
+    level: DEBUG
+    handlers: [rich_development, debug_file_handler]
+    propagate: False
+    
+  # Matplotlib operations for debugging figure creation
+  matplotlib:
+    level: WARNING  # Reduce matplotlib noise unless errors
+    handlers: [rich_development]
+    propagate: False
+    
+  # Pandas operations (reduce verbosity)
+  pandas:
+    level: WARNING
+    handlers: [rich_development]
+    propagate: False
+    
+  # NumPy operations (reduce verbosity)
+  numpy:
+    level: WARNING
+    handlers: [rich_development]
+    propagate: False
+    
+  # Pydantic validation (useful for config debugging)
+  pydantic:
+    level: INFO
+    handlers: [rich_development]
+    propagate: False
+    
+  # === THIRD-PARTY LIBRARY LOGGERS (REDUCED VERBOSITY) ===
+  
+  # Reduce urllib3 verbosity (common in data operations)
+  urllib3:
+    level: WARNING
+    handlers: [rich_development]
+    propagate: False
+    
+  # Reduce requests verbosity
+  requests:
+    level: WARNING
+    handlers: [rich_development]
+    propagate: False
+    
+  # File system operations
+  fsspec:
+    level: WARNING
+    handlers: [rich_development]
+    propagate: False
+    
+  # === PERFORMANCE MONITORING LOGGERS ===
+  
+  # Custom logger for performance monitoring
+  figregistry_kedro.performance:
+    level: DEBUG
+    handlers: [rich_development, figregistry_debug_handler]
+    propagate: False
+    
+  # Style resolution timing
+  figregistry_kedro.performance.style:
+    level: DEBUG
+    handlers: [rich_development]
+    propagate: False
+    
+  # Dataset operation timing
+  figregistry_kedro.performance.datasets:
+    level: DEBUG
+    handlers: [rich_development]
+    propagate: False
+
+# Root logger configuration
+root:
+  level: DEBUG  # Set to DEBUG for comprehensive local development logging
+  handlers: [rich_development, debug_file_handler, error_handler]
+
+# Development-specific configuration notes:
+#
+# 1. Rich Handler Features:
+#    - Enhanced tracebacks with local variables for debugging
+#    - Clickable file paths in supported terminals
+#    - Rich markup for colored and formatted output
+#    - Detailed timing and context information
+#
+# 2. File Logging:
+#    - Separate logs for general debug, figregistry operations, and errors
+#    - Rotating log files to prevent disk space issues
+#    - JSON format for figregistry operations enables easy parsing
+#
+# 3. Logger Hierarchy:
+#    - DEBUG level for all figregistry_kedro and figregistry modules
+#    - INFO level for Kedro framework components
+#    - WARNING level for third-party libraries to reduce noise
+#    - Separate loggers for performance monitoring
+#
+# 4. Development Workflow:
+#    - All plugin operations are logged at DEBUG level
+#    - Configuration bridge merging is fully traced
+#    - Style resolution and application steps are detailed
+#    - Figure persistence operations include context information
+#    - Hook lifecycle events are comprehensively logged
+#
+# 5. Performance Considerations:
+#    - Separate file handlers prevent I/O blocking
+#    - Rotating logs prevent disk space issues
+#    - Structured JSON logging for automated analysis
+#    - Configurable log levels for different components
+#
+# Usage:
+# 1. Set KEDRO_LOGGING_CONFIG environment variable:
+#    export KEDRO_LOGGING_CONFIG=conf/local/logging.yml
+#
+# 2. Run Kedro commands to see enhanced debugging output:
+#    kedro run
+#    kedro run --pipeline=data_visualization
+#
+# 3. Check log files for persistent debugging information:
+#    tail -f logs/development_debug.log
+#    tail -f logs/figregistry_operations.log
+#
+# 4. For JSON log analysis:
+#    cat logs/figregistry_operations.log | jq '.message' | grep "style"
