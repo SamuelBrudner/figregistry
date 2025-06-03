@@ -1,0 +1,516 @@
+name: Performance Benchmarking
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/figregistry_kedro/**'
+      - 'benchmarks/**'
+      - 'pyproject.toml'
+      - '.github/workflows/performance.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'src/figregistry_kedro/**'
+      - 'benchmarks/**'
+      - 'pyproject.toml'
+      - '.github/workflows/performance.yml'
+  schedule:
+    # Run performance benchmarks daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      benchmark_mode:
+        description: 'Benchmark execution mode'
+        required: false
+        default: 'standard'
+        type: choice
+        options:
+          - standard
+          - comprehensive
+          - regression-only
+      performance_threshold_override:
+        description: 'Override performance thresholds (JSON format)'
+        required: false
+        default: ''
+        type: string
+
+env:
+  # Performance threshold targets from Section 6.6.4.3 and Section 3.6.3.2
+  PLUGIN_OVERHEAD_THRESHOLD_PCT: 5.0
+  CONFIG_BRIDGE_THRESHOLD_MS: 50.0
+  HOOK_INIT_THRESHOLD_MS: 25.0
+  DATASET_SAVE_THRESHOLD_MS: 200.0
+  
+  # Benchmark configuration
+  BENCHMARK_ITERATIONS: 100
+  BENCHMARK_WARMUP_ITERATIONS: 10
+  MEMORY_THRESHOLD_MB: 5.0
+  
+  # Environment settings
+  PYTHONUNBUFFERED: "1"
+  PYTHONDONTWRITEBYTECODE: "1"
+
+jobs:
+  performance-matrix:
+    name: Performance Testing Matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.10", "3.11", "3.12"]
+        kedro-version: ["0.18.14", "0.19.8"]
+        exclude:
+          # Reduce matrix size for performance testing while maintaining coverage
+          - os: windows-latest
+            python-version: "3.10"
+          - os: macos-latest
+            python-version: "3.12"
+    
+    timeout-minutes: 45
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2  # Needed for performance regression detection
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    
+    - name: Install system dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libffi-dev
+    
+    - name: Create performance test environment
+      run: |
+        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install kedro==${{ matrix.kedro-version }}
+        python -m pip install pytest pytest-benchmark pytest-mock pytest-xdist
+        python -m pip install psutil memory-profiler
+        python -m pip install matplotlib numpy pandas scipy pydantic pyyaml
+        python -m pip install -e .
+    
+    - name: Verify plugin installation
+      run: |
+        python -c "
+        import figregistry_kedro
+        info = figregistry_kedro.get_plugin_info()
+        print(f'Plugin version: {info[\"version\"]}')
+        print(f'Fully functional: {info[\"fully_functional\"]}')
+        assert info['fully_functional'], 'Plugin is not fully functional'
+        "
+    
+    - name: Setup benchmarking environment
+      run: |
+        mkdir -p benchmark_results
+        mkdir -p temp_kedro_projects
+        
+        # Create benchmark configuration
+        cat > benchmark_config.json << EOF
+        {
+          "plugin_overhead_threshold_pct": ${{ env.PLUGIN_OVERHEAD_THRESHOLD_PCT }},
+          "config_bridge_threshold_ms": ${{ env.CONFIG_BRIDGE_THRESHOLD_MS }},
+          "hook_init_threshold_ms": ${{ env.HOOK_INIT_THRESHOLD_MS }},
+          "dataset_save_threshold_ms": ${{ env.DATASET_SAVE_THRESHOLD_MS }},
+          "benchmark_iterations": ${{ env.BENCHMARK_ITERATIONS }},
+          "warmup_iterations": ${{ env.BENCHMARK_WARMUP_ITERATIONS }},
+          "memory_threshold_mb": ${{ env.MEMORY_THRESHOLD_MB }},
+          "python_version": "${{ matrix.python-version }}",
+          "kedro_version": "${{ matrix.kedro-version }}",
+          "os": "${{ matrix.os }}",
+          "benchmark_mode": "${{ github.event.inputs.benchmark_mode || 'standard' }}"
+        }
+        EOF
+    
+    - name: Run core performance benchmarks
+      run: |
+        echo "::group::Configuration Bridge Performance"
+        python -m pytest benchmarks/performance_tests.py::test_config_bridge_performance \
+          -v --benchmark-only --benchmark-json=benchmark_results/config_bridge_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json
+        echo "::endgroup::"
+        
+        echo "::group::Hook Initialization Performance"
+        python -m pytest benchmarks/performance_tests.py::test_hook_initialization_performance \
+          -v --benchmark-only --benchmark-json=benchmark_results/hook_init_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json
+        echo "::endgroup::"
+        
+        echo "::group::Dataset Save Performance"
+        python -m pytest benchmarks/performance_tests.py::test_dataset_save_performance \
+          -v --benchmark-only --benchmark-json=benchmark_results/dataset_save_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json
+        echo "::endgroup::"
+    
+    - name: Run plugin overhead benchmarks
+      run: |
+        echo "::group::Plugin Overhead Analysis"
+        python -m pytest benchmarks/performance_tests.py::test_plugin_overhead_measurement \
+          -v --benchmark-only --benchmark-json=benchmark_results/plugin_overhead_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json
+        echo "::endgroup::"
+    
+    - name: Run memory profiling benchmarks
+      run: |
+        echo "::group::Memory Usage Profiling"
+        python -m pytest benchmarks/performance_tests.py::test_memory_usage_profiling \
+          -v --benchmark-json=benchmark_results/memory_usage_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json
+        echo "::endgroup::"
+    
+    - name: Run comprehensive benchmarks (if enabled)
+      if: github.event.inputs.benchmark_mode == 'comprehensive' || github.event_name == 'schedule'
+      run: |
+        echo "::group::Comprehensive Pipeline Performance"
+        python -m pytest benchmarks/performance_tests.py::test_comprehensive_pipeline_performance \
+          -v --benchmark-only --benchmark-json=benchmark_results/comprehensive_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json
+        echo "::endgroup::"
+        
+        echo "::group::Multi-Figure Batch Performance"
+        python -m pytest benchmarks/performance_tests.py::test_batch_figure_performance \
+          -v --benchmark-only --benchmark-json=benchmark_results/batch_performance_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json
+        echo "::endgroup::"
+        
+        echo "::group::Concurrent Pipeline Performance"
+        python -m pytest benchmarks/performance_tests.py::test_concurrent_pipeline_performance \
+          -v --benchmark-only --benchmark-json=benchmark_results/concurrent_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json
+        echo "::endgroup::"
+    
+    - name: Performance threshold validation
+      run: |
+        echo "::group::Performance Threshold Validation"
+        python benchmarks/validate_performance_thresholds.py \
+          --benchmark-dir benchmark_results \
+          --config-file benchmark_config.json \
+          --output-file performance_validation_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json
+        echo "::endgroup::"
+    
+    - name: Generate performance report
+      run: |
+        echo "::group::Performance Report Generation"
+        python benchmarks/generate_performance_report.py \
+          --benchmark-dir benchmark_results \
+          --config-file benchmark_config.json \
+          --output-file performance_report_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.html \
+          --format html
+        echo "::endgroup::"
+    
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: benchmark-results-${{ matrix.os }}-py${{ matrix.python-version }}-kedro${{ matrix.kedro-version }}
+        path: |
+          benchmark_results/
+          performance_validation_*.json
+          performance_report_*.html
+        retention-days: 30
+    
+    - name: Performance regression detection
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "::group::Performance Regression Analysis"
+        # Compare with main branch performance baseline
+        python benchmarks/detect_performance_regression.py \
+          --current-results benchmark_results \
+          --baseline-branch main \
+          --threshold-config benchmark_config.json \
+          --output-file regression_analysis_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json
+        echo "::endgroup::"
+    
+    - name: Comment PR with performance results
+      uses: actions/github-script@v6
+      if: github.event_name == 'pull_request' && matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+      with:
+        script: |
+          const fs = require('fs');
+          const path = require('path');
+          
+          // Read performance validation results
+          const validationFile = `performance_validation_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json`;
+          if (fs.existsSync(validationFile)) {
+            const validation = JSON.parse(fs.readFileSync(validationFile, 'utf8'));
+            
+            let comment = '## 🚀 Performance Benchmark Results\n\n';
+            comment += `**Environment:** ${{ matrix.os }} | Python ${{ matrix.python-version }} | Kedro ${{ matrix.kedro-version }}\n\n`;
+            
+            comment += '| Metric | Target | Actual | Status |\n';
+            comment += '|--------|--------|--------|--------|\n';
+            
+            const results = validation.results;
+            for (const [metric, data] of Object.entries(results)) {
+              const status = data.passed ? '✅ PASS' : '❌ FAIL';
+              comment += `| ${metric} | ${data.threshold} | ${data.actual} | ${status} |\n`;
+            }
+            
+            comment += '\n---\n';
+            comment += `📊 **Overall Status:** ${validation.overall_passed ? '✅ All thresholds met' : '❌ Performance regressions detected'}\n`;
+            comment += `⏱️ **Test Duration:** ${validation.total_duration_seconds}s\n`;
+            comment += `🔄 **Iterations:** ${validation.benchmark_iterations}\n`;
+            
+            // Add regression analysis if available
+            const regressionFile = `regression_analysis_${{ matrix.os }}_py${{ matrix.python-version }}_kedro${{ matrix.kedro-version }}.json`;
+            if (fs.existsSync(regressionFile)) {
+              const regression = JSON.parse(fs.readFileSync(regressionFile, 'utf8'));
+              if (regression.regressions_detected) {
+                comment += '\n### ⚠️ Performance Regressions Detected\n\n';
+                for (const regression of regression.regressions) {
+                  comment += `- **${regression.metric}:** ${regression.change_pct}% slower than baseline\n`;
+                }
+              } else {
+                comment += '\n### ✅ No Performance Regressions Detected\n';
+              }
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          }
+
+  performance-aggregation:
+    name: Aggregate Performance Results
+    runs-on: ubuntu-latest
+    needs: performance-matrix
+    if: always()
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+    
+    - name: Install analysis dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install pandas matplotlib seaborn jinja2
+    
+    - name: Download all benchmark artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: aggregated_results/
+    
+    - name: Aggregate cross-platform performance results
+      run: |
+        echo "::group::Performance Results Aggregation"
+        python benchmarks/aggregate_performance_results.py \
+          --results-dir aggregated_results/ \
+          --output-dir consolidated_performance/ \
+          --format json,html,csv
+        echo "::endgroup::"
+    
+    - name: Generate cross-platform performance comparison
+      run: |
+        echo "::group::Cross-Platform Performance Analysis"
+        python benchmarks/generate_platform_comparison.py \
+          --consolidated-dir consolidated_performance/ \
+          --output-file platform_performance_comparison.html
+        echo "::endgroup::"
+    
+    - name: Performance trend analysis
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        echo "::group::Performance Trend Analysis"
+        python benchmarks/analyze_performance_trends.py \
+          --consolidated-dir consolidated_performance/ \
+          --historical-data performance_history/ \
+          --output-file performance_trends.html \
+          --commit-sha ${{ github.sha }}
+        echo "::endgroup::"
+    
+    - name: Update performance dashboard data
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      run: |
+        echo "::group::Performance Dashboard Update"
+        # Update GitHub Pages performance dashboard
+        mkdir -p dashboard_data/
+        cp consolidated_performance/performance_summary.json dashboard_data/latest_performance.json
+        cp platform_performance_comparison.html dashboard_data/
+        cp performance_trends.html dashboard_data/
+        echo "::endgroup::"
+    
+    - name: Check for critical performance failures
+      run: |
+        echo "::group::Critical Performance Failure Check"
+        python benchmarks/check_critical_performance_failures.py \
+          --consolidated-dir consolidated_performance/ \
+          --failure-threshold-pct 20.0 \
+          --output-file critical_failures.json
+        
+        if [ -f critical_failures.json ] && [ "$(cat critical_failures.json | jq '.critical_failures_detected')" = "true" ]; then
+          echo "::error::Critical performance failures detected"
+          cat critical_failures.json | jq '.failures'
+          exit 1
+        fi
+        echo "::endgroup::"
+    
+    - name: Upload consolidated performance results
+      uses: actions/upload-artifact@v3
+      with:
+        name: consolidated-performance-results
+        path: |
+          consolidated_performance/
+          platform_performance_comparison.html
+          performance_trends.html
+          dashboard_data/
+        retention-days: 90
+    
+    - name: Deploy performance dashboard (main branch only)
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: dashboard_data/
+        destination_dir: performance_dashboard/
+        commit_message: 'Update performance dashboard: ${{ github.sha }}'
+
+  performance-baseline-update:
+    name: Update Performance Baseline
+    runs-on: ubuntu-latest
+    needs: [performance-matrix, performance-aggregation]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Download consolidated results
+      uses: actions/download-artifact@v3
+      with:
+        name: consolidated-performance-results
+        path: baseline_update/
+    
+    - name: Update performance baseline
+      run: |
+        echo "::group::Performance Baseline Update"
+        mkdir -p performance_baselines/
+        
+        # Copy current results as new baseline
+        cp baseline_update/consolidated_performance/performance_summary.json \
+           performance_baselines/baseline_$(date +%Y%m%d_%H%M%S)_${{ github.sha }}.json
+        
+        # Update latest baseline pointer
+        cp baseline_update/consolidated_performance/performance_summary.json \
+           performance_baselines/latest_baseline.json
+        
+        # Keep only last 30 baselines to prevent repository bloat
+        ls -t performance_baselines/baseline_*.json | tail -n +31 | xargs -r rm
+        echo "::endgroup::"
+    
+    - name: Commit updated baselines
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add performance_baselines/
+        
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Update performance baselines: $(date +%Y-%m-%d)"
+          git push
+        fi
+
+  performance-notification:
+    name: Performance Notification
+    runs-on: ubuntu-latest
+    needs: [performance-matrix, performance-aggregation]
+    if: always() && (github.event_name == 'schedule' || failure())
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Download aggregated results
+      uses: actions/download-artifact@v3
+      if: needs.performance-aggregation.result == 'success'
+      with:
+        name: consolidated-performance-results
+        path: notification_data/
+    
+    - name: Generate performance notification
+      run: |
+        echo "::group::Performance Notification Generation"
+        
+        if [ "${{ needs.performance-matrix.result }}" = "failure" ] || [ "${{ needs.performance-aggregation.result }}" = "failure" ]; then
+          echo "NOTIFICATION_TYPE=failure" >> $GITHUB_ENV
+          echo "NOTIFICATION_TITLE=Performance Benchmark Failure" >> $GITHUB_ENV
+          echo "NOTIFICATION_MESSAGE=Performance benchmarking workflow has failed. Please review the logs and investigate." >> $GITHUB_ENV
+        elif [ -f notification_data/consolidated_performance/performance_summary.json ]; then
+          python -c "
+import json
+import os
+
+with open('notification_data/consolidated_performance/performance_summary.json') as f:
+    data = json.load(f)
+
+failed_thresholds = [metric for metric, result in data.get('threshold_results', {}).items() if not result.get('passed', True)]
+
+if failed_thresholds:
+    print('NOTIFICATION_TYPE=threshold_failure', file=open(os.environ['GITHUB_ENV'], 'a'))
+    print('NOTIFICATION_TITLE=Performance Thresholds Exceeded', file=open(os.environ['GITHUB_ENV'], 'a'))
+    print(f'NOTIFICATION_MESSAGE=Performance thresholds exceeded for: {", ".join(failed_thresholds)}', file=open(os.environ['GITHUB_ENV'], 'a'))
+else:
+    print('NOTIFICATION_TYPE=success', file=open(os.environ['GITHUB_ENV'], 'a'))
+    print('NOTIFICATION_TITLE=Performance Benchmarks Completed Successfully', file=open(os.environ['GITHUB_ENV'], 'a'))
+    print('NOTIFICATION_MESSAGE=All performance thresholds met successfully.', file=open(os.environ['GITHUB_ENV'], 'a'))
+"
+        else
+          echo "NOTIFICATION_TYPE=unknown" >> $GITHUB_ENV
+          echo "NOTIFICATION_TITLE=Performance Benchmark Status Unknown" >> $GITHUB_ENV
+          echo "NOTIFICATION_MESSAGE=Unable to determine performance benchmark status." >> $GITHUB_ENV
+        fi
+        echo "::endgroup::"
+    
+    - name: Create performance issue (on threshold failures)
+      if: env.NOTIFICATION_TYPE == 'threshold_failure' || env.NOTIFICATION_TYPE == 'failure'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const title = `[Performance Alert] ${process.env.NOTIFICATION_TITLE}`;
+          const body = `
+## Performance Alert
+
+**Status:** ${process.env.NOTIFICATION_TYPE}
+**Message:** ${process.env.NOTIFICATION_MESSAGE}
+**Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+**Commit:** ${{ github.sha }}
+**Branch:** ${{ github.ref_name }}
+
+### Next Steps
+1. Review the performance benchmark results
+2. Investigate any performance regressions
+3. Optimize slow components if necessary
+4. Update performance thresholds if justified
+
+### Performance Thresholds
+- Plugin Overhead: < ${process.env.PLUGIN_OVERHEAD_THRESHOLD_PCT}%
+- Config Bridge: < ${process.env.CONFIG_BRIDGE_THRESHOLD_MS}ms
+- Hook Initialization: < ${process.env.HOOK_INIT_THRESHOLD_MS}ms
+- Dataset Save: < ${process.env.DATASET_SAVE_THRESHOLD_MS}ms
+
+*This issue was automatically generated by the performance benchmarking workflow.*
+          `;
+          
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: title,
+            body: body,
+            labels: ['performance', 'automated', 'needs-investigation']
+          });
