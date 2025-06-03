@@ -1,0 +1,71 @@
+timestamp,experiment_id,condition,measurement_value,measurement_type,quality_score,researcher,data_source,batch_id,replicate_id,notes
+2024-01-15T08:00:00Z,EXP001,control,12.45,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_001,Baseline measurement - automated FigRegistry styling will apply control styling
+2024-01-15T08:15:00Z,EXP001,control,12.52,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_001,15min timepoint - demonstrates time series continuity
+2024-01-15T08:30:00Z,EXP001,control,12.48,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_001,30min timepoint - stable baseline pattern
+2024-01-15T08:45:00Z,EXP001,control,12.41,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_001,45min timepoint - controlled variation within normal range
+2024-01-15T09:00:00Z,EXP001,control,12.39,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_001,60min timepoint - consistent control response
+2024-01-15T09:15:00Z,EXP001,control,12.44,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_001,75min timepoint - FigureDataSet will auto-apply control styling
+2024-01-15T09:30:00Z,EXP001,control,12.50,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_001,90min timepoint - eliminates manual plt.savefig() calls
+2024-01-15T09:45:00Z,EXP001,control,12.47,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_001,105min timepoint - automated condition_param resolution
+2024-01-15T10:00:00Z,EXP001,control,12.43,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_001,120min timepoint - Kedro catalog integration
+2024-01-15T10:15:00Z,EXP001,control,12.46,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_001,135min timepoint - versioned figure storage
+2024-01-15T08:00:00Z,EXP002,treatment_A,13.12,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_001,Treatment A baseline - demonstrates automated styling differentiation
+2024-01-15T08:15:00Z,EXP002,treatment_A,13.45,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_001,Treatment A response emerging - condition-based styling active
+2024-01-15T08:30:00Z,EXP002,treatment_A,13.78,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_001,Treatment A effect building - FigRegistry styling applied automatically
+2024-01-15T08:45:00Z,EXP002,treatment_A,14.12,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_001,Treatment A sustained response - distinct from control styling
+2024-01-15T09:00:00Z,EXP002,treatment_A,14.56,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_001,Treatment A peak response - automated figure management
+2024-01-15T09:15:00Z,EXP002,treatment_A,14.89,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_001,Treatment A maintaining - no manual styling overhead
+2024-01-15T09:30:00Z,EXP002,treatment_A,15.12,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_001,Treatment A plateau - condition_param resolution success
+2024-01-15T09:45:00Z,EXP002,treatment_A,15.34,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_001,Treatment A stable - automated versioning active
+2024-01-15T10:00:00Z,EXP002,treatment_A,15.28,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_001,Treatment A maintained effect - catalog-based storage
+2024-01-15T10:15:00Z,EXP002,treatment_A,15.41,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_001,Treatment A sustained - FigureDataSet integration complete
+2024-01-15T08:00:00Z,EXP003,treatment_B,11.98,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_001,Treatment B baseline - third condition for styling variation
+2024-01-15T08:15:00Z,EXP003,treatment_B,12.23,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_001,Treatment B modest response - different styling pattern
+2024-01-15T08:30:00Z,EXP003,treatment_B,12.56,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_001,Treatment B gradual increase - automated differentiation
+2024-01-15T08:45:00Z,EXP003,treatment_B,12.89,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_001,Treatment B intermediate response - condition-specific styling
+2024-01-15T09:00:00Z,EXP003,treatment_B,13.12,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_001,Treatment B building effect - style variation demonstration
+2024-01-15T09:15:00Z,EXP003,treatment_B,13.34,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_001,Treatment B sustained - F-005 integration active
+2024-01-15T09:30:00Z,EXP003,treatment_B,13.67,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_001,Treatment B continued - automated workflow demonstration
+2024-01-15T09:45:00Z,EXP003,treatment_B,13.91,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_001,Treatment B peak - eliminates manual styling
+2024-01-15T10:00:00Z,EXP003,treatment_B,14.12,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_001,Treatment B plateau - pipeline node compatibility
+2024-01-15T10:15:00Z,EXP003,treatment_B,14.05,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_001,Treatment B stable - pandas DataFrame processing ready
+2024-01-15T08:00:00Z,EXP004,treatment_C,10.23,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_001,Treatment C baseline - fourth condition for comprehensive styling
+2024-01-15T08:15:00Z,EXP004,treatment_C,9.89,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_001,Treatment C initial decrease - negative response pattern
+2024-01-15T08:30:00Z,EXP004,treatment_C,9.56,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_001,Treatment C suppression - distinct styling for negative effects
+2024-01-15T08:45:00Z,EXP004,treatment_C,9.34,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_001,Treatment C continued decrease - automatic style application
+2024-01-15T09:00:00Z,EXP004,treatment_C,9.12,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_001,Treatment C minimum - condition_param properly resolved
+2024-01-15T09:15:00Z,EXP004,treatment_C,9.28,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_001,Treatment C recovery start - dynamic styling demonstration
+2024-01-15T09:30:00Z,EXP004,treatment_C,9.45,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_001,Treatment C gradual recovery - automated figure management
+2024-01-15T09:45:00Z,EXP004,treatment_C,9.67,primary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_001,Treatment C continued recovery - FigureDataSet save operations
+2024-01-15T10:00:00Z,EXP004,treatment_C,9.89,primary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_001,Treatment C approaching baseline - catalog integration success
+2024-01-15T10:15:00Z,EXP004,treatment_C,10.12,primary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_001,Treatment C near baseline - automated workflow complete
+2024-01-16T08:00:00Z,EXP001,control,12.51,secondary_endpoint,0.96,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_002,Secondary endpoint control - additional replicate data
+2024-01-16T08:00:00Z,EXP002,treatment_A,15.67,secondary_endpoint,0.98,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_002,Secondary endpoint treatment A - consistent response pattern
+2024-01-16T08:00:00Z,EXP003,treatment_B,14.23,secondary_endpoint,0.97,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_002,Secondary endpoint treatment B - intermediate effects maintained
+2024-01-16T08:00:00Z,EXP004,treatment_C,10.45,secondary_endpoint,0.99,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_002,Secondary endpoint treatment C - recovery to baseline
+2024-01-17T08:00:00Z,EXP001,control,12.47,biomarker_level,0.95,Dr. Sarah Chen,automated_instrument,BATCH_001,REP_003,Biomarker control - supports multi-endpoint visualization
+2024-01-17T08:00:00Z,EXP002,treatment_A,18.34,biomarker_level,0.97,Dr. Sarah Chen,automated_instrument,BATCH_002,REP_003,Biomarker treatment A - strong biomarker response
+2024-01-17T08:00:00Z,EXP003,treatment_B,16.12,biomarker_level,0.98,Dr. Sarah Chen,automated_instrument,BATCH_003,REP_003,Biomarker treatment B - moderate biomarker elevation
+2024-01-17T08:00:00Z,EXP004,treatment_C,11.89,biomarker_level,0.96,Dr. Sarah Chen,automated_instrument,BATCH_004,REP_003,Biomarker treatment C - minimal biomarker change
+2024-01-18T10:00:00Z,EXP005,treatment,16.78,time_course_6h,0.98,Dr. Michael Rodriguez,automated_instrument,BATCH_005,REP_001,6-hour timepoint - validation phase styling demonstration
+2024-01-18T16:00:00Z,EXP006,treatment,18.12,time_course_12h,0.97,Dr. Michael Rodriguez,automated_instrument,BATCH_006,REP_001,12-hour timepoint - mid-validation styling pattern
+2024-01-19T08:00:00Z,EXP007,treatment,19.45,time_course_24h,0.99,Dr. Michael Rodriguez,automated_instrument,BATCH_007,REP_001,24-hour timepoint - late validation styling application
+2024-01-20T08:00:00Z,EXP008,novel_compound,21.34,comparative_study,0.98,Dr. Lisa Park,automated_instrument,BATCH_008,REP_001,Novel compound - discovery phase experimental styling
+2024-01-20T08:00:00Z,EXP009,standard_treatment,15.67,comparative_study,0.97,Dr. Lisa Park,automated_instrument,BATCH_009,REP_001,Standard treatment - reference styling for comparison
+2024-01-21T08:00:00Z,EXP010,high_responder,24.56,biomarker_expression,0.99,Dr. James Wilson,automated_instrument,BATCH_010,REP_001,High responder - validation with distinct styling
+2024-01-21T08:00:00Z,EXP011,low_responder,8.23,biomarker_expression,0.96,Dr. James Wilson,automated_instrument,BATCH_011,REP_001,Low responder - contrasting validation styling
+2024-01-22T08:00:00Z,EXP012,baseline,13.45,longitudinal_study,0.98,Dr. Emma Thompson,automated_instrument,BATCH_012,REP_001,Longitudinal baseline - temporal styling differentiation
+2024-02-19T08:00:00Z,EXP013,week_4,17.89,longitudinal_study,0.97,Dr. Emma Thompson,automated_instrument,BATCH_013,REP_001,4-week followup - progressive styling changes
+2024-03-18T08:00:00Z,EXP014,week_8,22.12,longitudinal_study,0.99,Dr. Emma Thompson,automated_instrument,BATCH_014,REP_001,8-week followup - final timepoint styling
+2024-01-23T08:00:00Z,EXP015,pathway_a,19.67,mechanistic_study,0.98,Dr. Robert Kim,automated_instrument,BATCH_015,REP_001,Pathway A - mechanistic validation styling
+2024-01-23T08:00:00Z,EXP016,pathway_b,16.23,mechanistic_study,0.97,Dr. Robert Kim,automated_instrument,BATCH_016,REP_001,Pathway B - alternative pathway styling
+2024-01-24T08:00:00Z,EXP017,vehicle_control,12.34,safety_assessment,0.99,Dr. Angela Foster,automated_instrument,BATCH_017,REP_001,Vehicle control - regulatory phase safety styling
+2024-01-24T08:00:00Z,EXP018,treatment_low,14.56,safety_assessment,0.98,Dr. Angela Foster,automated_instrument,BATCH_018,REP_001,Low dose safety - regulatory safety styling
+2024-01-24T08:00:00Z,EXP019,treatment_high,18.78,safety_assessment,0.97,Dr. Angela Foster,automated_instrument,BATCH_019,REP_001,High dose safety - maximum safety dose styling
+2024-01-25T08:00:00Z,EXP020,placebo,12.67,efficacy_trial,0.99,Dr. David Martinez,automated_instrument,BATCH_020,REP_001,Placebo control - regulatory placebo styling
+2024-01-25T08:00:00Z,EXP021,active_treatment,19.34,efficacy_trial,0.98,Dr. David Martinez,automated_instrument,BATCH_021,REP_001,Active treatment - regulatory treatment styling
+2024-01-26T08:00:00Z,EXP022,reference,16.45,bioequivalence,0.97,Dr. Jennifer Liu,automated_instrument,BATCH_022,REP_001,Reference formulation - bioequivalence reference styling
+2024-01-26T08:00:00Z,EXP023,test_formulation,16.52,bioequivalence,0.99,Dr. Jennifer Liu,automated_instrument,BATCH_023,REP_001,Test formulation - bioequivalence test styling
+2024-01-27T08:00:00Z,EXP024,monotherapy_a,15.23,combination_study,0.98,Dr. Thomas Anderson,automated_instrument,BATCH_024,REP_001,Single agent A - combination baseline styling
+2024-01-27T08:00:00Z,EXP025,monotherapy_b,14.67,combination_study,0.97,Dr. Thomas Anderson,automated_instrument,BATCH_025,REP_001,Single agent B - combination comparator styling
+2024-01-27T08:00:00Z,EXP026,combination_therapy,23.45,combination_study,0.99,Dr. Thomas Anderson,automated_instrument,BATCH_026,REP_001,Combined A+B - synergistic combination styling
