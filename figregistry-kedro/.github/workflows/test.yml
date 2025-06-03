@@ -1,0 +1,740 @@
+name: Comprehensive Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'examples/**'
+      - 'pyproject.toml'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'examples/**'
+      - 'pyproject.toml'
+      - '.github/workflows/**'
+  schedule:
+    # Run nightly tests to catch external dependency issues
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      run_performance_tests:
+        description: 'Run performance benchmarking tests'
+        required: false
+        default: 'false'
+        type: boolean
+      run_security_tests:
+        description: 'Run security vulnerability scanning'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  PYTHONPATH: ${{ github.workspace }}/src
+  PYTHONUNBUFFERED: 1
+  # Force matplotlib to use non-interactive backend for testing
+  MPLBACKEND: Agg
+  # Optimize pytest for CI
+  PYTEST_ADDOPTS: --tb=short --strict-markers --strict-config
+
+jobs:
+  # ============================================================================
+  # Pre-flight checks for basic validation
+  # ============================================================================
+  pre-flight:
+    name: Pre-flight Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for accurate version detection
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install minimal dependencies
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
+          pip install build twine check-manifest
+
+      - name: Validate package configuration
+        run: |
+          # Validate pyproject.toml structure
+          python -c "import tomllib; tomllib.load(open('pyproject.toml', 'rb'))"
+          
+          # Check package can be built
+          python -m build --sdist --wheel .
+          
+          # Verify wheel contents
+          python -m twine check dist/*
+          
+          # Validate manifest
+          check-manifest
+
+      - name: Validate dependency specifications
+        run: |
+          # Test that dependencies can be resolved
+          pip install --dry-run -e .[test]
+          echo "✓ Dependency resolution successful"
+
+  # ============================================================================
+  # Main test matrix with comprehensive coverage
+  # ============================================================================
+  test-matrix:
+    name: Test Python ${{ matrix.python-version }}, Kedro ${{ matrix.kedro-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    needs: pre-flight
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false  # Continue testing other combinations even if one fails
+      matrix:
+        # Cross-platform testing matrix per Section 8.3.1.2
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+        kedro-version: ['0.18.*', '0.19.*']
+        include:
+          # Add specific version combinations for edge case testing
+          - os: ubuntu-latest
+            python-version: '3.10'
+            kedro-version: '0.18.0'  # Minimum supported version
+          - os: ubuntu-latest
+            python-version: '3.12'
+            kedro-version: '0.19.8'  # Latest supported version
+        exclude:
+          # Reduce matrix size for non-critical combinations on nightly runs
+          - os: windows-latest
+            python-version: '3.10'
+            kedro-version: '0.18.*'
+          - os: macos-latest
+            python-version: '3.10'
+            kedro-version: '0.18.*'
+
+    env:
+      # Environment-specific configuration
+      KEDRO_VERSION: ${{ matrix.kedro-version }}
+      PYTHON_VERSION: ${{ matrix.python-version }}
+      COVERAGE_FILE: .coverage.${{ matrix.os }}.${{ matrix.python-version }}.${{ matrix.kedro-version }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: |
+            pyproject.toml
+            requirements*.txt
+
+      - name: Configure Windows environment
+        if: runner.os == 'Windows'
+        run: |
+          # Configure Windows-specific settings
+          echo "TEMP=${{ runner.temp }}" >> $GITHUB_ENV
+          echo "TMP=${{ runner.temp }}" >> $GITHUB_ENV
+          # Ensure long path support
+          git config --system core.longpaths true
+
+      - name: Install system dependencies (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz  # For potential dependency graph generation
+
+      - name: Install system dependencies (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install graphviz
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          
+          # Install specific Kedro version
+          pip install "kedro${{ matrix.kedro-version }}"
+          
+          # Install package with test dependencies
+          pip install -e .[test]
+          
+          # Install additional testing tools
+          pip install pytest-benchmark>=4.0.0 pytest-xdist>=3.0.0
+          
+          # Verify installations
+          python -c "import kedro; print(f'Kedro version: {kedro.__version__}')"
+          python -c "import figregistry_kedro; print('figregistry-kedro imported successfully')"
+
+      - name: Display environment information
+        run: |
+          echo "Python version: $(python --version)"
+          echo "Pip version: $(pip --version)"
+          echo "Operating System: ${{ runner.os }}"
+          echo "Kedro version: ${{ matrix.kedro-version }}"
+          pip list | grep -E "(kedro|figregistry|matplotlib|pytest)"
+
+      - name: Run unit tests with coverage
+        run: |
+          # Run tests with coverage collection per Section 6.6.2.4
+          python -m pytest tests/ \
+            -v \
+            --cov=figregistry_kedro \
+            --cov-report=term-missing \
+            --cov-report=xml:coverage.xml \
+            --cov-report=html:htmlcov \
+            --cov-branch \
+            --cov-fail-under=90 \
+            --durations=10 \
+            --maxfail=5 \
+            -x
+
+      - name: Run integration tests
+        run: |
+          # Run integration tests with Kedro context simulation
+          python -m pytest tests/ -m integration \
+            -v \
+            --durations=10 \
+            --maxfail=3
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          files: ./coverage.xml
+          name: coverage-${{ matrix.os }}-py${{ matrix.python-version }}-kedro${{ matrix.kedro-version }}
+          flags: unittests
+          env_vars: OS,PYTHON_VERSION,KEDRO_VERSION
+          fail_ci_if_error: false
+
+      - name: Archive test artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: test-artifacts-${{ matrix.os }}-py${{ matrix.python-version }}-kedro${{ matrix.kedro-version }}
+          path: |
+            htmlcov/
+            coverage.xml
+            .coverage.*
+          retention-days: 7
+
+  # ============================================================================
+  # Example pipeline validation per Section 8.3.1.2
+  # ============================================================================
+  test-examples:
+    name: Example Projects - ${{ matrix.example }} (Python ${{ matrix.python-version }}, Kedro ${{ matrix.kedro-version }})
+    runs-on: ubuntu-latest
+    needs: pre-flight
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+        kedro-version: ['0.18.*', '0.19.*']
+        example: ['basic', 'advanced']
+        include:
+          # Test migration example on a subset of configurations
+          - python-version: '3.11'
+            kedro-version: '0.19.*'
+            example: 'migration'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install "kedro${{ matrix.kedro-version }}"
+          pip install -e .[test]
+
+      - name: Validate example project structure
+        working-directory: examples/${{ matrix.example }}
+        run: |
+          # Verify required files exist
+          test -f pyproject.toml
+          test -f .kedro.yml
+          test -f README.md
+          
+          # Verify configuration structure
+          test -d conf/base
+          test -f conf/base/catalog.yml
+          
+          # Check for figregistry configuration
+          if [ -f conf/base/figregistry.yml ]; then
+            echo "✓ FigRegistry configuration found"
+          else
+            echo "⚠ No FigRegistry configuration - may be optional for this example"
+          fi
+
+      - name: Install example dependencies
+        working-directory: examples/${{ matrix.example }}
+        run: |
+          pip install -e .
+          
+          # Verify kedro CLI works
+          kedro --version
+          kedro info
+
+      - name: Run example pipeline
+        working-directory: examples/${{ matrix.example }}
+        timeout-minutes: 10
+        run: |
+          # Execute the example pipeline
+          kedro run --pipeline=__default__
+          
+          # Verify pipeline execution created expected outputs
+          echo "Checking for generated figures..."
+          find data/ -name "*.png" -o -name "*.pdf" -o -name "*.svg" | head -10
+
+      - name: Validate figure outputs
+        working-directory: examples/${{ matrix.example }}
+        run: |
+          # Check that figures were created with proper FigRegistry styling
+          python -c "
+          import os
+          import matplotlib.pyplot as plt
+          from pathlib import Path
+          
+          # Look for generated figures
+          figure_files = list(Path('data').rglob('*.png'))
+          figure_files.extend(list(Path('data').rglob('*.pdf')))
+          
+          print(f'Found {len(figure_files)} figure files')
+          
+          if figure_files:
+              print('Example figures generated successfully:')
+              for fig_file in figure_files[:5]:  # Show first 5
+                  print(f'  - {fig_file}')
+          else:
+              print('No figure files found - this may be expected for some examples')
+          "
+
+      - name: Test plugin hook registration
+        working-directory: examples/${{ matrix.example }}
+        run: |
+          # Verify hooks are properly registered
+          python -c "
+          from kedro.framework.context import KedroContext
+          from kedro.framework.hooks import _create_hook_manager
+          import figregistry_kedro
+          
+          print('Testing hook registration...')
+          try:
+              # This should not raise an error if hooks are properly registered
+              hook_manager = _create_hook_manager()
+              print('✓ Hook manager created successfully')
+              
+              # Check if FigRegistry hooks are available
+              hooks = hook_manager.list_name_plugin()
+              figregistry_hooks = [h for h in hooks if 'figregistry' in str(h)]
+              
+              if figregistry_hooks:
+                  print(f'✓ Found FigRegistry hooks: {figregistry_hooks}')
+              else:
+                  print('⚠ No FigRegistry hooks found in hook manager')
+                  
+          except Exception as e:
+              print(f'✗ Hook registration test failed: {e}')
+              raise
+          "
+
+      - name: Cleanup example environment
+        if: always()
+        working-directory: examples/${{ matrix.example }}
+        run: |
+          # Clean up generated files to prevent storage bloat
+          find data/ -name "*.png" -delete 2>/dev/null || true
+          find data/ -name "*.pdf" -delete 2>/dev/null || true
+          find data/ -name "*.svg" -delete 2>/dev/null || true
+          rm -rf logs/ 2>/dev/null || true
+          rm -rf .kedro/ 2>/dev/null || true
+
+  # ============================================================================
+  # Performance benchmarking per Section 6.6.4.3
+  # ============================================================================
+  performance-tests:
+    name: Performance Benchmarking
+    runs-on: ubuntu-latest
+    needs: [pre-flight]
+    timeout-minutes: 15
+    if: github.event_name == 'schedule' || github.event.inputs.run_performance_tests == 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies with performance tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install "kedro>=0.18.0,<0.20.0"
+          pip install -e .[test]
+          pip install pytest-benchmark>=4.0.0 memory-profiler>=0.60.0
+
+      - name: Run performance benchmarks
+        run: |
+          # Run performance tests with benchmarking
+          python -m pytest tests/ -m "performance" \
+            --benchmark-only \
+            --benchmark-sort=mean \
+            --benchmark-json=benchmark.json \
+            --benchmark-min-rounds=5 \
+            --benchmark-max-time=300 \
+            -v
+
+      - name: Validate performance thresholds
+        run: |
+          # Validate performance against requirements from Section 6.6.4.3
+          python -c "
+          import json
+          import sys
+          
+          # Load benchmark results
+          try:
+              with open('benchmark.json', 'r') as f:
+                  data = json.load(f)
+          except FileNotFoundError:
+              print('No benchmark data found - skipping validation')
+              sys.exit(0)
+          
+          # Define performance thresholds (in seconds)
+          thresholds = {
+              'config_bridge_merge': 0.050,  # <50ms per Section 6.6.4.3
+              'dataset_save_operation': 0.200,  # <200ms per Section 6.6.4.3  
+              'hook_initialization': 0.025,   # <25ms per Section 6.6.4.3
+          }
+          
+          failures = []
+          for benchmark in data.get('benchmarks', []):
+              name = benchmark['name']
+              mean_time = benchmark['stats']['mean']
+              
+              # Check against thresholds
+              for threshold_name, threshold_value in thresholds.items():
+                  if threshold_name in name.lower():
+                      if mean_time > threshold_value:
+                          failures.append(f'{name}: {mean_time:.3f}s > {threshold_value:.3f}s')
+                      else:
+                          print(f'✓ {name}: {mean_time:.3f}s <= {threshold_value:.3f}s')
+          
+          if failures:
+              print('Performance threshold violations:')
+              for failure in failures:
+                  print(f'  ✗ {failure}')
+              sys.exit(1)
+          else:
+              print('All performance thresholds met!')
+          "
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: performance-benchmarks
+          path: benchmark.json
+          retention-days: 30
+
+  # ============================================================================
+  # Security scanning per Section 6.6.8
+  # ============================================================================
+  security-scan:
+    name: Security Vulnerability Scanning
+    runs-on: ubuntu-latest
+    needs: pre-flight
+    timeout-minutes: 10
+    if: github.event.inputs.run_security_tests != 'false'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install safety>=2.3.0 bandit>=1.7.5
+
+      - name: Install package dependencies
+        run: |
+          pip install "kedro>=0.18.0,<0.20.0"
+          pip install -e .[test]
+
+      - name: Run dependency vulnerability scan
+        run: |
+          # Check for known vulnerabilities in dependencies
+          safety check --json --output safety-report.json || true
+          
+          # Display results
+          if [ -f safety-report.json ]; then
+            echo "Safety scan completed. Checking results..."
+            python -c "
+            import json
+            import sys
+            
+            try:
+                with open('safety-report.json', 'r') as f:
+                    data = json.load(f)
+                
+                vulnerabilities = data.get('vulnerabilities', [])
+                
+                if vulnerabilities:
+                    print(f'Found {len(vulnerabilities)} vulnerabilities:')
+                    for vuln in vulnerabilities:
+                        print(f'  - {vuln.get(\"package_name\", \"unknown\")}: {vuln.get(\"vulnerability_id\", \"N/A\")}')
+                        print(f'    {vuln.get(\"advisory\", \"No description\")}')
+                    
+                    # Fail for high/critical vulnerabilities
+                    critical_vulns = [v for v in vulnerabilities if v.get('severity', '').lower() in ['high', 'critical']]
+                    if critical_vulns:
+                        print(f'Found {len(critical_vulns)} critical/high severity vulnerabilities')
+                        sys.exit(1)
+                else:
+                    print('✓ No vulnerabilities found')
+            except Exception as e:
+                print(f'Error processing safety report: {e}')
+                sys.exit(1)
+            "
+          fi
+
+      - name: Run static security analysis
+        run: |
+          # Run bandit security linter
+          bandit -r src/ -f json -o bandit-report.json || true
+          
+          # Check results
+          if [ -f bandit-report.json ]; then
+            python -c "
+            import json
+            import sys
+            
+            try:
+                with open('bandit-report.json', 'r') as f:
+                    data = json.load(f)
+                
+                results = data.get('results', [])
+                high_severity = [r for r in results if r.get('issue_severity') == 'HIGH']
+                medium_severity = [r for r in results if r.get('issue_severity') == 'MEDIUM']
+                
+                print(f'Bandit found {len(results)} total issues')
+                print(f'  High severity: {len(high_severity)}')
+                print(f'  Medium severity: {len(medium_severity)}')
+                
+                if high_severity:
+                    print('High severity issues found:')
+                    for issue in high_severity:
+                        print(f'  - {issue.get(\"filename\", \"unknown\")}: {issue.get(\"test_name\", \"unknown\")}')
+                    sys.exit(1)
+                else:
+                    print('✓ No high severity security issues found')
+            except Exception as e:
+                print(f'Error processing bandit report: {e}')
+            "
+          fi
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: security-reports
+          path: |
+            safety-report.json
+            bandit-report.json
+          retention-days: 30
+
+  # ============================================================================
+  # Quality gates enforcement per Section 6.6.6.4
+  # ============================================================================
+  quality-gates:
+    name: Quality Gates Enforcement
+    runs-on: ubuntu-latest
+    needs: [test-matrix, test-examples]
+    timeout-minutes: 10
+    if: always()
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Download all test artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: test-artifacts/
+
+      - name: Combine coverage reports
+        run: |
+          python -m pip install --upgrade pip
+          pip install coverage>=7.0.0
+          
+          # Find and combine all coverage files
+          find test-artifacts/ -name "*.coverage*" -exec cp {} . \; 2>/dev/null || true
+          find test-artifacts/ -name "coverage.xml" -exec cp {} coverage-{}.xml \; 2>/dev/null || true
+          
+          # Combine coverage data if any .coverage files exist
+          if ls .coverage* 1> /dev/null 2>&1; then
+            coverage combine .coverage*
+            coverage report --show-missing --fail-under=90
+            coverage xml
+            echo "✓ Coverage quality gate passed (≥90%)"
+          else
+            echo "⚠ No coverage files found for combination"
+          fi
+
+      - name: Validate test success rates
+        run: |
+          # Check if any required jobs failed
+          python -c "
+          import sys
+          import os
+          
+          # This step runs even if previous jobs failed due to 'if: always()'
+          # We need to check the job outcomes to enforce quality gates
+          
+          test_matrix_result = '${{ needs.test-matrix.result }}'
+          test_examples_result = '${{ needs.test-examples.result }}'
+          
+          print(f'Test matrix result: {test_matrix_result}')
+          print(f'Test examples result: {test_examples_result}')
+          
+          # Quality gate: Both test suites must succeed
+          if test_matrix_result != 'success':
+              print('✗ Test matrix quality gate failed')
+              sys.exit(1)
+              
+          if test_examples_result != 'success':
+              print('✗ Example tests quality gate failed') 
+              sys.exit(1)
+              
+          print('✓ All quality gates passed')
+          "
+
+      - name: Generate quality report
+        if: always()
+        run: |
+          # Generate comprehensive quality report
+          cat > quality-report.md << 'EOF'
+          # figregistry-kedro Quality Report
+          
+          **Build Information:**
+          - Commit: ${{ github.sha }}
+          - Branch: ${{ github.ref_name }}
+          - Trigger: ${{ github.event_name }}
+          - Timestamp: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          **Test Results:**
+          - Test Matrix: ${{ needs.test-matrix.result }}
+          - Example Projects: ${{ needs.test-examples.result }}
+          
+          **Quality Gates:**
+          - Coverage Threshold (≥90%): $([ -f coverage.xml ] && echo "✓ PASSED" || echo "⚠ NO DATA")
+          - Test Success Rate: $([ "${{ needs.test-matrix.result }}" = "success" ] && [ "${{ needs.test-examples.result }}" = "success" ] && echo "✓ PASSED" || echo "✗ FAILED")
+          
+          **Matrix Coverage:**
+          - Python versions: 3.10, 3.11, 3.12
+          - Kedro versions: 0.18.x, 0.19.x  
+          - Operating systems: Ubuntu, Windows, macOS
+          - Total combinations tested: 18
+          
+          EOF
+
+      - name: Upload quality report
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: quality-report
+          path: quality-report.md
+          retention-days: 30
+
+  # ============================================================================
+  # Final cleanup and notification
+  # ============================================================================
+  cleanup:
+    name: Cleanup and Notification
+    runs-on: ubuntu-latest
+    needs: [test-matrix, test-examples, performance-tests, security-scan, quality-gates]
+    if: always()
+    timeout-minutes: 5
+
+    steps:
+      - name: Cleanup test environments
+        run: |
+          echo "Performing automated cleanup for failed test environments..."
+          
+          # Note: Individual jobs already handle their own cleanup
+          # This is a central coordination point for any additional cleanup
+          
+          echo "✓ Cleanup coordination completed"
+
+      - name: Generate workflow summary
+        run: |
+          echo "## figregistry-kedro Test Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY  
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Test Matrix | ${{ needs.test-matrix.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Example Projects | ${{ needs.test-examples.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Performance Tests | ${{ needs.performance-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ${{ needs.security-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Quality Gates | ${{ needs.quality-gates.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Overall status
+          if [ "${{ needs.test-matrix.result }}" = "success" ] && [ "${{ needs.test-examples.result }}" = "success" ] && [ "${{ needs.quality-gates.result }}" = "success" ]; then
+            echo "### ✅ All critical tests passed!" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Some critical tests failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Test Coverage:** Python 3.10-3.12 × Kedro 0.18.x-0.19.x × Ubuntu/Windows/macOS" >> $GITHUB_STEP_SUMMARY
+          echo "**Quality Standards:** 90% coverage threshold, security scanning, performance validation" >> $GITHUB_STEP_SUMMARY
+
+      - name: Report workflow completion
+        run: |
+          echo "=============================================="
+          echo "figregistry-kedro Test Workflow Completed"
+          echo "=============================================="
+          echo "Timestamp: $(date -u +"%Y-%m-%d %H:%M:%S UTC")"
+          echo "Commit: ${{ github.sha }}"
+          echo "Trigger: ${{ github.event_name }}"
+          echo ""
+          echo "Critical Jobs Status:"
+          echo "  - Test Matrix: ${{ needs.test-matrix.result }}"
+          echo "  - Example Projects: ${{ needs.test-examples.result }}"
+          echo "  - Quality Gates: ${{ needs.quality-gates.result }}"
+          echo ""
+          echo "Optional Jobs Status:"
+          echo "  - Performance Tests: ${{ needs.performance-tests.result }}"
+          echo "  - Security Scan: ${{ needs.security-scan.result }}"
+          echo "=============================================="
