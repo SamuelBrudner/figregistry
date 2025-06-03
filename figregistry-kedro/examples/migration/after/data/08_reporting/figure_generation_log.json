@@ -1,0 +1,605 @@
+{
+  "metadata": {
+    "log_version": "1.0.0",
+    "figregistry_kedro_version": "0.1.0",
+    "figregistry_version": "0.3.0",
+    "kedro_version": "0.18.14",
+    "project": "kedro_figregistry_example",
+    "environment": "base",
+    "session_id": "2024-06-03T14:32:18.456789Z",
+    "pipeline_name": "data_visualization",
+    "log_created_at": "2024-06-03T14:32:18.456789Z",
+    "log_description": "Automated figure generation log capturing metadata about all figures created through FigureDataSet operations, demonstrating systematic tracking, configuration resolution details, and styling decisions made automatically by the figregistry-kedro integration."
+  },
+  "configuration_initialization": {
+    "timestamp": "2024-06-03T14:32:18.457123Z",
+    "hook": "after_config_loaded",
+    "bridge_initialization": {
+      "config_sources": [
+        {
+          "source_type": "kedro_config",
+          "path": "conf/base/figregistry.yml",
+          "exists": true,
+          "loaded": true,
+          "sections": ["styles", "palettes", "outputs", "defaults", "kedro"]
+        },
+        {
+          "source_type": "standalone_figregistry",
+          "path": "figregistry.yaml",
+          "exists": false,
+          "loaded": false,
+          "fallback_applied": true
+        }
+      ],
+      "merged_configuration": {
+        "styles": {
+          "training": {
+            "figure.figsize": [10, 6],
+            "axes.titlesize": 14,
+            "axes.labelsize": 12,
+            "lines.linewidth": 2.0,
+            "lines.color": "#2E86AB",
+            "figure.dpi": 150
+          },
+          "validation": {
+            "figure.figsize": [8, 6],
+            "axes.titlesize": 12,
+            "axes.labelsize": 10,
+            "lines.linewidth": 1.5,
+            "lines.color": "#A23B72",
+            "figure.dpi": 150
+          },
+          "publication": {
+            "figure.figsize": [6, 4],
+            "axes.titlesize": 10,
+            "axes.labelsize": 8,
+            "lines.linewidth": 1.0,
+            "font.family": "serif",
+            "figure.dpi": 300,
+            "savefig.bbox": "tight",
+            "savefig.transparent": true
+          }
+        },
+        "palettes": {
+          "default": ["#2E86AB", "#A23B72", "#F18F01", "#C73E1D", "#592E83"],
+          "publication": ["#000000", "#666666", "#999999", "#CCCCCC"]
+        },
+        "outputs": {
+          "base_path": "data/08_reporting",
+          "timestamp_format": "%Y%m%d_%H%M%S",
+          "name_template": "{name}_{timestamp}",
+          "exploratory": "data/08_reporting",
+          "presentation": "data/08_reporting",
+          "publication": "data/08_reporting"
+        },
+        "defaults": {
+          "purpose": "exploratory",
+          "format": "png",
+          "dpi": 150,
+          "bbox_inches": "tight"
+        }
+      },
+      "validation_results": {
+        "status": "success",
+        "warnings": [],
+        "performance": {
+          "merge_time_ms": 12.3,
+          "validation_time_ms": 8.7,
+          "total_time_ms": 21.0
+        }
+      }
+    },
+    "figregistry_initialization": {
+      "status": "success",
+      "init_time_ms": 15.2,
+      "config_validated": true,
+      "cache_initialized": true
+    }
+  },
+  "pipeline_execution": {
+    "timestamp": "2024-06-03T14:32:18.478456Z",
+    "hook": "before_pipeline_run",
+    "pipeline_context": {
+      "session_id": "2024-06-03T14:32:18.456789Z",
+      "pipeline_name": "data_visualization",
+      "environment": "base",
+      "parameters": {
+        "experiment_condition": "training",
+        "model_type": "random_forest",
+        "validation_split": 0.2,
+        "random_seed": 42,
+        "output_purpose": "presentation"
+      }
+    },
+    "context_registration": {
+      "active_pipelines": 1,
+      "bridge_available": true,
+      "context_setup_time_ms": 2.1
+    }
+  },
+  "figure_generation_events": [
+    {
+      "event_id": "fig_001",
+      "timestamp": "2024-06-03T14:32:19.123456Z",
+      "dataset_name": "training_metrics_visualization",
+      "dataset_config": {
+        "type": "figregistry_kedro.FigureDataSet",
+        "filepath": "data/08_reporting/training_metrics_analysis.png",
+        "purpose": "presentation",
+        "condition_param": "experiment_condition",
+        "style_params": {
+          "figure.facecolor": "white",
+          "axes.grid": true
+        },
+        "save_args": {
+          "bbox_inches": "tight",
+          "transparent": false
+        },
+        "versioned": true
+      },
+      "condition_resolution": {
+        "condition_param_name": "experiment_condition",
+        "resolved_condition": "training",
+        "resolution_source": "pipeline_parameters",
+        "fallback_applied": false,
+        "resolution_time_ms": 0.3
+      },
+      "style_application": {
+        "cache_key": "a7b5c2d9e1f8a6b4c3d7e9f1a2b5c8d4",
+        "cache_hit": false,
+        "base_style_lookup": {
+          "condition": "training",
+          "figregistry_style_found": true,
+          "style_parameters_count": 6,
+          "lookup_time_ms": 0.8
+        },
+        "final_style": {
+          "figure.figsize": [10, 6],
+          "figure.facecolor": "white",
+          "axes.titlesize": 14,
+          "axes.labelsize": 12,
+          "axes.grid": true,
+          "lines.linewidth": 2.0,
+          "lines.color": "#2E86AB",
+          "figure.dpi": 150
+        },
+        "style_precedence": {
+          "base_figregistry": 6,
+          "dataset_overrides": 2,
+          "total_applied": 8
+        },
+        "application_time_ms": 3.2
+      },
+      "save_operation": {
+        "method": "figregistry_save_figure",
+        "resolved_filepath": "data/08_reporting/training_metrics_analysis.png",
+        "figure_properties": {
+          "size_inches": [10, 6],
+          "dpi": 150,
+          "format": "png",
+          "axes_count": 2,
+          "has_legend": true
+        },
+        "file_operations": {
+          "directory_created": false,
+          "directory_exists": true,
+          "file_written": true,
+          "file_size_bytes": 245678
+        },
+        "performance": {
+          "save_time_ms": 45.7,
+          "total_operation_time_ms": 49.7,
+          "overhead_percentage": 2.1
+        }
+      },
+      "versioning": {
+        "kedro_versioned": true,
+        "version_id": "2024-06-03T14.32.19.123456Z",
+        "version_path": "data/08_reporting/2024-06-03T14.32.19.123456Z/training_metrics_analysis.png",
+        "load_version": null,
+        "save_version": "2024-06-03T14.32.19.123456Z"
+      },
+      "audit_trail": {
+        "node_name": "create_training_metrics_plot",
+        "pipeline_stage": "data_visualization",
+        "inputs": ["training_results", "metrics_data"],
+        "figure_type": "line_plot",
+        "reproducibility_hash": "sha256:a1b2c3d4e5f6789012345678901234567890123456789012345678901234567890"
+      },
+      "validation": {
+        "figure_object_valid": true,
+        "matplotlib_figure_type": "matplotlib.figure.Figure",
+        "style_application_successful": true,
+        "save_operation_successful": true,
+        "file_accessibility": true
+      }
+    },
+    {
+      "event_id": "fig_002",
+      "timestamp": "2024-06-03T14:32:20.789012Z",
+      "dataset_name": "validation_performance_report",
+      "dataset_config": {
+        "type": "figregistry_kedro.FigureDataSet",
+        "filepath": "data/08_reporting/validation_performance_summary.pdf",
+        "purpose": "presentation",
+        "condition_param": "experiment_condition",
+        "style_params": {
+          "savefig.format": "pdf"
+        },
+        "save_args": {
+          "bbox_inches": "tight",
+          "transparent": false
+        },
+        "versioned": true
+      },
+      "condition_resolution": {
+        "condition_param_name": "experiment_condition",
+        "resolved_condition": "validation",
+        "resolution_source": "pipeline_parameters",
+        "fallback_applied": false,
+        "resolution_time_ms": 0.2
+      },
+      "style_application": {
+        "cache_key": "b8c6d3e0f2a9b7c5d4e8f0a3b6c9d5e1",
+        "cache_hit": false,
+        "base_style_lookup": {
+          "condition": "validation",
+          "figregistry_style_found": true,
+          "style_parameters_count": 6,
+          "lookup_time_ms": 0.6
+        },
+        "final_style": {
+          "figure.figsize": [8, 6],
+          "axes.titlesize": 12,
+          "axes.labelsize": 10,
+          "lines.linewidth": 1.5,
+          "lines.color": "#A23B72",
+          "figure.dpi": 150,
+          "savefig.format": "pdf"
+        },
+        "style_precedence": {
+          "base_figregistry": 6,
+          "dataset_overrides": 1,
+          "total_applied": 7
+        },
+        "application_time_ms": 2.8
+      },
+      "save_operation": {
+        "method": "figregistry_save_figure",
+        "resolved_filepath": "data/08_reporting/validation_performance_summary.pdf",
+        "figure_properties": {
+          "size_inches": [8, 6],
+          "dpi": 150,
+          "format": "pdf",
+          "axes_count": 4,
+          "has_legend": true
+        },
+        "file_operations": {
+          "directory_created": false,
+          "directory_exists": true,
+          "file_written": true,
+          "file_size_bytes": 156342
+        },
+        "performance": {
+          "save_time_ms": 38.2,
+          "total_operation_time_ms": 41.6,
+          "overhead_percentage": 1.8
+        }
+      },
+      "versioning": {
+        "kedro_versioned": true,
+        "version_id": "2024-06-03T14.32.20.789012Z",
+        "version_path": "data/08_reporting/2024-06-03T14.32.20.789012Z/validation_performance_summary.pdf",
+        "load_version": null,
+        "save_version": "2024-06-03T14.32.20.789012Z"
+      },
+      "audit_trail": {
+        "node_name": "create_validation_report",
+        "pipeline_stage": "data_visualization",
+        "inputs": ["validation_results", "performance_metrics"],
+        "figure_type": "multi_subplot",
+        "reproducibility_hash": "sha256:b2c3d4e5f6a789012345678901234567890123456789012345678901234567891"
+      },
+      "validation": {
+        "figure_object_valid": true,
+        "matplotlib_figure_type": "matplotlib.figure.Figure",
+        "style_application_successful": true,
+        "save_operation_successful": true,
+        "file_accessibility": true
+      }
+    },
+    {
+      "event_id": "fig_003",
+      "timestamp": "2024-06-03T14:32:22.345678Z",
+      "dataset_name": "feature_importance_analysis",
+      "dataset_config": {
+        "type": "figregistry_kedro.FigureDataSet",
+        "filepath": "data/08_reporting/feature_importance_publication.svg",
+        "purpose": "publication",
+        "condition_param": null,
+        "style_params": {
+          "savefig.format": "svg",
+          "font.size": 8
+        },
+        "save_args": {
+          "bbox_inches": "tight",
+          "transparent": true
+        },
+        "versioned": true
+      },
+      "condition_resolution": {
+        "condition_param_name": null,
+        "resolved_condition": "publication",
+        "resolution_source": "dataset_purpose_fallback",
+        "fallback_applied": true,
+        "resolution_time_ms": 0.1
+      },
+      "style_application": {
+        "cache_key": "c9d7e4f1a3b0c8d6e5f9a4b7c0d6e2f5",
+        "cache_hit": false,
+        "base_style_lookup": {
+          "condition": "publication",
+          "figregistry_style_found": true,
+          "style_parameters_count": 8,
+          "lookup_time_ms": 0.7
+        },
+        "final_style": {
+          "figure.figsize": [6, 4],
+          "axes.titlesize": 10,
+          "axes.labelsize": 8,
+          "lines.linewidth": 1.0,
+          "font.family": "serif",
+          "font.size": 8,
+          "figure.dpi": 300,
+          "savefig.bbox": "tight",
+          "savefig.transparent": true,
+          "savefig.format": "svg"
+        },
+        "style_precedence": {
+          "base_figregistry": 8,
+          "dataset_overrides": 2,
+          "total_applied": 10
+        },
+        "application_time_ms": 4.1
+      },
+      "save_operation": {
+        "method": "figregistry_save_figure",
+        "resolved_filepath": "data/08_reporting/feature_importance_publication.svg",
+        "figure_properties": {
+          "size_inches": [6, 4],
+          "dpi": 300,
+          "format": "svg",
+          "axes_count": 1,
+          "has_legend": false
+        },
+        "file_operations": {
+          "directory_created": false,
+          "directory_exists": true,
+          "file_written": true,
+          "file_size_bytes": 89456
+        },
+        "performance": {
+          "save_time_ms": 42.1,
+          "total_operation_time_ms": 46.9,
+          "overhead_percentage": 2.3
+        }
+      },
+      "versioning": {
+        "kedro_versioned": true,
+        "version_id": "2024-06-03T14.32.22.345678Z",
+        "version_path": "data/08_reporting/2024-06-03T14.32.22.345678Z/feature_importance_publication.svg",
+        "load_version": null,
+        "save_version": "2024-06-03T14.32.22.345678Z"
+      },
+      "audit_trail": {
+        "node_name": "create_feature_importance_plot",
+        "pipeline_stage": "data_visualization",
+        "inputs": ["feature_importance_data", "model_metadata"],
+        "figure_type": "bar_chart",
+        "reproducibility_hash": "sha256:c3d4e5f6a789012345678901234567890123456789012345678901234567892"
+      },
+      "validation": {
+        "figure_object_valid": true,
+        "matplotlib_figure_type": "matplotlib.figure.Figure",
+        "style_application_successful": true,
+        "save_operation_successful": true,
+        "file_accessibility": true
+      }
+    },
+    {
+      "event_id": "fig_004",
+      "timestamp": "2024-06-03T14:32:24.567890Z",
+      "dataset_name": "model_comparison_dashboard",
+      "dataset_config": {
+        "type": "figregistry_kedro.FigureDataSet",
+        "filepath": "data/08_reporting/model_comparison_dashboard.png",
+        "purpose": "exploratory",
+        "condition_param": "model_type",
+        "style_params": {
+          "figure.figsize": [12, 8],
+          "axes.titlesize": 16
+        },
+        "save_args": {
+          "bbox_inches": "tight",
+          "dpi": 200
+        },
+        "versioned": true
+      },
+      "condition_resolution": {
+        "condition_param_name": "model_type",
+        "resolved_condition": "random_forest",
+        "resolution_source": "pipeline_parameters",
+        "fallback_applied": false,
+        "resolution_time_ms": 0.3
+      },
+      "style_application": {
+        "cache_key": "d0e8f5a2b4c1d9e7f6a0b5c2d8e3f6a9",
+        "cache_hit": false,
+        "base_style_lookup": {
+          "condition": "random_forest",
+          "figregistry_style_found": false,
+          "fallback_to_palette": true,
+          "palette_colors_applied": 5,
+          "lookup_time_ms": 1.2
+        },
+        "final_style": {
+          "figure.figsize": [12, 8],
+          "axes.titlesize": 16,
+          "lines.color": "#2E86AB",
+          "axes.prop_cycle": {
+            "color": ["#2E86AB", "#A23B72", "#F18F01", "#C73E1D", "#592E83"]
+          },
+          "figure.dpi": 150
+        },
+        "style_precedence": {
+          "base_figregistry": 0,
+          "palette_fallback": 3,
+          "dataset_overrides": 2,
+          "total_applied": 5
+        },
+        "application_time_ms": 2.6
+      },
+      "save_operation": {
+        "method": "matplotlib_fallback",
+        "fallback_reason": "figregistry_save_figure_unavailable",
+        "resolved_filepath": "data/08_reporting/model_comparison_dashboard.png",
+        "figure_properties": {
+          "size_inches": [12, 8],
+          "dpi": 200,
+          "format": "png",
+          "axes_count": 6,
+          "has_legend": true
+        },
+        "file_operations": {
+          "directory_created": false,
+          "directory_exists": true,
+          "file_written": true,
+          "file_size_bytes": 456789
+        },
+        "performance": {
+          "save_time_ms": 67.3,
+          "total_operation_time_ms": 71.1,
+          "overhead_percentage": 3.1
+        }
+      },
+      "versioning": {
+        "kedro_versioned": true,
+        "version_id": "2024-06-03T14.32.24.567890Z",
+        "version_path": "data/08_reporting/2024-06-03T14.32.24.567890Z/model_comparison_dashboard.png",
+        "load_version": null,
+        "save_version": "2024-06-03T14.32.24.567890Z"
+      },
+      "audit_trail": {
+        "node_name": "create_model_comparison_dashboard",
+        "pipeline_stage": "data_visualization",
+        "inputs": ["model_results", "comparison_metrics", "benchmark_data"],
+        "figure_type": "dashboard",
+        "reproducibility_hash": "sha256:d4e5f6a789012345678901234567890123456789012345678901234567893"
+      },
+      "validation": {
+        "figure_object_valid": true,
+        "matplotlib_figure_type": "matplotlib.figure.Figure",
+        "style_application_successful": true,
+        "save_operation_successful": true,
+        "file_accessibility": true
+      }
+    }
+  ],
+  "pipeline_completion": {
+    "timestamp": "2024-06-03T14:32:25.123456Z",
+    "hook": "after_pipeline_run",
+    "cleanup_operations": {
+      "context_cleared": true,
+      "cache_statistics": {
+        "total_lookups": 4,
+        "cache_hits": 0,
+        "cache_misses": 4,
+        "cache_hit_rate": 0.0,
+        "cache_size": 4,
+        "cache_max_size": 1000
+      },
+      "pipeline_unregistered": true,
+      "cleanup_time_ms": 1.8
+    }
+  },
+  "performance_summary": {
+    "total_figures_generated": 4,
+    "total_pipeline_time_ms": 6667.0,
+    "figregistry_overhead_ms": 209.3,
+    "overhead_percentage": 3.1,
+    "average_figure_generation_time_ms": 52.3,
+    "style_resolution_performance": {
+      "total_time_ms": 13.5,
+      "average_time_ms": 3.4,
+      "cache_effectiveness": "initial_run_no_hits"
+    },
+    "save_operation_performance": {
+      "total_time_ms": 193.3,
+      "average_time_ms": 48.3,
+      "figregistry_saves": 3,
+      "matplotlib_fallbacks": 1
+    }
+  },
+  "quality_metrics": {
+    "configuration_validation": "passed",
+    "all_figures_generated": true,
+    "style_application_success_rate": 1.0,
+    "save_operation_success_rate": 1.0,
+    "versioning_compliance": true,
+    "file_accessibility": true,
+    "reproducibility_verified": true
+  },
+  "debugging_information": {
+    "environment_variables": {
+      "KEDRO_ENV": "base",
+      "PYTHONPATH": "/home/user/project",
+      "FIGREGISTRY_CONFIG": null
+    },
+    "system_information": {
+      "python_version": "3.11.4",
+      "matplotlib_version": "3.9.0",
+      "platform": "linux-x86_64",
+      "memory_usage_mb": 245.7
+    },
+    "warnings_issued": [
+      {
+        "timestamp": "2024-06-03T14:32:24.568123Z",
+        "level": "warning",
+        "message": "Condition 'random_forest' not found in styles, using palette fallback",
+        "source": "FigureDataSet.style_resolution",
+        "event_id": "fig_004"
+      }
+    ],
+    "errors_encountered": [],
+    "fallback_operations": [
+      {
+        "timestamp": "2024-06-03T14:32:24.567890Z",
+        "operation": "save_figure",
+        "fallback_method": "matplotlib_savefig",
+        "reason": "figregistry_save_function_error",
+        "event_id": "fig_004"
+      }
+    ]
+  },
+  "compliance_verification": {
+    "kedro_dataset_api_compliance": true,
+    "figregistry_api_compliance": true,
+    "versioning_semantics_honored": true,
+    "thread_safety_maintained": true,
+    "performance_targets_met": {
+      "style_resolution_under_1ms": false,
+      "save_overhead_under_5_percent": true,
+      "hook_execution_under_50ms": true,
+      "config_merge_under_25ms": true
+    }
+  },
+  "audit_summary": {
+    "reproducibility_status": "fully_reproducible",
+    "configuration_hash": "sha256:e5f6a789012345678901234567890123456789012345678901234567894",
+    "pipeline_execution_hash": "sha256:f6a789012345678901234567890123456789012345678901234567895",
+    "all_figures_accessible": true,
+    "metadata_completeness": 100.0,
+    "automated_workflow_successful": true,
+    "manual_intervention_required": false
+  }
+}
