@@ -1,0 +1,596 @@
+# Performance-Optimized Kedro Catalog Configuration
+# 
+# This catalog provides performance-optimized FigureDataSet entries designed for
+# benchmarking and performance testing of figregistry-kedro plugin operations.
+# All configurations target the <200ms overhead requirement per Section 6.6.4.3
+# and enable systematic performance validation of plugin operations.
+#
+# Performance Targets:
+# - FigureDataSet Save Overhead: < 200ms per operation
+# - Style Resolution: < 1ms per lookup (cached)
+# - Configuration Bridge: < 50ms per pipeline run
+# - Hook Initialization: < 25ms per project startup
+# - Plugin Memory Overhead: < 5MB total footprint
+#
+# Usage:
+#   This catalog is used by performance tests in tests/test_performance.py
+#   to validate plugin performance meets scientific computing standards.
+
+# =============================================================================
+# BASELINE PERFORMANCE MEASUREMENT DATASETS
+# =============================================================================
+
+# Minimal configuration for baseline performance measurement
+baseline_minimal_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/baseline_minimal.png
+  purpose: exploratory
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+    format: png
+
+baseline_simple_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/baseline_simple.png
+  purpose: exploratory
+  condition_param: baseline_condition
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+
+baseline_with_style_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/baseline_styled.png
+  purpose: exploratory
+  condition_param: baseline_condition
+  style_params:
+    figure.figsize: [8, 6]
+    font.size: 12
+  save_args:
+    dpi: 100
+
+# =============================================================================
+# STYLE RESOLUTION PERFORMANCE TESTING
+# =============================================================================
+
+# Efficient condition_param configurations for <1ms lookup testing
+fast_condition_resolution_simple:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/fast_condition_simple.png
+  purpose: exploratory
+  condition_param: experiment_type
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+
+fast_condition_resolution_cached:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/fast_condition_cached.png
+  purpose: presentation
+  condition_param: cached_condition
+  save_args:
+    dpi: 150
+    bbox_inches: tight
+
+fast_condition_resolution_batch:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/fast_condition_batch_{run_id}.png
+  purpose: exploratory
+  condition_param: batch_condition
+  versioned: true
+  save_args:
+    dpi: 100
+
+# Multiple conditions for cache performance testing
+style_cache_test_001:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/cache_test_001.png
+  purpose: exploratory
+  condition_param: cache_test_condition
+  save_args: {dpi: 100, bbox_inches: tight}
+
+style_cache_test_002:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/cache_test_002.png
+  purpose: presentation
+  condition_param: cache_test_condition
+  save_args: {dpi: 150, bbox_inches: tight}
+
+style_cache_test_003:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/cache_test_003.png
+  purpose: publication
+  condition_param: cache_test_condition
+  save_args: {dpi: 300, bbox_inches: tight}
+
+# =============================================================================
+# STREAMLINED FILEPATH PATTERNS FOR PATH RESOLUTION SPEED
+# =============================================================================
+
+# Simple filepath patterns for fast path resolution
+fast_path_flat:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/flat_path.png
+  purpose: exploratory
+  save_args: {dpi: 100}
+
+fast_path_single_param:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/{purpose}/single_param.png
+  purpose: exploratory
+  save_args: {dpi: 100}
+
+fast_path_minimal_nesting:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/{purpose}/minimal.png
+  purpose: exploratory
+  condition_param: simple_condition
+  save_args: {dpi: 100}
+
+# Efficient timestamp-based paths for versioning performance
+fast_versioned_timestamp:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/versioned/timestamp_{run_id}.png
+  purpose: exploratory
+  versioned: true
+  save_args: {dpi: 100, bbox_inches: tight}
+
+fast_versioned_simple:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/simple_v_{run_id}.png
+  purpose: exploratory
+  condition_param: version_condition
+  versioned: true
+  save_args: {dpi: 100}
+
+# =============================================================================
+# EFFICIENT SAVE_ARGS CONFIGURATIONS FOR FIGURE PERSISTENCE PERFORMANCE
+# =============================================================================
+
+# Optimized save_args for maximum figure persistence speed
+fast_save_png_optimized:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/fast_png.png
+  purpose: exploratory
+  save_args:
+    format: png
+    dpi: 100
+    bbox_inches: tight
+    pad_inches: 0.1
+    facecolor: white
+    edgecolor: none
+    transparent: false
+
+fast_save_pdf_optimized:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/fast_pdf.pdf
+  purpose: presentation
+  save_args:
+    format: pdf
+    dpi: 150
+    bbox_inches: tight
+    pad_inches: 0.05
+    backend: pdf
+
+fast_save_minimal_args:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/minimal_args.png
+  purpose: exploratory
+  save_args:
+    dpi: 100
+
+# Memory-optimized save configurations
+memory_optimized_save:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/memory_optimized.png
+  purpose: exploratory
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+    optimize: true
+    pil_kwargs: {optimize: true}
+
+# High-performance batch save configuration
+batch_save_optimized:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/batch/{batch_id}/figure_{figure_id}.png
+  purpose: exploratory
+  condition_param: batch_condition
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+    format: png
+
+# =============================================================================
+# CONCURRENT EXECUTION PERFORMANCE TESTING
+# =============================================================================
+
+# Parallel execution configurations for testing concurrent FigureDataSet operations
+parallel_execution_001:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/parallel/thread_001.png
+  purpose: exploratory
+  condition_param: parallel_condition
+  save_args: {dpi: 100, bbox_inches: tight}
+
+parallel_execution_002:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/parallel/thread_002.png
+  purpose: exploratory
+  condition_param: parallel_condition
+  save_args: {dpi: 100, bbox_inches: tight}
+
+parallel_execution_003:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/parallel/thread_003.png
+  purpose: exploratory
+  condition_param: parallel_condition
+  save_args: {dpi: 100, bbox_inches: tight}
+
+parallel_execution_004:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/parallel/thread_004.png
+  purpose: exploratory
+  condition_param: parallel_condition
+  save_args: {dpi: 100, bbox_inches: tight}
+
+# Thread-safe concurrent access testing
+concurrent_shared_condition:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/concurrent/shared_{thread_id}.png
+  purpose: exploratory
+  condition_param: shared_condition
+  save_args: {dpi: 100, bbox_inches: tight}
+
+concurrent_different_conditions:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/concurrent/different_{thread_id}.png
+  purpose: exploratory
+  condition_param: thread_specific_condition
+  save_args: {dpi: 100, bbox_inches: tight}
+
+# High-concurrency stress testing (8+ parallel operations)
+stress_concurrent_001:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/stress/concurrent_001.png
+  purpose: exploratory
+  condition_param: stress_condition
+  save_args: {dpi: 100}
+
+stress_concurrent_002:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/stress/concurrent_002.png
+  purpose: exploratory
+  condition_param: stress_condition
+  save_args: {dpi: 100}
+
+stress_concurrent_003:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/stress/concurrent_003.png
+  purpose: exploratory
+  condition_param: stress_condition
+  save_args: {dpi: 100}
+
+stress_concurrent_004:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/stress/concurrent_004.png
+  purpose: exploratory
+  condition_param: stress_condition
+  save_args: {dpi: 100}
+
+stress_concurrent_005:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/stress/concurrent_005.png
+  purpose: exploratory
+  condition_param: stress_condition
+  save_args: {dpi: 100}
+
+stress_concurrent_006:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/stress/concurrent_006.png
+  purpose: exploratory
+  condition_param: stress_condition
+  save_args: {dpi: 100}
+
+stress_concurrent_007:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/stress/concurrent_007.png
+  purpose: exploratory
+  condition_param: stress_condition
+  save_args: {dpi: 100}
+
+stress_concurrent_008:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/stress/concurrent_008.png
+  purpose: exploratory
+  condition_param: stress_condition
+  save_args: {dpi: 100}
+
+# =============================================================================
+# BENCHMARKING-FRIENDLY DATASET STRUCTURES
+# =============================================================================
+
+# Systematic performance validation datasets with controlled complexity
+benchmark_complexity_low:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/benchmark/complexity_low.png
+  purpose: exploratory
+  condition_param: benchmark_condition
+  style_params:
+    figure.figsize: [8, 6]
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+
+benchmark_complexity_medium:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/benchmark/complexity_medium.png
+  purpose: presentation
+  condition_param: benchmark_condition
+  style_params:
+    figure.figsize: [10, 8]
+    font.size: 12
+    axes.grid: true
+  save_args:
+    dpi: 150
+    bbox_inches: tight
+
+benchmark_complexity_high:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/benchmark/complexity_high.png
+  purpose: publication
+  condition_param: benchmark_condition
+  style_params:
+    figure.figsize: [12, 10]
+    font.size: 14
+    axes.grid: true
+    axes.grid.alpha: 0.3
+    legend.fontsize: 12
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.2
+
+# Timing measurement datasets for different operation types
+timing_config_resolution:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/timing/config_resolution.png
+  purpose: exploratory
+  condition_param: timing_condition
+  save_args: {dpi: 100}
+
+timing_style_application:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/timing/style_application.png
+  purpose: exploratory
+  condition_param: timing_condition
+  style_params:
+    figure.figsize: [8, 6]
+    font.size: 12
+  save_args: {dpi: 100}
+
+timing_file_operations:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/timing/file_operations.png
+  purpose: exploratory
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+
+# Memory usage validation datasets
+memory_baseline_usage:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/memory/baseline.png
+  purpose: exploratory
+  save_args: {dpi: 100}
+
+memory_with_caching:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/memory/with_caching.png
+  purpose: exploratory
+  condition_param: cache_condition
+  save_args: {dpi: 100}
+
+memory_complex_styling:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/memory/complex_styling.png
+  purpose: presentation
+  condition_param: memory_condition
+  style_params:
+    figure.figsize: [12, 10]
+    font.size: 14
+    axes.grid: true
+    axes.grid.alpha: 0.3
+    axes.labelsize: 12
+    axes.titlesize: 16
+    legend.fontsize: 11
+    xtick.labelsize: 10
+    ytick.labelsize: 10
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+
+# =============================================================================
+# THROUGHPUT AND SCALABILITY TESTING
+# =============================================================================
+
+# High-volume datasets for throughput testing
+throughput_batch_001:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/throughput/batch_001/figure_{item_id}.png
+  purpose: exploratory
+  condition_param: throughput_condition
+  save_args: {dpi: 100}
+
+throughput_batch_002:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/throughput/batch_002/figure_{item_id}.png
+  purpose: exploratory
+  condition_param: throughput_condition
+  save_args: {dpi: 100}
+
+throughput_batch_003:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/throughput/batch_003/figure_{item_id}.png
+  purpose: exploratory
+  condition_param: throughput_condition
+  save_args: {dpi: 100}
+
+# Scalability testing with increasing complexity
+scalability_test_small:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/scalability/small.png
+  purpose: exploratory
+  condition_param: scale_condition
+  save_args: {dpi: 100}
+
+scalability_test_medium:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/scalability/medium.png
+  purpose: exploratory
+  condition_param: scale_condition
+  style_params:
+    figure.figsize: [10, 8]
+  save_args: {dpi: 150}
+
+scalability_test_large:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/scalability/large.png
+  purpose: presentation
+  condition_param: scale_condition
+  style_params:
+    figure.figsize: [12, 10]
+    font.size: 12
+  save_args: {dpi: 200}
+
+scalability_test_xlarge:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/scalability/xlarge.png
+  purpose: publication
+  condition_param: scale_condition
+  style_params:
+    figure.figsize: [16, 12]
+    font.size: 14
+    axes.grid: true
+  save_args: {dpi: 300, bbox_inches: tight}
+
+# =============================================================================
+# VERSIONING PERFORMANCE TESTING
+# =============================================================================
+
+# Kedro versioning performance with FigRegistry integration
+versioned_performance_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/versioned/test_figure.png
+  purpose: exploratory
+  condition_param: version_condition
+  versioned: true
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+
+versioned_with_styling:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/versioned/styled_figure.png
+  purpose: presentation
+  condition_param: version_condition
+  versioned: true
+  style_params:
+    figure.figsize: [10, 8]
+    font.size: 12
+  save_args:
+    dpi: 150
+    bbox_inches: tight
+
+versioned_complex:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/versioned/complex_figure.png
+  purpose: publication
+  condition_param: version_condition
+  versioned: true
+  style_params:
+    figure.figsize: [12, 10]
+    font.size: 14
+    axes.grid: true
+    axes.grid.alpha: 0.3
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.2
+
+# =============================================================================
+# REGRESSION TESTING DATASETS
+# =============================================================================
+
+# Baseline figures for regression testing against manual matplotlib operations
+regression_baseline_manual:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/regression/baseline_manual.png
+  purpose: exploratory
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+
+regression_baseline_figregistry:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/regression/baseline_figregistry.png
+  purpose: exploratory
+  condition_param: regression_condition
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+
+regression_with_styling:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/regression/with_styling.png
+  purpose: presentation
+  condition_param: regression_condition
+  style_params:
+    figure.figsize: [10, 8]
+    font.size: 12
+  save_args:
+    dpi: 150
+    bbox_inches: tight
+
+# =============================================================================
+# ERROR HANDLING AND EDGE CASE PERFORMANCE
+# =============================================================================
+
+# Performance testing with edge cases to ensure consistent timing
+edge_case_missing_condition:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/edge_cases/missing_condition.png
+  purpose: exploratory
+  condition_param: nonexistent_condition
+  save_args: {dpi: 100}
+
+edge_case_empty_style_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/edge_cases/empty_style.png
+  purpose: exploratory
+  condition_param: edge_condition
+  style_params: {}
+  save_args: {dpi: 100}
+
+edge_case_minimal_config:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/edge_cases/minimal.png
+  purpose: exploratory
+
+# Performance with fallback scenarios
+fallback_condition_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/fallback/condition_fallback.png
+  purpose: exploratory
+  condition_param: fallback_condition
+  save_args: {dpi: 100}
+
+fallback_style_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/fallback/style_fallback.png
+  purpose: exploratory
+  condition_param: fallback_condition
+  style_params:
+    nonexistent.property: value
+  save_args: {dpi: 100}
