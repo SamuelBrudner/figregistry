@@ -1,0 +1,842 @@
+{
+  "metadata_version": "1.0.0",
+  "created": "2024-12-19",
+  "description": "Publication-ready figure metadata catalog demonstrating sophisticated FigRegistry-Kedro integration with advanced styling, condition-based parameter resolution, and multi-environment configuration support.",
+  "purpose": "advanced_figregistry_integration_showcase",
+  "figregistry_compatibility": {
+    "minimum_version": "0.3.0",
+    "kedro_compatibility": ">=0.18.0,<0.20.0",
+    "features_required": [
+      "condition_based_styling",
+      "advanced_parameter_resolution",
+      "environment_specific_configuration",
+      "hierarchical_condition_matching",
+      "purpose_based_classification"
+    ]
+  },
+  
+  "figure_specifications": {
+    "training_pipeline_figures": {
+      "data_quality_analysis": {
+        "dataset_reference": "training_data_quality_plots",
+        "purpose_classification": "exploration",
+        "publication_context": {
+          "target_audience": "data_science_team",
+          "usage_scenario": "model_development_validation",
+          "quality_requirements": "development_quality",
+          "update_frequency": "per_training_run"
+        },
+        "condition_resolution": {
+          "primary_condition_param": "data_quality_condition",
+          "expected_values": [
+            "training.data.raw",
+            "training.data.cleaned", 
+            "training.data.transformed"
+          ],
+          "fallback_condition": "training.data.baseline",
+          "dynamic_resolution": {
+            "parameter_path": "experimental_conditions.data_preprocessing.quality_level",
+            "template": "training.data.{quality_level}",
+            "validation_rules": ["raw", "cleaned", "transformed", "baseline"]
+          }
+        },
+        "styling_parameters": {
+          "figure_dimensions": {
+            "width": 12,
+            "height": 8,
+            "dpi": 150,
+            "aspect_ratio": "flexible"
+          },
+          "publication_overrides": {
+            "figure.figsize": [12, 8],
+            "figure.dpi": 150,
+            "axes.titlesize": 16,
+            "axes.labelsize": 14,
+            "legend.fontsize": 12,
+            "grid.alpha": 0.8,
+            "grid.linewidth": 0.8
+          },
+          "condition_specific_styling": {
+            "training.data.raw": {
+              "color": "#E74C3C",
+              "marker": "o",
+              "linestyle": ":",
+              "alpha": 0.7,
+              "label": "Raw Data Quality"
+            },
+            "training.data.cleaned": {
+              "color": "#F39C12",
+              "marker": "s", 
+              "linestyle": "--",
+              "alpha": 0.8,
+              "label": "Cleaned Data Quality"
+            },
+            "training.data.transformed": {
+              "color": "#27AE60",
+              "marker": "^",
+              "linestyle": "-",
+              "alpha": 1.0,
+              "label": "Transformed Data Quality"
+            }
+          }
+        },
+        "environment_configuration": {
+          "development": {
+            "optimization_level": "speed",
+            "dpi_override": 100,
+            "caching_enabled": true,
+            "validation_level": "basic"
+          },
+          "staging": {
+            "optimization_level": "balanced",
+            "dpi_override": 150,
+            "caching_enabled": true,
+            "validation_level": "standard"
+          },
+          "production": {
+            "optimization_level": "quality",
+            "dpi_override": 300,
+            "caching_enabled": false,
+            "validation_level": "comprehensive"
+          }
+        }
+      },
+      
+      "model_performance_comparison": {
+        "dataset_reference": "training_model_performance_plots",
+        "purpose_classification": "presentation",
+        "publication_context": {
+          "target_audience": "technical_stakeholders",
+          "usage_scenario": "model_selection_presentation",
+          "quality_requirements": "presentation_quality",
+          "update_frequency": "per_model_iteration"
+        },
+        "condition_resolution": {
+          "primary_condition_param": "model_type",
+          "expected_values": [
+            "training.model.baseline",
+            "training.model.candidate",
+            "training.model.champion"
+          ],
+          "fallback_condition": "training.model.baseline",
+          "dynamic_resolution": {
+            "parameter_path": "experimental_conditions.model_comparison.algorithm_type",
+            "template": "training.model.{algorithm_type}",
+            "validation_rules": ["baseline", "candidate", "champion", "experimental"]
+          },
+          "hierarchical_conditions": {
+            "model_category": "training.{model_category}.{specific_model}",
+            "performance_tier": "training.model.{performance_tier}",
+            "experimental_variant": "training.model.{variant_id}"
+          }
+        },
+        "styling_parameters": {
+          "figure_dimensions": {
+            "width": 14,
+            "height": 10,
+            "dpi": 200,
+            "aspect_ratio": "presentation_standard"
+          },
+          "publication_overrides": {
+            "figure.figsize": [14, 10],
+            "figure.dpi": 200,
+            "axes.spines.top": false,
+            "axes.spines.right": false,
+            "axes.grid": true,
+            "axes.axisbelow": true,
+            "lines.markersize": 8,
+            "lines.markeredgewidth": 1.5,
+            "lines.linewidth": 3.0
+          },
+          "professional_styling": {
+            "color_scheme": "corporate_standard",
+            "font_family": "sans_serif_professional",
+            "grid_style": "subtle_guidance",
+            "legend_positioning": "optimal_readability"
+          }
+        },
+        "performance_metrics": {
+          "expected_render_time_ms": 250,
+          "cache_efficiency_target": 0.85,
+          "style_lookup_time_ms": 1,
+          "file_size_target_kb": 500
+        }
+      },
+      
+      "hyperparameter_optimization": {
+        "dataset_reference": "training_hyperparameter_optimization",
+        "purpose_classification": "exploration",
+        "publication_context": {
+          "target_audience": "ml_engineers",
+          "usage_scenario": "hyperparameter_space_analysis",
+          "quality_requirements": "analytical_quality",
+          "update_frequency": "per_optimization_run"
+        },
+        "condition_resolution": {
+          "primary_condition_param": "model_algorithm",
+          "expected_values": [
+            "training.algorithm.random_forest",
+            "training.algorithm.gradient_boosting",
+            "training.algorithm.neural_network",
+            "training.algorithm.support_vector_machine"
+          ],
+          "fallback_condition": "training.algorithm.baseline",
+          "complex_resolution": {
+            "multi_dimensional_conditions": {
+              "algorithm_performance": "training.{algorithm}.performance.{metric_type}",
+              "hyperparameter_space": "training.{algorithm}.hyperparams.{param_category}",
+              "optimization_stage": "training.{algorithm}.optimization.{stage}"
+            },
+            "conditional_logic": {
+              "if_high_performance": "training.{algorithm}.champion",
+              "if_medium_performance": "training.{algorithm}.candidate", 
+              "if_low_performance": "training.{algorithm}.baseline"
+            }
+          }
+        },
+        "styling_parameters": {
+          "figure_dimensions": {
+            "width": 16,
+            "height": 12,
+            "dpi": 150,
+            "aspect_ratio": "analysis_optimized"
+          },
+          "scientific_styling": {
+            "color_mapping": "viridis_scientific",
+            "contour_levels": "adaptive",
+            "annotation_density": "high_information",
+            "axis_scaling": "logarithmic_appropriate"
+          },
+          "hyperparameter_specific": {
+            "heatmap_resolution": "high",
+            "convergence_indicators": "enabled",
+            "parameter_space_boundaries": "visible",
+            "optimization_path_tracking": "enabled"
+          }
+        }
+      }
+    },
+    
+    "inference_pipeline_figures": {
+      "prediction_quality_analysis": {
+        "dataset_reference": "inference_prediction_quality",
+        "purpose_classification": "presentation",
+        "publication_context": {
+          "target_audience": "business_stakeholders",
+          "usage_scenario": "model_performance_reporting",
+          "quality_requirements": "business_presentation_quality",
+          "update_frequency": "daily_monitoring"
+        },
+        "condition_resolution": {
+          "primary_condition_param": "confidence_level",
+          "expected_values": [
+            "inference.confidence.high",
+            "inference.confidence.medium",
+            "inference.confidence.low"
+          ],
+          "fallback_condition": "inference.confidence.medium",
+          "confidence_thresholds": {
+            "high_confidence": ">= 0.9",
+            "medium_confidence": "0.7 - 0.9",
+            "low_confidence": "< 0.7"
+          },
+          "dynamic_confidence_mapping": {
+            "parameter_source": "model_monitoring.prediction_confidence_stats",
+            "mapping_function": "confidence_level_to_condition",
+            "update_frequency": "real_time"
+          }
+        },
+        "styling_parameters": {
+          "figure_dimensions": {
+            "width": 12,
+            "height": 8,
+            "dpi": 200,
+            "aspect_ratio": "business_standard"
+          },
+          "business_presentation": {
+            "color_scheme": "confidence_traffic_light",
+            "confidence_intervals": "visible_with_alpha",
+            "trend_indicators": "prominent",
+            "threshold_lines": "business_critical"
+          },
+          "quality_indicators": {
+            "error_bars": "confidence_based",
+            "prediction_bounds": "visible",
+            "quality_metrics": "overlaid",
+            "alert_thresholds": "highlighted"
+          }
+        },
+        "real_time_updates": {
+          "refresh_interval_seconds": 300,
+          "data_staleness_warning": "enabled",
+          "automatic_rerendering": "on_threshold_breach",
+          "performance_degradation_alerts": "enabled"
+        }
+      },
+      
+      "model_drift_detection": {
+        "dataset_reference": "inference_model_drift_detection",
+        "purpose_classification": "exploration",
+        "publication_context": {
+          "target_audience": "ml_ops_team",
+          "usage_scenario": "model_health_monitoring",
+          "quality_requirements": "monitoring_dashboard_quality",
+          "update_frequency": "continuous_monitoring"
+        },
+        "condition_resolution": {
+          "primary_condition_param": "inference_environment",
+          "expected_values": [
+            "inference.environment.production",
+            "inference.environment.staging",
+            "inference.environment.canary"
+          ],
+          "fallback_condition": "inference.environment.production",
+          "environment_specific_conditions": {
+            "production": "inference.production.stable",
+            "staging": "inference.staging.validation",
+            "canary": "inference.canary.experimental",
+            "rollback": "inference.production.degraded"
+          }
+        },
+        "styling_parameters": {
+          "figure_dimensions": {
+            "width": 16,
+            "height": 10,
+            "dpi": 150,
+            "aspect_ratio": "monitoring_dashboard"
+          },
+          "drift_detection_styling": {
+            "time_series_style": "continuous_monitoring",
+            "drift_threshold_indicators": "prominent_warning",
+            "statistical_significance": "p_value_annotations",
+            "trend_analysis": "regression_overlays"
+          },
+          "alert_visualization": {
+            "warning_zones": "color_coded",
+            "critical_thresholds": "bold_indicators",
+            "historical_context": "background_reference",
+            "prediction_intervals": "uncertainty_bands"
+          }
+        }
+      }
+    },
+    
+    "reporting_pipeline_figures": {
+      "executive_summary_dashboard": {
+        "dataset_reference": "reporting_executive_summary",
+        "purpose_classification": "publication",
+        "publication_context": {
+          "target_audience": "c_level_executives",
+          "usage_scenario": "executive_briefing",
+          "quality_requirements": "executive_presentation_quality",
+          "update_frequency": "monthly_reports"
+        },
+        "condition_resolution": {
+          "primary_condition_param": "report_type",
+          "expected_values": [
+            "reporting.summary.executive",
+            "reporting.summary.strategic",
+            "reporting.summary.operational"
+          ],
+          "fallback_condition": "reporting.summary.executive",
+          "executive_contexts": {
+            "quarterly_review": "reporting.executive.quarterly",
+            "board_presentation": "reporting.executive.board",
+            "investor_update": "reporting.executive.investor",
+            "strategic_planning": "reporting.executive.strategic"
+          }
+        },
+        "styling_parameters": {
+          "figure_dimensions": {
+            "width": 16,
+            "height": 12,
+            "dpi": 300,
+            "aspect_ratio": "executive_presentation"
+          },
+          "executive_styling": {
+            "color_scheme": "corporate_branding",
+            "font_hierarchy": "executive_clarity",
+            "visual_emphasis": "key_metrics_highlighted",
+            "professional_polish": "maximum"
+          },
+          "publication_quality": {
+            "resolution": "print_ready",
+            "format_options": ["pdf", "png", "svg"],
+            "color_profile": "professional_printing",
+            "font_embedding": "enabled"
+          }
+        },
+        "branding_compliance": {
+          "corporate_colors": "enforced",
+          "logo_placement": "standardized",
+          "font_standards": "corporate_approved",
+          "layout_guidelines": "executive_template"
+        }
+      },
+      
+      "technical_deep_dive_analysis": {
+        "dataset_reference": "reporting_technical_analysis",
+        "purpose_classification": "publication",
+        "publication_context": {
+          "target_audience": "technical_leadership",
+          "usage_scenario": "technical_documentation",
+          "quality_requirements": "technical_publication_quality",
+          "update_frequency": "per_major_release"
+        },
+        "condition_resolution": {
+          "primary_condition_param": "report_section",
+          "expected_values": [
+            "reporting.technical.architecture",
+            "reporting.technical.performance",
+            "reporting.technical.scalability",
+            "reporting.technical.reliability"
+          ],
+          "fallback_condition": "reporting.technical.overview",
+          "technical_contexts": {
+            "system_architecture": "reporting.technical.architecture.system",
+            "performance_analysis": "reporting.technical.performance.detailed",
+            "scalability_study": "reporting.technical.scalability.analysis",
+            "reliability_metrics": "reporting.technical.reliability.sla"
+          }
+        },
+        "styling_parameters": {
+          "figure_dimensions": {
+            "width": 14,
+            "height": 16,
+            "dpi": 300,
+            "aspect_ratio": "technical_documentation"
+          },
+          "technical_styling": {
+            "precision_graphics": "engineering_standards",
+            "data_density": "information_rich",
+            "annotation_detail": "comprehensive",
+            "grid_system": "technical_precision"
+          },
+          "documentation_quality": {
+            "font_family": "monospace_technical",
+            "code_formatting": "syntax_highlighted",
+            "diagram_standards": "technical_illustration",
+            "measurement_units": "clearly_labeled"
+          }
+        }
+      },
+      
+      "performance_benchmark_comparison": {
+        "dataset_reference": "reporting_performance_benchmarks",
+        "purpose_classification": "publication",
+        "publication_context": {
+          "target_audience": "academic_research_community",
+          "usage_scenario": "peer_review_publication",
+          "quality_requirements": "journal_publication_quality",
+          "update_frequency": "per_research_milestone"
+        },
+        "condition_resolution": {
+          "primary_condition_param": "target_audience",
+          "expected_values": [
+            "reporting.audience.academic",
+            "reporting.audience.industry",
+            "reporting.audience.regulatory"
+          ],
+          "fallback_condition": "reporting.audience.academic",
+          "publication_standards": {
+            "peer_review": "reporting.academic.peer_review",
+            "conference": "reporting.academic.conference",
+            "journal": "reporting.academic.journal",
+            "preprint": "reporting.academic.preprint"
+          }
+        },
+        "styling_parameters": {
+          "figure_dimensions": {
+            "width": 12,
+            "height": 8,
+            "dpi": 600,
+            "aspect_ratio": "journal_standard"
+          },
+          "academic_styling": {
+            "font_family": "times_new_roman_serif",
+            "scientific_notation": "standard_academic",
+            "citation_formatting": "apa_style",
+            "figure_numbering": "sequential"
+          },
+          "publication_requirements": {
+            "resolution": "journal_print_quality",
+            "color_mode": "grayscale_compatible",
+            "accessibility": "colorblind_safe",
+            "copyright": "attribution_ready"
+          }
+        },
+        "peer_review_compliance": {
+          "reproducibility": "fully_documented",
+          "data_availability": "supplementary_provided",
+          "methodology": "transparent",
+          "statistical_rigor": "validated"
+        }
+      }
+    },
+    
+    "experimental_analysis_figures": {
+      "algorithm_comparison_study": {
+        "dataset_reference": "experimental_algorithm_comparison",
+        "purpose_classification": "exploration",
+        "publication_context": {
+          "target_audience": "research_team",
+          "usage_scenario": "experimental_validation",
+          "quality_requirements": "research_quality",
+          "update_frequency": "per_experiment_iteration"
+        },
+        "condition_resolution": {
+          "primary_condition_param": "experimental_group",
+          "expected_values": [
+            "experiment.control",
+            "experiment.treatment.group_a",
+            "experiment.treatment.group_b",
+            "experiment.treatment.group_c",
+            "experiment.treatment.group_d"
+          ],
+          "fallback_condition": "experiment.control",
+          "experimental_design": {
+            "control_group": "experiment.control.baseline",
+            "treatment_groups": [
+              "experiment.treatment.group_a.intervention_1",
+              "experiment.treatment.group_b.intervention_2", 
+              "experiment.treatment.group_c.intervention_3",
+              "experiment.treatment.group_d.intervention_4"
+            ],
+            "crossover_design": "experiment.crossover.{period}.{sequence}",
+            "factorial_design": "experiment.factorial.{factor_a}.{factor_b}"
+          }
+        },
+        "styling_parameters": {
+          "figure_dimensions": {
+            "width": 16,
+            "height": 12,
+            "dpi": 150,
+            "aspect_ratio": "experimental_analysis"
+          },
+          "experimental_styling": {
+            "group_differentiation": "high_contrast",
+            "statistical_indicators": "prominent",
+            "confidence_intervals": "error_bars",
+            "significance_markers": "asterisk_notation"
+          },
+          "statistical_visualization": {
+            "p_value_annotations": "enabled",
+            "effect_size_indicators": "visible",
+            "power_analysis": "overlaid",
+            "multiple_comparison_corrections": "indicated"
+          }
+        },
+        "experimental_metadata": {
+          "sample_size_calculation": "documented",
+          "randomization_method": "recorded",
+          "blinding_status": "indicated",
+          "protocol_deviations": "flagged"
+        }
+      },
+      
+      "statistical_significance_validation": {
+        "dataset_reference": "experimental_significance_analysis",
+        "purpose_classification": "publication",
+        "publication_context": {
+          "target_audience": "statistical_reviewers",
+          "usage_scenario": "statistical_validation",
+          "quality_requirements": "statistical_publication_quality",
+          "update_frequency": "per_analysis_completion"
+        },
+        "condition_resolution": {
+          "primary_condition_param": "p_value",
+          "expected_values": [
+            "result.significant.p001",
+            "result.significant.p01", 
+            "result.significant.p05",
+            "result.not_significant"
+          ],
+          "fallback_condition": "result.not_significant",
+          "significance_levels": {
+            "highly_significant": "result.significant.p001",
+            "very_significant": "result.significant.p01",
+            "significant": "result.significant.p05", 
+            "marginally_significant": "result.marginal.p10",
+            "not_significant": "result.not_significant"
+          },
+          "multiple_testing_corrections": {
+            "bonferroni": "result.corrected.bonferroni",
+            "fdr_bh": "result.corrected.fdr_bh",
+            "holm": "result.corrected.holm"
+          }
+        },
+        "styling_parameters": {
+          "figure_dimensions": {
+            "width": 12,
+            "height": 10,
+            "dpi": 600,
+            "aspect_ratio": "statistical_analysis"
+          },
+          "statistical_styling": {
+            "p_value_color_coding": "traffic_light_system",
+            "confidence_band_transparency": "graded_by_significance",
+            "effect_size_scaling": "proportional_markers",
+            "statistical_test_annotations": "comprehensive"
+          },
+          "validation_indicators": {
+            "assumption_checks": "flagged",
+            "outlier_detection": "highlighted",
+            "model_diagnostics": "overlaid",
+            "robustness_tests": "indicated"
+          }
+        }
+      }
+    }
+  },
+  
+  "environment_specific_configurations": {
+    "development": {
+      "optimization_priority": "rendering_speed",
+      "caching_strategy": "aggressive",
+      "validation_level": "basic",
+      "performance_targets": {
+        "max_render_time_ms": 500,
+        "cache_hit_ratio": 0.8,
+        "memory_usage_mb": 100
+      },
+      "debugging_features": {
+        "style_resolution_logging": "enabled",
+        "parameter_validation_verbose": "enabled",
+        "performance_profiling": "enabled",
+        "error_stack_traces": "full"
+      }
+    },
+    
+    "staging": {
+      "optimization_priority": "quality_validation",
+      "caching_strategy": "balanced",
+      "validation_level": "comprehensive",
+      "performance_targets": {
+        "max_render_time_ms": 1000,
+        "cache_hit_ratio": 0.9,
+        "memory_usage_mb": 200
+      },
+      "quality_assurance": {
+        "visual_regression_testing": "enabled",
+        "style_consistency_validation": "enabled",
+        "cross_browser_compatibility": "checked",
+        "accessibility_compliance": "validated"
+      }
+    },
+    
+    "production": {
+      "optimization_priority": "maximum_quality",
+      "caching_strategy": "conservative",
+      "validation_level": "production_grade",
+      "performance_targets": {
+        "max_render_time_ms": 2000,
+        "cache_hit_ratio": 0.95,
+        "memory_usage_mb": 500
+      },
+      "production_safeguards": {
+        "error_recovery": "graceful_degradation",
+        "monitoring": "comprehensive",
+        "alerting": "real_time",
+        "backup_rendering": "fallback_enabled"
+      }
+    }
+  },
+  
+  "integration_specifications": {
+    "figregistry_hooks_integration": {
+      "lifecycle_management": {
+        "before_pipeline_run": {
+          "configuration_initialization": "figregistry.init_config",
+          "style_cache_warming": "enabled",
+          "validation_checks": "comprehensive",
+          "performance_baseline": "established"
+        },
+        "before_node_run": {
+          "context_injection": "dynamic_parameter_resolution",
+          "condition_validation": "runtime_checks",
+          "style_preparation": "condition_based_lookup"
+        },
+        "after_node_run": {
+          "figure_processing": "automatic_styling_application",
+          "quality_validation": "output_verification",
+          "metadata_recording": "performance_tracking"
+        },
+        "after_pipeline_run": {
+          "cleanup": "cache_optimization",
+          "reporting": "performance_summary",
+          "archiving": "figure_versioning"
+        }
+      },
+      
+      "context_management": {
+        "parameter_injection": {
+          "experimental_conditions": "from_pipeline_parameters",
+          "environment_variables": "from_kedro_config",
+          "run_metadata": "from_execution_context"
+        },
+        "configuration_merging": {
+          "base_figregistry_config": "loaded_first",
+          "kedro_project_overrides": "applied_second",
+          "environment_specific": "applied_last",
+          "dataset_specific": "highest_precedence"
+        }
+      }
+    },
+    
+    "advanced_parameter_resolution": {
+      "resolution_strategies": {
+        "direct_mapping": {
+          "description": "Direct condition parameter to style mapping",
+          "example": "model_type -> training.model.{model_type}",
+          "performance": "fastest",
+          "cache_friendly": true
+        },
+        "template_based": {
+          "description": "Template-driven condition resolution",
+          "example": "experiment.{group}.{condition} -> style_lookup", 
+          "performance": "fast",
+          "flexibility": "high"
+        },
+        "hierarchical_lookup": {
+          "description": "Multi-level condition hierarchy",
+          "example": "pipeline.stage.substage.condition",
+          "performance": "moderate",
+          "complexity": "high"
+        },
+        "dynamic_resolution": {
+          "description": "Runtime parameter resolution",
+          "example": "computed_from_data_characteristics",
+          "performance": "slowest",
+          "adaptability": "maximum"
+        }
+      },
+      
+      "parameter_validation": {
+        "type_checking": "strict",
+        "value_range_validation": "configurable",
+        "dependency_verification": "enabled",
+        "fallback_strategies": "graceful"
+      }
+    },
+    
+    "performance_optimization": {
+      "caching_strategies": {
+        "style_lookup_cache": {
+          "enabled": true,
+          "max_size": 1000,
+          "ttl_seconds": 300,
+          "eviction_policy": "lru"
+        },
+        "figure_template_cache": {
+          "enabled": true,
+          "max_size": 100,
+          "ttl_seconds": 600,
+          "eviction_policy": "size_based"
+        },
+        "configuration_cache": {
+          "enabled": true,
+          "max_size": 50,
+          "ttl_seconds": 1800,
+          "eviction_policy": "time_based"
+        }
+      },
+      
+      "performance_monitoring": {
+        "timing_collection": "enabled",
+        "memory_tracking": "optional",
+        "cache_statistics": "detailed",
+        "bottleneck_identification": "automated"
+      }
+    }
+  },
+  
+  "quality_assurance": {
+    "validation_requirements": {
+      "figure_output_validation": {
+        "file_exists": "mandatory",
+        "file_size_reasonable": "mandatory",
+        "format_correctness": "mandatory",
+        "visual_integrity": "recommended"
+      },
+      "style_application_validation": {
+        "condition_resolution": "mandatory",
+        "style_parameter_application": "mandatory",
+        "fallback_handling": "mandatory",
+        "error_recovery": "recommended"
+      },
+      "performance_validation": {
+        "render_time_within_limits": "mandatory",
+        "memory_usage_acceptable": "recommended",
+        "cache_efficiency": "recommended",
+        "concurrent_safety": "mandatory"
+      }
+    },
+    
+    "testing_specifications": {
+      "unit_testing": {
+        "condition_resolution": "comprehensive",
+        "style_application": "comprehensive", 
+        "parameter_validation": "comprehensive",
+        "error_handling": "comprehensive"
+      },
+      "integration_testing": {
+        "kedro_pipeline_integration": "end_to_end",
+        "figregistry_compatibility": "cross_version",
+        "environment_configuration": "multi_environment",
+        "performance_benchmarking": "regression_testing"
+      },
+      "visual_testing": {
+        "output_consistency": "automated_comparison",
+        "style_accuracy": "visual_regression",
+        "format_compliance": "specification_validation",
+        "accessibility": "contrast_validation"
+      }
+    }
+  },
+  
+  "compliance_and_governance": {
+    "data_governance": {
+      "figure_versioning": "required",
+      "metadata_tracking": "comprehensive",
+      "audit_trail": "enabled",
+      "retention_policy": "configurable"
+    },
+    
+    "security_considerations": {
+      "output_path_validation": "required",
+      "configuration_sanitization": "enabled",
+      "access_control": "inherited_from_kedro",
+      "sensitive_data_handling": "policy_compliant"
+    },
+    
+    "accessibility_compliance": {
+      "colorblind_accessibility": "validated",
+      "high_contrast_support": "available",
+      "screen_reader_compatibility": "alt_text_generation",
+      "wcag_compliance": "level_aa_target"
+    }
+  },
+  
+  "documentation_and_examples": {
+    "usage_examples": {
+      "basic_integration": "examples/basic/",
+      "advanced_styling": "examples/advanced/",
+      "custom_conditions": "examples/custom/",
+      "performance_optimization": "examples/performance/"
+    },
+    
+    "api_documentation": {
+      "dataset_configuration": "docs/api/datasets.md",
+      "condition_resolution": "docs/api/conditions.md",
+      "styling_parameters": "docs/api/styling.md",
+      "hooks_integration": "docs/api/hooks.md"
+    },
+    
+    "troubleshooting_guide": {
+      "common_issues": "docs/troubleshooting/common.md",
+      "performance_tuning": "docs/troubleshooting/performance.md",
+      "configuration_errors": "docs/troubleshooting/config.md",
+      "integration_problems": "docs/troubleshooting/integration.md"
+    }
+  }
+}
