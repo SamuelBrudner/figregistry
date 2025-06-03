@@ -1,0 +1,261 @@
+# Enhanced Kedro Project Logging Configuration with FigRegistry Integration
+# This represents advanced logging patterns after FigRegistry integration
+# 
+# This configuration demonstrates the comprehensive logging capabilities provided
+# by figregistry-kedro integration, offering detailed visibility into automated
+# figure styling, condition-based resolution, configuration bridge operations,
+# and lifecycle hook execution that were not available in traditional manual
+# figure management workflows.
+#
+# The enhanced logging enables monitoring and debugging of:
+# - Automated styling workflow execution
+# - Configuration bridge initialization and merging
+# - Dataset save operations and style resolution
+# - Lifecycle hook registration and execution
+# - Error recovery mechanisms and fallback strategies
+
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  simple:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  detailed:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
+  performance:
+    format: "%(asctime)s - PERF - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
+  figregistry_enhanced:
+    format: "%(asctime)s - FIGR - %(name)s - %(levelname)s - [%(funcName)s:%(lineno)d] - %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+    stream: ext://sys.stdout
+
+  info_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: detailed
+    filename: logs/info.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    encoding: utf8
+
+  error_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: detailed
+    filename: logs/errors.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    encoding: utf8
+
+  # Enhanced handler for FigRegistry integration debugging
+  figregistry_debug_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: figregistry_enhanced
+    filename: logs/figregistry_debug.log
+    maxBytes: 5242880 # 5MB
+    backupCount: 10
+    encoding: utf8
+
+  # Performance monitoring for integration operations
+  performance_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: performance
+    filename: logs/performance.log
+    maxBytes: 5242880 # 5MB
+    backupCount: 5
+    encoding: utf8
+
+  # Integration workflow tracking
+  integration_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: figregistry_enhanced
+    filename: logs/integration.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 15
+    encoding: utf8
+
+loggers:
+  # Core Kedro loggers with enhanced visibility
+  kedro:
+    level: INFO
+    handlers: [console, info_file_handler, error_file_handler]
+    propagate: false
+
+  kedro.io:
+    level: INFO
+    handlers: [console, info_file_handler, error_file_handler, integration_handler]
+    propagate: false
+
+  kedro.pipeline:
+    level: INFO
+    handlers: [console, info_file_handler, error_file_handler, integration_handler]
+    propagate: false
+
+  kedro.runner:
+    level: INFO
+    handlers: [console, info_file_handler, error_file_handler, integration_handler]
+    propagate: false
+
+  # Enhanced logging for FigRegistry-Kedro integration components
+  figregistry_kedro:
+    level: DEBUG
+    handlers: [console, figregistry_debug_handler, integration_handler, error_file_handler]
+    propagate: false
+    filters: []
+
+  # Specialized logger for lifecycle hooks providing hook execution visibility
+  figregistry_kedro.hooks:
+    level: DEBUG
+    handlers: [console, figregistry_debug_handler, integration_handler, performance_handler]
+    propagate: false
+
+  # Detailed logging for dataset operations and style resolution
+  figregistry_kedro.datasets:
+    level: DEBUG
+    handlers: [console, figregistry_debug_handler, integration_handler, performance_handler]
+    propagate: false
+
+  # Configuration bridge initialization and merging operations
+  figregistry_kedro.config:
+    level: DEBUG
+    handlers: [console, figregistry_debug_handler, integration_handler, error_file_handler]
+    propagate: false
+
+  # Core FigRegistry logging with enhanced integration visibility
+  figregistry:
+    level: INFO
+    handlers: [console, figregistry_debug_handler, integration_handler, error_file_handler]
+    propagate: false
+
+  # Style resolution and condition-based styling operations
+  figregistry.style:
+    level: DEBUG
+    handlers: [figregistry_debug_handler, integration_handler]
+    propagate: false
+
+  # Output management and automated persistence tracking
+  figregistry.output:
+    level: DEBUG
+    handlers: [figregistry_debug_handler, integration_handler, performance_handler]
+    propagate: false
+
+  # Configuration loading and validation with bridge integration
+  figregistry.config:
+    level: DEBUG
+    handlers: [figregistry_debug_handler, integration_handler, error_file_handler]
+    propagate: false
+
+  # Enhanced matplotlib logging for figure operation visibility
+  matplotlib:
+    level: INFO
+    handlers: [console, figregistry_debug_handler, error_file_handler]
+    propagate: false
+
+  # Figure backend operations for debugging style application
+  matplotlib.backends:
+    level: DEBUG
+    handlers: [figregistry_debug_handler]
+    propagate: false
+
+  # rcParams operations for monitoring automated styling changes
+  matplotlib.rcsetup:
+    level: DEBUG
+    handlers: [figregistry_debug_handler]
+    propagate: false
+
+  # Standard data science library logging with integration awareness
+  pandas:
+    level: WARNING
+    handlers: [console, error_file_handler]
+    propagate: false
+
+  numpy:
+    level: WARNING
+    handlers: [console, error_file_handler]
+    propagate: false
+
+  scipy:
+    level: WARNING
+    handlers: [console, error_file_handler]
+    propagate: false
+
+  # Application-specific logging for automated pipeline nodes
+  kedro_figregistry_example:
+    level: INFO
+    handlers: [console, info_file_handler, integration_handler, error_file_handler]
+    propagate: false
+
+  # Pipeline-specific loggers for data visualization workflows
+  kedro_figregistry_example.pipelines:
+    level: DEBUG
+    handlers: [console, figregistry_debug_handler, integration_handler]
+    propagate: false
+
+  kedro_figregistry_example.pipelines.data_visualization:
+    level: DEBUG
+    handlers: [console, figregistry_debug_handler, integration_handler, performance_handler]
+    propagate: false
+
+  # Pydantic validation logging for configuration bridge operations
+  pydantic:
+    level: INFO
+    handlers: [figregistry_debug_handler, error_file_handler]
+    propagate: false
+
+  # YAML processing for configuration bridge debugging
+  yaml:
+    level: INFO
+    handlers: [figregistry_debug_handler, error_file_handler]
+    propagate: false
+
+  # Thread-safety and concurrency logging for parallel pipeline execution
+  concurrent.futures:
+    level: INFO
+    handlers: [performance_handler, error_file_handler]
+    propagate: false
+
+  # Cache operations for style resolution performance monitoring
+  figregistry_kedro.datasets.StyleResolutionCache:
+    level: DEBUG
+    handlers: [performance_handler, figregistry_debug_handler]
+    propagate: false
+
+root:
+  level: INFO
+  handlers: [console, info_file_handler, error_file_handler]
+
+# Enhanced logging configuration notes:
+#
+# 1. figregistry_debug_handler: Captures detailed debugging information for all
+#    FigRegistry integration components, enabling troubleshooting of automated
+#    styling workflows and configuration bridge operations
+#
+# 2. performance_handler: Monitors hook execution timing, style resolution
+#    performance, and dataset save operation benchmarks to ensure <5ms overhead
+#
+# 3. integration_handler: Tracks high-level integration workflow events for
+#    educational purposes and process monitoring
+#
+# 4. Specialized loggers for figregistry_kedro.* modules provide granular
+#    visibility into hooks, datasets, and configuration bridge operations
+#
+# 5. Enhanced matplotlib logging enables monitoring of automated rcParams
+#    changes and backend operations during style application
+#
+# 6. Thread-safety logging supports debugging parallel pipeline execution
+#    and concurrent style resolution operations
+#
+# 7. Performance monitoring for cache operations ensures efficient style
+#    lookups and validates <1ms resolution targets
+#
+# This configuration enables comprehensive monitoring and debugging of the
+# automated figure management workflow while maintaining production-grade
+# performance and reliability.
