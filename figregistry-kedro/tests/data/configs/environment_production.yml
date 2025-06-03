@@ -1,0 +1,344 @@
+# Production Environment Configuration for FigRegistry-Kedro Integration
+# This configuration provides production-grade settings optimized for deployment scenarios,
+# strict validation, security-conscious patterns, and high-performance operation.
+# 
+# Production Configuration Principles:
+# - Strict validation and error handling for reliable operation
+# - Optimized caching and memory management for high-volume workflows
+# - Security-conscious path restrictions and access controls
+# - Publication-quality outputs with consistent professional styling
+# - Comprehensive monitoring and operational debugging capabilities
+# - Performance-optimized settings targeting <50ms configuration merge operations
+
+# FigRegistry version constraint for production environment
+figregistry_version: ">=0.3.0"
+
+# Production environment identification
+environment: "production"
+
+# Validation and error handling settings
+validation:
+  enabled: true
+  strict_mode: true  # Fail fast on configuration errors in production
+  schema_validation: true  # Enforce strict schema compliance
+  type_checking: "strict"  # Enable strict type checking for production safety
+  
+# Error handling configuration for production reliability
+error_handling:
+  fail_fast: true  # Don't attempt recovery in production - fail immediately
+  log_errors: true  # Always log errors for debugging
+  raise_on_style_not_found: true  # Strict validation for missing styles
+  raise_on_invalid_condition: true  # Strict validation for condition parameters
+  max_retry_attempts: 0  # No retries in production - deterministic behavior
+
+# Production-grade performance and caching configuration
+performance:
+  enable_caching: true
+  cache_size: 1000  # Large cache for high-volume production pipelines
+  cache_ttl_seconds: 3600  # 1-hour cache TTL for production stability
+  lazy_loading: true  # Optimize startup time for production deployments
+  concurrent_access: true  # Enable thread-safe operations for parallel pipelines
+  memory_optimization: true  # Enable memory optimization for production workloads
+  
+# Memory management settings for production scalability
+memory_management:
+  garbage_collection_threshold: 100  # Trigger GC after 100 operations
+  max_memory_usage_mb: 50  # Maximum memory usage limit
+  cache_cleanup_interval: 300  # Clean cache every 5 minutes
+  optimize_for_memory: true  # Prioritize memory efficiency over speed
+
+# Security configuration for production deployment
+security:
+  restricted_paths: true  # Enable path access restrictions
+  allowed_output_directories:
+    - "/app/data/08_reporting"  # Production reporting directory
+    - "/app/outputs/figures"    # Production figure output directory
+    - "/app/artifacts"          # Production artifact directory
+  path_traversal_protection: true  # Prevent path traversal attacks
+  sanitize_filenames: true         # Sanitize all generated filenames
+  validate_file_extensions: true  # Restrict to allowed file extensions
+  allowed_extensions: [".png", ".pdf", ".svg", ".jpg", ".jpeg"]
+
+# Production-appropriate styling conditions focused on publication quality
+styles:
+  # Publication-quality output styling
+  publication:
+    figure_size: [10, 8]  # Large format for publication
+    dpi: 300              # High DPI for print quality
+    color_palette: "professional"
+    line_width: 2.0
+    marker_size: 8
+    font_family: "serif"
+    font_size: 12
+    background_color: "white"
+    grid: false           # Clean look for publications
+    spine_visibility: 
+      top: false
+      right: false
+      bottom: true
+      left: true
+    
+  # High-quality presentation styling
+  presentation:
+    figure_size: [12, 9]  # Wide format for presentations
+    dpi: 150              # Medium DPI for screen display
+    color_palette: "vibrant"
+    line_width: 2.5
+    marker_size: 10
+    font_family: "sans-serif"
+    font_size: 14
+    background_color: "white"
+    grid: true
+    grid_alpha: 0.3
+    
+  # Professional reporting styling
+  reporting:
+    figure_size: [8, 6]   # Standard format for reports
+    dpi: 200              # Good quality for digital reports
+    color_palette: "corporate"
+    line_width: 1.5
+    marker_size: 6
+    font_family: "sans-serif"
+    font_size: 11
+    background_color: "white"
+    grid: true
+    grid_alpha: 0.2
+
+# Production condition mappings for automated styling
+condition_styles:
+  # Model performance conditions
+  "model_evaluation":
+    purpose: "publication"
+    color_palette: "accuracy"
+    title_template: "Model Performance: {model_name}"
+    
+  "baseline_comparison":
+    purpose: "publication"
+    color_palette: "comparison"
+    title_template: "Baseline Comparison: {experiment_name}"
+    
+  # Data analysis conditions
+  "exploratory_analysis":
+    purpose: "reporting"
+    color_palette: "sequential"
+    title_template: "Exploratory Analysis: {dataset_name}"
+    
+  # Production monitoring conditions
+  "monitoring_dashboard":
+    purpose: "presentation"
+    color_palette: "status"
+    title_template: "Production Metrics: {metric_name}"
+    
+  # Final results for stakeholders
+  "executive_summary":
+    purpose: "presentation"
+    color_palette: "executive"
+    title_template: "Executive Summary: {project_name}"
+
+# Color palettes optimized for production use
+palettes:
+  professional:
+    primary: "#2E86AB"      # Professional blue
+    secondary: "#A23B72"    # Professional magenta
+    tertiary: "#F18F01"     # Professional orange
+    quaternary: "#C73E1D"   # Professional red
+    
+  vibrant:
+    primary: "#FF6B6B"      # Vibrant red
+    secondary: "#4ECDC4"    # Vibrant teal
+    tertiary: "#45B7D1"     # Vibrant blue
+    quaternary: "#96CEB4"   # Vibrant green
+    
+  corporate:
+    primary: "#1F2937"      # Corporate dark gray
+    secondary: "#374151"    # Corporate gray
+    tertiary: "#6B7280"     # Corporate light gray
+    quaternary: "#9CA3AF"   # Corporate very light gray
+    
+  accuracy:
+    high: "#10B981"         # Green for high accuracy
+    medium: "#F59E0B"       # Orange for medium accuracy
+    low: "#EF4444"          # Red for low accuracy
+    
+  comparison:
+    baseline: "#6B7280"     # Gray for baseline
+    improved: "#10B981"     # Green for improvements
+    degraded: "#EF4444"     # Red for degradation
+    
+  sequential:
+    colors: ["#FEF3E2", "#FDE68A", "#F59E0B", "#D97706", "#92400E"]
+    
+  status:
+    healthy: "#10B981"      # Green for healthy status
+    warning: "#F59E0B"      # Orange for warnings
+    critical: "#EF4444"     # Red for critical issues
+    
+  executive:
+    primary: "#1E3A8A"      # Executive blue
+    secondary: "#059669"    # Executive green
+    accent: "#DC2626"       # Executive red
+
+# Production output configuration
+outputs:
+  base_path: "/app/data/08_reporting/figures"  # Production output path
+  versioning: true         # Enable versioning for production
+  timestamp_format: "%Y%m%d_%H%M%S"  # Production timestamp format
+  filename_template: "{purpose}_{condition}_{timestamp}_{name}"
+  
+  # Format-specific settings for production
+  formats:
+    png:
+      dpi: 300
+      transparent: false
+      optimize: true
+      
+    pdf:
+      dpi: 300
+      transparent: false
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      
+    svg:
+      transparent: false
+      bbox_inches: "tight"
+      
+  # Directory structure for production organization
+  directory_structure:
+    publication: "publication"
+    presentation: "presentation" 
+    reporting: "reporting"
+    monitoring: "monitoring"
+    
+  # File permissions for production security
+  file_permissions: 0o644  # Read-write for owner, read for group/others
+  directory_permissions: 0o755  # Standard directory permissions
+
+# Production-optimized matplotlib rcParams
+defaults:
+  rcParams:
+    # Figure settings
+    "figure.facecolor": "white"
+    "figure.edgecolor": "none"
+    "figure.dpi": 150
+    "figure.constrained_layout.use": true
+    
+    # Axes settings
+    "axes.facecolor": "white"
+    "axes.edgecolor": "black"
+    "axes.linewidth": 1.0
+    "axes.labelsize": 12
+    "axes.titlesize": 14
+    "axes.grid": false
+    "axes.spines.top": false
+    "axes.spines.right": false
+    
+    # Font settings for production consistency
+    "font.family": "sans-serif"
+    "font.size": 11
+    "font.weight": "normal"
+    
+    # Line and marker settings
+    "lines.linewidth": 1.5
+    "lines.markersize": 6
+    "lines.markeredgewidth": 0.5
+    
+    # Legend settings
+    "legend.frameon": true
+    "legend.fancybox": false
+    "legend.shadow": false
+    "legend.fontsize": 10
+    "legend.title_fontsize": 11
+    
+    # Grid settings
+    "grid.alpha": 0.3
+    "grid.linewidth": 0.5
+    
+    # Saving settings
+    "savefig.dpi": 300
+    "savefig.format": "png"
+    "savefig.bbox": "tight"
+    "savefig.facecolor": "white"
+    "savefig.edgecolor": "none"
+    "savefig.transparent": false
+
+# Kedro-specific production configuration
+kedro:
+  # Configuration bridge settings
+  config_bridge:
+    enable_caching: true
+    cache_timeout: 3600  # 1 hour cache for production
+    merge_timeout_ms: 25  # Target <25ms merge time for production
+    validation_level: "strict"
+    
+  # Dataset configuration
+  datasets:
+    default_format: "png"
+    versioning_enabled: true
+    auto_create_directories: true
+    
+  # Hook configuration
+  hooks:
+    initialization_timeout_ms: 50  # Target <50ms initialization
+    error_propagation: true  # Propagate errors in production
+    monitoring_enabled: true
+    
+  # Environment-specific overrides
+  environments:
+    production:
+      enable_debug_logging: false  # Disable debug in production
+      strict_validation: true
+      performance_monitoring: true
+
+# Monitoring and logging configuration for production operations
+monitoring:
+  enabled: true
+  performance_tracking: true
+  error_tracking: true
+  usage_analytics: false  # Disabled for production privacy
+  
+  # Performance monitoring settings
+  performance:
+    track_configuration_load_time: true
+    track_style_resolution_time: true  
+    track_file_save_time: true
+    track_memory_usage: true
+    sla_targets:
+      configuration_load_ms: 100
+      style_resolution_ms: 1
+      file_save_ms: 200
+      hook_initialization_ms: 50
+      config_bridge_merge_ms: 25
+      
+  # Error monitoring settings
+  error_monitoring:
+    capture_stack_traces: true
+    log_error_context: true
+    alert_on_critical_errors: true
+    
+  # Operational monitoring
+  operational:
+    log_level: "INFO"  # Production log level
+    structured_logging: true
+    json_formatted_logs: true
+    include_pipeline_context: true
+    include_performance_metrics: true
+
+# Production-specific metadata
+metadata:
+  environment: "production"
+  configuration_version: "1.0.0"
+  last_updated: "2024-01-15T00:00:00Z"
+  maintainer: "Production Operations Team"
+  description: "Production environment configuration for FigRegistry-Kedro integration"
+  
+  # Production compliance and audit information
+  compliance:
+    gdpr_compliant: true
+    data_retention_policy: "30_days"
+    audit_logging: true
+    
+  # Production support information
+  support:
+    documentation_url: "https://docs.figregistry-kedro.com/production"
+    monitoring_dashboard: "https://monitoring.company.com/figregistry-kedro"
+    alert_channels: ["#production-alerts", "#ml-ops"]
