@@ -1,0 +1,335 @@
+# =============================================================================
+# Basic FigRegistry-Kedro Integration Example - Parameters Configuration
+# =============================================================================
+# This file provides pipeline parameters that enable condition-based styling
+# demonstration through the figregistry-kedro plugin. Parameters defined here
+# are automatically available to pipeline nodes and can be resolved by
+# FigureDataSet instances through the condition_param mechanism.
+#
+# Key Integration Features Demonstrated:
+# - Experimental condition parameters for automatic style resolution (F-002)
+# - Parameter-driven styling variation for educational purposes
+# - Context injection for conditional styling via pipeline metadata (F-005-RQ-004)
+# - Support for different output purposes (exploratory, presentation, publication)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Experimental Conditions - Core Parameters for Style Resolution
+# -----------------------------------------------------------------------------
+# These parameters are used by FigureDataSet instances with condition_param
+# configuration to automatically resolve styling through figregistry.get_style()
+
+# Primary experimental condition for demonstrating condition-based styling
+# This parameter is referenced by catalog entries with condition_param: "experiment_condition"
+experiment_condition: "treatment_group_a"
+
+# Secondary experimental conditions for advanced styling scenarios
+experiment_phase: "training"
+model_type: "linear_regression"
+analysis_stage: "exploratory"
+
+# Alternative experimental scenarios for parameter-driven styling variation
+# Users can modify these values to see different styling applied automatically
+experimental_scenarios:
+  baseline:
+    condition: "control_group"
+    phase: "baseline"
+    stage: "exploratory"
+  
+  treatment_a:
+    condition: "treatment_group_a"
+    phase: "training"
+    stage: "presentation"
+  
+  treatment_b:
+    condition: "treatment_group_b"
+    phase: "validation"
+    stage: "publication"
+  
+  final_analysis:
+    condition: "combined_groups"
+    phase: "final"
+    stage: "publication"
+
+# -----------------------------------------------------------------------------
+# Model Configuration Parameters
+# -----------------------------------------------------------------------------
+# Parameters supporting the visualization pipeline nodes and data processing
+
+# Machine learning model parameters
+model_config:
+  algorithm: "linear_regression"
+  random_state: 42
+  test_size: 0.2
+  cv_folds: 5
+  
+  # Feature engineering settings
+  feature_scaling: true
+  remove_outliers: true
+  outlier_threshold: 3.0
+  
+  # Training parameters
+  max_iterations: 1000
+  tolerance: 1e-6
+  learning_rate: 0.01
+
+# Data generation parameters for synthetic dataset creation
+data_generation:
+  sample_size: 1000
+  noise_level: 0.1
+  feature_count: 5
+  target_correlation: 0.8
+  random_seed: 123
+
+# -----------------------------------------------------------------------------
+# Visualization Configuration Parameters
+# -----------------------------------------------------------------------------
+# Parameters controlling plot generation and content for pipeline nodes
+
+# Plot configuration parameters
+plot_settings:
+  # Basic plot dimensions and format
+  figure_size: [10, 8]
+  dpi: 150
+  
+  # Data visualization parameters
+  scatter_alpha: 0.6
+  line_width: 2.0
+  marker_size: 8
+  
+  # Color and styling preferences (will be overridden by FigRegistry styling)
+  color_palette: "viridis"
+  style_theme: "whitegrid"
+  
+  # Text and annotation settings
+  title_fontsize: 14
+  label_fontsize: 12
+  legend_fontsize: 10
+  
+  # Statistical display options
+  show_confidence_intervals: true
+  show_r_squared: true
+  show_sample_size: true
+
+# Different visualization types for condition-based styling demonstration
+visualization_types:
+  training_plots:
+    purpose: "exploratory"
+    condition_param: "experiment_phase"
+    show_diagnostics: true
+    include_residuals: true
+  
+  validation_metrics:
+    purpose: "presentation"
+    condition_param: "experiment_condition"
+    show_metrics: true
+    include_comparison: true
+  
+  final_results:
+    purpose: "publication"
+    condition_param: "analysis_stage"
+    publication_ready: true
+    high_resolution: true
+
+# -----------------------------------------------------------------------------
+# Pipeline Execution Parameters
+# -----------------------------------------------------------------------------
+# Parameters controlling pipeline behavior and output management
+
+# Environment and execution settings
+execution_config:
+  environment: "development"
+  verbose_logging: true
+  enable_profiling: false
+  parallel_execution: false
+  
+  # Output path configurations (work with FigRegistry path aliases)
+  output_base_path: "data/08_reporting"
+  figure_formats: ["png", "pdf"]
+  
+  # Version management
+  enable_versioning: true
+  version_tag: "v1.0.0"
+  experiment_id: "basic_example_001"
+
+# Quality assurance and validation parameters
+quality_config:
+  validate_inputs: true
+  check_data_quality: true
+  run_statistical_tests: true
+  
+  # Data validation thresholds
+  min_sample_size: 100
+  max_missing_rate: 0.05
+  correlation_threshold: 0.1
+
+# -----------------------------------------------------------------------------
+# Advanced Configuration for Educational Purposes
+# -----------------------------------------------------------------------------
+# Additional parameters demonstrating various integration scenarios
+
+# Multiple experimental conditions for complex styling scenarios
+multi_condition_demo:
+  primary_condition: "experiment_condition"
+  secondary_condition: "experiment_phase"
+  tertiary_condition: "model_type"
+  
+  # Condition combinations for advanced styling resolution
+  condition_combinations:
+    - conditions: ["treatment_group_a", "training", "linear_regression"]
+      description: "Primary treatment group during training phase"
+      expected_style: "treatment_training_style"
+    
+    - conditions: ["control_group", "validation", "random_forest"]
+      description: "Control group during validation phase"
+      expected_style: "control_validation_style"
+    
+    - conditions: ["combined_groups", "final", "ensemble"]
+      description: "Combined analysis for final results"
+      expected_style: "publication_final_style"
+
+# Parameter sets for different demonstration scenarios
+demo_scenarios:
+  quick_demo:
+    sample_size: 100
+    experiment_condition: "treatment_group_a"
+    analysis_stage: "exploratory"
+    enable_all_plots: false
+  
+  full_demo:
+    sample_size: 1000
+    experiment_condition: "treatment_group_b"
+    analysis_stage: "presentation"
+    enable_all_plots: true
+  
+  publication_demo:
+    sample_size: 5000
+    experiment_condition: "combined_groups"
+    analysis_stage: "publication"
+    enable_all_plots: true
+    high_quality_output: true
+
+# -----------------------------------------------------------------------------
+# Integration Testing Parameters
+# -----------------------------------------------------------------------------
+# Parameters specifically for testing FigRegistry-Kedro integration features
+
+# Test various condition resolution scenarios
+condition_resolution_tests:
+  # Test basic condition parameter resolution
+  basic_resolution:
+    test_condition: "test_condition_basic"
+    expected_resolution: true
+    
+  # Test missing condition fallback behavior
+  missing_condition_test:
+    test_condition: "nonexistent_condition"
+    expected_fallback: "exploratory"
+    
+  # Test complex condition parameter paths
+  nested_condition_test:
+    nested:
+      deep:
+        condition: "nested_test_condition"
+    condition_path: "nested.deep.condition"
+
+# Performance and scalability test parameters
+performance_tests:
+  style_resolution_timing:
+    target_time_ms: 1
+    test_iterations: 1000
+    
+  save_operation_timing:
+    target_overhead_percent: 5
+    baseline_save_time_ms: 50
+    
+  cache_efficiency:
+    target_hit_rate: 0.8
+    cache_size_limit: 1000
+
+# -----------------------------------------------------------------------------
+# Documentation and Example Parameters
+# -----------------------------------------------------------------------------
+# Parameters that help explain the integration features to users
+
+# Example parameter explanations
+parameter_documentation:
+  experiment_condition:
+    description: "Primary experimental condition used for automatic style resolution"
+    usage: "Referenced by FigureDataSet with condition_param: 'experiment_condition'"
+    example_values: ["treatment_group_a", "treatment_group_b", "control_group"]
+    
+  experiment_phase:
+    description: "Analysis phase parameter for workflow-based styling"
+    usage: "Enables different styling based on pipeline execution stage"
+    example_values: ["training", "validation", "testing", "final"]
+    
+  analysis_stage:
+    description: "Output purpose parameter for publication-ready formatting"
+    usage: "Controls figure quality and styling for different audiences"
+    example_values: ["exploratory", "presentation", "publication"]
+
+# Integration workflow explanations
+workflow_examples:
+  basic_workflow:
+    description: "Minimal example showing automatic figure styling"
+    steps:
+      - "Pipeline node creates matplotlib figure"
+      - "FigureDataSet.save() intercepts figure"
+      - "Condition resolved from 'experiment_condition' parameter"
+      - "FigRegistry styling applied automatically"
+      - "Figure saved with versioning and naming"
+    
+  advanced_workflow:
+    description: "Complex example with multiple condition parameters"
+    steps:
+      - "Multiple condition parameters available in context"
+      - "Different catalog entries use different condition_param values"
+      - "Each figure gets styled based on its specific condition"
+      - "Automated output management handles all file operations"
+
+# Expected outputs for verification
+expected_outputs:
+  figure_files:
+    - "experiment_results_treatment_group_a.png"
+    - "validation_metrics_training.png"
+    - "final_analysis_publication.pdf"
+  
+  styling_applications:
+    - condition: "treatment_group_a"
+      expected_styles: ["color: red", "marker: circle", "linestyle: solid"]
+    - condition: "control_group"
+      expected_styles: ["color: blue", "marker: square", "linestyle: dashed"]
+    - condition: "combined_groups"
+      expected_styles: ["color: green", "marker: triangle", "linestyle: dotted"]
+
+# =============================================================================
+# Usage Notes for Developers
+# =============================================================================
+# 
+# 1. Condition Parameter Resolution:
+#    - Parameters defined here are automatically available to all pipeline nodes
+#    - FigureDataSet instances use condition_param to look up values dynamically
+#    - Example: condition_param: "experiment_condition" resolves to "treatment_group_a"
+#
+# 2. Style Variation Testing:
+#    - Modify experiment_condition to see different styling applied
+#    - Change analysis_stage to test exploratory vs presentation vs publication styles
+#    - Use experimental_scenarios for pre-defined parameter combinations
+#
+# 3. Pipeline Integration:
+#    - All parameters are accessible in node functions via params dictionary
+#    - No manual parameter passing required - Kedro handles injection automatically
+#    - Supports nested parameter access with dot notation
+#
+# 4. Performance Considerations:
+#    - Parameter resolution is cached for performance (target <1ms)
+#    - Large parameter structures won't impact styling resolution speed
+#    - Consider parameter complexity vs readability trade-offs
+#
+# 5. Educational Value:
+#    - Demonstrates separation between data processing and visualization styling
+#    - Shows how condition-based styling eliminates manual plot customization
+#    - Illustrates integration between Kedro's parameter system and FigRegistry
+#
+# =============================================================================
