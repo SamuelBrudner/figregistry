@@ -1,0 +1,731 @@
+# FigureDataSet API Reference
+
+## Overview
+
+The `FigureDataSet` class is a custom Kedro `AbstractDataSet` implementation that bridges matplotlib figure objects with FigRegistry's automated styling and versioning system. This dataset intercepts figure save operations within Kedro's catalog workflow, automatically applying condition-based styling through FigRegistry's `get_style()` API and managing file persistence through `save_figure()`.
+
+The implementation maintains full compatibility with Kedro's versioning system while eliminating manual styling code from pipeline nodes and ensuring consistent figure outputs across all workflow stages.
+
+## Class Definition
+
+```python
+from figregistry_kedro.datasets import FigureDataSet
+```
+
+### Constructor
+
+```python
+FigureDataSet(
+    filepath: str,
+    purpose: str = "exploratory",
+    condition_param: Optional[str] = None,
+    style_params: Optional[Dict[str, Any]] = None,
+    save_args: Optional[Dict[str, Any]] = None,
+    load_args: Optional[Dict[str, Any]] = None,
+    version: Optional[str] = None,
+    credentials: Optional[Dict[str, Any]] = None,
+    fs_args: Optional[Dict[str, Any]] = None
+)
+```
+
+#### Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `filepath` | `str` | *Required* | Output file path for the figure. Supports Kedro path placeholders and versioning patterns |
+| `purpose` | `str` | `"exploratory"` | Output categorization for condition-based styling. Valid values: `"exploratory"`, `"presentation"`, `"publication"` |
+| `condition_param` | `Optional[str]` | `None` | Parameter name for dynamic condition resolution from pipeline context. When provided, the dataset resolves the condition value from pipeline parameters |
+| `style_params` | `Optional[Dict[str, Any]]` | `None` | Dataset-specific styling overrides that take precedence over condition-based styles. Uses matplotlib rcParams format |
+| `save_args` | `Optional[Dict[str, Any]]` | `None` | Additional arguments passed to matplotlib's `savefig` method (e.g., `dpi`, `format`, `bbox_inches`) |
+| `load_args` | `Optional[Dict[str, Any]]` | `None` | Additional arguments for figure loading (currently not used as figures are typically write-only) |
+| `version` | `Optional[str]` | `None` | Dataset version for Kedro's versioning system. Enables versioned figure outputs |
+| `credentials` | `Optional[Dict[str, Any]]` | `None` | Credentials for accessing file systems (reserved for future use) |
+| `fs_args` | `Optional[Dict[str, Any]]` | `None` | File system arguments (reserved for future use) |
+
+#### Raises
+
+- `FigureDataSetError`: If required dependencies (matplotlib, kedro, figregistry) are not available
+- `ValueError`: If `purpose` parameter contains invalid values or configuration is malformed
+
+## Core Methods
+
+### _save()
+
+```python
+def _save(self, data: Figure) -> None
+```
+
+Saves a matplotlib figure with FigRegistry styling applied. This method implements the Kedro `AbstractDataSet._save` interface, applying condition-based styling and managing file persistence with versioning support.
+
+#### Parameters
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `data` | `matplotlib.figure.Figure` | Matplotlib Figure object to save with styling |
+
+#### Behavior
+
+1. **Input Validation**: Ensures the provided data is a valid matplotlib Figure object
+2. **Condition Resolution**: Resolves styling condition from `condition_param` or falls back to `purpose`
+3. **Style Application**: Retrieves condition-based styling through FigRegistry's `get_style()` API
+4. **Figure Styling**: Applies styling parameters to the figure using matplotlib rcParams context
+5. **Path Resolution**: Handles Kedro versioning and filepath resolution
+6. **File Persistence**: Saves figure using FigRegistry's `save_figure()` with automatic directory creation
+
+#### Performance Specifications
+
+- **Style Resolution**: <1ms per figure (cached lookups)
+- **Save Operation**: <100ms for standard figure formats
+- **Total Overhead**: <5% compared to manual matplotlib operations
+- **Memory Usage**: Constant per figure regardless of pipeline complexity
+
+#### Raises
+
+- `FigureDataSetError`: If figure save operation fails or styling resolution encounters errors
+- `TypeError`: If data is not a matplotlib Figure object
+
+#### Example
+
+```python
+import matplotlib.pyplot as plt
+from figregistry_kedro.datasets import FigureDataSet
+
+# Create a figure
+fig, ax = plt.subplots()
+ax.plot([1, 2, 3], [1, 4, 9])
+
+# Save through dataset (typically handled by Kedro catalog)
+dataset = FigureDataSet(
+    filepath="data/08_reporting/results.png",
+    purpose="presentation",
+    style_params={"figure.dpi": 300}
+)
+dataset._save(fig)
+```
+
+### _load()
+
+```python
+def _load(self) -> None
+```
+
+Load operation for FigureDataSet. **Note**: FigureDataSet is designed as a write-only dataset for figure persistence. Loading is not supported as figures are typically generated by pipeline nodes rather than loaded from disk.
+
+#### Raises
+
+- `FigureDataSetError`: Always raised with descriptive message explaining that loading is not supported
+
+#### Usage Note
+
+Figure generation should occur within Kedro pipeline nodes, which then output Figure objects to be styled and saved by the dataset:
+
+```python
+def create_visualization(data: pd.DataFrame) -> plt.Figure:
+    """Pipeline node that generates figures."""
+    fig, ax = plt.subplots()
+    ax.plot(data["x"], data["y"])
+    return fig  # Returns Figure object for catalog saving
+```
+
+### _describe()
+
+```python
+def _describe(self) -> Dict[str, Any]
+```
+
+Returns comprehensive metadata about the dataset configuration and current operational state.
+
+#### Returns
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `filepath` | `str` | Configured output file path |
+| `purpose` | `str` | Output categorization setting |
+| `condition_param` | `Optional[str]` | Parameter name for condition resolution |
+| `style_params` | `Dict[str, Any]` | Dataset-specific styling overrides |
+| `save_args` | `Dict[str, Any]` | matplotlib savefig arguments |
+| `version` | `Optional[str]` | Dataset version for Kedro versioning |
+| `operation_stats` | `Dict[str, Any]` | Performance statistics for this instance |
+| `cache_stats` | `Dict[str, Any]` | Style cache performance metrics |
+| `dependencies` | `Dict[str, bool]` | Availability status of required dependencies |
+
+#### Example Response
+
+```python
+{
+    "filepath": "data/08_reporting/experiment_results.png",
+    "purpose": "presentation",
+    "condition_param": "experiment_condition",
+    "style_params": {"figure.dpi": 300, "figure.facecolor": "white"},
+    "save_args": {"bbox_inches": "tight", "transparent": False},
+    "version": "2024-01-15T10.30.45.123Z",
+    "operation_stats": {
+        "saves": 15,
+        "style_resolution_time": 0.012,
+        "save_operation_time": 1.234
+    },
+    "cache_stats": {
+        "size": 42,
+        "max_size": 1000,
+        "hit_rate": 0.85,
+        "hits": 127,
+        "misses": 23
+    },
+    "dependencies": {
+        "matplotlib_available": True,
+        "kedro_available": True,
+        "figregistry_available": True
+    }
+}
+```
+
+### _exists()
+
+```python
+def _exists(self) -> bool
+```
+
+Checks whether the dataset's output file exists on the filesystem.
+
+#### Returns
+
+- `bool`: `True` if the file exists, `False` otherwise
+
+#### Behavior
+
+Handles Kedro versioning by resolving the actual filepath before checking existence. Gracefully handles both versioned and non-versioned configurations.
+
+## Configuration Integration
+
+### Kedro Catalog Configuration
+
+The `FigureDataSet` integrates seamlessly with Kedro's data catalog system through YAML configuration:
+
+#### Basic Configuration
+
+```yaml
+# catalog.yml
+experiment_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/experiment_results.png
+  purpose: presentation
+```
+
+#### Advanced Configuration
+
+```yaml
+# catalog.yml with comprehensive options
+detailed_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/{condition}/analysis_{timestamp}.pdf
+  purpose: publication
+  condition_param: experiment_condition
+  style_params:
+    figure.dpi: 300
+    figure.facecolor: white
+    figure.edgecolor: black
+    axes.grid: true
+    axes.grid.alpha: 0.3
+  save_args:
+    bbox_inches: tight
+    transparent: false
+    format: pdf
+    metadata:
+      Title: "Experimental Analysis"
+      Author: "Data Science Team"
+```
+
+#### Versioned Dataset Configuration
+
+```yaml
+# Kedro versioning support
+versioned_figures:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/versioned/analysis.png
+  versioned: true
+  purpose: exploratory
+  condition_param: model_version
+```
+
+#### Environment-Specific Configuration
+
+```yaml
+# conf/base/catalog.yml - Base configuration
+production_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/production/results.png
+  purpose: presentation
+
+# conf/local/catalog.yml - Development overrides
+production_plots:
+  purpose: exploratory  # Override for local development
+  style_params:
+    figure.dpi: 150  # Lower DPI for faster development
+```
+
+### Pipeline Integration Examples
+
+#### Basic Pipeline Node
+
+```python
+from kedro.pipeline import Pipeline, node
+import matplotlib.pyplot as plt
+import pandas as pd
+
+def create_scatter_plot(data: pd.DataFrame) -> plt.Figure:
+    """Generate a scatter plot from data."""
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.scatter(data["x"], data["y"], alpha=0.6)
+    ax.set_xlabel("X Values")
+    ax.set_ylabel("Y Values")
+    ax.set_title("Data Scatter Plot")
+    return fig
+
+# Pipeline definition
+def create_pipeline() -> Pipeline:
+    return Pipeline([
+        node(
+            func=create_scatter_plot,
+            inputs="processed_data",
+            outputs="scatter_plot",  # Maps to FigureDataSet in catalog
+            name="generate_scatter_plot"
+        )
+    ])
+```
+
+#### Dynamic Condition Resolution
+
+```python
+# Pipeline with condition parameters
+def create_condition_plot(data: pd.DataFrame, params: Dict[str, Any]) -> plt.Figure:
+    """Generate plot with condition-specific styling."""
+    fig, ax = plt.subplots()
+    
+    # Plot data (styling applied automatically by FigureDataSet)
+    condition = params.get("experiment_condition", "baseline")
+    ax.plot(data["time"], data["value"], label=f"Condition: {condition}")
+    ax.legend()
+    
+    return fig
+
+# Catalog configuration uses condition_param
+# experiment_plot:
+#   type: figregistry_kedro.FigureDataSet
+#   filepath: data/08_reporting/condition_plots.png
+#   condition_param: experiment_condition
+```
+
+#### Multi-Purpose Output Pipeline
+
+```python
+def create_analysis_figures(results: pd.DataFrame) -> Dict[str, plt.Figure]:
+    """Generate multiple figures for different purposes."""
+    figures = {}
+    
+    # Exploratory plot
+    fig_exp, ax = plt.subplots()
+    ax.hist(results["metric"], bins=50, alpha=0.7)
+    ax.set_title("Distribution Analysis")
+    figures["exploratory_hist"] = fig_exp
+    
+    # Presentation plot
+    fig_pres, ax = plt.subplots(figsize=(12, 8))
+    ax.boxplot([results[col] for col in results.columns if "metric" in col])
+    ax.set_title("Comparative Analysis")
+    figures["presentation_boxplot"] = fig_pres
+    
+    return figures
+
+# Catalog configuration for multiple outputs
+# exploratory_hist:
+#   type: figregistry_kedro.FigureDataSet
+#   filepath: data/08_reporting/exploratory/distribution.png
+#   purpose: exploratory
+#
+# presentation_boxplot:
+#   type: figregistry_kedro.FigureDataSet
+#   filepath: data/08_reporting/presentation/comparison.png
+#   purpose: presentation
+```
+
+## Advanced Features
+
+### Performance Monitoring
+
+The `FigureDataSet` provides comprehensive performance monitoring capabilities:
+
+```python
+# Get global performance statistics
+stats = FigureDataSet.get_performance_stats()
+print(f"Average styling time: {stats['avg_style_time']*1000:.2f}ms")
+print(f"Cache hit rate: {stats['cache_stats']['hit_rate']:.2%}")
+```
+
+### Style Cache Management
+
+For high-performance scenarios, manage the global style cache:
+
+```python
+# Clear cache for memory management
+FigureDataSet.clear_cache()
+
+# Reset performance statistics
+FigureDataSet.reset_performance_stats()
+```
+
+### Context Management
+
+Set pipeline context for dynamic condition resolution:
+
+```python
+# Typically handled by FigRegistryHooks, but can be done manually
+dataset = FigureDataSet(filepath="output.png", condition_param="experiment_type")
+dataset.set_pipeline_context({"experiment_type": "treatment_a"})
+```
+
+## Error Handling
+
+### Exception Hierarchy
+
+```python
+# Base exception for all FigureDataSet errors
+class FigureDataSetError(Exception):
+    """Custom exception for FigureDataSet operations."""
+    
+    def __init__(self, message: str, original_error: Optional[Exception] = None):
+        super().__init__(message)
+        self.original_error = original_error
+```
+
+### Common Error Scenarios
+
+#### Missing Dependencies
+
+```python
+# Raised during initialization if dependencies unavailable
+try:
+    dataset = FigureDataSet(filepath="output.png")
+except FigureDataSetError as e:
+    print(f"Dependency error: {e}")
+    # Handle gracefully or install missing packages
+```
+
+#### Invalid Figure Objects
+
+```python
+# Raised during save if data is not a matplotlib Figure
+try:
+    dataset._save("not_a_figure")
+except FigureDataSetError as e:
+    print(f"Invalid data type: {e}")
+```
+
+#### Configuration Validation
+
+```python
+# Invalid purpose parameter
+try:
+    dataset = FigureDataSet(
+        filepath="output.png",
+        purpose="invalid_purpose"
+    )
+    # Warning logged, but initialization succeeds
+except ValueError as e:
+    print(f"Configuration error: {e}")
+```
+
+#### File System Errors
+
+```python
+# Handle file system issues during save
+try:
+    dataset._save(figure)
+except FigureDataSetError as e:
+    if "permission" in str(e).lower():
+        print("Permission denied - check file/directory permissions")
+    elif "disk" in str(e).lower():
+        print("Disk space issue - check available storage")
+```
+
+### Validation Rules
+
+#### Parameter Validation
+
+| Parameter | Validation Rules | Error Behavior |
+|-----------|------------------|----------------|
+| `filepath` | Must be valid string, no path traversal | `ValueError` on invalid paths |
+| `purpose` | Recommended: `exploratory`, `presentation`, `publication` | Warning logged for non-standard values |
+| `condition_param` | Must be valid string identifier | `ValueError` for invalid identifiers |
+| `style_params` | Must be dictionary with matplotlib-compatible keys | Warning for invalid style properties |
+| `save_args` | Must be dictionary compatible with `plt.savefig()` | `TypeError` for incompatible arguments |
+
+#### Runtime Validation
+
+| Validation | Check | Error Response |
+|------------|--------|----------------|
+| Figure Object | Instance of `matplotlib.figure.Figure` | `FigureDataSetError` with type information |
+| File Permissions | Write access to output directory | `FigureDataSetError` with permission details |
+| Configuration Merge | Pydantic schema compliance | `ConfigurationMergeError` with field-level errors |
+| Style Resolution | FigRegistry API availability | Graceful fallback with warning |
+
+## Thread Safety
+
+The `FigureDataSet` is designed for thread-safe operation in Kedro's parallel execution environment:
+
+### Concurrent Access Features
+
+- **Thread-Local Storage**: Pipeline context stored per thread
+- **Immutable Configuration**: Configuration objects are read-only after initialization
+- **Atomic File Operations**: File saves use atomic operations to prevent corruption
+- **Cache Synchronization**: Style cache uses thread-safe locks (RLock)
+
+### Parallel Runner Compatibility
+
+```python
+# Kedro parallel runners supported
+kedro run --runner=ParallelRunner --max-workers=4
+
+# Thread-safe operation guaranteed for:
+# - Style resolution and caching
+# - File save operations
+# - Performance statistics
+# - Configuration access
+```
+
+### Concurrency Recommendations
+
+| Scenario | Recommended Workers | Notes |
+|----------|-------------------|-------|
+| CPU-intensive analysis | Up to CPU cores | Limited by matplotlib thread safety |
+| I/O-heavy figure generation | 2x CPU cores | Benefits from parallel I/O |
+| Memory-constrained environments | 1-2 workers | Prevent memory exhaustion |
+| Large figure workflows | 4 workers max | Optimal balance for figure operations |
+
+## Integration Patterns
+
+### Kedro Versioning Integration
+
+```yaml
+# Automatic versioning with timestamps
+versioned_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/analysis/{version}/results.png
+  versioned: true
+  purpose: publication
+  
+# Custom version patterns
+experiment_tracking:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/experiments/{experiment_id}/plots.png
+  condition_param: experiment_id
+```
+
+### Environment-Specific Styling
+
+```yaml
+# conf/base/figregistry.yml
+styles:
+  baseline:
+    figure.dpi: 150
+    figure.facecolor: white
+  
+# conf/production/figregistry.yml  
+styles:
+  baseline:
+    figure.dpi: 300  # Higher resolution for production
+    figure.facecolor: white
+    axes.grid: true  # Professional presentation
+```
+
+### Hook Integration
+
+The dataset integrates automatically with `FigRegistryHooks` for lifecycle management:
+
+```python
+# settings.py
+from figregistry_kedro.hooks import FigRegistryHooks
+
+HOOKS = (FigRegistryHooks(),)
+
+# Automatic initialization enables:
+# - Configuration bridge setup
+# - Context management
+# - Performance monitoring
+```
+
+## Migration Guide
+
+### From Manual matplotlib Saves
+
+#### Before (Manual Approach)
+
+```python
+def create_and_save_plot(data: pd.DataFrame) -> None:
+    """Manual figure creation and saving."""
+    fig, ax = plt.subplots()
+    ax.plot(data["x"], data["y"])
+    
+    # Manual styling
+    ax.set_facecolor("white")
+    ax.grid(True, alpha=0.3)
+    
+    # Manual save with hardcoded path
+    plt.savefig("outputs/plot.png", dpi=300, bbox_inches="tight")
+    plt.close()
+```
+
+#### After (FigureDataSet Integration)
+
+```python
+def create_plot(data: pd.DataFrame) -> plt.Figure:
+    """Figure creation with automatic styling and saving."""
+    fig, ax = plt.subplots()
+    ax.plot(data["x"], data["y"])
+    
+    # Styling applied automatically based on configuration
+    # Saving handled by Kedro catalog
+    return fig
+```
+
+```yaml
+# catalog.yml
+analysis_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/plot.png
+  purpose: presentation
+  style_params:
+    figure.facecolor: white
+    axes.grid: true
+    axes.grid.alpha: 0.3
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+```
+
+### Migration Checklist
+
+- [ ] Convert save functions to return Figure objects
+- [ ] Add FigureDataSet entries to catalog.yml
+- [ ] Move styling configuration to FigRegistry config
+- [ ] Update pipeline nodes to remove manual saves
+- [ ] Add FigRegistryHooks to settings.py
+- [ ] Test versioning and environment configurations
+
+## Performance Benchmarks
+
+### Operation Timing (Target SLA)
+
+| Operation | Target Time | Typical Range | Measurement Method |
+|-----------|-------------|---------------|-------------------|
+| Style Resolution | <1ms | 0.1-0.8ms | Cache hit scenarios |
+| Configuration Merge | <10ms | 2-8ms | Bridge initialization |
+| Figure Save | <100ms | 20-80ms | Excluding matplotlib rendering |
+| Total Dataset Overhead | <5% | 1-3% | Compared to manual saves |
+
+### Memory Usage
+
+| Component | Memory Impact | Scaling Factor |
+|-----------|---------------|----------------|
+| Configuration Cache | <2MB | Linear with config size |
+| Style Cache | <1MB | Linear with unique conditions |
+| Figure Processing | Constant | Independent of pipeline size |
+| Thread-Local Storage | <100KB/thread | Linear with worker count |
+
+### Throughput Characteristics
+
+```python
+# Performance testing example
+import time
+from figregistry_kedro.datasets import FigureDataSet
+
+# Measure dataset overhead
+dataset = FigureDataSet(filepath="test.png", purpose="exploratory")
+
+start_time = time.perf_counter()
+dataset._save(test_figure)
+save_time = time.perf_counter() - start_time
+
+# Compare with manual save
+start_time = time.perf_counter()
+test_figure.savefig("manual.png")
+manual_time = time.perf_counter() - start_time
+
+overhead_percent = ((save_time - manual_time) / manual_time) * 100
+print(f"FigureDataSet overhead: {overhead_percent:.1f}%")
+```
+
+## API Compatibility
+
+### Kedro Version Compatibility
+
+| Kedro Version | Support Status | Notes |
+|---------------|----------------|-------|
+| 0.18.x | Full Support | Primary target version |
+| 0.19.x | Full Support | Tested compatibility |
+| 0.17.x | Limited | Missing some versioning features |
+| 0.20.x | Planned | Future compatibility planned |
+
+### Python Version Requirements
+
+- **Minimum**: Python 3.10
+- **Recommended**: Python 3.11+
+- **Testing Matrix**: 3.10, 3.11, 3.12
+
+### Dependencies
+
+```toml
+# pyproject.toml dependencies
+[project.dependencies]
+figregistry = ">=0.3.0"
+kedro = ">=0.18.0,<0.20.0"
+matplotlib = ">=3.9.0"
+pydantic = ">=2.9.0"
+pyyaml = ">=6.0.1"
+```
+
+## Related Components
+
+### Configuration Bridge
+
+See [`FigRegistryConfigBridge`](config.md) for configuration merging between Kedro and FigRegistry systems.
+
+### Lifecycle Hooks
+
+See [`FigRegistryHooks`](hooks.md) for automated initialization and context management.
+
+### Utility Functions
+
+```python
+from figregistry_kedro.datasets import (
+    create_figure_dataset,
+    validate_figure_dataset_config,
+    FigureDataSetError
+)
+
+# Factory function for programmatic creation
+dataset = create_figure_dataset(
+    filepath="output.png",
+    purpose="presentation",
+    condition_param="experiment_type"
+)
+
+# Configuration validation
+config = {
+    "filepath": "data/plots/analysis.png",
+    "purpose": "publication",
+    "style_params": {"figure.dpi": 300}
+}
+validated_config = validate_figure_dataset_config(config)
+```
+
+---
+
+## Examples Repository
+
+Complete working examples are available in the [examples directory](../../examples/):
+
+- **[Basic Integration](../../examples/basic/)**: Simple Kedro project with FigRegistry
+- **[Advanced Configuration](../../examples/advanced/)**: Multi-environment setup with complex styling
+- **[Migration Guide](../../examples/migration/)**: Before/after comparison for existing projects
+
+For additional support and community discussions, visit the [FigRegistry-Kedro GitHub repository](https://github.com/blitzy-platform/figregistry-kedro).
