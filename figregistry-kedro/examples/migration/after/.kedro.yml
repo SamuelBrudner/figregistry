@@ -1,0 +1,72 @@
+# Kedro project configuration for figregistry-kedro migration example (AFTER state)
+# This file represents the converted project state demonstrating proper integration
+# with figregistry-kedro plugin capabilities after migration from manual figure management
+
+# Project identification
+project_name: "Kedro FigRegistry Migration Example"
+package_name: "kedro_figregistry_example"
+
+# Source code structure
+source_dir: "src"
+
+# Kedro framework compatibility - matching lifecycle hook requirements
+kedro_init_version: "0.18.0"
+kedro_version: ">=0.18.0,<0.20.0"
+
+# Project configuration
+tools: ""
+example_pipeline: "True"
+
+# Environment settings
+default_environment: "base"
+config_source: "conf"
+
+# Package structure settings
+pipelines_package: "pipelines"
+main_module: "__main__"
+
+# Migration example specific settings
+description: "Converted Kedro project demonstrating automated figure management through figregistry-kedro integration"
+purpose: "migration_demonstration"
+migration_features:
+  - "FigureDataSet replacing manual plt.savefig() calls"
+  - "FigRegistryHooks for automatic configuration initialization"
+  - "Centralized styling through figregistry.yml configuration"
+  - "Eliminated manual figure management overhead"
+  - "Condition-based styling through pipeline parameters"
+  - "Automated versioning through Kedro catalog integration"
+
+# Integration capabilities enabled
+integration_status: "converted"
+automation_level: "full"
+manual_figure_calls_eliminated: "True"
+
+# Plugin discovery and registration support per F-008 requirements
+plugin_integration:
+  figregistry_kedro: "enabled"
+  dataset_types:
+    - "figregistry_kedro.FigureDataSet"
+  lifecycle_hooks:
+    - "figregistry_kedro.FigRegistryHooks"
+  config_bridges:
+    - "figregistry_kedro.FigRegistryConfigBridge"
+
+# Performance and quality settings
+performance_target: "<5% overhead vs manual matplotlib"
+style_resolution_target: "<1ms cache lookup"
+hook_execution_target: "<5ms initialization"
+
+# Migration comparison metadata
+migration_comparison:
+  before_state: "manual plt.savefig() calls scattered across pipeline nodes"
+  after_state: "automated figure management through catalog integration"
+  eliminated_patterns:
+    - "Hardcoded file paths in node functions"
+    - "Manual style application in each node"
+    - "Scattered figure saving logic"
+    - "Duplicate styling code across pipelines"
+  added_capabilities:
+    - "Centralized configuration management"
+    - "Automatic condition-based styling"
+    - "Integrated versioning through Kedro"
+    - "Thread-safe parallel execution support"
