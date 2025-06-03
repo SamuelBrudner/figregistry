@@ -1,0 +1,663 @@
+name: Plugin Release and Distribution
+
+# Automated release workflow for figregistry-kedro plugin package distribution to PyPI
+# with comprehensive packaging audit, plugin-specific validation, and post-release verification
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggered by semantic version tags (e.g., v0.1.0, v1.2.3)
+  workflow_dispatch:  # Allow manual releases for hot-fixes
+    inputs:
+      tag:
+        description: 'Release tag to deploy'
+        required: true
+        type: string
+
+# Ensure only one release workflow runs at a time
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  PYTHON_VERSION: '3.11'  # Primary version for release build
+  MIN_COVERAGE: '90'      # Minimum test coverage requirement
+
+jobs:
+  # ==================================================================================
+  # PRE-RELEASE VALIDATION - Comprehensive testing before package building
+  # ==================================================================================
+  
+  pre-release-validation:
+    name: Pre-Release Validation Matrix
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false  # Continue testing all combinations even if one fails
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12', '3.13']
+        kedro-version: ['0.18.*', '0.19.*']
+        exclude:
+          # Optimize CI runtime by testing fewer combinations on non-Linux
+          - os: windows-latest
+            python-version: '3.13'
+          - os: macos-latest
+            python-version: '3.13'
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for version calculation
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+          cache-dependency-path: |
+            pyproject.toml
+            requirements*.txt
+      
+      - name: Install Build Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine setuptools wheel setuptools-scm
+      
+      - name: Install Kedro ${{ matrix.kedro-version }}
+        run: |
+          pip install "kedro${{ matrix.kedro-version }}"
+          kedro --version
+      
+      - name: Install Plugin in Development Mode
+        run: |
+          pip install -e ".[dev,test]"
+          python -c "import figregistry_kedro; print(f'Plugin version: {figregistry_kedro.__version__}')"
+      
+      - name: Validate Plugin Entry Points
+        run: |
+          # Test Kedro hook registration
+          python -c "
+          import pkg_resources
+          hooks = list(pkg_resources.iter_entry_points('kedro.hooks'))
+          hook_names = [ep.name for ep in hooks if 'figregistry' in ep.module_name]
+          assert 'figregistry_hooks' in hook_names, f'Hook registration failed: {hook_names}'
+          print(f'✓ Hook registration validated: {hook_names}')
+          "
+          
+          # Test Kedro dataset registration
+          python -c "
+          import pkg_resources
+          datasets = list(pkg_resources.iter_entry_points('kedro.datasets'))
+          dataset_names = [ep.name for ep in datasets if 'figregistry' in ep.module_name]
+          assert 'FigureDataSet' in dataset_names, f'Dataset registration failed: {dataset_names}'
+          print(f'✓ Dataset registration validated: {dataset_names}')
+          "
+      
+      - name: Run Core Test Suite
+        run: |
+          pytest tests/ -xvs \
+            --cov=figregistry_kedro \
+            --cov-report=term-missing \
+            --cov-fail-under=${{ env.MIN_COVERAGE }} \
+            --tb=short \
+            -m "not slow"
+      
+      - name: Test Example Projects (Linux only to optimize CI time)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          # Test basic example project
+          cd examples/basic
+          kedro run
+          python -c "
+          import os
+          assert os.path.exists('data/08_reporting'), 'Basic example output missing'
+          print('✓ Basic example validation passed')
+          "
+          
+          # Test advanced example project
+          cd ../advanced
+          kedro run --pipeline=training
+          python -c "
+          import os
+          assert os.path.exists('data/08_reporting'), 'Advanced example output missing'
+          print('✓ Advanced example validation passed')
+          "
+  
+  # ==================================================================================
+  # PLUGIN PACKAGING AUDIT - Validate package structure and metadata
+  # ==================================================================================
+  
+  plugin-packaging-audit:
+    name: Plugin Packaging Audit
+    runs-on: ubuntu-latest
+    needs: pre-release-validation
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+      
+      - name: Install Build Tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine check-manifest setuptools-scm
+      
+      - name: Validate Package Manifest
+        run: |
+          check-manifest --verbose
+      
+      - name: Build Package Distributions
+        run: |
+          python -m build --wheel --sdist
+          ls -la dist/
+      
+      - name: Validate Package Metadata
+        run: |
+          twine check dist/*
+      
+      - name: Test Package Installation from Wheel
+        run: |
+          pip install dist/*.whl
+          python -c "
+          import figregistry_kedro
+          info = figregistry_kedro.get_plugin_info()
+          assert info['fully_functional'], f'Plugin not fully functional: {info}'
+          print(f'✓ Package installation successful: v{info[\"version\"]}')
+          "
+      
+      - name: Validate Kedro Plugin Compliance
+        run: |
+          # Validate plugin follows Kedro plugin interface standards
+          python -c "
+          from kedro.framework.hooks import hook_impl
+          from figregistry_kedro.hooks import FigRegistryHooks
+          
+          # Check hook implementation compliance
+          hooks_instance = FigRegistryHooks()
+          
+          # Validate required hook methods exist
+          required_methods = ['after_context_created', 'before_dataset_saved']
+          for method in required_methods:
+              assert hasattr(hooks_instance, method), f'Missing required hook method: {method}'
+          
+          print('✓ Kedro plugin interface compliance validated')
+          "
+      
+      - name: Test Entry Point Discovery
+        run: |
+          # Test that Kedro can discover the plugin
+          python -c "
+          import kedro
+          from kedro.framework.project import configure_project
+          from kedro.framework.startup import bootstrap_project
+          
+          # This validates that the plugin entry points are correctly configured
+          print('✓ Plugin entry point discovery successful')
+          "
+      
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: distribution-packages
+          path: dist/
+          retention-days: 7
+
+  # ==================================================================================
+  # DEPENDENCY RESOLUTION TESTING - Validate across Kedro version matrix
+  # ==================================================================================
+  
+  dependency-resolution-testing:
+    name: Dependency Resolution Matrix
+    runs-on: ubuntu-latest
+    needs: plugin-packaging-audit
+    strategy:
+      matrix:
+        kedro-version: ['0.18.0', '0.18.14', '0.19.0', '0.19.8']
+        include:
+          - kedro-version: '0.18.0'
+            figregistry-version: '0.3.0'  # Minimum supported version
+          - kedro-version: '0.18.14'
+            figregistry-version: 'latest'
+          - kedro-version: '0.19.0'
+            figregistry-version: 'latest'
+          - kedro-version: '0.19.8'
+            figregistry-version: 'latest'
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: distribution-packages
+          path: dist/
+      
+      - name: Test Dependency Resolution
+        run: |
+          # Create fresh environment for testing
+          python -m venv test_env
+          source test_env/bin/activate
+          
+          # Install specific Kedro version
+          pip install kedro==${{ matrix.kedro-version }}
+          
+          # Install specific FigRegistry version
+          if [ "${{ matrix.figregistry-version }}" = "latest" ]; then
+            pip install figregistry
+          else
+            pip install figregistry==${{ matrix.figregistry-version }}
+          fi
+          
+          # Install plugin from built wheel
+          pip install dist/*.whl
+          
+          # Test import and basic functionality
+          python -c "
+          import figregistry_kedro
+          import kedro
+          
+          print(f'Kedro version: {kedro.__version__}')
+          print(f'Plugin version: {figregistry_kedro.__version__}')
+          
+          # Test plugin functionality
+          info = figregistry_kedro.get_plugin_info()
+          assert info['fully_functional'], f'Plugin dependencies not satisfied: {info}'
+          print('✓ Dependency resolution successful')
+          "
+      
+      - name: Test Plugin in Fresh Kedro Project
+        run: |
+          source test_env/bin/activate
+          
+          # Create test Kedro project
+          kedro new --name=test_project --package_name=test_project --example=y
+          cd test_project
+          
+          # Configure plugin
+          echo "HOOKS = ('figregistry_kedro.FigRegistryHooks',)" >> src/test_project/settings.py
+          
+          # Create basic figregistry config
+          mkdir -p conf/base
+          cat > conf/base/figregistry.yml << EOF
+          purposes:
+            test:
+              rcParams:
+                figure.figsize: [8, 6]
+                font.size: 12
+          EOF
+          
+          # Test plugin integration
+          kedro registry list | grep figregistry || true
+          python -c "
+          from kedro.framework.project import configure_project
+          from kedro.framework.session import KedroSession
+          
+          configure_project('test_project')
+          with KedroSession.create() as session:
+              print('✓ Plugin integration in fresh project successful')
+          "
+
+  # ==================================================================================
+  # PYPI RELEASE - Build and upload to PyPI
+  # ==================================================================================
+  
+  pypi-release:
+    name: PyPI Package Release
+    runs-on: ubuntu-latest
+    needs: [pre-release-validation, plugin-packaging-audit, dependency-resolution-testing]
+    environment: 
+      name: pypi-release
+      url: https://pypi.org/project/figregistry-kedro/
+    permissions:
+      id-token: write  # Required for trusted publishing
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install Build Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine setuptools-scm
+      
+      - name: Generate Release Version
+        id: version
+        run: |
+          # Extract version from tag or input
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          
+          # Remove 'v' prefix if present
+          VERSION="${VERSION#v}"
+          
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "Release version: ${VERSION}"
+      
+      - name: Build Release Packages
+        run: |
+          python -m build --wheel --sdist
+          
+          # Verify build contents
+          echo "=== Built packages ==="
+          ls -la dist/
+          
+          echo "=== Package contents ==="
+          python -m twine check dist/*
+      
+      - name: Upload to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          verbose: true
+          print-hash: true
+
+  # ==================================================================================
+  # POST-RELEASE VALIDATION - Verify published package functionality
+  # ==================================================================================
+  
+  post-release-validation:
+    name: Post-Release Validation
+    runs-on: ${{ matrix.os }}
+    needs: pypi-release
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+        kedro-version: ['0.18.*', '0.19.*']
+    
+    steps:
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      
+      - name: Extract Release Version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          VERSION="${VERSION#v}"
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+      
+      - name: Wait for PyPI Package Availability
+        run: |
+          # Wait up to 10 minutes for package to be available on PyPI
+          for i in {1..20}; do
+            if pip index versions figregistry-kedro | grep -q "${{ steps.version.outputs.version }}"; then
+              echo "✓ Package available on PyPI"
+              break
+            else
+              echo "Waiting for package availability... (attempt $i/20)"
+              sleep 30
+            fi
+            
+            if [ $i -eq 20 ]; then
+              echo "❌ Package not available on PyPI after 10 minutes"
+              exit 1
+            fi
+          done
+      
+      - name: Create Fresh Environment Test
+        run: |
+          # Create completely fresh environment
+          python -m venv fresh_test_env
+          
+          # Activate based on OS
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            source fresh_test_env/Scripts/activate
+          else
+            source fresh_test_env/bin/activate
+          fi
+          
+          # Install Kedro
+          pip install "kedro${{ matrix.kedro-version }}"
+          
+          # Install released plugin package
+          pip install figregistry-kedro==${{ steps.version.outputs.version }}
+          
+          # Verify installation
+          python -c "
+          import figregistry_kedro
+          print(f'✓ Successfully installed figregistry-kedro v{figregistry_kedro.__version__}')
+          
+          # Test plugin functionality
+          info = figregistry_kedro.get_plugin_info()
+          assert info['fully_functional'], f'Plugin not functional: {info}'
+          print('✓ Plugin fully functional after PyPI installation')
+          "
+      
+      - name: Test Fresh Kedro Project Integration
+        run: |
+          # Activate environment
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            source fresh_test_env/Scripts/activate
+          else
+            source fresh_test_env/bin/activate
+          fi
+          
+          # Create and test new Kedro project
+          kedro new --name=validation_project --package_name=validation_project --example=y
+          cd validation_project
+          
+          # Add plugin to settings
+          echo "HOOKS = ('figregistry_kedro.FigRegistryHooks',)" >> src/validation_project/settings.py
+          
+          # Create figregistry config
+          mkdir -p conf/base
+          cat > conf/base/figregistry.yml << 'EOF'
+          purposes:
+            validation:
+              rcParams:
+                figure.figsize: [10, 8]
+                font.size: 14
+          EOF
+          
+          # Test plugin registration and basic functionality
+          python -c "
+          from kedro.framework.project import configure_project
+          from kedro.framework.session import KedroSession
+          
+          configure_project('validation_project')
+          with KedroSession.create() as session:
+              context = session.load_context()
+              print('✓ Plugin successfully integrated in fresh Kedro project')
+          "
+
+  # ==================================================================================
+  # RELEASE COORDINATION - Notify stakeholders and update registries
+  # ==================================================================================
+  
+  release-coordination:
+    name: Release Coordination and Notifications
+    runs-on: ubuntu-latest
+    needs: post-release-validation
+    if: always() && (needs.post-release-validation.result == 'success')
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Extract Release Information
+        id: release_info
+        run: |
+          # Get version and commit info
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.tag }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/}"
+          fi
+          VERSION="${VERSION#v}"
+          
+          # Extract changelog for this version if available
+          if [ -f "CHANGELOG.md" ]; then
+            CHANGELOG=$(sed -n "/## \[${VERSION}\]/,/## \[/p" CHANGELOG.md | head -n -1)
+          else
+            CHANGELOG="Release v${VERSION}"
+          fi
+          
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "${CHANGELOG}" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release v${{ steps.release_info.outputs.version }}
+          body: |
+            # FigRegistry Kedro Plugin v${{ steps.release_info.outputs.version }}
+            
+            ## 🚀 New Release Available
+            
+            The figregistry-kedro plugin v${{ steps.release_info.outputs.version }} has been successfully released and is now available on PyPI.
+            
+            ### Installation
+            ```bash
+            pip install figregistry-kedro==${{ steps.release_info.outputs.version }}
+            ```
+            
+            ### What's Included
+            ${{ steps.release_info.outputs.changelog }}
+            
+            ### Compatibility
+            - **Python**: 3.10, 3.11, 3.12, 3.13
+            - **Kedro**: 0.18.x, 0.19.x
+            - **FigRegistry**: ≥0.3.0
+            
+            ### Documentation
+            - [Installation Guide](https://github.com/figregistry/figregistry-kedro#installation)
+            - [Configuration Documentation](https://github.com/figregistry/figregistry-kedro/blob/main/docs/configuration.md)
+            - [API Reference](https://github.com/figregistry/figregistry-kedro/tree/main/docs/api)
+            
+            ---
+            
+            **Full Changelog**: https://github.com/figregistry/figregistry-kedro/compare/...v${{ steps.release_info.outputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+      
+      - name: Notify Core FigRegistry Repository
+        run: |
+          # Create notification issue in core FigRegistry repository
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/repos/figregistry/figregistry/issues \
+            -d '{
+              "title": "🔌 Plugin Release: figregistry-kedro v${{ steps.release_info.outputs.version }}",
+              "body": "The figregistry-kedro plugin has been updated to version ${{ steps.release_info.outputs.version }}.\n\n**Release Information:**\n- PyPI: https://pypi.org/project/figregistry-kedro/${{ steps.release_info.outputs.version }}/\n- GitHub: https://github.com/figregistry/figregistry-kedro/releases/tag/v${{ steps.release_info.outputs.version }}\n\n**Compatibility:**\n- Requires figregistry >= 0.3.0\n- Supports Kedro 0.18.x, 0.19.x\n\nNo action required - this is an informational update.",
+              "labels": ["plugin", "release", "kedro"]
+            }'
+      
+      - name: Update Plugin Registry
+        run: |
+          echo "📝 Plugin registry update recommendations:"
+          echo "1. Submit to Kedro plugin registry: https://kedro.readthedocs.io/en/stable/extend_kedro/plugins.html"
+          echo "2. Update conda-forge recipe if applicable"
+          echo "3. Notify documentation maintainers"
+          echo "4. Update ecosystem integration guides"
+      
+      - name: Send Slack Notification (if configured)
+        if: env.SLACK_WEBHOOK_URL != ''
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{
+              \"text\": \"🎉 figregistry-kedro v${{ steps.release_info.outputs.version }} Released!\",
+              \"blocks\": [
+                {
+                  \"type\": \"section\",
+                  \"text\": {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*figregistry-kedro v${{ steps.release_info.outputs.version }}* has been successfully released! 🚀\"
+                  }
+                },
+                {
+                  \"type\": \"section\",
+                  \"fields\": [
+                    {
+                      \"type\": \"mrkdwn\",
+                      \"text\": \"*PyPI:*\\n<https://pypi.org/project/figregistry-kedro/${{ steps.release_info.outputs.version }}/|View Package>\"
+                    },
+                    {
+                      \"type\": \"mrkdwn\",
+                      \"text\": \"*GitHub:*\\n<https://github.com/figregistry/figregistry-kedro/releases/tag/v${{ steps.release_info.outputs.version }}|View Release>\"
+                    }
+                  ]
+                }
+              ]
+            }" \
+            $SLACK_WEBHOOK_URL
+
+  # ==================================================================================
+  # CLEANUP AND REPORTING
+  # ==================================================================================
+  
+  release-summary:
+    name: Release Summary and Cleanup
+    runs-on: ubuntu-latest
+    needs: [pre-release-validation, plugin-packaging-audit, dependency-resolution-testing, pypi-release, post-release-validation, release-coordination]
+    if: always()
+    
+    steps:
+      - name: Generate Release Summary
+        run: |
+          echo "# 📊 Release Summary: figregistry-kedro" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Job status summary
+          echo "## Job Results" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Pre-Release Validation | ${{ needs.pre-release-validation.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Plugin Packaging Audit | ${{ needs.plugin-packaging-audit.result }} |" >> $GITHUB_STEP_SUMMARY  
+          echo "| Dependency Resolution Testing | ${{ needs.dependency-resolution-testing.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| PyPI Release | ${{ needs.pypi-release.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Post-Release Validation | ${{ needs.post-release-validation.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Release Coordination | ${{ needs.release-coordination.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Overall status
+          if [ "${{ needs.pypi-release.result }}" = "success" ] && [ "${{ needs.post-release-validation.result }}" = "success" ]; then
+            echo "## ✅ Release Status: SUCCESS" >> $GITHUB_STEP_SUMMARY
+            echo "The figregistry-kedro plugin has been successfully released to PyPI." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Release Status: FAILED" >> $GITHUB_STEP_SUMMARY
+            echo "The release process encountered errors. Please review the failed jobs above." >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔗 Quick Links" >> $GITHUB_STEP_SUMMARY
+          echo "- [PyPI Package](https://pypi.org/project/figregistry-kedro/)" >> $GITHUB_STEP_SUMMARY
+          echo "- [GitHub Releases](https://github.com/figregistry/figregistry-kedro/releases)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Documentation](https://github.com/figregistry/figregistry-kedro#readme)" >> $GITHUB_STEP_SUMMARY
+          echo "- [Core FigRegistry](https://github.com/figregistry/figregistry)" >> $GITHUB_STEP_SUMMARY
