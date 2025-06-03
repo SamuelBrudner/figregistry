@@ -1,0 +1,161 @@
+# Concurrent Execution Test Data for FigRegistry-Kedro Plugin
+# 
+# This dataset provides comprehensive test data for validating concurrent pipeline execution
+# scenarios, thread-safety operations, and parallel Kedro runner compatibility per Section 5.2.8
+# and Section 6.6.4.3 of the technical specification.
+#
+# Key Testing Scenarios Covered:
+# - Unique execution identifiers for concurrent operation tracking
+# - Thread-safety validation with process/thread identifiers  
+# - Parallel processing scenarios without conflicts
+# - Concurrent FigureDataSet operations and style resolution
+# - Synchronization test data for atomic operations
+# - Stress testing with rapid parallel access patterns
+#
+# Performance Targets Validated:
+# - Plugin Pipeline Execution Overhead: < 200ms per FigureDataSet save (Section 6.6.4.3)
+# - Parallel Runner Concurrency Guidelines: Up to 4 concurrent operations per CPU core (Section 5.2.8)
+# - Thread-safe styling resolution and atomic file operations (Section 5.2.8)
+# - Concurrent execution degradation: < 10% performance impact (Section 6.6.4.3)
+#
+# Usage in Tests:
+# - Load via pandas for concurrent execution scenario testing
+# - Group by thread_id/process_id for parallel operation validation
+# - Use execution_id for tracking operation completion and conflicts
+# - Filter by scenario_type for specific concurrency testing patterns
+# - Validate operation_duration against performance targets
+#
+# Generated: 2024-12-19
+# Compatible with: figregistry-kedro plugin concurrent execution testing framework
+execution_id,thread_id,process_id,scenario_type,operation_type,condition_param,figure_complexity,target_output_path,expected_duration_ms,concurrency_level,sync_point,conflict_potential,memory_pressure_mb,timestamp_offset_ms,pipeline_stage,dataset_name,expected_outcome,stress_factor
+# Basic Sequential Execution (Baseline)
+exec_001,thread_0,proc_0,sequential,figure_save,experiment_baseline,low,data/08_reporting/thread_0/baseline_001.png,150,1,sync_start,none,2.5,0,data_visualization,figure_baseline_001,success,1.0
+exec_002,thread_0,proc_0,sequential,figure_save,experiment_baseline,low,data/08_reporting/thread_0/baseline_002.png,145,1,sync_none,none,2.8,200,data_visualization,figure_baseline_002,success,1.0
+exec_003,thread_0,proc_0,sequential,figure_save,experiment_control,medium,data/08_reporting/thread_0/control_001.png,180,1,sync_none,none,4.2,400,data_visualization,figure_control_001,success,1.0
+exec_004,thread_0,proc_0,sequential,style_resolution,experiment_baseline,low,,25,1,sync_none,none,1.5,600,style_processing,style_baseline_001,success,1.0
+exec_005,thread_0,proc_0,sequential,config_merge,multi_env,medium,,45,1,sync_end,none,3.1,800,configuration,config_merge_001,success,1.0
+
+# Parallel Execution - 2 Threads (Low Concurrency)
+exec_006,thread_1,proc_0,parallel_low,figure_save,experiment_parallel_a,medium,data/08_reporting/thread_1/parallel_a_001.png,175,2,sync_start,low,3.5,0,data_visualization,figure_parallel_a_001,success,1.2
+exec_007,thread_2,proc_0,parallel_low,figure_save,experiment_parallel_b,medium,data/08_reporting/thread_2/parallel_b_001.png,185,2,sync_start,low,3.8,10,data_visualization,figure_parallel_b_001,success,1.2
+exec_008,thread_1,proc_0,parallel_low,style_resolution,experiment_parallel_a,medium,,30,2,sync_none,none,2.1,200,style_processing,style_parallel_a_001,success,1.2
+exec_009,thread_2,proc_0,parallel_low,style_resolution,experiment_parallel_b,medium,,32,2,sync_none,none,2.3,210,style_processing,style_parallel_b_001,success,1.2
+exec_010,thread_1,proc_0,parallel_low,figure_save,experiment_parallel_a,high,data/08_reporting/thread_1/parallel_a_002.png,195,2,sync_barrier,medium,5.2,400,data_visualization,figure_parallel_a_002,success,1.2
+exec_011,thread_2,proc_0,parallel_low,figure_save,experiment_parallel_b,high,data/08_reporting/thread_2/parallel_b_002.png,190,2,sync_barrier,medium,5.1,420,data_visualization,figure_parallel_b_002,success,1.2
+exec_012,thread_1,proc_0,parallel_low,config_access,shared_config,low,,20,2,sync_none,high,1.8,600,configuration,config_access_001,success,1.2
+exec_013,thread_2,proc_0,parallel_low,config_access,shared_config,low,,22,2,sync_none,high,1.9,620,configuration,config_access_002,success,1.2
+
+# Parallel Execution - 4 Threads (Medium Concurrency)
+exec_014,thread_1,proc_0,parallel_medium,figure_save,experiment_quad_a,high,data/08_reporting/thread_1/quad_a_001.png,195,4,sync_start,medium,4.8,0,data_visualization,figure_quad_a_001,success,1.5
+exec_015,thread_2,proc_0,parallel_medium,figure_save,experiment_quad_b,high,data/08_reporting/thread_2/quad_b_001.png,200,4,sync_start,medium,5.1,5,data_visualization,figure_quad_b_001,success,1.5
+exec_016,thread_3,proc_0,parallel_medium,figure_save,experiment_quad_c,high,data/08_reporting/thread_3/quad_c_001.png,205,4,sync_start,medium,5.3,10,data_visualization,figure_quad_c_001,success,1.5
+exec_017,thread_4,proc_0,parallel_medium,figure_save,experiment_quad_d,high,data/08_reporting/thread_4/quad_d_001.png,210,4,sync_start,medium,5.5,15,data_visualization,figure_quad_d_001,success,1.5
+exec_018,thread_1,proc_0,parallel_medium,style_resolution,experiment_quad_a,high,,35,4,sync_none,low,2.8,100,style_processing,style_quad_a_001,success,1.5
+exec_019,thread_2,proc_0,parallel_medium,style_resolution,experiment_quad_b,high,,38,4,sync_none,low,3.1,105,style_processing,style_quad_b_001,success,1.5
+exec_020,thread_3,proc_0,parallel_medium,style_resolution,experiment_quad_c,high,,36,4,sync_none,low,2.9,110,style_processing,style_quad_c_001,success,1.5
+exec_021,thread_4,proc_0,parallel_medium,style_resolution,experiment_quad_d,high,,40,4,sync_none,low,3.3,115,style_processing,style_quad_d_001,success,1.5
+
+# Shared Resource Contention Testing
+exec_022,thread_1,proc_0,shared_resource,figure_save,experiment_shared,medium,data/08_reporting/shared/conflict_test.png,220,4,sync_barrier,very_high,6.1,200,data_visualization,figure_shared_001,success,2.0
+exec_023,thread_2,proc_0,shared_resource,figure_save,experiment_shared,medium,data/08_reporting/shared/conflict_test.png,230,4,sync_barrier,very_high,6.3,205,data_visualization,figure_shared_002,conflict_resolved,2.0
+exec_024,thread_3,proc_0,shared_resource,figure_save,experiment_shared,medium,data/08_reporting/shared/conflict_test.png,240,4,sync_barrier,very_high,6.5,210,data_visualization,figure_shared_003,conflict_resolved,2.0
+exec_025,thread_4,proc_0,shared_resource,figure_save,experiment_shared,medium,data/08_reporting/shared/conflict_test.png,235,4,sync_barrier,very_high,6.2,215,data_visualization,figure_shared_004,conflict_resolved,2.0
+exec_026,thread_1,proc_0,shared_resource,cache_invalidation,shared_cache,high,,50,4,sync_critical,very_high,4.2,300,cache_management,cache_invalidate_001,success,2.0
+exec_027,thread_2,proc_0,shared_resource,cache_read,shared_cache,high,,25,4,sync_critical,very_high,2.1,310,cache_management,cache_read_001,success,2.0
+exec_028,thread_3,proc_0,shared_resource,cache_write,shared_cache,high,,45,4,sync_critical,very_high,3.8,320,cache_management,cache_write_001,success,2.0
+exec_029,thread_4,proc_0,shared_resource,cache_read,shared_cache,high,,28,4,sync_critical,very_high,2.3,330,cache_management,cache_read_002,success,2.0
+
+# High Concurrency Stress Testing - 8 Threads
+exec_030,thread_1,proc_0,stress_high,figure_save,stress_test_a,extreme,data/08_reporting/stress/thread_1/stress_a_001.png,250,8,sync_start,high,8.5,0,data_visualization,figure_stress_a_001,success,3.0
+exec_031,thread_2,proc_0,stress_high,figure_save,stress_test_b,extreme,data/08_reporting/stress/thread_2/stress_b_001.png,260,8,sync_start,high,8.8,2,data_visualization,figure_stress_b_001,success,3.0
+exec_032,thread_3,proc_0,stress_high,figure_save,stress_test_c,extreme,data/08_reporting/stress/thread_3/stress_c_001.png,255,8,sync_start,high,8.6,4,data_visualization,figure_stress_c_001,success,3.0
+exec_033,thread_4,proc_0,stress_high,figure_save,stress_test_d,extreme,data/08_reporting/stress/thread_4/stress_d_001.png,265,8,sync_start,high,9.0,6,data_visualization,figure_stress_d_001,success,3.0
+exec_034,thread_5,proc_0,stress_high,figure_save,stress_test_e,extreme,data/08_reporting/stress/thread_5/stress_e_001.png,270,8,sync_start,high,9.2,8,data_visualization,figure_stress_e_001,success,3.0
+exec_035,thread_6,proc_0,stress_high,figure_save,stress_test_f,extreme,data/08_reporting/stress/thread_6/stress_f_001.png,275,8,sync_start,high,9.4,10,data_visualization,figure_stress_f_001,success,3.0
+exec_036,thread_7,proc_0,stress_high,figure_save,stress_test_g,extreme,data/08_reporting/stress/thread_7/stress_g_001.png,280,8,sync_start,high,9.6,12,data_visualization,figure_stress_g_001,success,3.0
+exec_037,thread_8,proc_0,stress_high,figure_save,stress_test_h,extreme,data/08_reporting/stress/thread_8/stress_h_001.png,285,8,sync_start,high,9.8,14,data_visualization,figure_stress_h_001,success,3.0
+
+# Rapid Fire Operations - Burst Testing
+exec_038,thread_1,proc_0,burst_rapid,figure_save,burst_test_1,low,data/08_reporting/burst/thread_1/burst_001.png,160,8,sync_none,medium,3.2,0,data_visualization,figure_burst_001,success,2.5
+exec_039,thread_2,proc_0,burst_rapid,figure_save,burst_test_2,low,data/08_reporting/burst/thread_2/burst_002.png,165,8,sync_none,medium,3.4,5,data_visualization,figure_burst_002,success,2.5
+exec_040,thread_3,proc_0,burst_rapid,figure_save,burst_test_3,low,data/08_reporting/burst/thread_3/burst_003.png,170,8,sync_none,medium,3.6,10,data_visualization,figure_burst_003,success,2.5
+exec_041,thread_4,proc_0,burst_rapid,figure_save,burst_test_4,low,data/08_reporting/burst/thread_4/burst_004.png,175,8,sync_none,medium,3.8,15,data_visualization,figure_burst_004,success,2.5
+exec_042,thread_5,proc_0,burst_rapid,figure_save,burst_test_5,low,data/08_reporting/burst/thread_5/burst_005.png,180,8,sync_none,medium,4.0,20,data_visualization,figure_burst_005,success,2.5
+exec_043,thread_6,proc_0,burst_rapid,figure_save,burst_test_6,low,data/08_reporting/burst/thread_6/burst_006.png,185,8,sync_none,medium,4.2,25,data_visualization,figure_burst_006,success,2.5
+exec_044,thread_7,proc_0,burst_rapid,figure_save,burst_test_7,low,data/08_reporting/burst/thread_7/burst_007.png,190,8,sync_none,medium,4.4,30,data_visualization,figure_burst_007,success,2.5
+exec_045,thread_8,proc_0,burst_rapid,figure_save,burst_test_8,low,data/08_reporting/burst/thread_8/burst_008.png,195,8,sync_none,medium,4.6,35,data_visualization,figure_burst_008,success,2.5
+
+# Multi-Process Testing - Process-Level Concurrency
+exec_046,thread_1,proc_1,multi_process,figure_save,process_test_a,medium,data/08_reporting/process_1/proc_a_001.png,200,2,sync_start,low,5.0,0,data_visualization,figure_proc_a_001,success,1.8
+exec_047,thread_1,proc_2,multi_process,figure_save,process_test_b,medium,data/08_reporting/process_2/proc_b_001.png,205,2,sync_start,low,5.2,5,data_visualization,figure_proc_b_001,success,1.8
+exec_048,thread_2,proc_1,multi_process,style_resolution,process_test_a,medium,,40,2,sync_none,none,2.5,100,style_processing,style_proc_a_001,success,1.8
+exec_049,thread_2,proc_2,multi_process,style_resolution,process_test_b,medium,,42,2,sync_none,none,2.7,105,style_processing,style_proc_b_001,success,1.8
+exec_050,thread_3,proc_1,multi_process,config_load,independent_config,low,,35,2,sync_none,none,3.1,200,configuration,config_proc_1_001,success,1.8
+exec_051,thread_3,proc_2,multi_process,config_load,independent_config,low,,38,2,sync_none,none,3.3,205,configuration,config_proc_2_001,success,1.8
+
+# Race Condition Testing - Critical Section Operations
+exec_052,thread_1,proc_0,race_condition,config_update,shared_config_race,medium,,55,4,sync_critical,very_high,4.5,0,configuration,config_race_001,success,2.8
+exec_053,thread_2,proc_0,race_condition,config_read,shared_config_race,medium,,25,4,sync_critical,very_high,2.2,5,configuration,config_race_002,success,2.8
+exec_054,thread_3,proc_0,race_condition,config_update,shared_config_race,medium,,60,4,sync_critical,very_high,4.8,10,configuration,config_race_003,success,2.8
+exec_055,thread_4,proc_0,race_condition,config_read,shared_config_race,medium,,28,4,sync_critical,very_high,2.4,15,configuration,config_race_004,success,2.8
+exec_056,thread_1,proc_0,race_condition,style_cache_update,shared_style_cache,high,,45,4,sync_critical,very_high,3.8,100,cache_management,style_cache_race_001,success,2.8
+exec_057,thread_2,proc_0,race_condition,style_cache_read,shared_style_cache,high,,20,4,sync_critical,very_high,1.8,105,cache_management,style_cache_race_002,success,2.8
+exec_058,thread_3,proc_0,race_condition,style_cache_invalidate,shared_style_cache,high,,35,4,sync_critical,very_high,3.2,110,cache_management,style_cache_race_003,success,2.8
+exec_059,thread_4,proc_0,race_condition,style_cache_read,shared_style_cache,high,,22,4,sync_critical,very_high,2.0,115,cache_management,style_cache_race_004,success,2.8
+
+# Deadlock Prevention Testing
+exec_060,thread_1,proc_0,deadlock_prevention,resource_lock_a_then_b,dual_resource_test,medium,,180,2,sync_order_1,very_high,6.5,0,resource_management,deadlock_prev_001,success,3.5
+exec_061,thread_2,proc_0,deadlock_prevention,resource_lock_b_then_a,dual_resource_test,medium,,185,2,sync_order_2,very_high,6.7,10,resource_management,deadlock_prev_002,success,3.5
+exec_062,thread_1,proc_0,deadlock_prevention,release_resource_a,dual_resource_test,medium,,25,2,sync_release_1,high,2.1,200,resource_management,deadlock_prev_003,success,3.5
+exec_063,thread_2,proc_0,deadlock_prevention,release_resource_b,dual_resource_test,medium,,27,2,sync_release_2,high,2.3,210,resource_management,deadlock_prev_004,success,3.5
+
+# Memory Pressure Under Concurrency
+exec_064,thread_1,proc_0,memory_pressure,figure_save_large,memory_stress_a,extreme,data/08_reporting/memory/thread_1/large_001.png,300,4,sync_start,high,15.2,0,data_visualization,figure_memory_a_001,success,4.0
+exec_065,thread_2,proc_0,memory_pressure,figure_save_large,memory_stress_b,extreme,data/08_reporting/memory/thread_2/large_002.png,310,4,sync_start,high,15.8,5,data_visualization,figure_memory_b_001,success,4.0
+exec_066,thread_3,proc_0,memory_pressure,figure_save_large,memory_stress_c,extreme,data/08_reporting/memory/thread_3/large_003.png,320,4,sync_start,high,16.1,10,data_visualization,figure_memory_c_001,success,4.0
+exec_067,thread_4,proc_0,memory_pressure,figure_save_large,memory_stress_d,extreme,data/08_reporting/memory/thread_4/large_004.png,315,4,sync_start,high,15.9,15,data_visualization,figure_memory_d_001,success,4.0
+exec_068,thread_1,proc_0,memory_pressure,gc_collection,memory_cleanup,low,,75,4,sync_barrier,medium,8.2,500,memory_management,gc_collect_001,success,4.0
+exec_069,thread_2,proc_0,memory_pressure,memory_check,memory_validation,low,,15,4,sync_none,low,1.5,600,memory_management,memory_check_001,success,4.0
+
+# Performance Degradation Validation
+exec_070,thread_1,proc_0,performance_validation,figure_save,perf_baseline_single,medium,data/08_reporting/perf/single/baseline_001.png,175,1,sync_none,none,4.2,0,data_visualization,figure_perf_single_001,success,1.0
+exec_071,thread_1,proc_0,performance_validation,figure_save,perf_test_dual_a,medium,data/08_reporting/perf/dual/test_a_001.png,190,2,sync_start,low,4.5,100,data_visualization,figure_perf_dual_a_001,success,1.1
+exec_072,thread_2,proc_0,performance_validation,figure_save,perf_test_dual_b,medium,data/08_reporting/perf/dual/test_b_001.png,195,2,sync_start,low,4.7,105,data_visualization,figure_perf_dual_b_001,success,1.1
+exec_073,thread_1,proc_0,performance_validation,figure_save,perf_test_quad_a,medium,data/08_reporting/perf/quad/test_a_001.png,205,4,sync_start,medium,5.1,200,data_visualization,figure_perf_quad_a_001,success,1.2
+exec_074,thread_2,proc_0,performance_validation,figure_save,perf_test_quad_b,medium,data/08_reporting/perf/quad/test_b_001.png,210,4,sync_start,medium,5.3,205,data_visualization,figure_perf_quad_b_001,success,1.2
+exec_075,thread_3,proc_0,performance_validation,figure_save,perf_test_quad_c,medium,data/08_reporting/perf/quad/test_c_001.png,215,4,sync_start,medium,5.5,210,data_visualization,figure_perf_quad_c_001,success,1.2
+exec_076,thread_4,proc_0,performance_validation,figure_save,perf_test_quad_d,medium,data/08_reporting/perf/quad/test_d_001.png,220,4,sync_start,medium,5.7,215,data_visualization,figure_perf_quad_d_001,success,1.2
+
+# Thread Safety Edge Cases
+exec_077,thread_1,proc_0,edge_cases,simultaneous_start,edge_test_sync,high,data/08_reporting/edge/thread_1/sync_001.png,225,8,sync_precise,very_high,7.1,0,data_visualization,figure_edge_sync_001,success,3.2
+exec_078,thread_2,proc_0,edge_cases,simultaneous_start,edge_test_sync,high,data/08_reporting/edge/thread_2/sync_002.png,230,8,sync_precise,very_high,7.3,0,data_visualization,figure_edge_sync_002,success,3.2
+exec_079,thread_3,proc_0,edge_cases,simultaneous_start,edge_test_sync,high,data/08_reporting/edge/thread_3/sync_003.png,235,8,sync_precise,very_high,7.5,0,data_visualization,figure_edge_sync_003,success,3.2
+exec_080,thread_4,proc_0,edge_cases,context_switch,edge_test_context,medium,,45,8,sync_none,high,3.8,100,context_management,context_switch_001,success,3.2
+exec_081,thread_5,proc_0,edge_cases,interrupt_handling,edge_test_interrupt,low,,35,8,sync_none,medium,2.9,150,interrupt_management,interrupt_handle_001,success,3.2
+
+# Recovery and Resilience Testing
+exec_082,thread_1,proc_0,resilience,failure_recovery,recovery_test_a,medium,data/08_reporting/recovery/thread_1/recovery_001.png,280,4,sync_recovery,high,6.2,0,data_visualization,figure_recovery_001,recovered,2.5
+exec_083,thread_2,proc_0,resilience,timeout_handling,recovery_test_timeout,high,,120,4,sync_timeout,very_high,4.8,50,timeout_management,timeout_handle_001,timeout_recovered,2.5
+exec_084,thread_3,proc_0,resilience,resource_exhaustion,recovery_test_resource,extreme,,200,4,sync_resource,very_high,12.5,100,resource_management,resource_recovery_001,resource_recovered,2.5
+exec_085,thread_4,proc_0,resilience,graceful_degradation,recovery_test_degrade,high,data/08_reporting/recovery/thread_4/degraded_001.png,350,4,sync_degrade,high,8.1,150,data_visualization,figure_degraded_001,degraded_success,2.5
+
+# Long-Duration Stability Testing
+exec_086,thread_1,proc_0,stability_long,sustained_operation_1,stability_test_a,medium,data/08_reporting/stability/thread_1/sustained_001.png,180,2,sync_sustained,low,4.5,0,data_visualization,figure_sustained_001,success,1.5
+exec_087,thread_2,proc_0,stability_long,sustained_operation_2,stability_test_b,medium,data/08_reporting/stability/thread_2/sustained_002.png,185,2,sync_sustained,low,4.7,1000,data_visualization,figure_sustained_002,success,1.5
+exec_088,thread_1,proc_0,stability_long,sustained_operation_3,stability_test_a,medium,data/08_reporting/stability/thread_1/sustained_003.png,190,2,sync_sustained,low,4.9,2000,data_visualization,figure_sustained_003,success,1.5
+exec_089,thread_2,proc_0,stability_long,sustained_operation_4,stability_test_b,medium,data/08_reporting/stability/thread_2/sustained_004.png,195,2,sync_sustained,low,5.1,3000,data_visualization,figure_sustained_004,success,1.5
+exec_090,thread_1,proc_0,stability_long,sustained_operation_5,stability_test_a,medium,data/08_reporting/stability/thread_1/sustained_005.png,200,2,sync_sustained,low,5.3,4000,data_visualization,figure_sustained_005,success,1.5
+
+# Cross-Platform Concurrency Validation
+exec_091,thread_1,proc_0,cross_platform,platform_test_linux,cross_platform_a,medium,data/08_reporting/cross_platform/linux/thread_1/cross_001.png,185,4,sync_platform,medium,4.8,0,data_visualization,figure_cross_linux_001,success,1.8
+exec_092,thread_2,proc_0,cross_platform,platform_test_windows,cross_platform_b,medium,data/08_reporting/cross_platform/windows/thread_2/cross_002.png,190,4,sync_platform,medium,5.0,10,data_visualization,figure_cross_windows_002,success,1.8
+exec_093,thread_3,proc_0,cross_platform,platform_test_macos,cross_platform_c,medium,data/08_reporting/cross_platform/macos/thread_3/cross_003.png,195,4,sync_platform,medium,5.2,20,data_visualization,figure_cross_macos_003,success,1.8
+exec_094,thread_4,proc_0,cross_platform,file_system_sync,cross_platform_fs,low,,55,4,sync_filesystem,high,3.2,30,filesystem_management,filesystem_sync_001,success,1.8
+
+# Final Cleanup and Validation
+exec_095,thread_1,proc_0,cleanup_validation,cleanup_temp_files,cleanup_test,low,,40,1,sync_cleanup,none,2.1,0,cleanup_management,cleanup_temp_001,success,1.0
+exec_096,thread_1,proc_0,cleanup_validation,validate_consistency,validation_test,low,,30,1,sync_validation,none,1.8,100,validation_management,validate_consistency_001,success,1.0
+exec_097,thread_1,proc_0,cleanup_validation,memory_leak_check,memory_leak_test,low,,25,1,sync_memory,none,1.5,200,memory_management,memory_leak_check_001,success,1.0
+exec_098,thread_1,proc_0,cleanup_validation,performance_summary,performance_summary_test,low,,20,1,sync_summary,none,1.2,300,performance_management,performance_summary_001,success,1.0
+exec_099,thread_1,proc_0,cleanup_validation,test_completion,completion_test,low,,15,1,sync_completion,none,1.0,400,test_management,test_completion_001,success,1.0
+exec_100,thread_1,proc_0,cleanup_validation,final_validation,final_test,low,,10,1,sync_final,none,0.8,500,validation_management,final_validation_001,success,1.0
