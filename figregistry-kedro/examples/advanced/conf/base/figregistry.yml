@@ -1,0 +1,715 @@
+# Advanced FigRegistry Configuration for Kedro Integration
+# =====================================================
+# 
+# This configuration demonstrates sophisticated styling patterns and enterprise-grade
+# visualization management capabilities of FigRegistry integrated with Kedro's 
+# multi-environment configuration system. It showcases advanced features including
+# hierarchical condition styles, complex palette management, multi-purpose output
+# configurations, and seamless compatibility with both standalone FigRegistry usage
+# and automated Kedro pipeline operations.
+#
+# Features Demonstrated:
+# - Complex condition-based styling with wildcard matching (F-002)
+# - Sophisticated palette management with inheritance patterns
+# - Enterprise-grade output path configurations (F-004)
+# - Advanced configuration bridge compatibility (F-007)
+# - Multi-environment support for development, staging, and production workflows
+# - Publication-ready styling patterns for scientific visualizations
+
+# ==============================================================================
+# FIGREGISTRY VERSION AND COMPATIBILITY
+# ==============================================================================
+
+figregistry_version: ">=0.3.0"
+
+# Kedro-specific integration settings for advanced configuration bridge
+kedro:
+  # Enable advanced configuration merging through FigRegistryConfigBridge
+  enable_config_bridge: true
+  
+  # Multi-environment support with precedence rules
+  environment_overrides: true
+  
+  # Advanced dataset integration settings
+  dataset_integration:
+    enable_context_injection: true
+    enable_parameter_resolution: true
+    enable_run_metadata_styling: true
+  
+  # Performance optimization settings
+  performance:
+    enable_caching: true
+    cache_ttl_seconds: 300
+    enable_concurrent_access: true
+
+# ==============================================================================
+# ADVANCED PALETTE DEFINITIONS
+# ==============================================================================
+
+palettes:
+  # Scientific publication palette with professional color scheme
+  publication:
+    primary: "#2E86AB"      # Professional blue
+    secondary: "#A23B72"    # Complementary magenta
+    accent: "#F18F01"       # Attention orange
+    success: "#C73E1D"      # Status red
+    neutral: "#6C757D"      # Neutral gray
+    background: "#FFFFFF"   # Clean white
+    
+  # High-contrast palette for presentations and demos
+  presentation:
+    primary: "#1B365D"      # Deep navy
+    secondary: "#F4A261"    # Warm orange
+    accent: "#E76F51"       # Coral red
+    success: "#2A9D8F"      # Teal green
+    neutral: "#264653"      # Dark slate
+    background: "#F8F9FA"   # Light gray background
+    
+  # Exploration palette optimized for data analysis and debugging
+  exploration:
+    primary: "#4C72B0"      # Data blue
+    secondary: "#55A868"    # Analysis green
+    accent: "#C44E52"       # Warning red
+    success: "#8172B2"      # Insight purple
+    neutral: "#937860"      # Neutral brown
+    background: "#FEFEFE"   # Pure white
+    
+  # Extended scientific palette for complex experimental conditions
+  extended_scientific:
+    control: "#95A5A6"      # Neutral control
+    baseline: "#3498DB"     # Baseline blue
+    treatment_a: "#E74C3C"  # Treatment red
+    treatment_b: "#F39C12"  # Treatment orange
+    treatment_c: "#9B59B6"  # Treatment purple
+    treatment_d: "#1ABC9C"  # Treatment teal
+    positive: "#27AE60"     # Positive green
+    negative: "#E67E22"     # Negative orange
+    
+  # Colorblind-accessible palette ensuring universal readability
+  accessible:
+    primary: "#1f77b4"      # Blue (protanopia safe)
+    secondary: "#ff7f0e"    # Orange (deuteranopia safe)
+    accent: "#2ca02c"       # Green (tritanopia safe)
+    highlight: "#d62728"    # Red (high contrast)
+    neutral: "#7f7f7f"      # Gray (universal)
+    background: "#ffffff"   # White background
+
+# ==============================================================================
+# SOPHISTICATED CONDITION-BASED STYLING
+# ==============================================================================
+
+styles:
+  # Advanced experimental condition mappings with hierarchical inheritance
+  
+  # === TRAINING PIPELINE CONDITIONS ===
+  # Sophisticated ML training workflow styling patterns
+  
+  # Training data quality conditions
+  "training.data.raw":
+    color: "palettes.exploration.primary"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Raw Training Data"
+    
+  "training.data.cleaned":
+    color: "palettes.exploration.secondary"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.9
+    label: "Cleaned Training Data"
+    
+  "training.data.transformed":
+    color: "palettes.exploration.accent"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 7
+    alpha: 1.0
+    label: "Transformed Training Data"
+    
+  # Model performance tracking conditions
+  "training.model.baseline":
+    color: "palettes.extended_scientific.baseline"
+    marker: "D"
+    linestyle: "--"
+    linewidth: 3.0
+    markersize: 8
+    alpha: 0.9
+    label: "Baseline Model"
+    
+  "training.model.candidate":
+    color: "palettes.extended_scientific.treatment_a"
+    marker: "h"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 7
+    alpha: 0.95
+    label: "Candidate Model"
+    
+  "training.model.champion":
+    color: "palettes.extended_scientific.positive"
+    marker: "*"
+    linestyle: "-"
+    linewidth: 3.5
+    markersize: 10
+    alpha: 1.0
+    label: "Champion Model"
+    
+  # === INFERENCE PIPELINE CONDITIONS ===
+  # Production inference workflow styling patterns
+  
+  "inference.prediction.batch":
+    color: "palettes.presentation.primary"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 5
+    alpha: 0.8
+    label: "Batch Predictions"
+    
+  "inference.prediction.realtime":
+    color: "palettes.presentation.secondary"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 6
+    alpha: 0.9
+    label: "Real-time Predictions"
+    
+  "inference.confidence.high":
+    color: "palettes.extended_scientific.positive"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 7
+    alpha: 1.0
+    label: "High Confidence"
+    
+  "inference.confidence.medium":
+    color: "palettes.extended_scientific.treatment_b"
+    marker: "s"
+    linestyle: "--"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Medium Confidence"
+    
+  "inference.confidence.low":
+    color: "palettes.extended_scientific.negative"
+    marker: "x"
+    linestyle: ":"
+    linewidth: 1.5
+    markersize: 6
+    alpha: 0.7
+    label: "Low Confidence"
+    
+  # === REPORTING PIPELINE CONDITIONS ===
+  # Publication and presentation workflow styling patterns
+  
+  "reporting.summary.executive":
+    color: "palettes.publication.primary"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 3.0
+    markersize: 8
+    alpha: 1.0
+    label: "Executive Summary"
+    
+  "reporting.summary.technical":
+    color: "palettes.publication.secondary"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 7
+    alpha: 0.95
+    label: "Technical Summary"
+    
+  "reporting.detail.performance":
+    color: "palettes.publication.accent"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.9
+    label: "Performance Details"
+    
+  # === WILDCARD AND HIERARCHICAL PATTERNS ===
+  # Advanced pattern matching for flexible experimental design
+  
+  # Training pipeline wildcards (F-002-RQ-002)
+  "training.*":
+    # Base styling for all training-related conditions
+    linewidth: 2.0
+    alpha: 0.85
+    markeredgewidth: 1.0
+    markeredgecolor: "black"
+    
+  "training.*.baseline":
+    # Specific styling for all baseline conditions in training
+    linestyle: "--"
+    marker: "D"
+    markersize: 8
+    
+  "training.*.experimental":
+    # Specific styling for all experimental conditions in training
+    linestyle: "-"
+    marker: "o"
+    markersize: 7
+    
+  # Inference pipeline wildcards
+  "inference.*":
+    # Base styling for all inference-related conditions
+    linewidth: 2.5
+    alpha: 0.9
+    markeredgewidth: 0.5
+    
+  "inference.*.production":
+    # Production environment styling
+    color: "palettes.presentation.primary"
+    linestyle: "-"
+    marker: "s"
+    
+  "inference.*.staging":
+    # Staging environment styling
+    color: "palettes.presentation.secondary"
+    linestyle: "--"
+    marker: "^"
+    
+  # Environment-specific wildcard patterns
+  "*.development":
+    # Development environment base styling
+    alpha: 0.7
+    linestyle: ":"
+    linewidth: 1.5
+    
+  "*.staging":
+    # Staging environment base styling
+    alpha: 0.8
+    linestyle: "--"
+    linewidth: 2.0
+    
+  "*.production":
+    # Production environment base styling
+    alpha: 1.0
+    linestyle: "-"
+    linewidth: 2.5
+    
+  # === ADVANCED EXPERIMENTAL CONDITIONS ===
+  # Complex scientific experimental patterns
+  
+  "experiment.control":
+    color: "palettes.extended_scientific.control"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Control Group"
+    
+  "experiment.treatment.group_a":
+    color: "palettes.extended_scientific.treatment_a"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.9
+    label: "Treatment Group A"
+    
+  "experiment.treatment.group_b":
+    color: "palettes.extended_scientific.treatment_b"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.9
+    label: "Treatment Group B"
+    
+  "experiment.treatment.group_c":
+    color: "palettes.extended_scientific.treatment_c"
+    marker: "v"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.9
+    label: "Treatment Group C"
+    
+  "experiment.treatment.group_d":
+    color: "palettes.extended_scientific.treatment_d"
+    marker: ">"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.9
+    label: "Treatment Group D"
+    
+  # Statistical significance indicators
+  "result.significant.p001":
+    color: "palettes.extended_scientific.positive"
+    marker: "***"
+    linestyle: "-"
+    linewidth: 3.0
+    markersize: 10
+    alpha: 1.0
+    label: "p < 0.001 (***)"
+    
+  "result.significant.p01":
+    color: "palettes.extended_scientific.positive"
+    marker: "**"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 0.9
+    label: "p < 0.01 (**)"
+    
+  "result.significant.p05":
+    color: "palettes.extended_scientific.positive"
+    marker: "*"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 7
+    alpha: 0.8
+    label: "p < 0.05 (*)"
+    
+  "result.not_significant":
+    color: "palettes.extended_scientific.neutral"
+    marker: "o"
+    linestyle: ":"
+    linewidth: 1.5
+    markersize: 5
+    alpha: 0.6
+    label: "Not Significant"
+
+# ==============================================================================
+# ENTERPRISE OUTPUT CONFIGURATIONS
+# ==============================================================================
+
+outputs:
+  # Multi-purpose output path aliases supporting various workflows (F-004)
+  
+  # Base output configuration with enterprise-grade organization
+  base_path: "data/08_reporting/figures"
+  
+  # Advanced timestamp formatting for versioning and reproducibility
+  timestamp_format: "{name}_{ts:%Y%m%d_%H%M%S}"
+  
+  # Sophisticated path aliases for different use cases
+  aliases:
+    # Exploration alias for data analysis and debugging
+    expl: "data/08_reporting/figures/exploration"
+    exploration: "data/08_reporting/figures/exploration"
+    debug: "data/08_reporting/figures/exploration/debug"
+    analysis: "data/08_reporting/figures/exploration/analysis"
+    
+    # Presentation alias for internal meetings and demos
+    pres: "data/08_reporting/figures/presentation"
+    presentation: "data/08_reporting/figures/presentation"
+    demo: "data/08_reporting/figures/presentation/demos"
+    meeting: "data/08_reporting/figures/presentation/meetings"
+    stakeholder: "data/08_reporting/figures/presentation/stakeholders"
+    
+    # Publication alias for external sharing and reports
+    pub: "data/08_reporting/figures/publication"
+    publication: "data/08_reporting/figures/publication"
+    paper: "data/08_reporting/figures/publication/papers"
+    report: "data/08_reporting/figures/publication/reports"
+    journal: "data/08_reporting/figures/publication/journals"
+    conference: "data/08_reporting/figures/publication/conferences"
+    
+    # Pipeline-specific aliases for automated workflows
+    training: "data/08_reporting/figures/pipelines/training"
+    inference: "data/08_reporting/figures/pipelines/inference"
+    reporting: "data/08_reporting/figures/pipelines/reporting"
+    
+    # Environment-specific aliases
+    development: "data/08_reporting/figures/environments/development"
+    staging: "data/08_reporting/figures/environments/staging"
+    production: "data/08_reporting/figures/environments/production"
+    
+    # Quality assurance and validation aliases
+    validation: "data/08_reporting/figures/validation"
+    testing: "data/08_reporting/figures/testing"
+    quality_check: "data/08_reporting/figures/quality"
+    
+  # Advanced format specifications with quality optimization
+  formats:
+    # High-quality PNG for web and presentations
+    png:
+      dpi: 300
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      transparent: false
+      
+    # Vector PDF for publications and print
+    pdf:
+      dpi: 300
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      backend: "pdf"
+      
+    # Scalable SVG for web and interactive applications
+    svg:
+      dpi: 300
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      transparent: true
+      
+  # Directory management settings
+  create_directories: true
+  directory_permissions: 0o755
+  
+  # Metadata and versioning settings
+  include_metadata: true
+  metadata_format: "yaml"
+  versioning:
+    enable: true
+    strategy: "timestamp"
+    keep_versions: 10
+    
+  # Performance optimization settings
+  compression:
+    enable: true
+    level: 6
+    
+  validation:
+    enable: true
+    check_file_size: true
+    max_file_size_mb: 50
+
+# ==============================================================================
+# SOPHISTICATED DEFAULT CONFIGURATIONS
+# ==============================================================================
+
+defaults:
+  # Advanced matplotlib style defaults for enterprise-grade visualizations
+  style:
+    # Figure configuration
+    figure.figsize: [10, 6]
+    figure.dpi: 100
+    figure.facecolor: "white"
+    figure.edgecolor: "none"
+    figure.autolayout: true
+    
+    # Font configuration optimized for readability
+    font.family: ["DejaVu Sans", "Arial", "Helvetica", "sans-serif"]
+    font.size: 12
+    font.weight: "normal"
+    
+    # Axes configuration for professional appearance
+    axes.linewidth: 1.0
+    axes.edgecolor: "#333333"
+    axes.facecolor: "white"
+    axes.grid: true
+    axes.axisbelow: true
+    axes.labelsize: 12
+    axes.titlesize: 14
+    axes.titleweight: "bold"
+    axes.spines.top: false
+    axes.spines.right: false
+    
+    # Grid configuration for subtle guidance
+    grid.color: "#E0E0E0"
+    grid.linewidth: 0.5
+    grid.alpha: 0.7
+    
+    # Legend configuration for clarity
+    legend.frameon: true
+    legend.fancybox: true
+    legend.shadow: false
+    legend.framealpha: 0.9
+    legend.edgecolor: "#CCCCCC"
+    legend.facecolor: "white"
+    legend.fontsize: 10
+    
+    # Line configuration for visibility
+    lines.linewidth: 2.0
+    lines.markersize: 6
+    lines.markeredgewidth: 1.0
+    
+    # Tick configuration for professional appearance
+    xtick.labelsize: 10
+    ytick.labelsize: 10
+    xtick.direction: "out"
+    ytick.direction: "out"
+    xtick.major.size: 5
+    ytick.major.size: 5
+    xtick.minor.size: 3
+    ytick.minor.size: 3
+    
+  # Default condition styling fallback patterns
+  condition_fallback:
+    color: "palettes.publication.neutral"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    markersize: 5
+    alpha: 0.7
+    label: "Undefined Condition"
+    
+  # Default palette selection priority
+  palette_priority:
+    - "publication"      # First choice for undefined contexts
+    - "presentation"     # Second choice for presentation contexts
+    - "exploration"      # Third choice for analysis contexts
+    - "accessible"       # Fallback for accessibility requirements
+    
+  # Performance and quality defaults
+  performance:
+    enable_caching: true
+    cache_style_lookups: true
+    optimize_rendering: true
+    
+  quality:
+    enable_validation: true
+    validate_colors: true
+    validate_markers: true
+    validate_fonts: true
+
+# ==============================================================================
+# ADVANCED METADATA AND DOCUMENTATION
+# ==============================================================================
+
+metadata:
+  # Configuration metadata for tracking and versioning
+  version: "1.0.0"
+  created: "2024-12-19"
+  author: "FigRegistry-Kedro Advanced Example"
+  description: >
+    Advanced FigRegistry configuration demonstrating sophisticated styling patterns,
+    enterprise-grade output management, and seamless Kedro integration capabilities.
+    This configuration showcases complex condition-based styling, hierarchical
+    palette management, multi-purpose output configurations, and comprehensive
+    workflow automation for data science and machine learning pipelines.
+    
+  purpose: "advanced_example"
+  
+  # Feature flags for advanced capabilities
+  features:
+    enable_wildcard_matching: true
+    enable_hierarchical_styles: true
+    enable_palette_inheritance: true
+    enable_advanced_output_management: true
+    enable_metadata_tracking: true
+    enable_performance_optimization: true
+    
+  # Compatibility and integration settings
+  compatibility:
+    kedro_versions: [">=0.18.0", "<0.20.0"]
+    figregistry_versions: [">=0.3.0"]
+    python_versions: [">=3.10"]
+    
+  # Documentation and examples
+  documentation:
+    readme_path: "docs/README.md"
+    api_reference: "docs/api/"
+    examples_path: "examples/advanced/"
+    
+  # Quality assurance settings
+  quality_assurance:
+    validation_enabled: true
+    performance_monitoring: true
+    compatibility_testing: true
+    accessibility_compliance: true
+
+# ==============================================================================
+# KEDRO-SPECIFIC ADVANCED INTEGRATION SETTINGS
+# ==============================================================================
+
+kedro_integration:
+  # Advanced dataset configuration mapping
+  dataset_mappings:
+    # Training pipeline dataset purposes
+    training_figures:
+      purpose: "exploration"
+      condition_param: "model_type"
+      style_params:
+        default_condition: "training.model.baseline"
+        environment_condition: "training.{environment}"
+        
+    # Inference pipeline dataset purposes  
+    inference_figures:
+      purpose: "presentation"
+      condition_param: "prediction_type"
+      style_params:
+        default_condition: "inference.prediction.batch"
+        confidence_condition: "inference.confidence.{confidence_level}"
+        
+    # Reporting pipeline dataset purposes
+    reporting_figures:
+      purpose: "publication"
+      condition_param: "report_type"
+      style_params:
+        default_condition: "reporting.summary.executive"
+        detail_condition: "reporting.detail.{report_section}"
+        
+  # Environment-specific configuration overrides
+  environment_overrides:
+    development:
+      # Faster rendering for development
+      defaults.style.figure.dpi: 72
+      outputs.formats.png.dpi: 150
+      defaults.performance.optimize_rendering: false
+      
+    staging:
+      # Balanced quality for staging validation
+      defaults.style.figure.dpi: 150
+      outputs.formats.png.dpi: 200
+      defaults.performance.optimize_rendering: true
+      
+    production:
+      # Maximum quality for production outputs
+      defaults.style.figure.dpi: 300
+      outputs.formats.png.dpi: 300
+      defaults.performance.optimize_rendering: true
+      defaults.quality.enable_validation: true
+      
+  # Advanced parameter resolution patterns
+  parameter_resolution:
+    # Dynamic condition resolution from pipeline parameters
+    condition_templates:
+      model_performance: "training.model.{model_name}"
+      prediction_quality: "inference.confidence.{confidence_threshold}"
+      report_section: "reporting.detail.{section_name}"
+      experimental_group: "experiment.treatment.{group_id}"
+      
+    # Parameter validation rules
+    validation_rules:
+      model_name: ["baseline", "candidate", "champion"]
+      confidence_threshold: ["high", "medium", "low"]
+      section_name: ["performance", "summary", "technical"]
+      group_id: ["group_a", "group_b", "group_c", "group_d"]
+      
+  # Performance monitoring and optimization
+  performance_monitoring:
+    enable_timing: true
+    enable_memory_tracking: false
+    enable_cache_metrics: true
+    
+    # Performance targets for validation
+    targets:
+      style_lookup_ms: 1.0
+      config_merge_ms: 10.0
+      figure_save_overhead_percent: 5.0
+      
+  # Advanced error handling and recovery
+  error_handling:
+    fallback_to_defaults: true
+    log_configuration_errors: true
+    enable_graceful_degradation: true
+    
+    # Error recovery strategies
+    recovery_strategies:
+      invalid_condition: "use_fallback"
+      missing_palette: "use_default_palette"
+      invalid_output_path: "use_base_path"
+      configuration_merge_error: "use_figregistry_only"
