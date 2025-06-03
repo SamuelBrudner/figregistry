@@ -1,0 +1,363 @@
+# Traditional Kedro Parameters Configuration (Before FigRegistry Integration)
+# This file demonstrates the fragmented parameter management and hardcoded styling
+# approach that requires manual maintenance across multiple pipeline nodes.
+
+# ============================================================================
+# EXPERIMENTAL CONDITIONS - Manual Management Required
+# ============================================================================
+# These experimental parameters require manual updates across environments
+# and careful coordination between nodes to maintain consistency
+experiment:
+  name: "baseline_experiment_v2"
+  version: "2.1"
+  dataset_size: "medium"
+  algorithm: "random_forest"
+  feature_count: 150
+  cross_validation_folds: 5
+  random_seed: 42
+
+# Model training parameters that affect visualization
+model_training:
+  learning_rate: 0.001
+  batch_size: 32
+  epochs: 100
+  validation_split: 0.2
+
+# ============================================================================
+# FRAGMENTED PLOTTING PARAMETERS - Scattered Across Sections
+# ============================================================================
+
+# Data exploration plot settings (duplicated styling)
+data_exploration_plots:
+  figure_size_width: 12
+  figure_size_height: 8
+  dpi: 300
+  facecolor: "white"
+  edgecolor: "black"
+  
+  # Hardcoded color scheme for EDA plots
+  primary_color: "#2E86AB"
+  secondary_color: "#A23B72"
+  accent_color: "#F18F01"
+  background_color: "#C73E1D"
+  
+  # Font settings repeated multiple times
+  title_fontsize: 16
+  axis_label_fontsize: 12
+  tick_label_fontsize: 10
+  legend_fontsize: 11
+  
+  # Grid and styling
+  grid_alpha: 0.3
+  grid_color: "gray"
+  grid_linestyle: "--"
+  
+  # Histogram specific settings
+  histogram_bins: 30
+  histogram_alpha: 0.7
+  histogram_color: "#2E86AB"
+  
+  # Scatter plot specific settings
+  scatter_size: 50
+  scatter_alpha: 0.6
+  scatter_marker: "o"
+
+# Model performance plot settings (different styling, inconsistent with above)
+model_performance_plots:
+  # Different figure size for model plots - inconsistent
+  fig_width: 10
+  fig_height: 6
+  resolution: 300  # Different parameter name for DPI
+  background: "white"
+  
+  # Different color scheme - no consistency
+  accuracy_color: "#4CAF50"
+  loss_color: "#F44336"
+  validation_color: "#2196F3"
+  training_color: "#FF9800"
+  
+  # Different font naming convention
+  main_title_size: 14
+  subplot_title_size: 12
+  axis_text_size: 10
+  legend_text_size: 9
+  
+  # Line plot settings
+  line_width: 2.5
+  line_style: "-"
+  marker_size: 8
+  marker_style: "s"
+  
+  # ROC curve specific settings
+  roc_line_width: 3.0
+  roc_diagonal_style: "--"
+  roc_diagonal_color: "gray"
+  roc_diagonal_alpha: 0.8
+
+# Feature importance plots (yet another different styling approach)
+feature_plots:
+  canvas_width: 14
+  canvas_height: 10
+  image_dpi: 300
+  plot_facecolor: "#FAFAFA"
+  
+  # Yet another color scheme
+  importance_bar_color: "#8E44AD"
+  importance_edge_color: "#5B2C6F"
+  correlation_positive_color: "#E74C3C"
+  correlation_negative_color: "#3498DB"
+  
+  # Bar plot specific settings
+  bar_width: 0.8
+  bar_alpha: 0.8
+  bar_edge_width: 1.2
+  
+  # Text and labels
+  feature_name_fontsize: 8
+  importance_value_fontsize: 9
+  plot_title_fontsize: 15
+
+# ============================================================================
+# MANUAL FORMAT AND OUTPUT SPECIFICATIONS
+# ============================================================================
+
+# Output formats require manual specification per plot type
+output_formats:
+  # EDA plots
+  exploration_format: "png"
+  exploration_quality: 95
+  exploration_bbox_inches: "tight"
+  exploration_pad_inches: 0.1
+  
+  # Model plots  
+  model_format: "pdf"  # Different format for different plot types
+  model_bbox: "tight"
+  model_padding: 0.2
+  
+  # Feature plots
+  feature_format: "svg"  # Yet another format
+  feature_transparent: true
+  feature_bbox_inches: "tight"
+
+# File naming patterns - manual construction required
+file_naming:
+  timestamp_format: "%Y%m%d_%H%M%S"
+  experiment_prefix: "exp"
+  model_prefix: "model"
+  data_prefix: "data"
+  separator: "_"
+
+# ============================================================================
+# ENVIRONMENT-SPECIFIC OVERRIDES (Manual Management)
+# ============================================================================
+
+# Development environment plot settings
+development:
+  quick_plots:
+    dpi: 150  # Lower quality for faster development
+    figure_size: [8, 6]
+    save_format: "png"
+    
+# Production environment plot settings  
+production:
+  high_quality_plots:
+    dpi: 600  # High quality for reports
+    figure_size: [12, 9]
+    save_format: "pdf"
+
+# ============================================================================
+# ALGORITHM-SPECIFIC PARAMETERS (Conditioning Logic Required)
+# ============================================================================
+
+# Random Forest specific visualization parameters
+random_forest:
+  tree_visualization:
+    max_depth_display: 3
+    feature_name_fontsize: 8
+    node_color: "#E8F4FD"
+    edge_color: "#1976D2"
+    
+  feature_importance:
+    top_features: 20
+    bar_color: "#4CAF50"
+    threshold_line_color: "#FF5722"
+
+# SVM specific visualization parameters
+svm:
+  decision_boundary:
+    mesh_step_size: 0.02
+    contour_alpha: 0.8
+    support_vector_color: "#FF6B35"
+    decision_boundary_colors: ["#FFE66D", "#FF6B35", "#C73E1D"]
+
+# Neural Network specific parameters
+neural_network:
+  architecture_plot:
+    node_size: 100
+    edge_width: 2.0
+    layer_spacing: 3.0
+    node_colors: ["#3498DB", "#E74C3C", "#2ECC71"]
+    
+  training_curves:
+    smoothing_window: 10
+    curve_alpha: 0.8
+    validation_style: "--"
+
+# ============================================================================
+# MANUAL DATASET SIZE CONDITIONING
+# ============================================================================
+
+# Small dataset parameters
+small_dataset:
+  sample_plots:
+    bins: 20
+    alpha: 0.9
+    marker_size: 80
+    
+# Medium dataset parameters  
+medium_dataset:
+  sample_plots:
+    bins: 30
+    alpha: 0.7
+    marker_size: 60
+    
+# Large dataset parameters
+large_dataset:
+  sample_plots:
+    bins: 50
+    alpha: 0.5
+    marker_size: 40
+    subsample_rate: 0.1  # Need to subsample for performance
+
+# ============================================================================
+# CROSS-VALIDATION VISUALIZATION PARAMETERS
+# ============================================================================
+
+cv_plots:
+  fold_colors: 
+    - "#FF6B6B"  # Fold 1
+    - "#4ECDC4"  # Fold 2  
+    - "#45B7D1"  # Fold 3
+    - "#96CEB4"  # Fold 4
+    - "#FFEAA7"  # Fold 5
+  
+  box_plot_settings:
+    box_width: 0.6
+    whisker_props:
+      color: "#2C3E50"
+      linewidth: 1.5
+    median_props:
+      color: "#E74C3C"
+      linewidth: 2.0
+    flier_props:
+      marker: "o"
+      markersize: 5
+      alpha: 0.6
+
+# ============================================================================
+# REPORT GENERATION PARAMETERS
+# ============================================================================
+
+# Final report plot specifications - manual sizing required
+report_plots:
+  executive_summary:
+    width: 16
+    height: 12
+    title_fontsize: 20
+    subtitle_fontsize: 16
+    
+  technical_appendix:
+    width: 12
+    height: 8
+    title_fontsize: 14
+    subplot_title_fontsize: 12
+    
+  # Manual page layout specifications
+  page_layout:
+    margin_top: 1.0
+    margin_bottom: 1.0
+    margin_left: 0.8
+    margin_right: 0.8
+    subplot_spacing: 0.3
+
+# ============================================================================
+# COMPARISON BASELINE PARAMETERS
+# ============================================================================
+
+# Baseline algorithm comparison colors - manual assignment
+baseline_comparison:
+  algorithm_colors:
+    logistic_regression: "#3498DB"
+    random_forest: "#2ECC71"  
+    svm: "#E74C3C"
+    neural_network: "#9B59B6"
+    gradient_boosting: "#F39C12"
+    naive_bayes: "#1ABC9C"
+    
+  performance_metrics:
+    line_styles:
+      accuracy: "-"
+      precision: "--"
+      recall: "-."
+      f1_score: ":"
+    
+    marker_styles:
+      training: "o"
+      validation: "s"
+      test: "^"
+
+# Manual threshold parameters for different scenarios
+thresholds:
+  classification:
+    high_precision: 0.85
+    balanced: 0.5
+    high_recall: 0.3
+    
+  feature_selection:
+    importance_cutoff: 0.05
+    correlation_limit: 0.95
+    variance_threshold: 0.01
+
+# ============================================================================
+# MANUAL STYLE COORDINATION ACROSS NODES
+# ============================================================================
+
+# These parameters need to be manually kept in sync across pipeline nodes
+# Any changes require updating multiple node functions individually
+
+global_style_attempt:
+  # Attempt at consistent styling (but not enforced)
+  primary_palette:
+    - "#2E86AB"  # Primary blue
+    - "#A23B72"  # Primary magenta  
+    - "#F18F01"  # Primary orange
+    - "#C73E1D"  # Primary red
+    
+  # Font family preferences (not consistently applied)
+  font_family: "DejaVu Sans"
+  math_font: "DejaVu Serif"
+  
+  # Common figure parameters (often overridden locally)
+  standard_dpi: 300
+  standard_format: "png"
+  standard_bbox: "tight"
+  
+# Node-specific overrides that break consistency
+node_specific_overrides:
+  data_loading_node:
+    debug_plots: true
+    quick_preview_dpi: 100
+    
+  preprocessing_node:
+    validation_plots: true
+    intermediate_format: "jpg"  # Different format breaks consistency
+    
+  training_node:
+    progress_plots: true
+    checkpoint_plots: false
+    
+  evaluation_node:
+    detailed_plots: true
+    summary_plots: true
+    comparison_plots: true
+    export_format: "pdf"  # Another format inconsistency
