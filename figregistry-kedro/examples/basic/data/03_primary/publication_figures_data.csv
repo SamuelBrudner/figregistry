@@ -1,0 +1,54 @@
+# =============================================================================
+# Publication-Ready Analysis Dataset for FigRegistry-Kedro Integration
+# =============================================================================
+# This dataset contains final experimental results with effect sizes, statistical
+# significance measures, and publication categories formatted for high-quality
+# scientific visualization. It enables demonstration of FigRegistry's publication
+# output management through automated purpose-based styling and output formatting.
+#
+# Key Features Demonstrated:
+# - Publication-ready data with effect_size, p_value, confidence_interval columns (F-004)
+# - Purpose-based styling through publication categories (F-005, F-002)
+# - Automated publication output management and versioning (F-004) 
+# - Purpose parameter resolution in FigureDataSet (F-005-RQ-002)
+# - Statistical significance indicators for realistic scientific context
+# - Multiple publication figure types (main, supplementary, methods)
+#
+# Usage in Catalog Configuration:
+# This dataset is designed to work with FigureDataSet entries configured with:
+# - purpose: "publication" for publication-quality styling
+# - condition_param: "publication_category" for automated figure type styling
+# - High-resolution output formats (PDF, EPS) for journal submission
+# =============================================================================
+
+figure_id,analysis_name,publication_category,experiment_condition,experiment_phase,measurement_type,treatment_group,effect_size,effect_size_se,p_value,significance_level,confidence_interval_lower,confidence_interval_upper,sample_size_n,statistical_power,cohen_d,r_squared,mean_treatment,mean_control,std_treatment,std_control,test_statistic,degrees_freedom,publication_priority,figure_panel,statistical_notes
+main_fig_1a,primary_efficacy_analysis,main_figure,treatment_group_a,final,primary_endpoint,treatment_a,0.85,0.12,0.001,***,0.62,1.08,156,0.98,1.42,0.74,7.23,5.41,1.85,1.62,t=7.32,154,1,A,Primary efficacy endpoint with large effect size
+main_fig_1b,dose_response_curve,main_figure,combined_groups,final,dose_response,combined,1.25,0.18,0.0001,***,0.89,1.61,312,0.99,1.87,0.82,8.94,6.12,2.14,1.89,F=12.45,3/308,1,B,Dose-response relationship showing clear trend
+main_fig_1c,biomarker_correlation,main_figure,treatment_group_a,final,biomarker,treatment_a,0.73,0.14,0.003,**,0.45,1.01,89,0.87,1.21,0.58,12.67,9.83,3.21,2.94,r=0.76,87,1,C,Biomarker correlation with treatment response
+main_fig_2a,mechanistic_pathway,main_figure,treatment_group_b,final,mechanism,treatment_b,0.96,0.16,0.002,**,0.64,1.28,134,0.92,1.35,0.67,15.42,11.87,4.12,3.68,t=6.89,132,2,A,Mechanistic pathway analysis with moderate effect
+main_fig_2b,time_course_analysis,main_figure,combined_groups,final,temporal,combined,0.68,0.11,0.008,**,0.46,0.90,245,0.85,1.18,0.52,6.78,5.21,1.96,1.74,F=8.23,4/240,2,B,Time course showing progressive treatment effect
+main_fig_3a,safety_profile,main_figure,treatment_group_a,final,safety,treatment_a,0.31,0.09,0.045,*,0.13,0.49,178,0.68,0.67,0.23,2.84,2.41,0.89,0.82,χ²=4.12,1,3,A,Safety profile with small but significant effect
+main_fig_3b,tolerability_assessment,main_figure,treatment_group_b,final,tolerability,treatment_b,0.42,0.13,0.028,*,0.16,0.68,156,0.72,0.81,0.34,3.56,2.89,1.23,1.18,t=2.95,154,3,B,Tolerability assessment showing acceptable profile
+supp_fig_s1a,demographic_breakdown,supplementary,control_group,final,demographics,control,0.15,0.08,0.156,ns,-0.01,0.31,298,0.34,0.31,0.08,45.7,44.2,12.8,13.4,t=1.42,296,4,A,Demographic analysis showing no significant differences
+supp_fig_s1b,baseline_characteristics,supplementary,combined_groups,final,baseline,combined,0.08,0.06,0.234,ns,-0.04,0.20,389,0.21,0.18,0.03,23.4,22.8,5.6,5.9,F=1.18,2/386,4,B,Baseline characteristics confirm successful randomization
+supp_fig_s2a,sensitivity_analysis,supplementary,treatment_group_a,final,sensitivity,treatment_a,0.79,0.15,0.004,**,0.49,1.09,142,0.89,1.28,0.61,7.89,5.98,2.14,1.87,t=6.23,140,5,A,Sensitivity analysis confirms robustness of primary results
+supp_fig_s2b,subgroup_analysis_age,supplementary,treatment_group_b,final,subgroup,treatment_b,0.91,0.21,0.012,*,0.49,1.33,87,0.83,1.41,0.54,9.23,6.78,2.87,2.41,t=4.87,85,5,B,Subgroup analysis by age showing consistent effect
+supp_fig_s3a,pharmacokinetic_profile,supplementary,treatment_group_a,final,pharmacokinetics,treatment_a,1.12,0.19,0.001,***,0.74,1.50,76,0.94,1.67,0.71,24.8,18.2,6.8,5.9,t=7.21,74,6,A,Pharmacokinetic analysis demonstrating drug exposure
+supp_fig_s3b,metabolite_analysis,supplementary,treatment_group_b,final,metabolite,treatment_b,0.67,0.14,0.009,**,0.39,0.95,98,0.82,1.15,0.49,8.94,6.72,2.34,2.18,t=5.45,96,6,B,Metabolite profile supporting mechanism of action
+method_fig_m1a,study_flowchart,methods,combined_groups,final,methodology,combined,0.00,0.00,1.000,ns,0.00,0.00,423,1.00,0.00,1.00,423.0,423.0,0.0,0.0,n/a,n/a,7,A,CONSORT flow diagram for participant allocation
+method_fig_m1b,randomization_schema,methods,combined_groups,final,randomization,combined,0.02,0.05,0.678,ns,-0.08,0.12,423,0.05,0.04,0.00,211.5,211.5,21.2,21.2,χ²=0.17,1,7,B,Randomization validation showing balanced allocation
+method_fig_m2a,measurement_validation,methods,control_group,validation,validation,control,0.95,0.08,0.0001,***,0.79,1.11,45,0.99,2.14,0.89,9.87,8.23,1.23,1.15,r=0.94,43,8,A,Measurement method validation with excellent correlation
+method_fig_m2b,assay_precision,methods,combined_groups,validation,precision,combined,0.03,0.04,0.523,ns,-0.05,0.11,156,0.08,0.07,0.01,12.4,12.3,1.8,1.9,F=0.41,1/154,8,B,Assay precision analysis demonstrating reliability
+method_fig_m3a,statistical_power,methods,combined_groups,final,power_analysis,combined,0.80,0.05,0.0001,***,0.70,0.90,423,0.80,1.60,0.80,0.80,0.50,0.15,0.20,z=16.0,n/a,9,A,Statistical power analysis confirming adequate sample size
+method_fig_m3b,missing_data_analysis,methods,combined_groups,final,missing_data,combined,0.05,0.02,0.178,ns,0.01,0.09,423,0.15,0.11,0.02,5.2,4.9,2.1,2.3,t=1.35,421,9,B,Missing data analysis showing minimal impact on results
+exploratory_e1a,biomarker_discovery,exploratory,treatment_group_a,training,discovery,treatment_a,0.56,0.18,0.034,*,0.20,0.92,67,0.71,0.94,0.41,11.2,8.9,3.4,3.1,t=2.89,65,10,A,Exploratory biomarker showing promising signal
+exploratory_e1b,pathway_enrichment,exploratory,treatment_group_b,training,pathway,treatment_b,0.71,0.22,0.018,*,0.27,1.15,54,0.78,1.08,0.48,13.8,10.4,4.2,3.8,t=3.45,52,10,B,Pathway enrichment analysis identifying key mechanisms
+exploratory_e2a,dose_optimization,exploratory,combined_groups,training,optimization,combined,0.89,0.19,0.007,**,0.51,1.27,89,0.86,1.32,0.59,7.8,5.9,2.3,2.1,F=6.78,3/85,11,A,Dose optimization study informing final protocol
+exploratory_e2b,combination_screening,exploratory,treatment_group_a,training,combination,treatment_a,1.05,0.24,0.003,**,0.57,1.53,76,0.91,1.48,0.65,16.7,12.1,5.1,4.6,t=7.12,74,11,B,Combination therapy screening showing synergistic effects
+validation_v1a,replication_study,validation,treatment_group_a,validation,replication,treatment_a,0.78,0.14,0.002,**,0.50,1.06,134,0.88,1.25,0.62,7.01,5.43,1.92,1.78,t=6.45,132,12,A,Independent replication confirming primary findings
+validation_v1b,external_validation,validation,treatment_group_b,validation,external,treatment_b,0.83,0.16,0.001,***,0.51,1.15,98,0.92,1.31,0.67,8.45,6.21,2.14,1.96,t=7.23,96,12,B,External validation in independent cohort
+validation_v2a,biomarker_confirmation,validation,combined_groups,validation,biomarker_val,combined,0.69,0.13,0.004,**,0.43,0.95,187,0.84,1.19,0.56,12.1,9.8,2.8,2.6,t=5.89,185,13,A,Biomarker validation confirming predictive value
+validation_v2b,mechanism_validation,validation,treatment_group_a,validation,mechanism_val,treatment_a,0.74,0.15,0.003,**,0.44,1.04,156,0.87,1.23,0.58,14.8,11.7,3.6,3.2,t=6.12,154,13,B,Mechanism validation supporting proposed mode of action
+meta_analysis_m1,pooled_efficacy,meta_analysis,combined_groups,final,meta_efficacy,combined,0.81,0.09,0.0001,***,0.63,0.99,1247,0.99,1.62,0.79,7.89,6.12,2.14,1.98,Z=9.23,n/a,14,A,Meta-analysis of pooled efficacy across all studies
+meta_analysis_m2,pooled_safety,meta_analysis,combined_groups,final,meta_safety,combined,0.28,0.06,0.001,***,0.16,0.40,1247,0.95,0.56,0.31,2.67,2.31,0.87,0.83,Z=4.67,n/a,14,B,Meta-analysis confirming favorable safety profile
+publication_summary,overall_assessment,summary,combined_groups,final,summary,combined,0.77,0.08,0.0001,***,0.61,0.93,1247,0.99,1.54,0.76,7.56,5.89,2.01,1.91,Z=9.63,n/a,15,Overall,Comprehensive summary of treatment efficacy and safety
