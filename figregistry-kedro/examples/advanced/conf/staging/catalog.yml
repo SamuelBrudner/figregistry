@@ -1,0 +1,776 @@
+# Staging Environment Kedro Catalog Configuration
+# Advanced FigRegistry-Kedro Example - Production-like Validation Environment
+#
+# This staging catalog provides enterprise-grade FigureDataSet configurations with
+# production-like complexity while maintaining staging-specific safety measures,
+# comprehensive validation patterns, and enhanced figure versioning for thorough
+# production readiness testing.
+#
+# Purpose: Enable comprehensive staging validation of production deployment scenarios
+# through realistic experimental contexts, advanced condition-based styling testing,
+# and enterprise-appropriate output management with staging safety measures.
+#
+# Key Features:
+# - Production-like FigureDataSet configurations with staging validation enhancements
+# - Enhanced figure versioning and tracking for staging-to-production migration workflows
+# - Comprehensive condition parameter resolution testing with staging-appropriate scenarios
+# - Staging-specific safety mechanisms, rollback capabilities, and debugging features
+# - Advanced validation patterns ensuring production deployment readiness per F-005 requirements
+# - Enterprise-grade audit trails and logging for deployment testing per Section 8.3.1.1
+
+# ==============================================================================
+# TRAINING PIPELINE FIGURE OUTPUTS
+# ==============================================================================
+# Production-like training figure configurations with staging-specific validation
+# and comprehensive condition-based styling per F-005-RQ-004 requirements
+
+# Primary training metrics visualization with enterprise validation
+training_accuracy_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/training/accuracy_plot_v{kedro.version}.png
+  purpose: presentation  # Enterprise presentation quality for staging validation
+  condition_param: experimental_conditions.primary.condition  # staging_enterprise_ml_pipeline
+  versioned: true  # Enhanced versioning for staging deployment validation
+  style_params:
+    # Staging-specific style overrides for production-like validation
+    figure.figsize: [14, 10]  # Large enterprise presentation size
+    figure.dpi: 300  # Production-grade quality with staging validation
+    axes.grid: true
+    axes.grid.alpha: 0.3
+    font.size: 12
+    axes.titlesize: 16
+    axes.labelsize: 14
+    legend.fontsize: 12
+    # Staging validation watermark indicators
+    axes.facecolor: "#f8f9fa"  # Light staging background indicator
+  save_args:
+    bbox_inches: tight
+    transparent: false
+    # Enhanced staging safety and validation parameters
+    optimize: true
+    metadata:
+      environment: staging
+      validation_level: enterprise
+      pipeline_stage: training
+      safety_enabled: true
+
+# Training loss convergence visualization with production-like complexity
+training_loss_convergence:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/training/loss_convergence_v{kedro.version}.pdf
+  purpose: publication  # Publication-ready staging outputs for migration validation
+  condition_param: experimental_conditions.primary.context  # production_like_training
+  versioned: true
+  style_params:
+    figure.figsize: [12, 8]
+    figure.dpi: 600  # Publication quality with staging validation
+    font.family: ["Computer Modern", "Times", "serif"]
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.grid: false
+    legend.frameon: true
+    legend.shadow: false
+    # Staging-specific validation indicators
+    legend.title: "Staging Training Validation"
+  save_args:
+    bbox_inches: tight
+    format: pdf
+    backend: pdf
+    # Staging-specific safety and audit parameters
+    metadata:
+      environment: staging
+      validation_context: training_convergence
+      production_mirroring: true
+      audit_enabled: true
+
+# Model architecture visualization with comprehensive validation
+model_architecture_diagram:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/training/model_architecture_v{kedro.version}.svg
+  purpose: presentation
+  condition_param: validation_scenario  # comprehensive_enterprise_staging
+  versioned: true
+  style_params:
+    figure.figsize: [16, 12]  # Large enterprise diagram size
+    figure.dpi: 300
+    axes.titleweight: bold
+    legend.loc: upper right
+    # Production-like styling with staging validation indicators
+    axes.facecolor: white
+    figure.facecolor: white
+  save_args:
+    bbox_inches: tight
+    format: svg
+    facecolor: white
+    edgecolor: none
+    # Staging validation and safety parameters
+    metadata:
+      environment: staging
+      diagram_type: model_architecture
+      validation_comprehensive: true
+      safety_checks_enabled: true
+
+# ==============================================================================
+# INFERENCE PIPELINE FIGURE OUTPUTS  
+# ==============================================================================
+# Production-like inference figure configurations with staging validation
+# and enhanced condition parameter resolution testing
+
+# Inference performance metrics with staging validation enhancements
+inference_performance_metrics:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/inference/performance_metrics_v{kedro.version}.png
+  purpose: presentation
+  condition_param: experimental_conditions.secondary.condition  # staging_inference_validation
+  versioned: true
+  style_params:
+    figure.figsize: [14, 10]
+    figure.dpi: 300
+    axes.grid: true
+    axes.grid.alpha: 0.2
+    font.size: 11
+    axes.titlesize: 14
+    axes.labelsize: 12
+    # Staging-specific inference validation styling
+    axes.title: "Inference Performance - Staging Validation"
+    legend.title: "Staging Metrics"
+  save_args:
+    bbox_inches: tight
+    transparent: false
+    # Enhanced staging validation parameters
+    metadata:
+      environment: staging
+      pipeline_stage: inference
+      validation_level: comprehensive
+      performance_monitoring: true
+
+# Prediction accuracy distribution with production-like complexity
+prediction_accuracy_distribution:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/inference/accuracy_distribution_v{kedro.version}.pdf
+  purpose: publication
+  condition_param: experimental_conditions.secondary.context  # production_like_inference
+  versioned: true
+  style_params:
+    figure.figsize: [10, 7]
+    figure.dpi: 600
+    font.family: ["Computer Modern", "Times", "serif"]
+    axes.spines.top: false
+    axes.spines.right: false
+    lines.linewidth: 1.5
+    # Production-like publication styling with staging indicators
+    axes.labelweight: bold
+    legend.framealpha: 1.0
+  save_args:
+    bbox_inches: tight
+    format: pdf
+    # Staging safety and production readiness parameters
+    metadata:
+      environment: staging
+      distribution_type: prediction_accuracy
+      production_readiness_validation: true
+      rollback_enabled: true
+
+# Error analysis heatmap with comprehensive staging validation
+error_analysis_heatmap:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/inference/error_analysis_heatmap_v{kedro.version}.png
+  purpose: exploratory  # Detailed exploratory analysis for staging validation
+  condition_param: experiment_condition  # staging_enterprise_validation
+  versioned: true
+  style_params:
+    figure.figsize: [12, 8]
+    figure.dpi: 300
+    axes.grid: false  # Clean heatmap presentation
+    font.size: 10
+    axes.titlesize: 12
+    # Staging-specific error analysis styling
+    axes.facecolor: "#f8f9fa"  # Staging background indicator
+  save_args:
+    bbox_inches: tight
+    # Staging validation and debugging parameters
+    metadata:
+      environment: staging
+      analysis_type: error_heatmap
+      debugging_enabled: true
+      validation_extensive: true
+
+# ==============================================================================
+# REPORTING PIPELINE FIGURE OUTPUTS
+# ==============================================================================
+# Enterprise-grade reporting figures with staging deployment validation
+# and comprehensive production readiness testing per Section 8.3.2.1
+
+# Executive summary dashboard with enterprise staging validation
+executive_summary_dashboard:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/reporting/executive_summary_v{kedro.version}.png
+  purpose: presentation
+  condition_param: experimental_context  # production_readiness_testing
+  versioned: true
+  style_params:
+    figure.figsize: [16, 12]  # Executive presentation size
+    figure.dpi: 300
+    font.size: 12
+    axes.titlesize: 16
+    axes.titleweight: bold
+    axes.labelsize: 14
+    legend.fontsize: 12
+    # Enterprise staging dashboard styling
+    axes.facecolor: white
+    figure.facecolor: white
+    axes.spines.linewidth: 1.5
+  save_args:
+    bbox_inches: tight
+    transparent: false
+    # Staging executive reporting parameters
+    metadata:
+      environment: staging
+      report_type: executive_summary
+      presentation_ready: true
+      enterprise_validation: true
+
+# Performance comparison charts with production-like validation
+performance_comparison_charts:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/reporting/performance_comparison_v{kedro.version}.pdf
+  purpose: publication
+  condition_param: validation_scenario  # comprehensive_enterprise_staging
+  versioned: true
+  style_params:
+    figure.figsize: [14, 10]
+    figure.dpi: 600
+    font.family: ["DejaVu Sans", "Arial", "sans-serif"]
+    axes.grid: true
+    axes.grid.alpha: 0.2
+    axes.spines.top: false
+    axes.spines.right: false
+    # Production-grade comparison chart styling
+    legend.frameon: true
+    legend.fancybox: true
+    legend.shadow: false
+  save_args:
+    bbox_inches: tight
+    format: pdf
+    # Comprehensive staging validation parameters
+    metadata:
+      environment: staging
+      chart_type: performance_comparison
+      validation_comprehensive: true
+      production_mirroring: true
+
+# Risk assessment visualization with staging safety measures
+risk_assessment_visualization:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/reporting/risk_assessment_v{kedro.version}.svg
+  purpose: presentation
+  condition_param: experimental_conditions.fallback.condition  # staging_error_recovery
+  versioned: true
+  style_params:
+    figure.figsize: [12, 8]
+    figure.dpi: 300
+    axes.facecolor: "#fff5f5"  # Light red background for risk assessment
+    font.size: 11
+    axes.titlesize: 14
+    # Risk-specific staging validation styling
+    axes.title: "Risk Assessment - Staging Validation"
+    legend.title: "Risk Factors"
+  save_args:
+    bbox_inches: tight
+    format: svg
+    facecolor: white
+    # Staging risk assessment and safety parameters
+    metadata:
+      environment: staging
+      assessment_type: risk_analysis
+      safety_validation: true
+      error_handling_tested: true
+
+# ==============================================================================
+# VALIDATION AND TESTING FIGURE OUTPUTS
+# ==============================================================================
+# Staging-specific validation figures for comprehensive deployment testing
+# and production readiness assessment per F-005 requirements
+
+# Plugin functionality validation dashboard
+plugin_functionality_validation:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/validation/plugin_functionality_v{kedro.version}.png
+  purpose: exploratory
+  condition_param: experimental_conditions.primary.validation_tier  # comprehensive
+  versioned: true
+  style_params:
+    figure.figsize: [14, 10]
+    figure.dpi: 300
+    axes.grid: true
+    axes.grid.alpha: 0.3
+    font.size: 11
+    # Staging plugin validation styling indicators
+    axes.facecolor: "#f0f8ff"  # Light blue staging validation background
+    axes.title: "FigRegistry-Kedro Plugin Validation - Staging"
+  save_args:
+    bbox_inches: tight
+    # Plugin validation and testing parameters
+    metadata:
+      environment: staging
+      validation_type: plugin_functionality
+      hook_registration_tested: true
+      dataset_operation_validated: true
+
+# Performance regression testing visualization
+performance_regression_testing:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/validation/performance_regression_v{kedro.version}.pdf
+  purpose: publication
+  condition_param: experimental_conditions.secondary.complexity_level  # production_grade
+  versioned: true
+  style_params:
+    figure.figsize: [12, 8]
+    figure.dpi: 600
+    font.family: ["Computer Modern", "Times", "serif"]
+    axes.grid: true
+    axes.grid.alpha: 0.2
+    # Performance testing specific styling
+    lines.linewidth: 2.0
+    marker: "o"
+    markersize: 8
+  save_args:
+    bbox_inches: tight
+    format: pdf
+    # Performance testing and validation parameters
+    metadata:
+      environment: staging
+      test_type: performance_regression
+      benchmark_comparison: true
+      production_readiness_validated: true
+
+# Cross-platform compatibility validation
+cross_platform_compatibility:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/validation/cross_platform_compatibility_v{kedro.version}.svg
+  purpose: presentation
+  condition_param: experimental_conditions.fallback.complexity_level  # minimal_safe
+  versioned: true
+  style_params:
+    figure.figsize: [16, 10]
+    figure.dpi: 300
+    axes.grid: true
+    font.size: 10
+    axes.titlesize: 12
+    # Cross-platform validation styling
+    axes.title: "Cross-Platform Compatibility - Staging Validation"
+    legend.title: "Platform Results"
+  save_args:
+    bbox_inches: tight
+    format: svg
+    # Cross-platform testing parameters
+    metadata:
+      environment: staging
+      validation_type: cross_platform
+      platforms_tested: ["windows", "macos", "linux"]
+      compatibility_verified: true
+
+# ==============================================================================
+# DEGRADED PERFORMANCE TESTING FIGURES
+# ==============================================================================
+# Staging-specific degraded performance scenario testing for comprehensive
+# production readiness validation and error handling verification
+
+# Degraded performance scenario visualization
+degraded_performance_scenario:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/degraded/performance_scenario_v{kedro.version}.png
+  purpose: exploratory
+  condition_param: experimental_conditions.fallback.context  # degraded_performance_testing
+  versioned: true
+  style_params:
+    figure.figsize: [12, 8]
+    figure.dpi: 150  # Reduced quality for degraded scenarios
+    axes.facecolor: "#f5f5f5"  # Gray background for degraded scenarios
+    font.size: 10
+    # Degraded performance styling indicators
+    axes.title: "Degraded Performance Testing - Staging"
+    legend.title: "Degraded Scenarios"
+  save_args:
+    bbox_inches: tight
+    # Degraded performance testing parameters
+    metadata:
+      environment: staging
+      scenario_type: degraded_performance
+      fallback_mechanisms_tested: true
+      resource_constraints_simulated: true
+
+# Error recovery workflow visualization
+error_recovery_workflow:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/degraded/error_recovery_workflow_v{kedro.version}.pdf
+  purpose: presentation
+  condition_param: experimental_conditions.fallback.condition  # staging_error_recovery
+  versioned: true
+  style_params:
+    figure.figsize: [14, 10]
+    figure.dpi: 300
+    axes.facecolor: "#fff5f5"  # Light red background for error scenarios
+    font.size: 11
+    axes.titlesize: 14
+    # Error recovery styling with staging validation
+    axes.title: "Error Recovery Workflow - Staging Validation"
+    legend.title: "Recovery Steps"
+  save_args:
+    bbox_inches: tight
+    format: pdf
+    # Error recovery testing parameters
+    metadata:
+      environment: staging
+      workflow_type: error_recovery
+      rollback_procedures_tested: true
+      safety_mechanisms_validated: true
+
+# ==============================================================================
+# MONITORING AND OBSERVABILITY FIGURES
+# ==============================================================================
+# Enterprise-grade monitoring visualizations for staging deployment validation
+# and comprehensive production readiness assessment
+
+# Resource usage monitoring dashboard
+resource_usage_monitoring:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/monitoring/resource_usage_v{kedro.version}.png
+  purpose: presentation
+  condition_param: experiment_condition  # staging_enterprise_validation
+  versioned: true
+  style_params:
+    figure.figsize: [16, 12]
+    figure.dpi: 300
+    axes.grid: true
+    axes.grid.alpha: 0.3
+    font.size: 11
+    axes.titlesize: 14
+    # Resource monitoring styling for staging
+    axes.title: "Resource Usage Monitoring - Staging Environment"
+    legend.title: "Resource Metrics"
+  save_args:
+    bbox_inches: tight
+    # Resource monitoring parameters
+    metadata:
+      environment: staging
+      monitoring_type: resource_usage
+      real_time_tracking: true
+      threshold_monitoring: true
+
+# Alert and notification dashboard
+alert_notification_dashboard:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/monitoring/alert_dashboard_v{kedro.version}.svg
+  purpose: presentation
+  condition_param: experimental_context  # production_readiness_testing
+  versioned: true
+  style_params:
+    figure.figsize: [14, 10]
+    figure.dpi: 300
+    font.size: 10
+    axes.titlesize: 12
+    # Alert dashboard styling for staging validation
+    axes.title: "Alert & Notification Dashboard - Staging"
+    legend.title: "Alert Types"
+  save_args:
+    bbox_inches: tight
+    format: svg
+    # Alert monitoring parameters
+    metadata:
+      environment: staging
+      dashboard_type: alert_notification
+      escalation_procedures_validated: true
+      notification_reliability_tested: true
+
+# ==============================================================================
+# STAGING-SPECIFIC AUDIT AND COMPLIANCE FIGURES
+# ==============================================================================
+# Enterprise compliance and audit trail visualizations for staging
+# deployment validation and production migration readiness
+
+# Audit trail visualization
+audit_trail_visualization:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/audit/audit_trail_v{kedro.version}.pdf
+  purpose: publication
+  condition_param: validation_scenario  # comprehensive_enterprise_staging
+  versioned: true
+  style_params:
+    figure.figsize: [12, 8]
+    figure.dpi: 600
+    font.family: ["Computer Modern", "Times", "serif"]
+    axes.grid: false
+    # Audit-specific publication styling
+    axes.spines.top: false
+    axes.spines.right: false
+    legend.frameon: true
+  save_args:
+    bbox_inches: tight
+    format: pdf
+    # Audit trail parameters
+    metadata:
+      environment: staging
+      audit_type: trail_visualization
+      compliance_validated: true
+      enterprise_standards_met: true
+
+# Compliance validation dashboard
+compliance_validation_dashboard:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/audit/compliance_validation_v{kedro.version}.png
+  purpose: presentation
+  condition_param: experimental_conditions.primary.validation_tier  # comprehensive
+  versioned: true
+  style_params:
+    figure.figsize: [16, 12]
+    figure.dpi: 300
+    axes.grid: true
+    axes.grid.alpha: 0.2
+    font.size: 12
+    axes.titlesize: 16
+    # Compliance dashboard styling for enterprise staging
+    axes.title: "Compliance Validation Dashboard - Staging"
+    legend.title: "Compliance Metrics"
+  save_args:
+    bbox_inches: tight
+    # Compliance validation parameters
+    metadata:
+      environment: staging
+      validation_type: compliance_dashboard
+      enterprise_compliance_verified: true
+      security_standards_validated: true
+
+# ==============================================================================
+# CONFIGURATION VALIDATION AND TESTING FIGURES
+# ==============================================================================
+# Staging-specific configuration validation figures for comprehensive
+# plugin testing and production deployment readiness assessment
+
+# Configuration merge validation
+config_merge_validation:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/config/merge_validation_v{kedro.version}.svg
+  purpose: exploratory
+  condition_param: experimental_conditions.secondary.validation_tier  # extensive
+  versioned: true
+  style_params:
+    figure.figsize: [14, 10]
+    figure.dpi: 300
+    axes.grid: true
+    font.size: 10
+    # Configuration validation styling
+    axes.title: "Configuration Merge Validation - Staging"
+    legend.title: "Config Sources"
+  save_args:
+    bbox_inches: tight
+    format: svg
+    # Configuration testing parameters
+    metadata:
+      environment: staging
+      validation_type: config_merge
+      bridge_functionality_tested: true
+      precedence_rules_validated: true
+
+# Environment-specific configuration testing
+environment_config_testing:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/config/environment_testing_v{kedro.version}.pdf
+  purpose: publication
+  condition_param: experimental_conditions.fallback.validation_tier  # basic
+  versioned: true
+  style_params:
+    figure.figsize: [10, 7]
+    figure.dpi: 600
+    font.family: ["DejaVu Sans", "Arial", "sans-serif"]
+    axes.grid: true
+    # Environment testing styling
+    axes.spines.top: false
+    axes.spines.right: false
+  save_args:
+    bbox_inches: tight
+    format: pdf
+    # Environment configuration testing parameters
+    metadata:
+      environment: staging
+      testing_type: environment_config
+      multi_environment_validated: true
+      override_mechanisms_tested: true
+
+# ==============================================================================
+# EXAMPLE PROJECT VALIDATION FIGURES
+# ==============================================================================
+# Comprehensive validation figures for staging example project execution
+# and production readiness assessment per Section 8.3.2.1 requirements
+
+# Example project execution validation
+example_project_execution:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/examples/project_execution_v{kedro.version}.png
+  purpose: presentation
+  condition_param: experimental_context  # production_readiness_testing
+  versioned: true
+  style_params:
+    figure.figsize: [16, 12]
+    figure.dpi: 300
+    axes.grid: true
+    axes.grid.alpha: 0.3
+    font.size: 11
+    axes.titlesize: 14
+    # Example project validation styling
+    axes.title: "Example Project Execution - Staging Validation"
+    legend.title: "Project Types"
+  save_args:
+    bbox_inches: tight
+    # Example project validation parameters
+    metadata:
+      environment: staging
+      validation_type: example_project_execution
+      basic_example_validated: true
+      advanced_example_validated: true
+      migration_example_validated: true
+
+# Migration workflow validation
+migration_workflow_validation:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/examples/migration_validation_v{kedro.version}.svg
+  purpose: presentation
+  condition_param: validation_scenario  # comprehensive_enterprise_staging
+  versioned: true
+  style_params:
+    figure.figsize: [14, 10]
+    figure.dpi: 300
+    font.size: 10
+    axes.titlesize: 12
+    # Migration validation styling for staging
+    axes.title: "Migration Workflow Validation - Staging"
+    legend.title: "Migration Steps"
+  save_args:
+    bbox_inches: tight
+    format: svg
+    # Migration workflow validation parameters
+    metadata:
+      environment: staging
+      workflow_type: migration_validation
+      retrofit_procedures_tested: true
+      legacy_compatibility_validated: true
+
+# ==============================================================================
+# COMPREHENSIVE STAGING DATASET CONFIGURATIONS
+# ==============================================================================
+# Additional staging-specific datasets for comprehensive validation coverage
+# and enterprise-grade production readiness testing
+
+# Plugin integration stress testing
+plugin_integration_stress_test:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/stress/integration_stress_v{kedro.version}.png
+  purpose: exploratory
+  condition_param: experimental_conditions.primary.complexity_level  # enterprise
+  versioned: true
+  style_params:
+    figure.figsize: [12, 8]
+    figure.dpi: 150  # Reduced for stress testing scenarios
+    axes.grid: true
+    font.size: 9
+    # Stress testing styling indicators
+    axes.facecolor: "#fffacd"  # Light yellow for stress testing
+    axes.title: "Plugin Integration Stress Test - Staging"
+  save_args:
+    bbox_inches: tight
+    # Stress testing parameters
+    metadata:
+      environment: staging
+      test_type: integration_stress
+      concurrent_operations_tested: true
+      resource_limits_validated: true
+
+# Final staging validation summary
+staging_validation_summary:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/summary/validation_summary_v{kedro.version}.pdf
+  purpose: publication
+  condition_param: experiment_condition  # staging_enterprise_validation
+  versioned: true
+  style_params:
+    figure.figsize: [16, 12]  # Large summary report size
+    figure.dpi: 600
+    font.family: ["Computer Modern", "Times", "serif"]
+    font.size: 12
+    axes.titlesize: 18
+    axes.titleweight: bold
+    # Final validation summary styling
+    axes.title: "Staging Validation Summary - Production Readiness"
+    legend.title: "Validation Results"
+    legend.fontsize: 14
+  save_args:
+    bbox_inches: tight
+    format: pdf
+    # Final staging validation parameters
+    metadata:
+      environment: staging
+      summary_type: final_validation
+      production_readiness_confirmed: true
+      enterprise_standards_met: true
+      deployment_approved: true
+
+# ==============================================================================
+# STAGING SAFETY AND ROLLBACK VALIDATION
+# ==============================================================================
+# Critical safety mechanism validation for staging deployment confidence
+# and production migration risk mitigation per Section 8.3.5 requirements
+
+# Safety mechanism validation
+safety_mechanism_validation:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/safety/mechanism_validation_v{kedro.version}.svg
+  purpose: presentation
+  condition_param: experimental_conditions.fallback.condition  # staging_error_recovery
+  versioned: true
+  style_params:
+    figure.figsize: [14, 10]
+    figure.dpi: 300
+    axes.grid: true
+    font.size: 11
+    # Safety validation styling
+    axes.title: "Safety Mechanism Validation - Staging"
+    legend.title: "Safety Features"
+    axes.facecolor: "#f0fff0"  # Light green for safety validation
+  save_args:
+    bbox_inches: tight
+    format: svg
+    # Safety mechanism validation parameters
+    metadata:
+      environment: staging
+      validation_type: safety_mechanisms
+      rollback_procedures_validated: true
+      emergency_recovery_tested: true
+      data_integrity_verified: true
+
+# Rollback procedure testing
+rollback_procedure_testing:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/staging/safety/rollback_testing_v{kedro.version}.pdf
+  purpose: publication
+  condition_param: experimental_conditions.fallback.context  # degraded_performance_testing
+  versioned: true
+  style_params:
+    figure.figsize: [12, 8]
+    figure.dpi: 600
+    font.family: ["DejaVu Sans", "Arial", "sans-serif"]
+    axes.grid: true
+    axes.grid.alpha: 0.2
+    # Rollback testing styling
+    axes.spines.top: false
+    axes.spines.right: false
+    legend.frameon: true
+  save_args:
+    bbox_inches: tight
+    format: pdf
+    # Rollback testing parameters
+    metadata:
+      environment: staging
+      testing_type: rollback_procedures
+      automated_rollback_tested: true
+      manual_recovery_validated: true
+      state_restoration_verified: true
