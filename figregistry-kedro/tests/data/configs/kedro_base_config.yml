@@ -1,0 +1,380 @@
+# FigRegistry Kedro Base Configuration
+# This configuration provides organization-wide defaults for multi-environment
+# testing scenarios compatible with Kedro's ConfigLoader variable substitution
+# and configuration hierarchy. Suitable for placement in conf/base/figregistry.yml
+#
+# Requirements Coverage:
+# - F-007.2: Kedro-compatible base configuration for multi-environment testing
+# - Section 5.2.5: Configuration bridge requirements and precedence rules
+# - Kedro ConfigLoader variable substitution and templating support
+# - Environment-specific override scenarios and extensions
+
+# =============================================================================
+# Core FigRegistry Metadata
+# =============================================================================
+figregistry_version: "0.3.0"
+environment: "base"  # Will be overridden by environment-specific configs
+
+# =============================================================================
+# Organization-Wide Style Conditions
+# =============================================================================
+# Base styling conditions that establish organization standards
+# while supporting environment-specific overrides and extensions
+styles:
+  # Primary experimental conditions with organization standards
+  control:
+    color: "#1f77b4"  # Standard blue for control conditions
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Control"
+    zorder: 1
+
+  treatment_a:
+    color: "#ff7f0e"  # Standard orange for primary treatment
+    marker: "s"
+    linestyle: "--"
+    linewidth: 2.5
+    markersize: 7
+    alpha: 0.9
+    label: "Treatment A"
+    zorder: 2
+
+  treatment_b:
+    color: "#2ca02c"  # Standard green for secondary treatment
+    marker: "^"
+    linestyle: "-."
+    linewidth: 2.0
+    markersize: 8
+    alpha: 0.85
+    label: "Treatment B"
+    zorder: 2
+
+  baseline:
+    color: "#9467bd"  # Standard purple for baseline measurements
+    marker: "v"
+    linestyle: "-"
+    linewidth: 1.8
+    markersize: 6
+    alpha: 0.7
+    label: "Baseline"
+    zorder: 1
+
+  # Wildcard patterns for development and exploration phases
+  exploratory_*:
+    color: "#d62728"  # Red for exploratory conditions
+    marker: "x"
+    linestyle: ":"
+    linewidth: 1.5
+    markersize: 5
+    alpha: 0.6
+    label: "Exploratory"
+    zorder: 0
+
+  validation_*:
+    color: "#8c564b"  # Brown for validation studies
+    marker: "+"
+    linestyle: "-."
+    linewidth: 1.5
+    markersize: 6
+    alpha: 0.65
+    label: "Validation"
+    zorder: 1
+
+  pilot_*:
+    color: "#e377c2"  # Pink for pilot studies
+    marker: "D"
+    linestyle: "--"
+    linewidth: 1.2
+    markersize: 4
+    alpha: 0.5
+    label: "Pilot"
+    zorder: 0
+
+  # Template variable support for dynamic condition mapping
+  # These will be resolved by Kedro ConfigLoader at runtime
+  "${oc.env:PRIMARY_CONDITION,control}":
+    color: "${oc.env:PRIMARY_COLOR,#1f77b4}"
+    marker: "${oc.env:PRIMARY_MARKER,o}"
+    linewidth: "${oc.env:PRIMARY_LINEWIDTH,2.0}"
+    alpha: "${oc.env:PRIMARY_ALPHA,0.8}"
+    label: "${oc.env:PRIMARY_LABEL,Primary}"
+
+# =============================================================================
+# Organization Color Palettes
+# =============================================================================
+# Standard palettes supporting consistent branding across environments
+palettes:
+  # Default organizational palette
+  default: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+  
+  # Accessibility-compliant palette for inclusive design
+  colorblind_safe: ["#0173b2", "#de8f05", "#029e73", "#d55e00", "#cc78bc", "#ca9161"]
+  
+  # High-contrast palette for presentation environments
+  high_contrast: ["#000000", "#ffffff", "#ff0000", "#00ff00", "#0000ff", "#ffff00"]
+  
+  # Publication-ready grayscale palette
+  publication_bw: ["#000000", "#404040", "#666666", "#999999", "#cccccc", "#ffffff"]
+  
+  # Sequential palette for quantitative data
+  sequential_blue: ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#3182bd"]
+  
+  # Diverging palette for comparative analysis
+  diverging: ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#d9ef8b", "#a6d96a"]
+  
+  # Environment-configurable palette using template variables
+  dynamic:
+    - "${oc.env:PALETTE_COLOR_1,#1f77b4}"
+    - "${oc.env:PALETTE_COLOR_2,#ff7f0e}"
+    - "${oc.env:PALETTE_COLOR_3,#2ca02c}"
+    - "${oc.env:PALETTE_COLOR_4,#d62728}"
+    - "${oc.env:PALETTE_COLOR_5,#9467bd}"
+
+# =============================================================================
+# Output Path Configuration Supporting Kedro Data Layers
+# =============================================================================
+# Base output configuration supporting Kedro's data layer organization
+# and cross-environment path management
+outputs:
+  # Base path using Kedro template variable substitution
+  base_path: "${oc.env:FIGREGISTRY_BASE_PATH,data/08_reporting/figures}"
+  
+  # Path aliases mapping to Kedro data layer structure
+  path_aliases:
+    # Development and exploration phases
+    expl: "01_raw/exploratory"
+    eda: "01_raw/exploratory" 
+    explore: "01_raw/exploratory"
+    raw: "01_raw/figures"
+    
+    # Intermediate processing phases
+    inter: "02_intermediate/figures"
+    intermediate: "02_intermediate/figures"
+    processed: "02_intermediate/processed"
+    
+    # Primary analysis outputs
+    primary: "03_primary/figures"
+    analysis: "03_primary/analysis"
+    
+    # Reporting and presentation
+    report: "08_reporting/figures"
+    reporting: "08_reporting/figures"
+    pres: "08_reporting/presentation"
+    present: "08_reporting/presentation"
+    pub: "08_reporting/publication"
+    publish: "08_reporting/publication"
+    
+    # Debugging and development
+    debug: "debug/figures"
+    temp: "temp/figures"
+    test: "test/figures"
+
+  # File naming configuration with template support
+  timestamp_format: "${oc.env:TIMESTAMP_FORMAT,{name}_{ts:%Y%m%d_%H%M%S}}"
+  slug_format: "${oc.env:SLUG_FORMAT,{purpose}_{name}_{condition}}"
+  
+  # Output format configuration
+  default_format: "${oc.env:DEFAULT_FORMAT,png}"
+  formats: ["png", "pdf", "svg"]
+  
+  # Quality settings with environment overrides
+  dpi: "${oc.env:FIGURE_DPI,300}"
+  bbox_inches: "tight"
+  pad_inches: "${oc.env:PAD_INCHES,0.1}"
+  facecolor: "${oc.env:FACECOLOR,white}"
+  edgecolor: "none"
+  transparent: "${oc.env:TRANSPARENT,false}"
+  
+  # Metadata configuration
+  metadata: "${oc.env:SAVE_METADATA,true}"
+
+# =============================================================================
+# Comprehensive rcParams for Cross-Environment Consistency
+# =============================================================================
+# Matplotlib rcParams defaults ensuring consistent styling across environments
+defaults:
+  # Figure dimensions and layout
+  figure_size: "${oc.env:FIGURE_SIZE,[10, 6]}"
+  figure_dpi: "${oc.env:FIGURE_DPI,100}"
+  figure_max_open_warning: 20
+  
+  # Font configuration for professional appearance
+  font_family: "${oc.env:FONT_FAMILY,sans-serif}"
+  font_size: "${oc.env:FONT_SIZE,12}"
+  font_weight: "normal"
+  
+  # Text sizing hierarchy
+  title_size: "${oc.env:TITLE_SIZE,14}"
+  label_size: "${oc.env:LABEL_SIZE,12}"
+  tick_size: "${oc.env:TICK_SIZE,10}"
+  legend_size: "${oc.env:LEGEND_SIZE,11}"
+  
+  # Line and marker defaults
+  line_width: "${oc.env:LINE_WIDTH,1.5}"
+  marker_size: "${oc.env:MARKER_SIZE,6}"
+  
+  # Color and palette management
+  color_cycle: "${oc.env:COLOR_CYCLE,default}"
+  
+  # Grid configuration
+  grid: "${oc.env:GRID_ENABLED,true}"
+  grid_alpha: "${oc.env:GRID_ALPHA,0.3}"
+  grid_linewidth: 0.8
+  grid_linestyle: "-"
+  
+  # Axis spine configuration for clean presentation
+  spine_visibility:
+    top: "${oc.env:SPINE_TOP,false}"
+    right: "${oc.env:SPINE_RIGHT,false}"
+    bottom: "${oc.env:SPINE_BOTTOM,true}"
+    left: "${oc.env:SPINE_LEFT,true}"
+  
+  spine_linewidth: "${oc.env:SPINE_LINEWIDTH,1.0}"
+  
+  # Tick configuration
+  tick_direction: "${oc.env:TICK_DIRECTION,out}"
+  tick_major_size: 4.0
+  tick_minor_size: 2.0
+  tick_major_width: 1.0
+  tick_minor_width: 0.5
+  
+  # Legend configuration
+  legend_frameon: "${oc.env:LEGEND_FRAMEON,true}"
+  legend_fancybox: "${oc.env:LEGEND_FANCYBOX,true}"
+  legend_shadow: "${oc.env:LEGEND_SHADOW,false}"
+  legend_numpoints: 1
+  legend_scatterpoints: 1
+  
+  # Axis formatting
+  axes_linewidth: 1.0
+  axes_edgecolor: "black"
+  axes_labelpad: 4.0
+  axes_axisbelow: true
+  
+  # Image handling
+  image_interpolation: "bilinear"
+  image_resample: true
+  
+  # Save configuration
+  savefig_dpi: "${oc.env:SAVEFIG_DPI,300}"
+  savefig_bbox: "tight"
+  savefig_pad_inches: "${oc.env:SAVEFIG_PAD,0.1}"
+  savefig_format: "${oc.env:SAVEFIG_FORMAT,png}"
+
+# =============================================================================
+# Kedro-Specific Integration Configuration
+# =============================================================================
+# Configuration section for Kedro plugin behavior and optimization
+kedro:
+  # Versioning and dataset management
+  enable_versioning: "${oc.env:KEDRO_ENABLE_VERSIONING,true}"
+  version_format: "${oc.env:VERSION_FORMAT,%Y-%m-%dT%H.%M.%S.%fZ}"
+  
+  # Pipeline execution settings
+  parallel_execution: "${oc.env:PARALLEL_EXECUTION,true}"
+  max_workers: "${oc.env:MAX_WORKERS,4}"
+  
+  # Development and debugging
+  debug_mode: "${oc.env:DEBUG_MODE,false}"
+  verbose_logging: "${oc.env:VERBOSE_LOGGING,false}"
+  
+  # Performance optimization
+  cache_styling: "${oc.env:CACHE_STYLING,true}"
+  cache_ttl_seconds: "${oc.env:CACHE_TTL,3600}"
+  enable_concurrent_access: "${oc.env:CONCURRENT_ACCESS,true}"
+  
+  # Validation and error handling
+  validation_enabled: "${oc.env:VALIDATION_ENABLED,true}"
+  strict_validation: "${oc.env:STRICT_VALIDATION,false}"
+  fail_on_missing_styles: "${oc.env:FAIL_ON_MISSING_STYLES,false}"
+  
+  # Performance monitoring
+  performance_monitoring: "${oc.env:PERFORMANCE_MONITORING,false}"
+  timing_threshold_ms: "${oc.env:TIMING_THRESHOLD,10}"
+  memory_monitoring: "${oc.env:MEMORY_MONITORING,false}"
+  
+  # Integration settings
+  auto_register_datasets: "${oc.env:AUTO_REGISTER_DATASETS,true}"
+  hook_priority: "${oc.env:HOOK_PRIORITY,100}"
+  
+  # Data layer mapping for automatic purpose resolution
+  purpose_mapping:
+    "01_raw": "exploratory"
+    "02_intermediate": "analysis" 
+    "03_primary": "analysis"
+    "04_feature": "analysis"
+    "05_model_input": "analysis"
+    "06_models": "analysis"
+    "07_model_output": "presentation"
+    "08_reporting": "publication"
+  
+  # Environment-specific overrides placeholder
+  # These will be merged with environment configs
+  environment_overrides:
+    local:
+      debug_mode: true
+      cache_styling: false
+      performance_monitoring: false
+    staging:
+      performance_monitoring: true
+      validation_enabled: true
+    production:
+      debug_mode: false
+      cache_styling: true
+      performance_monitoring: true
+      strict_validation: true
+
+# =============================================================================
+# Metadata and Documentation
+# =============================================================================
+# Configuration metadata for tracking and validation
+metadata:
+  config_version: "1.0.0"
+  config_type: "kedro_base"
+  description: "Organization-wide base configuration for FigRegistry-Kedro integration"
+  created: "2024-01-01T00:00:00Z"
+  compatible_kedro_versions: [">=0.18.0", "<0.20.0"]
+  compatible_figregistry_versions: [">=0.3.0"]
+  
+  # Template variable documentation
+  supported_variables:
+    - "FIGREGISTRY_BASE_PATH: Base path for figure outputs"
+    - "PRIMARY_CONDITION: Default condition name"
+    - "PRIMARY_COLOR: Default condition color"
+    - "FIGURE_DPI: Output resolution"
+    - "GRID_ENABLED: Enable/disable grid display"
+    - "DEBUG_MODE: Enable debug logging"
+    - "PARALLEL_EXECUTION: Enable parallel pipeline execution"
+    - "CACHE_STYLING: Enable style caching"
+    - "VALIDATION_ENABLED: Enable configuration validation"
+  
+  # Environment hierarchy documentation
+  override_hierarchy:
+    - "Environment-specific configs (local, staging, production)"
+    - "Kedro parameter overrides"
+    - "Runtime template variable substitution"
+    - "Base configuration defaults (this file)"
+  
+  # Usage documentation
+  usage_notes:
+    - "Place in conf/base/figregistry.yml for project-wide defaults"
+    - "Override in conf/{env}/figregistry.yml for environment-specific settings"
+    - "Use ${oc.env:VAR_NAME,default} for environment variable substitution"
+    - "Supports deep merging of nested configuration sections"
+    - "Validates against FigRegistryKedroConfig Pydantic schema"
+
+# =============================================================================
+# Schema Validation Markers
+# =============================================================================
+# Markers for configuration validation and testing
+_validation:
+  schema_version: "2.0"
+  pydantic_model: "FigRegistryKedroConfig" 
+  required_sections: ["styles", "outputs", "defaults"]
+  optional_sections: ["palettes", "kedro", "metadata"]
+  template_variable_count: 25
+  environment_override_support: true
+  kedro_configloader_compatible: true
