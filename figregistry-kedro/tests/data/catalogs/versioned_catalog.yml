@@ -1,0 +1,424 @@
+# Versioned Kedro Catalog Configuration for FigRegistry-Kedro Integration Testing
+#
+# This catalog configuration file tests compatibility between Kedro's dataset versioning
+# and FigRegistry's timestamp-based versioning systems per F-005-RQ-002 requirements.
+# It validates that both versioning approaches operate independently without interference
+# while maintaining full functionality and accessibility of historical figure versions.
+#
+# Test Coverage:
+# - Kedro dataset versioning with versioned: true settings
+# - FigRegistry timestamp-based naming pattern compatibility
+# - Version-specific condition parameter configurations
+# - Versioned filepath patterns ensuring unique output paths
+# - Load version specifications for historical access testing
+# - Timestamp preservation in versioned save arguments
+# - Dataset dependencies respecting versioning constraints
+
+# Core versioned FigureDataSet entries for basic compatibility testing
+basic_versioned_exploratory_plot:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/basic_exploratory_{ts}.png
+  purpose: exploratory
+  condition_param: experiment_phase
+  versioned: true
+  style_params:
+    figure.dpi: 100
+    font.size: 10
+    axes.grid: true
+  save_args:
+    bbox_inches: tight
+    pad_inches: 0.1
+    metadata:
+      title: "Basic Versioned Exploratory Plot"
+      creator: "FigRegistry-Kedro Test Suite"
+
+basic_versioned_presentation_plot:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/basic_presentation_{ts}.png
+  purpose: presentation
+  condition_param: presentation_type
+  versioned: true
+  style_params:
+    figure.dpi: 200
+    font.size: 12
+    axes.titlesize: 14
+    figure.facecolor: white
+  save_args:
+    bbox_inches: tight
+    transparent: false
+    optimize: true
+
+basic_versioned_publication_plot:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/publication_{ts}.pdf
+  purpose: publication
+  condition_param: publication_target
+  versioned: true
+  style_params:
+    figure.dpi: 300
+    font.family: serif
+    font.size: 12
+    axes.linewidth: 1.0
+    lines.linewidth: 1.5
+    mathtext.fontset: dejavuserif
+  save_args:
+    format: pdf
+    bbox_inches: tight
+    pad_inches: 0.05
+    metadata:
+      Title: "Publication Quality Versioned Figure"
+      Creator: "FigRegistry-Kedro Plugin"
+      Subject: "Scientific Visualization"
+
+# Advanced versioned configurations testing complex parameter combinations
+versioned_high_dpi_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/high_dpi/figure_{ts}.png
+  purpose: presentation
+  condition_param: display_target
+  versioned: true
+  style_params:
+    figure.dpi: 300
+    savefig.dpi: 300
+    font.size: 14
+    axes.titlesize: 16
+    axes.labelsize: 14
+    legend.fontsize: 12
+    figure.figsize: [10, 8]
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    transparent: false
+    facecolor: white
+    edgecolor: none
+
+versioned_multi_format_svg:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/vector/figure_{ts}.svg
+  purpose: presentation
+  condition_param: output_format_type
+  versioned: true
+  style_params:
+    figure.dpi: figure  # Use figure's native DPI for vector formats
+    savefig.transparent: true
+    font.family: sans-serif
+    font.size: 12
+  save_args:
+    format: svg
+    bbox_inches: tight
+    transparent: true
+    metadata:
+      Title: "Versioned Vector Figure"
+      Description: "SVG format with versioning compatibility"
+
+# Timestamp-based versioning compatibility testing
+timestamp_compatible_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/timestamp/figure_{name}_{ts}.png
+  purpose: exploratory
+  condition_param: timestamp_test_condition
+  versioned: true
+  style_params:
+    figure.dpi: 150
+    axes.grid: true
+    grid.alpha: 0.3
+  save_args:
+    bbox_inches: tight
+    # Preserve timestamp information in save args for FigRegistry compatibility
+    figregistry_timestamp_format: "%Y%m%d_%H%M%S"
+    figregistry_version_enabled: true
+
+# Load version testing for historical figure access
+versioned_with_load_version:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/load_test/figure_{ts}.png
+  purpose: presentation
+  condition_param: version_load_test
+  versioned: true
+  load_version: "2023-12-01T10:30:00.000Z"  # Specific version for load testing
+  style_params:
+    figure.dpi: 200
+    font.size: 12
+  save_args:
+    bbox_inches: tight
+    metadata:
+      version_test: true
+      load_version: "2023-12-01T10:30:00.000Z"
+
+# Complex condition parameter resolution with versioning
+versioned_dynamic_condition:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/dynamic/condition_{ts}.png
+  purpose: exploratory
+  condition_param: experiment_metadata.visualization.type
+  versioned: true
+  style_params:
+    figure.dpi: 120
+    axes.facecolor: "#f8f9fa"
+    axes.edgecolor: "#333333"
+    grid.color: "#cccccc"
+  save_args:
+    bbox_inches: tight
+    facecolor: "#f8f9fa"
+    edgecolor: "#333333"
+
+# Performance testing with versioned large figures
+versioned_large_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/performance/large_figure_{ts}.png
+  purpose: presentation
+  condition_param: performance_test_type
+  versioned: true
+  style_params:
+    figure.dpi: 300
+    figure.figsize: [20, 15]
+    font.size: 14
+    lines.linewidth: 0.8
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    optimize: true
+    # Test performance with large versioned figures
+    compress_level: 6
+
+# Concurrent versioning test entries
+versioned_concurrent_worker_1:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/concurrent/worker_1_{ts}.png
+  purpose: exploratory
+  condition_param: concurrent_test_1
+  versioned: true
+  style_params:
+    figure.dpi: 100
+    font.size: 10
+  save_args:
+    bbox_inches: tight
+
+versioned_concurrent_worker_2:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/concurrent/worker_2_{ts}.png
+  purpose: exploratory
+  condition_param: concurrent_test_2
+  versioned: true
+  style_params:
+    figure.dpi: 100
+    font.size: 10
+  save_args:
+    bbox_inches: tight
+
+versioned_concurrent_worker_3:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/concurrent/worker_3_{ts}.png
+  purpose: exploratory
+  condition_param: concurrent_test_3
+  versioned: true
+  style_params:
+    figure.dpi: 100
+    font.size: 10
+  save_args:
+    bbox_inches: tight
+
+# Version-specific styling parameters testing
+versioned_style_override_v1:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/styles/v1_figure_{ts}.png
+  purpose: presentation
+  condition_param: style_version_test
+  versioned: true
+  style_params:
+    # Version 1 styling characteristics
+    figure.dpi: 150
+    font.family: sans-serif
+    font.size: 11
+    axes.titlesize: 13
+    axes.labelsize: 11
+    lines.linewidth: 1.2
+    axes.linewidth: 0.8
+  save_args:
+    bbox_inches: tight
+    metadata:
+      style_version: "v1"
+      test_purpose: "version_specific_styling"
+
+versioned_style_override_v2:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/styles/v2_figure_{ts}.png
+  purpose: presentation
+  condition_param: style_version_test
+  versioned: true
+  style_params:
+    # Version 2 styling characteristics (evolved)
+    figure.dpi: 200
+    font.family: serif
+    font.size: 12
+    axes.titlesize: 14
+    axes.labelsize: 12
+    lines.linewidth: 1.5
+    axes.linewidth: 1.0
+    mathtext.fontset: dejavuserif
+  save_args:
+    bbox_inches: tight
+    metadata:
+      style_version: "v2"
+      test_purpose: "version_specific_styling"
+
+# Mixed versioned and unversioned datasets for compatibility testing
+mixed_versioned_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/mixed/versioned_figure_{ts}.png
+  purpose: exploratory
+  condition_param: mixed_test_versioned
+  versioned: true
+  style_params:
+    figure.dpi: 150
+    font.size: 11
+
+mixed_unversioned_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/mixed/unversioned_figure.png
+  purpose: exploratory
+  condition_param: mixed_test_unversioned
+  versioned: false
+  style_params:
+    figure.dpi: 150
+    font.size: 11
+
+# Environment-specific versioned configurations
+versioned_development_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/env/dev_figure_{ts}.png
+  purpose: exploratory
+  condition_param: development_condition
+  versioned: true
+  style_params:
+    figure.dpi: 100  # Lower DPI for faster development iterations
+    font.size: 10
+    axes.grid: true
+  save_args:
+    bbox_inches: tight
+    optimize: false  # Skip optimization for speed
+
+versioned_production_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/env/prod_figure_{ts}.png
+  purpose: publication
+  condition_param: production_condition
+  versioned: true
+  style_params:
+    figure.dpi: 300  # High DPI for production quality
+    font.size: 12
+    axes.grid: false
+    figure.facecolor: white
+  save_args:
+    bbox_inches: tight
+    optimize: true
+    metadata:
+      environment: production
+      quality_level: high
+
+# Versioned dataset dependencies testing
+versioned_dependent_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/dependencies/dependent_figure_{ts}.png
+  purpose: presentation
+  condition_param: dependency_test_condition
+  versioned: true
+  style_params:
+    figure.dpi: 200
+    font.size: 12
+  save_args:
+    bbox_inches: tight
+    metadata:
+      depends_on: ["versioned_source_data", "versioned_model_results"]
+      integration_test: true
+
+# Specialized versioned formats for comprehensive testing
+versioned_eps_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/formats/figure_{ts}.eps
+  purpose: publication
+  condition_param: eps_format_test
+  versioned: true
+  style_params:
+    figure.dpi: 300
+    font.family: serif
+    font.size: 12
+  save_args:
+    format: eps
+    bbox_inches: tight
+
+versioned_jpg_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/formats/figure_{ts}.jpg
+  purpose: presentation
+  condition_param: jpg_format_test
+  versioned: true
+  style_params:
+    figure.dpi: 200
+    figure.facecolor: white
+  save_args:
+    format: jpeg
+    quality: 95
+    bbox_inches: tight
+    facecolor: white
+
+# Error handling and edge cases with versioning
+versioned_edge_case_empty_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/edge_cases/empty_params_{ts}.png
+  purpose: exploratory
+  condition_param: edge_case_empty
+  versioned: true
+  # Minimal parameters to test edge case handling
+  save_args:
+    bbox_inches: tight
+
+versioned_edge_case_minimal:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/edge_cases/minimal_{ts}.png
+  versioned: true
+  # Only required parameters to test minimal configuration with versioning
+
+# Performance benchmarking with versioning overhead
+versioned_benchmark_baseline:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/benchmark/baseline_{ts}.png
+  purpose: exploratory
+  condition_param: benchmark_baseline
+  versioned: true
+  style_params:
+    figure.dpi: 150
+  save_args:
+    bbox_inches: tight
+
+versioned_benchmark_complex:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/benchmark/complex_{ts}.png
+  purpose: publication
+  condition_param: benchmark_complex
+  versioned: true
+  style_params:
+    figure.dpi: 300
+    font.family: serif
+    font.size: 12
+    axes.titlesize: 14
+    axes.labelsize: 12
+    legend.fontsize: 10
+    lines.linewidth: 1.5
+    axes.linewidth: 1.0
+    mathtext.fontset: dejavuserif
+    figure.facecolor: white
+    axes.facecolor: white
+    axes.edgecolor: black
+    xtick.direction: in
+    ytick.direction: in
+    xtick.major.size: 4
+    ytick.major.size: 4
+  save_args:
+    format: pdf
+    bbox_inches: tight
+    pad_inches: 0.05
+    metadata:
+      Title: "Complex Versioned Benchmark Figure"
+      Creator: "FigRegistry-Kedro Performance Test"
+      Subject: "Versioning Performance Analysis"
