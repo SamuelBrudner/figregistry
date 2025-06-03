@@ -1,0 +1,173 @@
+# =============================================================================
+# Temporal Analysis Aggregated Data - FigRegistry-Kedro Migration Example (After)
+# =============================================================================
+# This dataset demonstrates automated temporal data processing where condition-based
+# styling eliminates manual line plot styling, hardcoded color schemes, and 
+# scattered plt.savefig() calls characteristic of traditional workflows.
+#
+# MIGRATION TRANSFORMATION DEMONSTRATED:
+# BEFORE: Manual temporal styling with hardcoded parameters in every time series plot
+# AFTER:  Automated temporal visualization through condition_param resolution
+# BEFORE: Scattered plt.savefig() calls with manual path management for time series
+# AFTER:  FigureDataSet catalog integration with automated styling and versioning
+# BEFORE: Repetitive temporal plot formatting code across pipeline nodes
+# AFTER:  Zero temporal styling code - handled automatically by FigRegistry
+#
+# AUTOMATED STYLING FEATURES ENABLED:
+# - condition_param resolution from experimental_condition for line plot styling
+# - trend_direction-based automatic color and marker selection per F-002
+# - seasonal_component-driven linestyle automation through style engine
+# - data_quality-based alpha and linewidth adjustment through condition mapping
+# - time_window aggregation supporting automated temporal chart formatting
+# - rolling statistics context enabling automatic axis scaling and grid settings
+#
+# COLUMN DESCRIPTIONS:
+# - time_window: Temporal aggregation period (daily, weekly, monthly, quarterly)
+# - experimental_condition: Primary condition parameter for automated styling via F-005
+# - trend_direction: Temporal trend indicator (increasing, decreasing, stable, volatile)
+# - seasonal_component: Seasonal pattern strength (strong, moderate, weak, none)
+# - data_quality: Quality assessment for automated styling decisions (high, medium, low)
+# - measurement_count: Number of observations in aggregation window
+# - mean_value: Central tendency measure for time series visualization
+# - std_deviation: Variability measure for automated error band styling
+# - rolling_mean_7d: 7-day rolling average for temporal smoothing
+# - rolling_std_7d: 7-day rolling standard deviation for variability context
+# - min_value: Minimum value in aggregation window for axis range automation
+# - max_value: Maximum value in aggregation window for axis range automation
+# - median_value: Median value for robust central tendency
+# - percentile_25: First quartile for automated quartile visualization
+# - percentile_75: Third quartile for automated quartile bands
+# - autocorrelation_lag1: First-order autocorrelation for temporal dependency indication
+# - temporal_pattern_strength: Overall pattern strength (0-1) for styling intensity
+# - anomaly_score: Anomaly detection score for automated highlighting
+# - confidence_interval_lower: Lower confidence bound for automated confidence bands
+# - confidence_interval_upper: Upper confidence bound for automated confidence bands
+# =============================================================================
+time_window,experimental_condition,trend_direction,seasonal_component,data_quality,measurement_count,mean_value,std_deviation,rolling_mean_7d,rolling_std_7d,min_value,max_value,median_value,percentile_25,percentile_75,autocorrelation_lag1,temporal_pattern_strength,anomaly_score,confidence_interval_lower,confidence_interval_upper
+# Exploratory analysis phase - early time periods with high variability
+daily,exploratory_analysis,volatile,weak,high_quality,24,15.73,4.82,14.56,3.91,8.21,26.45,15.12,12.34,18.67,0.23,0.42,0.12,13.89,17.57
+daily,exploratory_analysis,increasing,moderate,high_quality,24,18.94,5.21,17.23,4.67,10.12,29.33,18.45,14.78,22.56,0.34,0.58,0.08,16.87,21.01
+daily,exploratory_analysis,stable,strong,medium_quality,24,22.15,3.67,21.89,3.12,16.78,28.90,21.67,19.45,24.23,0.67,0.74,0.15,20.34,23.96
+weekly,exploratory_analysis,decreasing,moderate,high_quality,168,19.87,6.34,18.45,5.78,7.23,34.56,19.23,15.67,23.45,0.45,0.61,0.18,17.12,22.62
+weekly,exploratory_analysis,increasing,weak,medium_quality,168,25.43,7.89,24.12,6.92,12.34,39.87,24.78,20.12,29.34,0.28,0.49,0.22,22.45,28.41
+monthly,exploratory_analysis,stable,none,high_quality,720,28.67,4.23,27.89,3.87,20.45,36.78,28.12,25.34,31.23,0.12,0.38,0.09,26.78,30.56
+
+# Random forest model training phase - structured patterns emerging
+daily,random_forest,increasing,strong,high_quality,24,32.45,3.89,31.78,3.45,26.12,39.67,32.23,29.67,34.89,0.78,0.82,0.06,30.67,34.23
+daily,random_forest,stable,moderate,high_quality,24,35.67,2.34,35.12,2.89,31.23,39.45,35.45,33.78,37.12,0.65,0.71,0.11,34.23,37.11
+weekly,random_forest,increasing,strong,high_quality,168,38.94,4.56,37.67,4.12,29.78,47.23,38.45,35.67,41.78,0.73,0.79,0.14,36.78,41.10
+weekly,random_forest,stable,moderate,medium_quality,168,42.13,5.67,41.23,5.23,32.45,51.67,41.89,38.45,45.23,0.58,0.69,0.16,39.45,44.81
+monthly,random_forest,increasing,weak,high_quality,720,45.78,3.45,44.89,3.12,39.23,52.34,45.34,43.12,47.89,0.34,0.56,0.12,43.67,47.89
+quarterly,random_forest,stable,none,high_quality,2160,48.23,2.87,47.78,2.56,43.45,53.67,47.89,46.34,49.78,0.21,0.42,0.08,46.45,50.01
+
+# Moderate complexity optimization phase - balanced performance patterns
+daily,moderate,increasing,moderate,high_quality,24,51.34,4.23,50.67,3.89,44.56,58.78,50.89,48.23,53.67,0.56,0.67,0.09,49.23,53.45
+daily,moderate,stable,strong,medium_quality,24,54.67,3.78,53.89,3.45,48.23,60.45,54.12,52.34,56.78,0.69,0.75,0.13,52.45,56.89
+weekly,moderate,decreasing,moderate,high_quality,168,52.89,5.34,51.67,4.89,43.78,62.34,52.45,49.67,55.89,0.43,0.61,0.17,50.23,55.55
+weekly,moderate,increasing,weak,high_quality,168,56.78,4.89,55.45,4.34,48.23,65.67,56.23,53.45,59.12,0.38,0.58,0.14,54.12,59.44
+monthly,moderate,stable,strong,high_quality,720,59.45,3.67,58.67,3.23,52.34,66.78,59.12,56.78,61.45,0.72,0.78,0.11,57.34,61.56
+quarterly,moderate,increasing,moderate,medium_quality,2160,62.13,4.45,61.23,4.12,54.67,70.89,61.78,58.89,64.67,0.54,0.68,0.15,59.78,64.48
+
+# Optimized training phase - high performance with controlled variability
+daily,optimized,increasing,strong,high_quality,24,68.92,2.89,68.34,2.56,64.23,73.45,68.67,66.78,70.45,0.81,0.87,0.05,67.23,70.61
+daily,optimized,stable,moderate,high_quality,24,72.45,2.34,71.89,2.12,68.78,76.23,72.12,70.89,73.67,0.74,0.82,0.07,71.12,73.78
+weekly,optimized,increasing,strong,high_quality,168,75.67,3.45,74.89,3.12,69.23,81.34,75.23,73.45,77.89,0.79,0.85,0.09,73.89,77.45
+weekly,optimized,stable,weak,medium_quality,168,78.34,4.12,77.56,3.78,71.45,85.67,77.89,75.67,80.45,0.62,0.73,0.12,76.23,80.45
+monthly,optimized,increasing,moderate,high_quality,720,81.78,2.67,80.89,2.34,77.45,86.23,81.34,79.67,83.12,0.68,0.76,0.08,80.23,83.33
+quarterly,optimized,stable,strong,high_quality,2160,84.56,2.12,83.78,1.89,80.34,88.67,84.12,83.23,85.67,0.83,0.89,0.06,83.34,85.78
+
+# Real-world dataset validation phase - realistic performance patterns
+daily,real_world,volatile,weak,medium_quality,24,79.23,6.78,78.45,6.23,67.89,89.56,78.67,74.56,83.45,0.31,0.52,0.19,75.67,82.79
+daily,real_world,decreasing,moderate,high_quality,24,76.89,5.34,75.67,4.89,68.23,85.45,76.34,73.45,79.67,0.47,0.63,0.16,73.89,79.89
+weekly,real_world,stable,strong,medium_quality,168,74.56,7.23,73.23,6.78,62.34,87.89,73.89,69.78,78.67,0.59,0.71,0.21,70.89,78.23
+weekly,real_world,increasing,moderate,high_quality,168,77.34,6.45,76.12,5.89,66.78,88.23,76.89,72.45,81.23,0.52,0.67,0.18,73.67,81.01
+monthly,real_world,stable,weak,medium_quality,720,80.12,5.67,79.34,5.23,70.45,89.67,79.67,76.23,83.45,0.41,0.59,0.15,77.45,82.79
+quarterly,real_world,decreasing,none,high_quality,2160,77.89,4.89,76.67,4.45,69.23,86.45,77.34,74.67,80.78,0.28,0.48,0.13,75.23,80.55
+
+# High quality data analysis phase - consistent high-performance metrics
+daily,high_quality,stable,strong,high_quality,24,85.67,1.89,85.12,1.67,82.34,88.45,85.45,84.23,86.78,0.87,0.92,0.04,84.67,86.67
+daily,high_quality,increasing,moderate,high_quality,24,87.23,2.12,86.67,1.89,83.45,90.67,86.89,85.67,88.34,0.79,0.86,0.06,86.12,88.34
+weekly,high_quality,stable,strong,high_quality,168,89.45,2.34,88.78,2.12,85.67,93.23,89.12,87.78,90.67,0.84,0.89,0.07,88.12,90.78
+weekly,high_quality,increasing,weak,high_quality,168,91.78,2.67,90.89,2.34,87.23,95.67,91.34,89.89,93.12,0.72,0.81,0.09,90.23,93.33
+monthly,high_quality,stable,moderate,high_quality,720,93.56,1.78,92.89,1.56,90.45,96.78,93.23,92.34,94.45,0.88,0.93,0.05,92.67,94.45
+quarterly,high_quality,increasing,strong,high_quality,2160,95.34,1.45,94.67,1.23,92.78,97.89,95.12,94.23,96.12,0.91,0.95,0.03,94.56,96.12
+
+# Medium sample size analysis - representative performance patterns
+daily,medium_sample,stable,moderate,medium_quality,24,82.45,3.67,81.78,3.34,76.23,87.89,82.12,79.89,84.67,0.64,0.74,0.11,80.67,84.23
+daily,medium_sample,increasing,strong,high_quality,24,84.78,3.23,83.89,2.89,79.45,89.23,84.34,82.67,86.45,0.76,0.83,0.08,82.89,86.67
+weekly,medium_sample,volatile,weak,medium_quality,168,81.23,5.89,80.45,5.34,71.67,91.45,80.89,77.34,84.67,0.39,0.57,0.18,78.45,84.01
+weekly,medium_sample,stable,moderate,high_quality,168,83.67,4.45,82.89,4.12,76.78,90.23,83.23,80.89,86.12,0.61,0.72,0.14,81.34,86.00
+monthly,medium_sample,increasing,strong,high_quality,720,86.23,3.78,85.45,3.45,79.89,92.67,85.89,83.67,88.34,0.73,0.81,0.12,84.12,88.34
+quarterly,medium_sample,stable,weak,medium_quality,2160,88.45,3.23,87.67,2.89,83.23,93.78,88.12,86.34,90.23,0.58,0.69,0.10,86.89,90.01
+
+# Validation phase analysis - rigorous performance assessment
+daily,validation,decreasing,moderate,high_quality,24,84.12,4.34,83.45,3.89,76.67,90.45,83.78,81.23,86.89,0.48,0.64,0.15,81.78,86.46
+daily,validation,stable,strong,high_quality,24,86.78,3.45,86.12,3.12,81.23,92.34,86.45,84.67,88.67,0.71,0.79,0.11,84.89,88.67
+weekly,validation,increasing,moderate,medium_quality,168,88.34,4.67,87.56,4.23,80.67,95.23,87.89,85.34,90.78,0.59,0.71,0.16,85.89,90.79
+weekly,validation,stable,weak,high_quality,168,90.67,3.89,89.89,3.56,84.23,96.78,90.23,88.45,92.45,0.66,0.75,0.13,88.45,92.89
+monthly,validation,decreasing,none,high_quality,720,87.89,5.23,87.12,4.78,79.45,95.67,87.45,84.67,90.89,0.35,0.56,0.17,85.12,90.66
+quarterly,validation,stable,moderate,high_quality,2160,89.23,4.12,88.45,3.78,82.34,95.89,88.89,86.78,91.34,0.62,0.73,0.14,87.12,91.34
+
+# Detailed analysis phase - comprehensive performance evaluation
+daily,detailed,increasing,strong,high_quality,24,91.45,2.78,90.78,2.45,87.23,95.67,91.12,89.67,92.78,0.82,0.88,0.07,90.12,92.78
+daily,detailed,stable,moderate,high_quality,24,93.23,2.34,92.67,2.12,89.45,96.78,92.89,91.78,94.23,0.77,0.84,0.08,92.12,94.34
+weekly,detailed,increasing,strong,high_quality,168,94.67,2.89,93.89,2.56,90.23,98.45,94.34,92.89,96.12,0.79,0.86,0.09,93.12,96.22
+weekly,detailed,stable,weak,medium_quality,168,92.34,3.67,91.67,3.34,86.78,97.23,92.12,89.89,94.45,0.64,0.75,0.12,90.45,94.23
+monthly,detailed,decreasing,moderate,high_quality,720,90.78,4.23,90.12,3.89,84.45,96.89,90.45,88.23,93.12,0.53,0.68,0.14,88.67,92.89
+quarterly,detailed,stable,strong,high_quality,2160,92.56,3.45,91.89,3.12,87.67,97.23,92.23,90.78,94.12,0.74,0.82,0.11,90.89,94.23
+
+# Stakeholder presentation phase - business-focused performance metrics
+daily,stakeholder,increasing,moderate,high_quality,24,89.67,3.23,88.89,2.89,84.45,94.23,89.34,87.67,91.45,0.69,0.77,0.10,88.12,91.22
+daily,stakeholder,stable,strong,high_quality,24,91.34,2.67,90.67,2.34,87.23,95.45,91.12,89.89,92.67,0.81,0.87,0.08,90.12,92.56
+weekly,stakeholder,increasing,weak,medium_quality,168,93.78,3.45,92.89,3.12,88.67,98.23,93.45,91.78,95.34,0.62,0.73,0.12,92.12,95.44
+weekly,stakeholder,stable,moderate,high_quality,168,95.23,2.89,94.56,2.56,91.34,99.12,94.89,93.45,96.78,0.75,0.83,0.09,93.67,96.79
+monthly,stakeholder,decreasing,strong,high_quality,720,92.45,4.12,91.78,3.78,86.23,98.67,92.12,90.34,94.56,0.58,0.71,0.13,90.67,94.23
+quarterly,stakeholder,stable,none,high_quality,2160,94.12,3.34,93.45,3.01,89.78,99.45,93.89,92.34,95.67,0.66,0.76,0.11,92.56,95.68
+
+# Review quality assessment phase - quality control metrics
+daily,review,volatile,weak,medium_quality,24,86.23,5.67,85.45,5.23,78.45,94.67,85.89,82.67,89.34,0.37,0.55,0.19,83.45,89.01
+daily,review,stable,moderate,high_quality,24,88.67,4.23,87.89,3.89,82.34,95.23,88.34,86.12,90.78,0.63,0.74,0.14,86.67,90.67
+weekly,review,increasing,strong,medium_quality,168,90.34,4.78,89.56,4.34,83.67,97.89,89.89,87.78,92.45,0.69,0.78,0.16,88.12,92.56
+weekly,review,decreasing,moderate,high_quality,168,87.78,5.34,87.01,4.89,80.23,95.67,87.45,84.89,90.67,0.51,0.67,0.17,85.23,90.33
+monthly,review,stable,weak,high_quality,720,89.45,4.45,88.67,4.12,82.78,96.23,89.12,86.78,91.89,0.56,0.69,0.15,87.23,91.67
+quarterly,review,increasing,none,medium_quality,2160,91.23,3.89,90.45,3.56,85.67,97.45,90.89,88.89,93.34,0.48,0.64,0.13,89.12,93.34
+
+# Technical audience analysis - precision-focused metrics
+daily,technical,stable,strong,high_quality,24,93.45,1.89,92.78,1.67,90.67,96.23,93.23,92.34,94.45,0.88,0.92,0.05,92.67,94.23
+daily,technical,increasing,moderate,high_quality,24,94.78,2.12,94.12,1.89,91.45,97.67,94.45,93.67,95.67,0.83,0.89,0.06,93.89,95.67
+weekly,technical,stable,strong,high_quality,168,96.23,2.34,95.56,2.12,92.89,99.45,95.89,94.78,97.23,0.86,0.91,0.07,95.12,97.34
+weekly,technical,decreasing,weak,medium_quality,168,94.12,3.45,93.45,3.12,89.67,98.78,93.78,92.34,95.89,0.64,0.75,0.11,92.67,95.57
+monthly,technical,increasing,moderate,high_quality,720,97.34,2.67,96.67,2.34,93.45,101.23,97.12,95.89,98.45,0.78,0.85,0.08,96.12,98.56
+quarterly,technical,stable,none,high_quality,2160,98.67,2.12,97.89,1.89,95.34,102.45,98.34,97.45,99.67,0.81,0.88,0.06,97.67,99.67
+
+# Screen display optimization - visual presentation metrics
+daily,screen,increasing,moderate,high_quality,24,91.78,3.45,91.12,3.12,86.34,96.45,91.45,89.67,93.56,0.71,0.79,0.11,90.12,93.44
+daily,screen,stable,strong,medium_quality,24,93.45,2.89,92.78,2.56,89.67,97.23,93.12,91.89,94.78,0.76,0.83,0.09,92.12,94.78
+weekly,screen,volatile,weak,medium_quality,168,90.23,4.67,89.45,4.23,83.78,97.67,89.89,87.34,92.78,0.44,0.62,0.16,87.89,92.57
+weekly,screen,increasing,moderate,high_quality,168,92.67,3.78,91.89,3.45,87.23,98.45,92.34,90.45,94.56,0.67,0.76,0.13,90.45,94.89
+monthly,screen,stable,strong,high_quality,720,94.78,3.23,94.12,2.89,89.45,99.67,94.45,92.89,96.34,0.73,0.81,0.10,93.12,96.44
+quarterly,screen,decreasing,none,high_quality,2160,92.34,4.12,91.67,3.78,86.78,98.23,92.12,90.23,94.45,0.58,0.71,0.14,90.67,94.01
+
+# Colorblind safe analysis - accessibility-focused metrics
+daily,colorblind_safe,stable,moderate,high_quality,24,88.34,3.67,87.67,3.34,83.45,93.78,88.12,86.23,90.45,0.65,0.75,0.12,86.67,90.01
+daily,colorblind_safe,increasing,strong,high_quality,24,90.67,3.12,89.89,2.78,86.23,95.12,90.34,88.78,92.23,0.74,0.82,0.10,89.12,92.22
+weekly,colorblind_safe,stable,weak,medium_quality,168,89.45,4.23,88.78,3.89,83.67,95.89,89.12,87.23,91.67,0.59,0.71,0.14,87.67,91.23
+weekly,colorblind_safe,decreasing,moderate,high_quality,168,87.23,4.78,86.56,4.34,80.45,94.67,86.89,84.67,89.78,0.52,0.68,0.16,85.12,89.34
+monthly,colorblind_safe,increasing,strong,high_quality,720,91.56,3.45,90.89,3.12,86.78,96.78,91.23,89.67,93.12,0.71,0.79,0.11,90.12,93.00
+quarterly,colorblind_safe,stable,none,high_quality,2160,93.78,2.89,93.12,2.56,89.45,98.23,93.45,92.23,95.12,0.68,0.76,0.09,92.45,95.11
+
+# Testing environment metrics - development and validation context
+daily,testing,volatile,weak,medium_quality,24,82.67,6.23,81.89,5.78,74.45,92.34,82.34,79.23,85.89,0.33,0.51,0.21,79.67,85.67
+daily,testing,stable,moderate,high_quality,24,85.34,4.89,84.67,4.45,78.78,93.67,85.12,82.45,87.89,0.61,0.72,0.16,82.89,87.79
+weekly,testing,increasing,strong,medium_quality,168,87.78,5.45,87.01,4.98,80.23,96.45,87.45,84.67,90.34,0.67,0.76,0.18,85.23,90.33
+weekly,testing,decreasing,moderate,high_quality,168,84.45,6.12,83.78,5.67,76.89,94.23,84.12,81.34,87.56,0.46,0.63,0.19,81.78,87.12
+monthly,testing,stable,weak,medium_quality,720,86.67,5.78,86.01,5.34,78.45,95.89,86.34,83.45,89.23,0.54,0.68,0.17,83.89,89.45
+quarterly,testing,increasing,none,high_quality,2160,88.23,4.67,87.56,4.23,81.67,96.78,87.89,85.67,90.45,0.42,0.61,0.15,86.12,90.34
+
+# Standard resource allocation - baseline performance metrics
+daily,standard,stable,moderate,medium_quality,24,87.45,4.12,86.78,3.78,81.23,93.67,87.12,85.34,89.56,0.63,0.74,0.13,85.67,89.23
+daily,standard,increasing,strong,high_quality,24,89.78,3.56,89.12,3.23,84.67,95.23,89.45,87.89,91.34,0.72,0.81,0.11,88.12,91.44
+weekly,standard,stable,weak,medium_quality,168,86.23,5.23,85.56,4.78,79.45,94.67,85.89,83.45,88.78,0.57,0.69,0.16,83.67,88.79
+weekly,standard,volatile,moderate,high_quality,168,88.67,4.78,87.89,4.34,81.89,96.45,88.34,86.12,91.23,0.49,0.65,0.15,86.34,91.00
+monthly,standard,increasing,strong,high_quality,720,91.34,3.89,90.67,3.56,85.78,97.23,91.12,89.45,93.12,0.69,0.77,0.12,89.67,93.01
+quarterly,standard,stable,none,medium_quality,2160,93.12,3.34,92.45,3.01,88.78,98.45,92.78,91.23,94.67,0.64,0.74,0.10,91.45,94.79
