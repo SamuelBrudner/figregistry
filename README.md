@@ -10,15 +10,90 @@ A configuration-driven figure generation and management system for scientific vi
 - **Versioned Outputs**: Automatic timestamping and naming conventions
 - **Flexible Outputs**: Support for different output purposes (exploratory, presentation, publication)
 
+## Kedro Integration
+
+The `figregistry-kedro` plugin extends FigRegistry's configuration-driven visualization capabilities into Kedro machine learning pipelines, enabling automated figure styling, versioning, and management within data science workflows.
+
+### Key Plugin Components
+
+#### FigureDataSet
+Custom Kedro dataset that automatically applies FigRegistry styling to matplotlib figures during catalog save operations:
+- Seamless integration with Kedro's data catalog and versioning
+- Automatic condition-based styling based on pipeline parameters
+- Elimination of manual `plt.savefig()` calls in node functions
+- Support for all FigRegistry output formats (PNG, PDF, SVG)
+
+#### FigRegistryHooks
+Lifecycle hooks for configuration initialization and context management:
+- Automatic FigRegistry configuration loading at pipeline startup
+- Non-invasive integration that preserves Kedro's execution model
+- Thread-safe operation for parallel pipeline execution
+- Transparent context management requiring no code changes
+
+#### FigRegistryConfigBridge
+Configuration translation layer between Kedro and FigRegistry:
+- Seamless merging of Kedro project configurations with traditional `figregistry.yaml` settings
+- Support for environment-specific configuration overrides (dev, staging, production)
+- Unified configuration source eliminating duplicate configuration management
+- Automatic validation and type safety across both systems
+
+### Kedro Plugin Quick Start
+
+1. Install the plugin:
+   ```bash
+   pip install figregistry-kedro
+   ```
+
+2. Configure your Kedro catalog (`conf/base/catalog.yml`):
+   ```yaml
+   exploratory_plot:
+     type: figregistry_kedro.FigureDataSet
+     filepath: data/08_reporting/exploratory_plot
+     condition_param: experimental_condition
+     style_params:
+       purpose: "exploratory"
+   
+   publication_figure:
+     type: figregistry_kedro.FigureDataSet
+     filepath: data/08_reporting/publication_figure
+     condition_param: treatment_group
+     style_params:
+       purpose: "publication"
+       dpi: 300
+   ```
+
+3. Create pipeline nodes that return matplotlib figures:
+   ```python
+   def create_scatter_plot(data: pd.DataFrame) -> plt.Figure:
+       fig, ax = plt.subplots()
+       ax.scatter(data['x'], data['y'])
+       ax.set_title('Data Analysis Results')
+       return fig
+   ```
+
+4. Register hooks in your project settings (`src/your_project/settings.py`):
+   ```python
+   from figregistry_kedro.hooks import hooks
+   
+   HOOKS = (hooks,)
+   ```
+
+### Compatibility
+- **Kedro**: `>=0.18.0,<0.20.0`
+- **FigRegistry**: `>=0.3.0`
+- **Python**: `>=3.10`
+
+For comprehensive documentation, examples, and advanced configuration options, see the [figregistry-kedro documentation](figregistry-kedro/docs/).
+
 ## Installation
 
-### Core Package (Python)
+### Python
 ```bash
 pip install -e .
 ```
 
 ### Kedro Plugin
-For automated figure styling and management in Kedro data pipelines:
+For automated figure styling and management in Kedro workflows:
 ```bash
 pip install figregistry-kedro
 ```
@@ -60,77 +135,6 @@ Add the `matlab` directory to your MATLAB path.
    figregistry.saveFigure('my_plot');
    ```
 
-## Kedro Integration
-
-The `figregistry-kedro` plugin extends FigRegistry's capabilities into Kedro machine learning pipelines, providing automated figure styling, versioning, and management within data science workflows.
-
-### Plugin Components
-
-The plugin provides three core components for seamless integration:
-
-- **FigureDataSet**: Custom Kedro dataset that automatically applies FigRegistry styling to matplotlib figures during catalog save operations
-- **FigRegistryHooks**: Lifecycle hooks for initializing FigRegistry configuration at pipeline startup and managing context throughout execution
-- **FigRegistryConfigBridge**: Configuration translation layer that merges Kedro project configurations with FigRegistry settings
-
-### Quick Start with Kedro
-
-1. Install the plugin:
-   ```bash
-   pip install figregistry-kedro
-   ```
-
-2. Configure your Kedro data catalog (`conf/base/catalog.yml`):
-   ```yaml
-   model_performance_plot:
-     type: figregistry_kedro.FigureDataSet
-     filepath: data/08_reporting/model_performance.png
-     condition_param: model_type
-     style_params:
-       purpose: publication
-   ```
-
-3. Create figures in your Kedro nodes:
-   ```python
-   def plot_model_performance(model_metrics: pd.DataFrame) -> plt.Figure:
-       fig, ax = plt.subplots()
-       ax.plot(model_metrics['epoch'], model_metrics['accuracy'])
-       return fig  # FigRegistry styling applied automatically
-   ```
-
-4. Register hooks in your `settings.py`:
-   ```python
-   from figregistry_kedro.hooks import hooks
-
-   HOOKS = hooks
-   ```
-
-### Configuration Integration
-
-The plugin supports both standalone `figregistry.yaml` files and Kedro-integrated configuration in `conf/base/figregistry.yml`:
-
-```yaml
-figregistry_version: ">=0.3"
-style:
-  rcparams:
-    font.family: sans-serif
-    font.size: 9
-layout:
-  width_cm: 8.9
-condition_styles:
-  random_forest:
-    color: "#2E8B57"
-    marker: "o"
-  xgboost:
-    color: "#4682B4" 
-    marker: "s"
-```
-
-### Plugin Documentation
-
-For comprehensive documentation including advanced configuration, deployment patterns, and migration guides, see the [figregistry-kedro documentation](figregistry-kedro/docs/).
-
-**Requirements**: `kedro>=0.18.0,<0.20.0` and `figregistry>=0.3.0`
-
 ## Documentation
 
 See the [documentation](docs/index.md) for detailed usage and configuration options.
@@ -151,31 +155,17 @@ See the [documentation](docs/index.md) for detailed usage and configuration opti
    pip install -e ".[dev]"
    ```
 
-### Plugin Development
-
-For developing the Kedro plugin:
-
-1. Install additional dependencies:
+3. For Kedro plugin development, also install:
    ```bash
-   pip install kedro>=0.18.0,<0.20.0 kedro-datasets pytest-mock
-   ```
-
-2. Run plugin tests:
-   ```bash
-   cd figregistry-kedro
-   pytest
+   pip install "kedro>=0.18.0,<0.20.0"
+   pip install -e "./figregistry-kedro[dev]"
    ```
 
 ### Testing
 
-Run core tests:
+Run tests:
 ```bash
 pytest
-```
-
-Run all tests including plugin:
-```bash
-pytest --cov=figregistry --cov=figregistry_kedro
 ```
 
 ## License
