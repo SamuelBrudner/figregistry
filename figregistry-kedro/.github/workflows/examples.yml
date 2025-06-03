@@ -1,0 +1,1869 @@
+name: Example Pipeline Validation
+
+# Example pipeline validation workflow that creates temporary Kedro projects,
+# installs the plugin, and executes comprehensive integration scenarios including
+# basic plugin functionality, advanced multi-environment configurations, and
+# migration workflows. Validates end-to-end plugin behavior in realistic Kedro
+# pipeline contexts.
+
+on:
+  # Trigger on pull requests affecting examples or core plugin code
+  pull_request:
+    paths:
+      - 'examples/**'
+      - 'src/figregistry_kedro/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.github/workflows/examples.yml'
+    branches: [ main, develop ]
+
+  # Trigger on main branch pushes to validate example integrity
+  push:
+    branches: [ main ]
+    paths:
+      - 'examples/**'
+      - 'src/figregistry_kedro/**'
+
+  # Manual trigger for ad-hoc validation
+  workflow_dispatch:
+    inputs:
+      example_type:
+        description: 'Specific example to validate (basic, advanced, migration, all)'
+        required: false
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - basic
+          - advanced
+          - migration
+      kedro_version:
+        description: 'Kedro version for testing'
+        required: false
+        default: 'latest'
+        type: choice
+        options:
+          - latest
+          - '0.18.14'
+          - '0.19.8'
+
+  # Scheduled runs to catch breaking changes in dependencies
+  schedule:
+    # Run twice weekly (Wednesday and Sunday at 02:00 UTC)
+    - cron: '0 2 * * 3,0'
+
+env:
+  # Performance and quality thresholds per Section 6.6.4.3
+  PLUGIN_OVERHEAD_THRESHOLD_MS: 200
+  CONFIG_BRIDGE_THRESHOLD_MS: 50
+  HOOK_INIT_THRESHOLD_MS: 25
+  COVERAGE_THRESHOLD: 90
+  
+  # Environment configuration
+  PYTHONUNBUFFERED: 1
+  PYTEST_TIMEOUT: 300
+  KEDRO_DISABLE_TELEMETRY: true
+
+jobs:
+  # Pre-validation setup and compatibility checks
+  setup-validation:
+    name: Setup and Compatibility Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    outputs:
+      examples-to-test: ${{ steps.determine-examples.outputs.examples }}
+      python-versions: ${{ steps.determine-versions.outputs.python-versions }}
+      kedro-versions: ${{ steps.determine-versions.outputs.kedro-versions }}
+      should-run-examples: ${{ steps.check-changes.outputs.should-run }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      
+      - name: Check for relevant changes
+        id: check-changes
+        run: |
+          # Check if this is a manual run or scheduled run
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event_name }}" == "schedule" ]]; then
+            echo "should-run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # For PR/push events, check if we have relevant changes
+          if git diff --name-only HEAD~1 | grep -E "(examples/|src/figregistry_kedro/|tests/|pyproject\.toml)" > /dev/null; then
+            echo "should-run=true" >> $GITHUB_OUTPUT
+          else
+            echo "should-run=false" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Determine examples to test
+        id: determine-examples
+        run: |
+          if [[ "${{ github.event.inputs.example_type }}" == "basic" ]]; then
+            echo 'examples=["basic"]' >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.example_type }}" == "advanced" ]]; then
+            echo 'examples=["advanced"]' >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.example_type }}" == "migration" ]]; then
+            echo 'examples=["migration"]' >> $GITHUB_OUTPUT
+          else
+            echo 'examples=["basic", "advanced", "migration"]' >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Determine version matrix
+        id: determine-versions
+        run: |
+          # Python versions to test (Section 8.3.1.2)
+          echo 'python-versions=["3.10", "3.11", "3.12"]' >> $GITHUB_OUTPUT
+          
+          # Kedro versions based on input or default matrix
+          if [[ "${{ github.event.inputs.kedro_version }}" == "0.18.14" ]]; then
+            echo 'kedro-versions=["0.18.14"]' >> $GITHUB_OUTPUT
+          elif [[ "${{ github.event.inputs.kedro_version }}" == "0.19.8" ]]; then
+            echo 'kedro-versions=["0.19.8"]' >> $GITHUB_OUTPUT
+          else
+            echo 'kedro-versions=["0.18.14", "0.19.8"]' >> $GITHUB_OUTPUT
+          fi
+
+  # Plugin installation and basic functionality validation
+  plugin-installation-test:
+    name: Plugin Installation Test (${{ matrix.os }}, Python ${{ matrix.python-version }}, Kedro ${{ matrix.kedro-version }})
+    runs-on: ${{ matrix.os }}
+    needs: setup-validation
+    if: needs.setup-validation.outputs.should-run-examples == 'true'
+    timeout-minutes: 20
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ${{ fromJson(needs.setup-validation.outputs.python-versions) }}
+        kedro-version: ${{ fromJson(needs.setup-validation.outputs.kedro-versions) }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Create fresh test environment
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install build twine
+      
+      - name: Install Kedro ${{ matrix.kedro-version }}
+        run: |
+          python -m pip install "kedro==${{ matrix.kedro-version }}"
+          kedro --version
+      
+      - name: Build figregistry-kedro plugin
+        run: |
+          python -m build --wheel --outdir dist/
+          echo "Built wheel:"
+          ls -la dist/
+      
+      - name: Install figregistry-kedro plugin
+        shell: bash
+        run: |
+          # Install the wheel we just built
+          WHEEL_FILE=$(ls dist/*.whl | head -n1)
+          python -m pip install "$WHEEL_FILE"
+          
+          # Verify installation
+          python -c "import figregistry_kedro; print(f'Plugin version: {figregistry_kedro.__version__}')"
+          python -c "from figregistry_kedro import check_dependencies; print(f'Dependencies OK: {check_dependencies()}')"
+      
+      - name: Validate plugin entry points
+        run: |
+          # Check entry points registration (Section 6.6.8.4)
+          python -c "
+          import pkg_resources
+          import sys
+          
+          # Validate hook entry points
+          hooks = list(pkg_resources.iter_entry_points('kedro.hooks'))
+          figregistry_hooks = [h for h in hooks if 'figregistry' in h.name.lower()]
+          
+          if not figregistry_hooks:
+              print('ERROR: FigRegistry hooks not found in entry points')
+              sys.exit(1)
+          
+          print(f'Found {len(figregistry_hooks)} FigRegistry hook entry points')
+          for hook in figregistry_hooks:
+              print(f'  - {hook.name}: {hook.module_name}')
+          
+          # Validate dataset entry points
+          datasets = list(pkg_resources.iter_entry_points('kedro.datasets'))
+          figregistry_datasets = [d for d in datasets if 'figregistry' in d.name.lower() or 'figure' in d.name.lower()]
+          
+          print(f'Found {len(figregistry_datasets)} FigRegistry dataset entry points')
+          for dataset in figregistry_datasets:
+              print(f'  - {dataset.name}: {dataset.module_name}')
+          "
+      
+      - name: Test hook registration
+        run: |
+          # Test hook registration in isolated environment
+          python -c "
+          import tempfile
+          import os
+          import sys
+          from pathlib import Path
+          
+          # Create temporary Kedro project structure
+          with tempfile.TemporaryDirectory() as temp_dir:
+              project_dir = Path(temp_dir) / 'test_project'
+              project_dir.mkdir()
+              
+              # Create minimal settings.py
+              settings_py = project_dir / 'src' / 'test_project' / 'settings.py'
+              settings_py.parent.mkdir(parents=True)
+              settings_py.write_text('''
+from figregistry_kedro import FigRegistryHooks
+
+HOOKS = (FigRegistryHooks(),)
+              ''')
+              
+              # Test hook instantiation
+              sys.path.insert(0, str(settings_py.parent))
+              try:
+                  from settings import HOOKS
+                  hook_instance = HOOKS[0]
+                  print(f'Hook registration successful: {type(hook_instance).__name__}')
+              except Exception as e:
+                  print(f'ERROR: Hook registration failed: {e}')
+                  sys.exit(1)
+          "
+
+  # Temporary Kedro project creation and basic example validation
+  basic-example-validation:
+    name: Basic Example (${{ matrix.os }}, Python ${{ matrix.python-version }}, Kedro ${{ matrix.kedro-version }})
+    runs-on: ${{ matrix.os }}
+    needs: [setup-validation, plugin-installation-test]
+    if: |
+      needs.setup-validation.outputs.should-run-examples == 'true' && 
+      contains(fromJson(needs.setup-validation.outputs.examples-to-test), 'basic')
+    timeout-minutes: 25
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ${{ fromJson(needs.setup-validation.outputs.python-versions) }}
+        kedro-version: ${{ fromJson(needs.setup-validation.outputs.kedro-versions) }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install "kedro==${{ matrix.kedro-version }}"
+          python -m pip install -e .
+      
+      - name: Create temporary Kedro project
+        id: create-project
+        shell: bash
+        run: |
+          # Create temporary directory for isolated testing
+          TEMP_DIR=$(mktemp -d)
+          echo "temp-dir=$TEMP_DIR" >> $GITHUB_OUTPUT
+          
+          cd "$TEMP_DIR"
+          
+          # Create basic Kedro project using starter (Section 6.6.7.2)
+          kedro new --name="figregistry_basic_test" \
+                    --package-name="figregistry_basic_test" \
+                    --python-package="figregistry_basic_test" \
+                    --tools=none \
+                    --example=y
+          
+          cd figregistry_basic_test
+          echo "project-dir=$TEMP_DIR/figregistry_basic_test" >> $GITHUB_OUTPUT
+          
+          # Verify project structure
+          ls -la
+          echo "Project created successfully"
+      
+      - name: Configure FigRegistry plugin
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Register FigRegistryHooks in settings.py
+          cat >> src/figregistry_basic_test/settings.py << 'EOF'
+          
+          # FigRegistry-Kedro integration
+          from figregistry_kedro import FigRegistryHooks
+          
+          HOOKS = (FigRegistryHooks(),)
+          EOF
+          
+          # Create figregistry configuration
+          mkdir -p conf/base
+          cat > conf/base/figregistry.yml << 'EOF'
+          purposes:
+            test:
+              description: "Basic test visualization"
+              rcParams:
+                figure.figsize: [8, 6]
+                figure.dpi: 100
+                axes.titlesize: 14
+                axes.labelsize: 12
+                legend.fontsize: 10
+              save_args:
+                dpi: 150
+                bbox_inches: tight
+                
+            presentation:
+              description: "Presentation-ready plots"
+              rcParams:
+                figure.figsize: [10, 8]
+                figure.dpi: 150
+                axes.titlesize: 16
+                axes.labelsize: 14
+                legend.fontsize: 12
+              save_args:
+                dpi: 300
+                bbox_inches: tight
+                format: png
+          
+          conditions:
+            default: test
+            experiment_type:
+              training: test
+              evaluation: presentation
+          EOF
+          
+          # Add FigureDataSet to catalog
+          cat >> conf/base/catalog.yml << 'EOF'
+          
+          # FigRegistry figure outputs
+          test_figure:
+            type: figregistry_kedro.FigureDataSet
+            filepath: data/08_reporting/test_figure.png
+            purpose: test
+            condition_param: experiment_condition
+          
+          evaluation_figure:
+            type: figregistry_kedro.FigureDataSet
+            filepath: data/08_reporting/evaluation_figure.png
+            purpose: presentation
+            condition_param: experiment_type
+            style_params:
+              condition: evaluation
+          EOF
+      
+      - name: Create test pipeline nodes
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Create pipeline with figure generation
+          mkdir -p src/figregistry_basic_test/pipelines/visualization
+          
+          # Pipeline nodes
+          cat > src/figregistry_basic_test/pipelines/visualization/nodes.py << 'EOF'
+          """Pipeline nodes for figure generation testing."""
+          import matplotlib.pyplot as plt
+          import numpy as np
+          from typing import Dict, Any
+          
+          
+          def create_test_figure() -> plt.Figure:
+              """Create a simple test figure."""
+              fig, ax = plt.subplots(figsize=(8, 6))
+              
+              # Generate sample data
+              x = np.linspace(0, 10, 100)
+              y = np.sin(x) + 0.1 * np.random.randn(100)
+              
+              ax.plot(x, y, 'b-', label='Sin wave with noise')
+              ax.set_xlabel('X values')
+              ax.set_ylabel('Y values')
+              ax.set_title('Test Figure - Basic Example')
+              ax.legend()
+              ax.grid(True, alpha=0.3)
+              
+              return fig
+          
+          
+          def create_evaluation_figure(parameters: Dict[str, Any]) -> plt.Figure:
+              """Create evaluation figure with styling."""
+              fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+              
+              # Sample evaluation metrics
+              metrics = ['Accuracy', 'Precision', 'Recall', 'F1-Score']
+              values = [0.85, 0.82, 0.88, 0.85]
+              
+              # Bar plot
+              ax1.bar(metrics, values, color='skyblue', alpha=0.8)
+              ax1.set_ylabel('Score')
+              ax1.set_title('Model Performance Metrics')
+              ax1.set_ylim(0, 1)
+              
+              # Line plot for training curves
+              epochs = range(1, 11)
+              train_loss = [0.8 - 0.05 * i + 0.01 * np.random.randn() for i in epochs]
+              val_loss = [0.85 - 0.04 * i + 0.02 * np.random.randn() for i in epochs]
+              
+              ax2.plot(epochs, train_loss, 'b-', label='Training Loss')
+              ax2.plot(epochs, val_loss, 'r-', label='Validation Loss')
+              ax2.set_xlabel('Epoch')
+              ax2.set_ylabel('Loss')
+              ax2.set_title('Training Progress')
+              ax2.legend()
+              ax2.grid(True, alpha=0.3)
+              
+              plt.tight_layout()
+              return fig
+          EOF
+          
+          # Pipeline definition
+          cat > src/figregistry_basic_test/pipelines/visualization/pipeline.py << 'EOF'
+          """Visualization pipeline definition."""
+          from kedro.pipeline import Pipeline, node
+          from .nodes import create_test_figure, create_evaluation_figure
+          
+          
+          def create_pipeline(**kwargs) -> Pipeline:
+              return Pipeline([
+                  node(
+                      func=create_test_figure,
+                      inputs=None,
+                      outputs="test_figure",
+                      name="create_test_figure",
+                  ),
+                  node(
+                      func=create_evaluation_figure,
+                      inputs="parameters",
+                      outputs="evaluation_figure", 
+                      name="create_evaluation_figure",
+                  ),
+              ])
+          EOF
+          
+          # __init__.py
+          touch src/figregistry_basic_test/pipelines/visualization/__init__.py
+          
+          # Register pipeline
+          cat >> src/figregistry_basic_test/pipeline_registry.py << 'EOF'
+          
+          from figregistry_basic_test.pipelines.visualization import create_pipeline as viz_pipeline
+          
+          def register_pipelines() -> Dict[str, Pipeline]:
+              """Register the project's pipelines."""
+              return {
+                  "__default__": viz_pipeline(),
+                  "visualization": viz_pipeline(),
+              }
+          EOF
+      
+      - name: Execute basic example pipeline
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Set experiment parameters
+          export EXPERIMENT_CONDITION=test
+          export EXPERIMENT_TYPE=evaluation
+          
+          echo "Starting pipeline execution..."
+          
+          # Run the visualization pipeline
+          kedro run --pipeline=visualization --verbose
+          
+          echo "Pipeline execution completed"
+      
+      - name: Validate figure outputs and styling
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Check that figures were created
+          if [[ ! -f "data/08_reporting/test_figure.png" ]]; then
+              echo "ERROR: test_figure.png not created"
+              exit 1
+          fi
+          
+          if [[ ! -f "data/08_reporting/evaluation_figure.png" ]]; then
+              echo "ERROR: evaluation_figure.png not created"
+              exit 1
+          fi
+          
+          echo "✓ All expected figure files created"
+          
+          # Validate file sizes (figures should not be empty)
+          test_size=$(stat -f%z "data/08_reporting/test_figure.png" 2>/dev/null || stat -c%s "data/08_reporting/test_figure.png")
+          eval_size=$(stat -f%z "data/08_reporting/evaluation_figure.png" 2>/dev/null || stat -c%s "data/08_reporting/evaluation_figure.png")
+          
+          if [[ $test_size -lt 1000 ]]; then
+              echo "ERROR: test_figure.png appears to be too small ($test_size bytes)"
+              exit 1
+          fi
+          
+          if [[ $eval_size -lt 1000 ]]; then
+              echo "ERROR: evaluation_figure.png appears to be too small ($eval_size bytes)"
+              exit 1
+          fi
+          
+          echo "✓ Figure files have reasonable sizes"
+          echo "  - test_figure.png: $test_size bytes"
+          echo "  - evaluation_figure.png: $eval_size bytes"
+      
+      - name: Test hook registration and context
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Test hook functionality
+          python -c "
+          import sys
+          sys.path.append('src')
+          
+          # Test hook imports
+          try:
+              from figregistry_kedro import FigRegistryHooks
+              hook = FigRegistryHooks()
+              print('✓ FigRegistryHooks instantiated successfully')
+          except Exception as e:
+              print(f'ERROR: Hook instantiation failed: {e}')
+              sys.exit(1)
+          
+          # Test configuration loading
+          try:
+              from figregistry_kedro import FigRegistryConfigBridge
+              bridge = FigRegistryConfigBridge()
+              print('✓ FigRegistryConfigBridge instantiated successfully')
+          except Exception as e:
+              print(f'ERROR: Config bridge instantiation failed: {e}')
+              sys.exit(1)
+          "
+      
+      - name: Performance validation
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Measure pipeline execution time
+          echo "Measuring pipeline performance..."
+          
+          start_time=$(python -c "import time; print(int(time.time() * 1000))")
+          kedro run --pipeline=visualization --runner=SequentialRunner
+          end_time=$(python -c "import time; print(int(time.time() * 1000))")
+          
+          execution_time=$((end_time - start_time))
+          
+          echo "Pipeline execution time: ${execution_time}ms"
+          
+          # Check against threshold (should complete reasonably quickly)
+          if [[ $execution_time -gt 30000 ]]; then  # 30 seconds
+              echo "WARNING: Pipeline execution took longer than expected (${execution_time}ms)"
+          else
+              echo "✓ Pipeline execution time within acceptable range"
+          fi
+      
+      - name: Cleanup on failure
+        if: failure()
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-project.outputs.project-dir }}"
+          if [[ -n "$PROJECT_DIR" && -d "$PROJECT_DIR" ]]; then
+              echo "Cleaning up failed test project..."
+              # Remove the temporary project directory
+              rm -rf "$PROJECT_DIR"
+              echo "Cleanup completed"
+          fi
+      
+      - name: Archive test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: basic-example-artifacts-${{ matrix.os }}-py${{ matrix.python-version }}-kedro${{ matrix.kedro-version }}
+          path: |
+            ${{ steps.create-project.outputs.project-dir }}/data/08_reporting/*.png
+            ${{ steps.create-project.outputs.project-dir }}/conf/base/figregistry.yml
+            ${{ steps.create-project.outputs.project-dir }}/conf/base/catalog.yml
+            ${{ steps.create-project.outputs.project-dir }}/logs/
+          retention-days: 7
+
+  # Advanced multi-environment configuration validation
+  advanced-example-validation:
+    name: Advanced Example (${{ matrix.os }}, Python ${{ matrix.python-version }}, Kedro ${{ matrix.kedro-version }})
+    runs-on: ${{ matrix.os }}
+    needs: [setup-validation, plugin-installation-test]
+    if: |
+      needs.setup-validation.outputs.should-run-examples == 'true' && 
+      contains(fromJson(needs.setup-validation.outputs.examples-to-test), 'advanced')
+    timeout-minutes: 35
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]  # Reduce matrix for advanced tests
+        python-version: ["3.11", "3.12"]   # Focus on newer Python versions
+        kedro-version: ${{ fromJson(needs.setup-validation.outputs.kedro-versions) }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install "kedro==${{ matrix.kedro-version }}"
+          python -m pip install -e .
+      
+      - name: Create advanced Kedro project
+        id: create-advanced-project
+        shell: bash
+        run: |
+          TEMP_DIR=$(mktemp -d)
+          echo "temp-dir=$TEMP_DIR" >> $GITHUB_OUTPUT
+          
+          cd "$TEMP_DIR"
+          
+          # Create advanced project with data science template
+          kedro new --name="figregistry_advanced_test" \
+                    --package-name="figregistry_advanced_test" \
+                    --python-package="figregistry_advanced_test" \
+                    --tools=["pytest", "nbstripout"] \
+                    --example=y
+          
+          cd figregistry_advanced_test
+          echo "project-dir=$TEMP_DIR/figregistry_advanced_test" >> $GITHUB_OUTPUT
+      
+      - name: Configure multi-environment FigRegistry setup
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-advanced-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Enhanced settings.py with advanced hooks
+          cat >> src/figregistry_advanced_test/settings.py << 'EOF'
+          
+          # Advanced FigRegistry-Kedro integration
+          from figregistry_kedro import FigRegistryHooks
+          
+          HOOKS = (FigRegistryHooks(),)
+          
+          # Advanced session configuration
+          SESSION_STORE_CLASS = "kedro.framework.session.shelve_store.ShelveStore"
+          SESSION_STORE_ARGS = {"path": "./sessions"}
+          EOF
+          
+          # Base configuration
+          mkdir -p conf/base conf/local conf/staging conf/production
+          
+          cat > conf/base/figregistry.yml << 'EOF'
+          purposes:
+            research:
+              description: "Research and development plots"
+              rcParams:
+                figure.figsize: [12, 8]
+                figure.dpi: 100
+                font.size: 11
+                axes.titlesize: 14
+                axes.labelsize: 12
+                legend.fontsize: 10
+                lines.linewidth: 1.5
+              save_args:
+                dpi: 150
+                bbox_inches: tight
+                format: png
+                
+            publication:
+              description: "Publication-quality figures"
+              rcParams:
+                figure.figsize: [8, 6]
+                figure.dpi: 300
+                font.family: serif
+                font.size: 12
+                axes.titlesize: 16
+                axes.labelsize: 14
+                legend.fontsize: 11
+                lines.linewidth: 2
+              save_args:
+                dpi: 600
+                bbox_inches: tight
+                format: pdf
+                
+            dashboard:
+              description: "Dashboard and monitoring plots"
+              rcParams:
+                figure.figsize: [10, 6]
+                figure.dpi: 100
+                font.size: 10
+                axes.titlesize: 12
+                axes.labelsize: 10
+                legend.fontsize: 9
+                lines.linewidth: 1
+              save_args:
+                dpi: 120
+                bbox_inches: tight
+                format: png
+          
+          conditions:
+            default: research
+            environment:
+              development: research
+              staging: dashboard
+              production: publication
+            analysis_type:
+              exploratory: research
+              model_evaluation: dashboard
+              final_report: publication
+          EOF
+          
+          # Local environment overrides
+          cat > conf/local/figregistry.yml << 'EOF'
+          purposes:
+            research:
+              rcParams:
+                figure.figsize: [10, 6]  # Smaller for development
+                figure.dpi: 75           # Lower DPI for faster rendering
+              save_args:
+                dpi: 100
+          
+          conditions:
+            default: research
+            debug_mode:
+              enabled: research
+              disabled: dashboard
+          EOF
+          
+          # Staging environment configuration
+          cat > conf/staging/figregistry.yml << 'EOF'
+          purposes:
+            dashboard:
+              rcParams:
+                figure.figsize: [12, 8]
+                figure.dpi: 150
+              save_args:
+                dpi: 200
+                
+          conditions:
+            default: dashboard
+            performance_test:
+              enabled: dashboard
+              disabled: research
+          EOF
+          
+          # Advanced catalog with multiple figure types
+          cat >> conf/base/catalog.yml << 'EOF'
+          
+          # Advanced FigRegistry figure outputs with versioning
+          model_performance_plot:
+            type: figregistry_kedro.FigureDataSet
+            filepath: data/08_reporting/model_performance_{env}.png
+            purpose: dashboard
+            condition_param: analysis_type
+            style_params:
+              condition: model_evaluation
+            versioned: true
+          
+          feature_importance_plot:
+            type: figregistry_kedro.FigureDataSet
+            filepath: data/08_reporting/feature_importance.pdf
+            purpose: publication
+            condition_param: environment
+            style_params:
+              condition: production
+          
+          training_curves_plot:
+            type: figregistry_kedro.FigureDataSet
+            filepath: data/08_reporting/training_curves_{timestamp}.png
+            purpose: research
+            condition_param: debug_mode
+            style_params:
+              condition: enabled
+          
+          correlation_matrix_plot:
+            type: figregistry_kedro.FigureDataSet
+            filepath: data/08_reporting/correlation_matrix.png
+            purpose: dashboard
+            condition_param: analysis_type
+            save_args:
+              dpi: 200
+              bbox_inches: tight
+              facecolor: white
+          EOF
+      
+      - name: Create advanced pipeline with multiple scenarios
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-advanced-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Advanced visualization pipeline
+          mkdir -p src/figregistry_advanced_test/pipelines/analysis
+          
+          cat > src/figregistry_advanced_test/pipelines/analysis/nodes.py << 'EOF'
+          """Advanced analysis pipeline with multiple figure types."""
+          import matplotlib.pyplot as plt
+          import numpy as np
+          import pandas as pd
+          from typing import Dict, Any
+          import seaborn as sns
+          
+          
+          def create_model_performance_plot(parameters: Dict[str, Any]) -> plt.Figure:
+              """Create comprehensive model performance visualization."""
+              fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
+              
+              # ROC Curve
+              fpr = np.linspace(0, 1, 100)
+              tpr = 1 - np.exp(-2 * fpr)
+              ax1.plot(fpr, tpr, 'b-', linewidth=2, label='Model ROC')
+              ax1.plot([0, 1], [0, 1], 'r--', alpha=0.5, label='Random')
+              ax1.set_xlabel('False Positive Rate')
+              ax1.set_ylabel('True Positive Rate')
+              ax1.set_title('ROC Curve (AUC = 0.89)')
+              ax1.legend()
+              ax1.grid(True, alpha=0.3)
+              
+              # Precision-Recall Curve
+              recall = np.linspace(0, 1, 100)
+              precision = 0.9 * np.exp(-2 * recall) + 0.1
+              ax2.plot(recall, precision, 'g-', linewidth=2)
+              ax2.set_xlabel('Recall')
+              ax2.set_ylabel('Precision')
+              ax2.set_title('Precision-Recall Curve')
+              ax2.grid(True, alpha=0.3)
+              
+              # Confusion Matrix
+              cm = np.array([[45, 3], [2, 50]])
+              im = ax3.imshow(cm, interpolation='nearest', cmap='Blues')
+              ax3.set_title('Confusion Matrix')
+              tick_marks = np.arange(2)
+              ax3.set_xticks(tick_marks)
+              ax3.set_yticks(tick_marks)
+              ax3.set_xticklabels(['Negative', 'Positive'])
+              ax3.set_yticklabels(['Negative', 'Positive'])
+              
+              # Add text annotations
+              for i in range(2):
+                  for j in range(2):
+                      ax3.text(j, i, str(cm[i, j]), ha='center', va='center')
+              
+              # Feature importance
+              features = ['Feature_A', 'Feature_B', 'Feature_C', 'Feature_D', 'Feature_E']
+              importance = [0.3, 0.25, 0.2, 0.15, 0.1]
+              ax4.barh(features, importance, color='skyblue')
+              ax4.set_xlabel('Importance')
+              ax4.set_title('Feature Importance')
+              
+              plt.tight_layout()
+              return fig
+          
+          
+          def create_feature_importance_plot(parameters: Dict[str, Any]) -> plt.Figure:
+              """Create detailed feature importance analysis."""
+              fig, ax = plt.subplots(figsize=(10, 8))
+              
+              # Generate sample feature importance data
+              n_features = 20
+              feature_names = [f'Feature_{i:02d}' for i in range(1, n_features + 1)]
+              importance_scores = np.random.exponential(0.1, n_features)
+              importance_scores = importance_scores / importance_scores.sum()
+              
+              # Sort by importance
+              sorted_idx = np.argsort(importance_scores)[::-1]
+              sorted_features = [feature_names[i] for i in sorted_idx]
+              sorted_scores = importance_scores[sorted_idx]
+              
+              # Create horizontal bar plot
+              colors = plt.cm.viridis(np.linspace(0, 1, n_features))
+              bars = ax.barh(range(n_features), sorted_scores, color=colors)
+              
+              ax.set_yticks(range(n_features))
+              ax.set_yticklabels(sorted_features)
+              ax.set_xlabel('Feature Importance Score')
+              ax.set_title('Feature Importance Analysis\n(Top 20 Features)')
+              ax.grid(True, axis='x', alpha=0.3)
+              
+              # Add value labels
+              for i, (bar, score) in enumerate(zip(bars, sorted_scores)):
+                  ax.text(score + 0.001, i, f'{score:.3f}', 
+                         va='center', fontsize=8)
+              
+              plt.tight_layout()
+              return fig
+          
+          
+          def create_training_curves_plot(parameters: Dict[str, Any]) -> plt.Figure:
+              """Create training progress visualization."""
+              fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+              
+              # Training and validation loss
+              epochs = range(1, 51)
+              train_loss = [1.0 * np.exp(-0.1 * i) + 0.05 * np.random.randn() for i in epochs]
+              val_loss = [1.2 * np.exp(-0.08 * i) + 0.08 * np.random.randn() for i in epochs]
+              
+              ax1.plot(epochs, train_loss, 'b-', label='Training Loss', linewidth=2)
+              ax1.plot(epochs, val_loss, 'r-', label='Validation Loss', linewidth=2)
+              ax1.set_xlabel('Epoch')
+              ax1.set_ylabel('Loss')
+              ax1.set_title('Training Progress - Loss')
+              ax1.legend()
+              ax1.grid(True, alpha=0.3)
+              ax1.set_yscale('log')
+              
+              # Training and validation accuracy
+              train_acc = [0.5 + 0.45 * (1 - np.exp(-0.15 * i)) + 0.02 * np.random.randn() for i in epochs]
+              val_acc = [0.5 + 0.4 * (1 - np.exp(-0.12 * i)) + 0.03 * np.random.randn() for i in epochs]
+              
+              ax2.plot(epochs, train_acc, 'b-', label='Training Accuracy', linewidth=2)
+              ax2.plot(epochs, val_acc, 'r-', label='Validation Accuracy', linewidth=2)
+              ax2.set_xlabel('Epoch')
+              ax2.set_ylabel('Accuracy')
+              ax2.set_title('Training Progress - Accuracy')
+              ax2.legend()
+              ax2.grid(True, alpha=0.3)
+              ax2.set_ylim(0, 1)
+              
+              plt.tight_layout()
+              return fig
+          
+          
+          def create_correlation_matrix_plot(parameters: Dict[str, Any]) -> plt.Figure:
+              """Create correlation matrix heatmap."""
+              # Generate sample correlation data
+              n_vars = 10
+              var_names = [f'Var_{i}' for i in range(1, n_vars + 1)]
+              
+              # Create symmetric correlation matrix
+              np.random.seed(42)
+              corr_matrix = np.random.randn(n_vars, n_vars)
+              corr_matrix = np.corrcoef(corr_matrix)
+              
+              fig, ax = plt.subplots(figsize=(10, 8))
+              
+              # Create heatmap
+              im = ax.imshow(corr_matrix, cmap='RdBu_r', vmin=-1, vmax=1)
+              
+              # Set ticks and labels
+              ax.set_xticks(range(n_vars))
+              ax.set_yticks(range(n_vars))
+              ax.set_xticklabels(var_names, rotation=45)
+              ax.set_yticklabels(var_names)
+              
+              # Add colorbar
+              cbar = plt.colorbar(im, ax=ax)
+              cbar.set_label('Correlation Coefficient')
+              
+              # Add text annotations
+              for i in range(n_vars):
+                  for j in range(n_vars):
+                      text = ax.text(j, i, f'{corr_matrix[i, j]:.2f}',
+                                   ha='center', va='center', 
+                                   color='white' if abs(corr_matrix[i, j]) > 0.5 else 'black',
+                                   fontsize=8)
+              
+              ax.set_title('Feature Correlation Matrix')
+              plt.tight_layout()
+              return fig
+          EOF
+          
+          # Pipeline definition
+          cat > src/figregistry_advanced_test/pipelines/analysis/pipeline.py << 'EOF'
+          """Advanced analysis pipeline definition."""
+          from kedro.pipeline import Pipeline, node
+          from .nodes import (
+              create_model_performance_plot,
+              create_feature_importance_plot,
+              create_training_curves_plot,
+              create_correlation_matrix_plot
+          )
+          
+          
+          def create_pipeline(**kwargs) -> Pipeline:
+              return Pipeline([
+                  node(
+                      func=create_model_performance_plot,
+                      inputs="parameters",
+                      outputs="model_performance_plot",
+                      name="create_model_performance_plot",
+                  ),
+                  node(
+                      func=create_feature_importance_plot,
+                      inputs="parameters",
+                      outputs="feature_importance_plot",
+                      name="create_feature_importance_plot",
+                  ),
+                  node(
+                      func=create_training_curves_plot,
+                      inputs="parameters",
+                      outputs="training_curves_plot",
+                      name="create_training_curves_plot",
+                  ),
+                  node(
+                      func=create_correlation_matrix_plot,
+                      inputs="parameters",
+                      outputs="correlation_matrix_plot",
+                      name="create_correlation_matrix_plot",
+                  ),
+              ])
+          EOF
+          
+          touch src/figregistry_advanced_test/pipelines/analysis/__init__.py
+          
+          # Update pipeline registry
+          cat >> src/figregistry_advanced_test/pipeline_registry.py << 'EOF'
+          
+          from figregistry_advanced_test.pipelines.analysis import create_pipeline as analysis_pipeline
+          
+          def register_pipelines() -> Dict[str, Pipeline]:
+              """Register the project's pipelines."""
+              return {
+                  "__default__": analysis_pipeline(),
+                  "analysis": analysis_pipeline(),
+              }
+          EOF
+      
+      - name: Test multi-environment configuration
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-advanced-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          echo "=== Testing Base Environment ==="
+          export ENVIRONMENT=development
+          export ANALYSIS_TYPE=exploratory
+          export DEBUG_MODE=enabled
+          
+          kedro run --pipeline=analysis --env=base --verbose
+          
+          echo "=== Testing Local Environment ==="
+          kedro run --pipeline=analysis --env=local --verbose
+          
+          echo "=== Testing Staging Environment ==="
+          export ENVIRONMENT=staging
+          export PERFORMANCE_TEST=enabled
+          
+          kedro run --pipeline=analysis --env=staging --verbose
+      
+      - name: Validate advanced figure outputs
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-advanced-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Expected outputs
+          expected_files=(
+              "data/08_reporting/model_performance_development.png"
+              "data/08_reporting/feature_importance.pdf"
+              "data/08_reporting/correlation_matrix.png"
+          )
+          
+          # Check file existence and sizes
+          for file in "${expected_files[@]}"; do
+              if [[ ! -f "$file" ]]; then
+                  echo "ERROR: Expected file not found: $file"
+                  exit 1
+              fi
+              
+              size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file")
+              if [[ $size -lt 5000 ]]; then
+                  echo "ERROR: File appears too small: $file ($size bytes)"
+                  exit 1
+              fi
+              
+              echo "✓ $file created successfully ($size bytes)"
+          done
+          
+          # Check for training curves with timestamp
+          training_files=$(ls data/08_reporting/training_curves_*.png 2>/dev/null || echo "")
+          if [[ -z "$training_files" ]]; then
+              echo "ERROR: No training curves files found"
+              exit 1
+          fi
+          
+          echo "✓ Training curves files found: $training_files"
+          
+          # Validate versioned outputs if versioning is enabled
+          versioned_dirs=$(ls -d data/08_reporting/model_performance_plot/*/model_performance_development.png 2>/dev/null || echo "")
+          if [[ -n "$versioned_dirs" ]]; then
+              echo "✓ Versioned model performance plots found"
+          fi
+      
+      - name: Test configuration bridge functionality
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-advanced-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Test configuration merging across environments
+          python -c "
+          import sys
+          import os
+          sys.path.append('src')
+          
+          # Test base configuration loading
+          os.environ['KEDRO_ENV'] = 'base'
+          from figregistry_kedro import FigRegistryConfigBridge
+          
+          try:
+              bridge = FigRegistryConfigBridge()
+              config = bridge.get_merged_config()
+              
+              # Validate base config structure
+              assert 'purposes' in config
+              assert 'research' in config['purposes']
+              assert 'publication' in config['purposes']
+              assert 'dashboard' in config['purposes']
+              
+              print('✓ Base configuration loaded successfully')
+              
+              # Test local environment override
+              os.environ['KEDRO_ENV'] = 'local'
+              bridge_local = FigRegistryConfigBridge()
+              config_local = bridge_local.get_merged_config()
+              
+              # Validate override behavior
+              base_research_dpi = config['purposes']['research']['rcParams']['figure.dpi']
+              local_research_dpi = config_local['purposes']['research']['rcParams']['figure.dpi']
+              
+              if base_research_dpi != local_research_dpi:
+                  print(f'✓ Configuration override working: DPI changed from {base_research_dpi} to {local_research_dpi}')
+              else:
+                  print('WARNING: Configuration override may not be working as expected')
+              
+          except Exception as e:
+              print(f'ERROR: Configuration bridge test failed: {e}')
+              sys.exit(1)
+          "
+      
+      - name: Performance benchmark
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-advanced-project.outputs.project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          echo "Running performance benchmark..."
+          
+          # Measure configuration bridge performance
+          python -c "
+          import time
+          import sys
+          sys.path.append('src')
+          
+          from figregistry_kedro import FigRegistryConfigBridge
+          
+          # Measure config bridge initialization time
+          start_time = time.time()
+          bridge = FigRegistryConfigBridge()
+          config = bridge.get_merged_config()
+          end_time = time.time()
+          
+          bridge_time_ms = (end_time - start_time) * 1000
+          print(f'Configuration bridge time: {bridge_time_ms:.2f}ms')
+          
+          # Check against threshold
+          if bridge_time_ms > ${CONFIG_BRIDGE_THRESHOLD_MS}:
+              print(f'WARNING: Config bridge exceeded threshold (${CONFIG_BRIDGE_THRESHOLD_MS}ms)')
+          else:
+              print('✓ Configuration bridge performance within threshold')
+          "
+          
+          # Measure full pipeline execution time
+          start_time=$(python -c "import time; print(int(time.time() * 1000))")
+          kedro run --pipeline=analysis --runner=SequentialRunner
+          end_time=$(python -c "import time; print(int(time.time() * 1000))")
+          
+          total_time=$((end_time - start_time))
+          echo "Total pipeline execution time: ${total_time}ms"
+          
+          if [[ $total_time -gt 60000 ]]; then  # 60 seconds
+              echo "WARNING: Advanced pipeline took longer than expected"
+          else
+              echo "✓ Advanced pipeline execution time acceptable"
+          fi
+      
+      - name: Cleanup advanced project
+        if: always()
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-advanced-project.outputs.project-dir }}"
+          if [[ -n "$PROJECT_DIR" && -d "$PROJECT_DIR" ]]; then
+              echo "Cleaning up advanced test project..."
+              rm -rf "$PROJECT_DIR"
+              echo "Advanced project cleanup completed"
+          fi
+      
+      - name: Archive advanced test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: advanced-example-artifacts-${{ matrix.os }}-py${{ matrix.python-version }}-kedro${{ matrix.kedro-version }}
+          path: |
+            ${{ steps.create-advanced-project.outputs.project-dir }}/data/08_reporting/*.png
+            ${{ steps.create-advanced-project.outputs.project-dir }}/data/08_reporting/*.pdf
+            ${{ steps.create-advanced-project.outputs.project-dir }}/conf/*/figregistry.yml
+            ${{ steps.create-advanced-project.outputs.project-dir }}/logs/
+          retention-days: 7
+
+  # Migration workflow validation
+  migration-example-validation:
+    name: Migration Example (${{ matrix.os }}, Python ${{ matrix.python-version }}, Kedro ${{ matrix.kedro-version }})
+    runs-on: ${{ matrix.os }}
+    needs: [setup-validation, plugin-installation-test]
+    if: |
+      needs.setup-validation.outputs.should-run-examples == 'true' && 
+      contains(fromJson(needs.setup-validation.outputs.examples-to-test), 'migration')
+    timeout-minutes: 30
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.11"]  # Single version for migration tests
+        kedro-version: ${{ fromJson(needs.setup-validation.outputs.kedro-versions) }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install "kedro==${{ matrix.kedro-version }}"
+          python -m pip install -e .
+      
+      - name: Create "before" migration project
+        id: create-before-project
+        shell: bash
+        run: |
+          TEMP_DIR=$(mktemp -d)
+          echo "temp-dir=$TEMP_DIR" >> $GITHUB_OUTPUT
+          
+          cd "$TEMP_DIR"
+          
+          # Create project representing existing Kedro workflow with manual figure management
+          kedro new --name="kedro_manual_example" \
+                    --package-name="kedro_manual_example" \
+                    --python-package="kedro_manual_example" \
+                    --tools=none \
+                    --example=y
+          
+          cd kedro_manual_example
+          echo "before-project-dir=$TEMP_DIR/kedro_manual_example" >> $GITHUB_OUTPUT
+      
+      - name: Implement manual figure management (before state)
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-before-project.outputs.before-project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Create pipeline with manual plt.savefig calls (before migration)
+          mkdir -p src/kedro_manual_example/pipelines/visualization
+          
+          cat > src/kedro_manual_example/pipelines/visualization/nodes.py << 'EOF'
+          """Pipeline with manual matplotlib figure management (BEFORE migration)."""
+          import matplotlib.pyplot as plt
+          import numpy as np
+          from pathlib import Path
+          import os
+          
+          
+          def create_manual_analysis_plot():
+              """Create analysis plot with manual figure saving."""
+              # Set manual styling
+              plt.rcParams['figure.figsize'] = [10, 6]
+              plt.rcParams['figure.dpi'] = 100
+              plt.rcParams['axes.titlesize'] = 14
+              
+              fig, ax = plt.subplots()
+              
+              # Generate sample data
+              x = np.linspace(0, 10, 100)
+              y1 = np.sin(x)
+              y2 = np.cos(x)
+              
+              ax.plot(x, y1, 'b-', label='Sin(x)', linewidth=2)
+              ax.plot(x, y2, 'r-', label='Cos(x)', linewidth=2)
+              ax.set_xlabel('X values')
+              ax.set_ylabel('Y values')
+              ax.set_title('Manual Analysis Plot')
+              ax.legend()
+              ax.grid(True, alpha=0.3)
+              
+              # Manual figure saving with hardcoded paths and settings
+              output_dir = Path('data/08_reporting')
+              output_dir.mkdir(parents=True, exist_ok=True)
+              
+              output_path = output_dir / 'manual_analysis_plot.png'
+              fig.savefig(output_path, dpi=150, bbox_inches='tight')
+              plt.close(fig)
+              
+              print(f"Manually saved figure to: {output_path}")
+              return str(output_path)
+          
+          
+          def create_manual_model_plot():
+              """Create model plot with manual styling and saving."""
+              # Different manual styling for different plot types
+              plt.rcParams['figure.figsize'] = [8, 6]
+              plt.rcParams['figure.dpi'] = 150
+              plt.rcParams['font.size'] = 12
+              
+              fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+              
+              # Model accuracy over epochs
+              epochs = range(1, 21)
+              train_acc = [0.6 + 0.35 * (1 - np.exp(-0.2 * i)) + 0.02 * np.random.randn() for i in epochs]
+              val_acc = [0.55 + 0.3 * (1 - np.exp(-0.15 * i)) + 0.03 * np.random.randn() for i in epochs]
+              
+              ax1.plot(epochs, train_acc, 'b-', label='Training', linewidth=2)
+              ax1.plot(epochs, val_acc, 'r-', label='Validation', linewidth=2)
+              ax1.set_xlabel('Epoch')
+              ax1.set_ylabel('Accuracy')
+              ax1.set_title('Model Accuracy')
+              ax1.legend()
+              ax1.grid(True, alpha=0.3)
+              
+              # Loss over epochs
+              train_loss = [2.0 * np.exp(-0.15 * i) + 0.1 * np.random.randn() for i in epochs]
+              val_loss = [2.2 * np.exp(-0.12 * i) + 0.15 * np.random.randn() for i in epochs]
+              
+              ax2.plot(epochs, train_loss, 'b-', label='Training', linewidth=2)
+              ax2.plot(epochs, val_loss, 'r-', label='Validation', linewidth=2)
+              ax2.set_xlabel('Epoch')
+              ax2.set_ylabel('Loss')
+              ax2.set_title('Model Loss')
+              ax2.legend()
+              ax2.grid(True, alpha=0.3)
+              
+              plt.tight_layout()
+              
+              # Manual figure saving with different settings
+              output_dir = Path('data/08_reporting')
+              output_dir.mkdir(parents=True, exist_ok=True)
+              
+              output_path = output_dir / 'manual_model_plot.png'
+              fig.savefig(output_path, dpi=200, bbox_inches='tight', facecolor='white')
+              plt.close(fig)
+              
+              print(f"Manually saved model plot to: {output_path}")
+              return str(output_path)
+          EOF
+          
+          # Pipeline definition (before migration)
+          cat > src/kedro_manual_example/pipelines/visualization/pipeline.py << 'EOF'
+          """Visualization pipeline with manual figure management (BEFORE)."""
+          from kedro.pipeline import Pipeline, node
+          from .nodes import create_manual_analysis_plot, create_manual_model_plot
+          
+          
+          def create_pipeline(**kwargs) -> Pipeline:
+              return Pipeline([
+                  node(
+                      func=create_manual_analysis_plot,
+                      inputs=None,
+                      outputs="analysis_plot_path",
+                      name="create_manual_analysis_plot",
+                  ),
+                  node(
+                      func=create_manual_model_plot,
+                      inputs=None,
+                      outputs="model_plot_path",
+                      name="create_manual_model_plot",
+                  ),
+              ])
+          EOF
+          
+          touch src/kedro_manual_example/pipelines/visualization/__init__.py
+          
+          # Simple catalog (before migration)
+          cat > conf/base/catalog.yml << 'EOF'
+          # Manual figure management - paths stored as text
+          analysis_plot_path:
+            type: text.TextDataSet
+            filepath: data/01_raw/analysis_plot_path.txt
+          
+          model_plot_path:
+            type: text.TextDataSet
+            filepath: data/01_raw/model_plot_path.txt
+          EOF
+          
+          # Register pipeline
+          cat > src/kedro_manual_example/pipeline_registry.py << 'EOF'
+          """Register pipelines."""
+          from typing import Dict
+          from kedro.pipeline import Pipeline
+          from kedro_manual_example.pipelines.visualization import create_pipeline as viz_pipeline
+          
+          
+          def register_pipelines() -> Dict[str, Pipeline]:
+              """Register the project's pipelines."""
+              return {
+                  "__default__": viz_pipeline(),
+                  "visualization": viz_pipeline(),
+              }
+          EOF
+      
+      - name: Execute "before" project (manual figure management)
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-before-project.outputs.before-project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          echo "=== Executing BEFORE migration state ==="
+          kedro run --pipeline=visualization --verbose
+          
+          # Verify manual outputs
+          if [[ ! -f "data/08_reporting/manual_analysis_plot.png" ]]; then
+              echo "ERROR: Manual analysis plot not created"
+              exit 1
+          fi
+          
+          if [[ ! -f "data/08_reporting/manual_model_plot.png" ]]; then
+              echo "ERROR: Manual model plot not created"
+              exit 1
+          fi
+          
+          echo "✓ Manual figure management working (before migration)"
+      
+      - name: Create "after" migration project
+        id: create-after-project
+        shell: bash
+        run: |
+          TEMP_DIR="${{ steps.create-before-project.outputs.temp-dir }}"
+          cd "$TEMP_DIR"
+          
+          # Copy the before project to create after state
+          cp -r kedro_manual_example kedro_figregistry_example
+          cd kedro_figregistry_example
+          
+          echo "after-project-dir=$TEMP_DIR/kedro_figregistry_example" >> $GITHUB_OUTPUT
+      
+      - name: Apply migration to figregistry-kedro (after state)
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-after-project.outputs.after-project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          # Update project name references
+          find . -name "*.py" -type f -exec sed -i.bak 's/kedro_manual_example/kedro_figregistry_example/g' {} \;
+          rm -f $(find . -name "*.bak")
+          
+          # Add FigRegistry plugin configuration
+          cat >> src/kedro_figregistry_example/settings.py << 'EOF'
+          
+          # FigRegistry-Kedro integration (AFTER migration)
+          from figregistry_kedro import FigRegistryHooks
+          
+          HOOKS = (FigRegistryHooks(),)
+          EOF
+          
+          # Create FigRegistry configuration
+          cat > conf/base/figregistry.yml << 'EOF'
+          purposes:
+            analysis:
+              description: "Data analysis visualizations"
+              rcParams:
+                figure.figsize: [10, 6]
+                figure.dpi: 100
+                axes.titlesize: 14
+                axes.labelsize: 12
+                legend.fontsize: 10
+                lines.linewidth: 2
+              save_args:
+                dpi: 150
+                bbox_inches: tight
+                format: png
+                
+            model_evaluation:
+              description: "Model performance plots"
+              rcParams:
+                figure.figsize: [12, 5]
+                figure.dpi: 150
+                font.size: 12
+                axes.titlesize: 14
+                lines.linewidth: 2
+              save_args:
+                dpi: 200
+                bbox_inches: tight
+                facecolor: white
+                format: png
+          
+          conditions:
+            default: analysis
+            plot_type:
+              analysis: analysis
+              model: model_evaluation
+          EOF
+          
+          # Update catalog to use FigureDataSet (AFTER migration)
+          cat > conf/base/catalog.yml << 'EOF'
+          # FigRegistry automated figure management (AFTER migration)
+          analysis_figure:
+            type: figregistry_kedro.FigureDataSet
+            filepath: data/08_reporting/analysis_plot_automated.png
+            purpose: analysis
+            condition_param: plot_type
+            style_params:
+              condition: analysis
+          
+          model_figure:
+            type: figregistry_kedro.FigureDataSet
+            filepath: data/08_reporting/model_plot_automated.png
+            purpose: model_evaluation
+            condition_param: plot_type
+            style_params:
+              condition: model
+          EOF
+          
+          # Update pipeline nodes to eliminate manual plt.savefig (AFTER migration)
+          cat > src/kedro_figregistry_example/pipelines/visualization/nodes.py << 'EOF'
+          """Pipeline with FigRegistry automated figure management (AFTER migration)."""
+          import matplotlib.pyplot as plt
+          import numpy as np
+          
+          
+          def create_automated_analysis_plot():
+              """Create analysis plot - FigRegistry handles styling and saving automatically."""
+              # No manual rcParams setting - FigRegistry handles this
+              fig, ax = plt.subplots()
+              
+              # Generate sample data
+              x = np.linspace(0, 10, 100)
+              y1 = np.sin(x)
+              y2 = np.cos(x)
+              
+              ax.plot(x, y1, 'b-', label='Sin(x)')  # linewidth handled by FigRegistry
+              ax.plot(x, y2, 'r-', label='Cos(x)')
+              ax.set_xlabel('X values')
+              ax.set_ylabel('Y values')
+              ax.set_title('Automated Analysis Plot')  # title size handled by FigRegistry
+              ax.legend()
+              ax.grid(True, alpha=0.3)
+              
+              # No manual plt.savefig() - return figure for FigRegistry to handle
+              return fig
+          
+          
+          def create_automated_model_plot():
+              """Create model plot - FigRegistry handles styling and saving automatically."""
+              # No manual rcParams or figure size setting
+              fig, (ax1, ax2) = plt.subplots(1, 2)  # figsize handled by FigRegistry
+              
+              # Model accuracy over epochs
+              epochs = range(1, 21)
+              train_acc = [0.6 + 0.35 * (1 - np.exp(-0.2 * i)) + 0.02 * np.random.randn() for i in epochs]
+              val_acc = [0.55 + 0.3 * (1 - np.exp(-0.15 * i)) + 0.03 * np.random.randn() for i in epochs]
+              
+              ax1.plot(epochs, train_acc, 'b-', label='Training')  # linewidth from FigRegistry
+              ax1.plot(epochs, val_acc, 'r-', label='Validation')
+              ax1.set_xlabel('Epoch')
+              ax1.set_ylabel('Accuracy')
+              ax1.set_title('Model Accuracy')
+              ax1.legend()
+              ax1.grid(True, alpha=0.3)
+              
+              # Loss over epochs
+              train_loss = [2.0 * np.exp(-0.15 * i) + 0.1 * np.random.randn() for i in epochs]
+              val_loss = [2.2 * np.exp(-0.12 * i) + 0.15 * np.random.randn() for i in epochs]
+              
+              ax2.plot(epochs, train_loss, 'b-', label='Training')
+              ax2.plot(epochs, val_loss, 'r-', label='Validation')
+              ax2.set_xlabel('Epoch')
+              ax2.set_ylabel('Loss')
+              ax2.set_title('Model Loss')
+              ax2.legend()
+              ax2.grid(True, alpha=0.3)
+              
+              plt.tight_layout()
+              
+              # Return figure - FigRegistry handles saving with configured DPI, format, etc.
+              return fig
+          EOF
+          
+          # Update pipeline definition (AFTER migration)
+          cat > src/kedro_figregistry_example/pipelines/visualization/pipeline.py << 'EOF'
+          """Visualization pipeline with FigRegistry automation (AFTER migration)."""
+          from kedro.pipeline import Pipeline, node
+          from .nodes import create_automated_analysis_plot, create_automated_model_plot
+          
+          
+          def create_pipeline(**kwargs) -> Pipeline:
+              return Pipeline([
+                  node(
+                      func=create_automated_analysis_plot,
+                      inputs=None,
+                      outputs="analysis_figure",  # FigureDataSet handles this
+                      name="create_automated_analysis_plot",
+                  ),
+                  node(
+                      func=create_automated_model_plot,
+                      inputs=None,
+                      outputs="model_figure",  # FigureDataSet handles this
+                      name="create_automated_model_plot",
+                  ),
+              ])
+          EOF
+      
+      - name: Execute "after" project (FigRegistry automation)
+        shell: bash
+        run: |
+          PROJECT_DIR="${{ steps.create-after-project.outputs.after-project-dir }}"
+          cd "$PROJECT_DIR"
+          
+          echo "=== Executing AFTER migration state ==="
+          
+          # Set condition parameters for styling
+          export PLOT_TYPE_ANALYSIS=analysis
+          export PLOT_TYPE_MODEL=model
+          
+          kedro run --pipeline=visualization --verbose
+          
+          # Verify automated outputs
+          if [[ ! -f "data/08_reporting/analysis_plot_automated.png" ]]; then
+              echo "ERROR: Automated analysis plot not created"
+              exit 1
+          fi
+          
+          if [[ ! -f "data/08_reporting/model_plot_automated.png" ]]; then
+              echo "ERROR: Automated model plot not created"
+              exit 1
+          fi
+          
+          echo "✓ FigRegistry automated figure management working (after migration)"
+      
+      - name: Compare before and after outputs
+        shell: bash
+        run: |
+          BEFORE_DIR="${{ steps.create-before-project.outputs.before-project-dir }}"
+          AFTER_DIR="${{ steps.create-after-project.outputs.after-project-dir }}"
+          
+          echo "=== Migration Comparison Analysis ==="
+          
+          # Compare file sizes and verify both approaches produced outputs
+          before_analysis_size=$(stat -f%z "$BEFORE_DIR/data/08_reporting/manual_analysis_plot.png" 2>/dev/null || stat -c%s "$BEFORE_DIR/data/08_reporting/manual_analysis_plot.png")
+          after_analysis_size=$(stat -f%z "$AFTER_DIR/data/08_reporting/analysis_plot_automated.png" 2>/dev/null || stat -c%s "$AFTER_DIR/data/08_reporting/analysis_plot_automated.png")
+          
+          before_model_size=$(stat -f%z "$BEFORE_DIR/data/08_reporting/manual_model_plot.png" 2>/dev/null || stat -c%s "$BEFORE_DIR/data/08_reporting/manual_model_plot.png")
+          after_model_size=$(stat -f%z "$AFTER_DIR/data/08_reporting/model_plot_automated.png" 2>/dev/null || stat -c%s "$AFTER_DIR/data/08_reporting/model_plot_automated.png")
+          
+          echo "Analysis plot sizes: Before=$before_analysis_size bytes, After=$after_analysis_size bytes"
+          echo "Model plot sizes: Before=$before_model_size bytes, After=$after_model_size bytes"
+          
+          # Verify both produced reasonable output sizes
+          if [[ $before_analysis_size -lt 1000 || $after_analysis_size -lt 1000 ]]; then
+              echo "ERROR: Analysis plots appear too small"
+              exit 1
+          fi
+          
+          if [[ $before_model_size -lt 1000 || $after_model_size -lt 1000 ]]; then
+              echo "ERROR: Model plots appear too small"
+              exit 1
+          fi
+          
+          echo "✓ Migration validation successful - both approaches produced valid outputs"
+          
+          # Code complexity analysis
+          before_nodes_lines=$(wc -l < "$BEFORE_DIR/src/kedro_manual_example/pipelines/visualization/nodes.py")
+          after_nodes_lines=$(wc -l < "$AFTER_DIR/src/kedro_figregistry_example/pipelines/visualization/nodes.py")
+          
+          echo "Node code complexity: Before=$before_nodes_lines lines, After=$after_nodes_lines lines"
+          
+          # Count plt.savefig occurrences
+          before_savefig_count=$(grep -c "plt.savefig\|fig.savefig" "$BEFORE_DIR/src/kedro_manual_example/pipelines/visualization/nodes.py" || echo 0)
+          after_savefig_count=$(grep -c "plt.savefig\|fig.savefig" "$AFTER_DIR/src/kedro_figregistry_example/pipelines/visualization/nodes.py" || echo 0)
+          
+          echo "Manual save calls: Before=$before_savefig_count, After=$after_savefig_count"
+          
+          if [[ $after_savefig_count -gt 0 ]]; then
+              echo "ERROR: Migration should eliminate manual plt.savefig calls"
+              exit 1
+          fi
+          
+          echo "✓ Migration successfully eliminated manual figure saving"
+      
+      - name: Validate migration benefits
+        shell: bash
+        run: |
+          AFTER_DIR="${{ steps.create-after-project.outputs.after-project-dir }}"
+          cd "$AFTER_DIR"
+          
+          echo "=== Validating Migration Benefits ==="
+          
+          # Test condition-based styling
+          echo "Testing condition-based styling..."
+          
+          export PLOT_TYPE=analysis
+          kedro run --pipeline=visualization --verbose
+          
+          # Verify configuration bridge is working
+          python -c "
+          import sys
+          sys.path.append('src')
+          
+          from figregistry_kedro import FigRegistryConfigBridge
+          
+          try:
+              bridge = FigRegistryConfigBridge()
+              config = bridge.get_merged_config()
+              
+              # Validate configuration structure
+              assert 'purposes' in config
+              assert 'analysis' in config['purposes']
+              assert 'model_evaluation' in config['purposes']
+              
+              # Check condition mapping
+              assert 'conditions' in config
+              assert config['conditions']['default'] == 'analysis'
+              
+              print('✓ Configuration bridge working correctly')
+              print('✓ Condition-based styling configured')
+              
+          except Exception as e:
+              print(f'ERROR: Configuration validation failed: {e}')
+              sys.exit(1)
+          "
+          
+          echo "✓ Migration benefits validated"
+      
+      - name: Cleanup migration projects
+        if: always()
+        shell: bash
+        run: |
+          TEMP_DIR="${{ steps.create-before-project.outputs.temp-dir }}"
+          if [[ -n "$TEMP_DIR" && -d "$TEMP_DIR" ]]; then
+              echo "Cleaning up migration test projects..."
+              rm -rf "$TEMP_DIR"
+              echo "Migration cleanup completed"
+          fi
+      
+      - name: Archive migration artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: migration-example-artifacts-${{ matrix.os }}-py${{ matrix.python-version }}-kedro${{ matrix.kedro-version }}
+          path: |
+            ${{ steps.create-before-project.outputs.before-project-dir }}/data/08_reporting/*.png
+            ${{ steps.create-after-project.outputs.after-project-dir }}/data/08_reporting/*.png
+            ${{ steps.create-after-project.outputs.after-project-dir }}/conf/base/figregistry.yml
+            ${{ steps.create-after-project.outputs.after-project-dir }}/conf/base/catalog.yml
+          retention-days: 7
+
+  # Summary and reporting
+  example-validation-summary:
+    name: Example Validation Summary
+    runs-on: ubuntu-latest
+    needs: [setup-validation, basic-example-validation, advanced-example-validation, migration-example-validation]
+    if: always() && needs.setup-validation.outputs.should-run-examples == 'true'
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Collect test results
+        run: |
+          echo "# Example Pipeline Validation Summary" > validation_summary.md
+          echo "" >> validation_summary.md
+          echo "**Validation Run:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> validation_summary.md
+          echo "**Trigger:** ${{ github.event_name }}" >> validation_summary.md
+          echo "" >> validation_summary.md
+          
+          # Basic example results
+          if [[ "${{ needs.basic-example-validation.result }}" == "success" ]]; then
+              echo "✅ **Basic Example Validation**: PASSED" >> validation_summary.md
+          elif [[ "${{ needs.basic-example-validation.result }}" == "skipped" ]]; then
+              echo "⏭️ **Basic Example Validation**: SKIPPED" >> validation_summary.md
+          else
+              echo "❌ **Basic Example Validation**: FAILED" >> validation_summary.md
+          fi
+          
+          # Advanced example results
+          if [[ "${{ needs.advanced-example-validation.result }}" == "success" ]]; then
+              echo "✅ **Advanced Example Validation**: PASSED" >> validation_summary.md
+          elif [[ "${{ needs.advanced-example-validation.result }}" == "skipped" ]]; then
+              echo "⏭️ **Advanced Example Validation**: SKIPPED" >> validation_summary.md
+          else
+              echo "❌ **Advanced Example Validation**: FAILED" >> validation_summary.md
+          fi
+          
+          # Migration example results
+          if [[ "${{ needs.migration-example-validation.result }}" == "success" ]]; then
+              echo "✅ **Migration Example Validation**: PASSED" >> validation_summary.md
+          elif [[ "${{ needs.migration-example-validation.result }}" == "skipped" ]]; then
+              echo "⏭️ **Migration Example Validation**: SKIPPED" >> validation_summary.md
+          else
+              echo "❌ **Migration Example Validation**: FAILED" >> validation_summary.md
+          fi
+          
+          echo "" >> validation_summary.md
+          echo "## Validation Details" >> validation_summary.md
+          echo "" >> validation_summary.md
+          echo "- **Examples Tested**: ${{ needs.setup-validation.outputs.examples-to-test }}" >> validation_summary.md
+          echo "- **Python Versions**: ${{ needs.setup-validation.outputs.python-versions }}" >> validation_summary.md
+          echo "- **Kedro Versions**: ${{ needs.setup-validation.outputs.kedro-versions }}" >> validation_summary.md
+          echo "" >> validation_summary.md
+          
+          # Check overall status
+          if [[ "${{ needs.basic-example-validation.result }}" == "success" && \
+                "${{ needs.advanced-example-validation.result }}" == "success" && \
+                "${{ needs.migration-example-validation.result }}" == "success" ]]; then
+              echo "## 🎉 Overall Status: SUCCESS" >> validation_summary.md
+              echo "All example pipeline validations completed successfully." >> validation_summary.md
+          else
+              echo "## ⚠️ Overall Status: NEEDS ATTENTION" >> validation_summary.md
+              echo "One or more example validations failed or were skipped." >> validation_summary.md
+          fi
+          
+          cat validation_summary.md
+      
+      - name: Archive validation summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: example-validation-summary
+          path: validation_summary.md
+          retention-days: 30
+      
+      - name: Comment on PR (if applicable)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            const summary = fs.readFileSync('validation_summary.md', 'utf8');
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
