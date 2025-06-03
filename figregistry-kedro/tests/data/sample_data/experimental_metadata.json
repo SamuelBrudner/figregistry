@@ -1,0 +1,821 @@
+{
+  "_metadata": {
+    "file_version": "1.2.0",
+    "created_date": "2024-11-15T10:30:00Z",
+    "last_modified": "2024-11-15T14:45:30Z",
+    "file_purpose": "Comprehensive experimental metadata for figregistry-kedro plugin testing",
+    "compatibility": {
+      "figregistry": ">=0.3.0",
+      "kedro": ">=0.18.0,<0.20.0",
+      "figregistry_kedro": ">=0.1.0"
+    },
+    "test_scenarios_supported": [
+      "condition_parameter_resolution",
+      "multi_environment_configuration",
+      "catalog_parameter_extraction",
+      "nested_condition_hierarchies",
+      "styling_automation",
+      "versioning_compatibility",
+      "error_handling"
+    ]
+  },
+  "project_information": {
+    "project_id": "fig-kedro-test-001",
+    "project_name": "FigRegistry Kedro Integration Test Project",
+    "project_description": "Comprehensive test project for validating figregistry-kedro plugin functionality including condition-based styling, configuration merging, and dataset operations",
+    "project_phase": "validation_testing",
+    "funding_source": "Internal R&D",
+    "project_start_date": "2024-10-01",
+    "estimated_completion": "2024-12-31",
+    "primary_objective": "Validate automated figure styling integration within Kedro data science workflows",
+    "secondary_objectives": [
+      "Test multi-environment configuration management",
+      "Validate condition parameter resolution accuracy",
+      "Ensure thread-safe concurrent execution",
+      "Benchmark performance overhead targets"
+    ]
+  },
+  "researcher_information": {
+    "principal_investigator": {
+      "researcher_id": "PI-001",
+      "name": "Dr. Sarah Chen",
+      "email": "s.chen@research.example.com",
+      "affiliation": "Data Science Research Lab",
+      "orcid": "0000-0002-1234-5678",
+      "role": "Principal Investigator",
+      "responsibilities": [
+        "Project oversight",
+        "Result validation",
+        "Publication planning"
+      ]
+    },
+    "co_investigators": [
+      {
+        "researcher_id": "CI-001",
+        "name": "Dr. Michael Rodriguez",
+        "email": "m.rodriguez@research.example.com",
+        "affiliation": "Machine Learning Pipeline Team",
+        "orcid": "0000-0003-2345-6789",
+        "role": "Co-Investigator",
+        "responsibilities": [
+          "Kedro pipeline design",
+          "Performance optimization",
+          "Integration testing"
+        ]
+      },
+      {
+        "researcher_id": "CI-002",
+        "name": "Dr. Emily Watson",
+        "email": "e.watson@research.example.com",
+        "affiliation": "Visualization Research Group",
+        "orcid": "0000-0004-3456-7890",
+        "role": "Co-Investigator",
+        "responsibilities": [
+          "Styling validation",
+          "Cross-platform testing",
+          "Documentation review"
+        ]
+      }
+    ],
+    "data_scientists": [
+      {
+        "researcher_id": "DS-001",
+        "name": "Alex Kim",
+        "email": "a.kim@research.example.com",
+        "role": "Senior Data Scientist",
+        "specialization": "Pipeline automation",
+        "kedro_experience": "expert",
+        "figregistry_experience": "intermediate"
+      },
+      {
+        "researcher_id": "DS-002",
+        "name": "Jordan Patel",
+        "email": "j.patel@research.example.com",
+        "role": "Data Scientist",
+        "specialization": "Data visualization",
+        "kedro_experience": "intermediate",
+        "figregistry_experience": "expert"
+      }
+    ]
+  },
+  "experimental_design": {
+    "study_type": "software_integration_validation",
+    "experimental_protocol": {
+      "protocol_id": "PROT-FKI-001",
+      "protocol_version": "2.1",
+      "protocol_name": "FigRegistry-Kedro Integration Validation Protocol",
+      "protocol_description": "Systematic validation of figregistry-kedro plugin functionality across multiple experimental conditions and environment configurations",
+      "last_revision_date": "2024-11-10",
+      "approval_status": "approved",
+      "ethics_review": "not_applicable"
+    },
+    "experimental_conditions": {
+      "_description": "Hierarchical experimental conditions designed to test complex condition resolution and styling automation",
+      "primary_conditions": {
+        "exploratory": {
+          "condition_id": "EXP001",
+          "description": "Exploratory data analysis phase",
+          "purpose": "exploratory",
+          "style_category": "draft",
+          "expected_outputs": ["scatter_plots", "histograms", "correlation_matrices"],
+          "styling_priorities": ["speed", "clarity"],
+          "file_formats": ["png"],
+          "quality_requirements": "standard",
+          "versioning_strategy": "timestamp_based"
+        },
+        "presentation": {
+          "condition_id": "PRES001",
+          "description": "Presentation-ready visualizations",
+          "purpose": "presentation",
+          "style_category": "professional",
+          "expected_outputs": ["line_plots", "bar_charts", "heatmaps"],
+          "styling_priorities": ["aesthetics", "readability"],
+          "file_formats": ["png", "pdf"],
+          "quality_requirements": "high",
+          "versioning_strategy": "semantic_versioning"
+        },
+        "publication": {
+          "condition_id": "PUB001",
+          "description": "Publication-quality figures",
+          "purpose": "publication",
+          "style_category": "academic",
+          "expected_outputs": ["complex_plots", "multi_panel_figures", "statistical_plots"],
+          "styling_priorities": ["precision", "compliance", "reproducibility"],
+          "file_formats": ["pdf", "svg", "eps"],
+          "quality_requirements": "publication_grade",
+          "versioning_strategy": "immutable_versioning"
+        }
+      },
+      "secondary_conditions": {
+        "data_quality": {
+          "high_quality": {
+            "condition_id": "DQ-HIGH",
+            "description": "High-quality, clean dataset",
+            "style_modifiers": ["confidence_indicators", "standard_styling"],
+            "error_handling": "strict",
+            "validation_level": "comprehensive"
+          },
+          "medium_quality": {
+            "condition_id": "DQ-MED",
+            "description": "Medium-quality dataset with some issues",
+            "style_modifiers": ["uncertainty_indicators", "cautionary_styling"],
+            "error_handling": "moderate",
+            "validation_level": "standard"
+          },
+          "low_quality": {
+            "condition_id": "DQ-LOW",
+            "description": "Low-quality dataset requiring careful interpretation",
+            "style_modifiers": ["warning_indicators", "conservative_styling"],
+            "error_handling": "permissive",
+            "validation_level": "basic"
+          }
+        },
+        "experimental_phase": {
+          "pilot": {
+            "condition_id": "PHASE-PILOT",
+            "description": "Pilot study phase",
+            "style_modifiers": ["preliminary_styling", "draft_watermarks"],
+            "confidence_level": "preliminary"
+          },
+          "main": {
+            "condition_id": "PHASE-MAIN",
+            "description": "Main experimental phase",
+            "style_modifiers": ["standard_styling", "full_annotations"],
+            "confidence_level": "standard"
+          },
+          "validation": {
+            "condition_id": "PHASE-VAL",
+            "description": "Validation and replication phase",
+            "style_modifiers": ["validation_styling", "comparison_highlights"],
+            "confidence_level": "high"
+          }
+        },
+        "analysis_type": {
+          "descriptive": {
+            "condition_id": "ANAL-DESC",
+            "description": "Descriptive statistical analysis",
+            "style_preferences": ["simple_aesthetics", "clear_labeling"],
+            "complexity_level": "basic"
+          },
+          "inferential": {
+            "condition_id": "ANAL-INF",
+            "description": "Inferential statistical analysis",
+            "style_preferences": ["statistical_annotations", "confidence_intervals"],
+            "complexity_level": "intermediate"
+          },
+          "predictive": {
+            "condition_id": "ANAL-PRED",
+            "description": "Predictive modeling analysis",
+            "style_preferences": ["model_diagnostics", "prediction_intervals"],
+            "complexity_level": "advanced"
+          }
+        }
+      },
+      "nested_condition_hierarchies": {
+        "_description": "Complex nested conditions for testing hierarchical condition resolution per F-005.4",
+        "experimental_design_matrix": {
+          "factorial_2x3": {
+            "condition_combination_id": "FACT-2x3-001",
+            "primary_factor": {
+              "factor_name": "treatment_type",
+              "levels": ["control", "treatment_a"],
+              "factor_type": "categorical"
+            },
+            "secondary_factor": {
+              "factor_name": "measurement_period",
+              "levels": ["baseline", "mid_treatment", "post_treatment"],
+              "factor_type": "ordinal"
+            },
+            "condition_combinations": [
+              {
+                "combination_id": "control_baseline",
+                "condition_params": {
+                  "treatment": "control",
+                  "period": "baseline",
+                  "style_override": "control_baseline_style"
+                },
+                "expected_style_resolution": "control_style + baseline_modifiers"
+              },
+              {
+                "combination_id": "control_mid",
+                "condition_params": {
+                  "treatment": "control",
+                  "period": "mid_treatment",
+                  "style_override": "control_progress_style"
+                },
+                "expected_style_resolution": "control_style + progress_modifiers"
+              },
+              {
+                "combination_id": "treatment_a_post",
+                "condition_params": {
+                  "treatment": "treatment_a",
+                  "period": "post_treatment",
+                  "style_override": "treatment_final_style"
+                },
+                "expected_style_resolution": "treatment_style + final_modifiers"
+              }
+            ]
+          }
+        },
+        "wildcard_patterns": {
+          "_description": "Patterns for testing wildcard matching in condition resolution",
+          "treatment_wildcard": {
+            "pattern": "treatment_*",
+            "description": "Matches any treatment condition",
+            "test_cases": [
+              "treatment_a",
+              "treatment_b",
+              "treatment_experimental",
+              "treatment_control_variant"
+            ],
+            "expected_matches": 4,
+            "fallback_style": "generic_treatment_style"
+          },
+          "phase_wildcard": {
+            "pattern": "*_phase",
+            "description": "Matches any phase-related condition",
+            "test_cases": [
+              "pilot_phase",
+              "main_phase",
+              "validation_phase",
+              "cleanup_phase"
+            ],
+            "expected_matches": 4,
+            "fallback_style": "generic_phase_style"
+          },
+          "quality_wildcard": {
+            "pattern": "quality_*_data",
+            "description": "Matches quality-level data conditions",
+            "test_cases": [
+              "quality_high_data",
+              "quality_medium_data",
+              "quality_low_data",
+              "quality_unknown_data"
+            ],
+            "expected_matches": 4,
+            "fallback_style": "quality_aware_style"
+          }
+        }
+      }
+    }
+  },
+  "environment_configurations": {
+    "_description": "Environment-specific metadata for multi-environment configuration testing per F-007.2",
+    "development": {
+      "environment_id": "dev",
+      "environment_name": "Development",
+      "description": "Development environment for rapid prototyping and testing",
+      "configuration_overrides": {
+        "performance_mode": "debug",
+        "caching_enabled": false,
+        "validation_level": "strict",
+        "output_formats": ["png"],
+        "figure_dpi": 100,
+        "save_intermediate_figures": true,
+        "enable_timing_logs": true,
+        "concurrent_execution": false
+      },
+      "kedro_specific": {
+        "runner_type": "SequentialRunner",
+        "enable_versioning": false,
+        "log_level": "DEBUG",
+        "pipeline_tags": ["dev", "testing"],
+        "memory_limit": "2GB"
+      },
+      "figregistry_overrides": {
+        "default_purpose": "exploratory",
+        "enable_watermarks": true,
+        "timestamp_format": "%Y%m%d_%H%M%S_dev",
+        "output_base_path": "data/01_raw/figures/dev",
+        "style_validation": "permissive"
+      },
+      "researcher_context": {
+        "primary_users": ["DS-001", "DS-002"],
+        "access_level": "full",
+        "collaboration_mode": "individual",
+        "experiment_tracking": "basic"
+      }
+    },
+    "staging": {
+      "environment_id": "staging",
+      "environment_name": "Staging",
+      "description": "Staging environment for pre-production validation",
+      "configuration_overrides": {
+        "performance_mode": "optimized",
+        "caching_enabled": true,
+        "validation_level": "standard",
+        "output_formats": ["png", "pdf"],
+        "figure_dpi": 150,
+        "save_intermediate_figures": false,
+        "enable_timing_logs": false,
+        "concurrent_execution": true
+      },
+      "kedro_specific": {
+        "runner_type": "ParallelRunner",
+        "enable_versioning": true,
+        "log_level": "INFO",
+        "pipeline_tags": ["staging", "validation"],
+        "memory_limit": "4GB",
+        "max_workers": 2
+      },
+      "figregistry_overrides": {
+        "default_purpose": "presentation",
+        "enable_watermarks": false,
+        "timestamp_format": "%Y%m%d_%H%M%S_staging",
+        "output_base_path": "data/08_reporting/figures/staging",
+        "style_validation": "standard"
+      },
+      "researcher_context": {
+        "primary_users": ["CI-001", "CI-002"],
+        "access_level": "read_write",
+        "collaboration_mode": "team",
+        "experiment_tracking": "comprehensive"
+      }
+    },
+    "production": {
+      "environment_id": "prod",
+      "environment_name": "Production",
+      "description": "Production environment for final results and publications",
+      "configuration_overrides": {
+        "performance_mode": "production",
+        "caching_enabled": true,
+        "validation_level": "strict",
+        "output_formats": ["pdf", "svg", "eps"],
+        "figure_dpi": 300,
+        "save_intermediate_figures": false,
+        "enable_timing_logs": false,
+        "concurrent_execution": true
+      },
+      "kedro_specific": {
+        "runner_type": "ParallelRunner",
+        "enable_versioning": true,
+        "log_level": "WARNING",
+        "pipeline_tags": ["production", "final"],
+        "memory_limit": "8GB",
+        "max_workers": 4
+      },
+      "figregistry_overrides": {
+        "default_purpose": "publication",
+        "enable_watermarks": false,
+        "timestamp_format": "%Y%m%d_%H%M%S_final",
+        "output_base_path": "data/08_reporting/figures/final",
+        "style_validation": "strict",
+        "immutable_outputs": true
+      },
+      "researcher_context": {
+        "primary_users": ["PI-001"],
+        "access_level": "read_only",
+        "collaboration_mode": "controlled",
+        "experiment_tracking": "audit_level",
+        "approval_required": true
+      }
+    }
+  },
+  "catalog_parameter_scenarios": {
+    "_description": "Scenarios for testing catalog parameter extraction within FigureDataSet operations per Section 5.2.6",
+    "basic_figure_dataset": {
+      "dataset_name": "exploratory_scatter_plot",
+      "dataset_type": "figregistry_kedro.FigureDataSet",
+      "filepath": "data/08_reporting/exploratory_plots/scatter_{timestamp}.png",
+      "purpose": "exploratory",
+      "condition_param": "experimental_condition",
+      "style_params": {
+        "figsize": [10, 6],
+        "dpi": 100,
+        "color_palette": "default"
+      },
+      "versioned": false,
+      "test_scenarios": [
+        {
+          "scenario_name": "basic_save",
+          "input_parameters": {
+            "experimental_condition": "control",
+            "researcher_id": "DS-001"
+          },
+          "expected_behavior": {
+            "style_resolution": "control_style",
+            "output_format": "png",
+            "save_location": "data/08_reporting/exploratory_plots/"
+          }
+        }
+      ]
+    },
+    "advanced_figure_dataset": {
+      "dataset_name": "publication_multi_panel",
+      "dataset_type": "figregistry_kedro.FigureDataSet",
+      "filepath": "data/08_reporting/publication_figures/figure_{purpose}_{timestamp}.pdf",
+      "purpose": "publication",
+      "condition_param": "analysis_type",
+      "style_params": {
+        "figsize": [12, 8],
+        "dpi": 300,
+        "color_palette": "academic",
+        "font_family": "serif",
+        "enable_grid": false
+      },
+      "versioned": true,
+      "version": {
+        "enabled": true,
+        "timestamp_format": "%Y%m%d_%H%M%S"
+      },
+      "test_scenarios": [
+        {
+          "scenario_name": "publication_save_with_versioning",
+          "input_parameters": {
+            "analysis_type": "inferential",
+            "researcher_id": "PI-001",
+            "experiment_phase": "main"
+          },
+          "expected_behavior": {
+            "style_resolution": "inferential_publication_style",
+            "output_format": "pdf",
+            "versioning_applied": true,
+            "save_location": "data/08_reporting/publication_figures/"
+          }
+        }
+      ]
+    },
+    "complex_parameter_extraction": {
+      "dataset_name": "dynamic_condition_plot",
+      "dataset_type": "figregistry_kedro.FigureDataSet",
+      "filepath": "data/08_reporting/dynamic_plots/{environment}_{condition}_{timestamp}.png",
+      "purpose": "presentation",
+      "condition_param": "nested_condition",
+      "style_params": {
+        "figsize": [8, 6],
+        "color_palette": "environment_specific",
+        "style_modifiers": "dynamic"
+      },
+      "parameter_extraction_rules": {
+        "nested_condition": {
+          "extraction_method": "hierarchical_lookup",
+          "primary_key": "experimental_conditions.primary_conditions",
+          "secondary_key": "experimental_conditions.secondary_conditions",
+          "fallback_strategy": "default_exploratory"
+        },
+        "environment_specific_styling": {
+          "extraction_method": "environment_override",
+          "source": "environment_configurations.{environment}.figregistry_overrides",
+          "merge_strategy": "deep_merge"
+        }
+      },
+      "test_scenarios": [
+        {
+          "scenario_name": "nested_condition_resolution",
+          "input_parameters": {
+            "nested_condition": "treatment_a.high_quality.main_phase",
+            "environment": "staging",
+            "researcher_id": "CI-001"
+          },
+          "expected_behavior": {
+            "condition_resolution_path": [
+              "experimental_conditions.primary_conditions.treatment_a",
+              "experimental_conditions.secondary_conditions.data_quality.high_quality",
+              "experimental_conditions.secondary_conditions.experimental_phase.main"
+            ],
+            "style_merging": "hierarchical_merge",
+            "final_style": "treatment_a_style + high_quality_modifiers + main_phase_modifiers"
+          }
+        }
+      ]
+    }
+  },
+  "figregistry_styling_patterns": {
+    "_description": "Condition mapping definitions aligned with FigRegistry styling patterns for testing automated style application per F-002",
+    "condition_style_mappings": {
+      "purpose_based_styles": {
+        "exploratory": {
+          "rcParams": {
+            "figure.figsize": [8, 6],
+            "figure.dpi": 100,
+            "axes.grid": true,
+            "axes.grid.alpha": 0.3,
+            "font.size": 10,
+            "axes.titlesize": 12,
+            "axes.labelsize": 10,
+            "legend.fontsize": 9
+          },
+          "color_palette": "Set1",
+          "style_modifiers": ["draft_quality", "speed_optimized"],
+          "file_format_preferences": ["png"],
+          "compression_level": "standard"
+        },
+        "presentation": {
+          "rcParams": {
+            "figure.figsize": [10, 7],
+            "figure.dpi": 150,
+            "axes.grid": false,
+            "font.size": 12,
+            "axes.titlesize": 14,
+            "axes.labelsize": 12,
+            "legend.fontsize": 11,
+            "axes.spines.top": false,
+            "axes.spines.right": false
+          },
+          "color_palette": "professional",
+          "style_modifiers": ["clean_aesthetics", "high_contrast"],
+          "file_format_preferences": ["png", "pdf"],
+          "compression_level": "high"
+        },
+        "publication": {
+          "rcParams": {
+            "figure.figsize": [6, 4],
+            "figure.dpi": 300,
+            "axes.grid": false,
+            "font.family": "serif",
+            "font.size": 8,
+            "axes.titlesize": 10,
+            "axes.labelsize": 8,
+            "legend.fontsize": 7,
+            "axes.linewidth": 0.5,
+            "lines.linewidth": 1.0
+          },
+          "color_palette": "academic_grayscale",
+          "style_modifiers": ["publication_quality", "space_efficient"],
+          "file_format_preferences": ["pdf", "svg", "eps"],
+          "compression_level": "lossless"
+        }
+      },
+      "condition_specific_styles": {
+        "control": {
+          "color": "#1f77b4",
+          "marker": "o",
+          "linestyle": "-",
+          "alpha": 0.8,
+          "style_priority": "baseline"
+        },
+        "treatment_a": {
+          "color": "#ff7f0e",
+          "marker": "s",
+          "linestyle": "--",
+          "alpha": 0.8,
+          "style_priority": "highlight"
+        },
+        "treatment_b": {
+          "color": "#2ca02c",
+          "marker": "^",
+          "linestyle": "-.",
+          "alpha": 0.8,
+          "style_priority": "comparison"
+        },
+        "experimental": {
+          "color": "#d62728",
+          "marker": "D",
+          "linestyle": ":",
+          "alpha": 0.9,
+          "style_priority": "emphasis"
+        }
+      },
+      "hierarchical_style_inheritance": {
+        "_description": "Demonstrates hierarchical style merging for nested conditions",
+        "base_style": {
+          "figure.facecolor": "white",
+          "axes.facecolor": "white",
+          "axes.edgecolor": "black",
+          "axes.linewidth": 1.0
+        },
+        "treatment_modifiers": {
+          "treatment_a": {
+            "axes.prop_cycle": "cycler('color', ['#ff7f0e', '#ffbb78'])"
+          },
+          "treatment_b": {
+            "axes.prop_cycle": "cycler('color', ['#2ca02c', '#98df8a'])"
+          }
+        },
+        "quality_modifiers": {
+          "high_quality": {
+            "lines.markersize": 6,
+            "lines.markeredgewidth": 1.0
+          },
+          "medium_quality": {
+            "lines.markersize": 4,
+            "lines.markeredgewidth": 0.5,
+            "axes.alpha": 0.9
+          },
+          "low_quality": {
+            "lines.markersize": 3,
+            "lines.markeredgewidth": 0.2,
+            "axes.alpha": 0.7,
+            "text.alpha": 0.8
+          }
+        }
+      },
+      "fallback_mechanisms": {
+        "_description": "Fallback strategies for undefined or conflicting conditions",
+        "default_fallback": {
+          "style_name": "safe_default",
+          "rcParams": {
+            "figure.figsize": [8, 6],
+            "figure.dpi": 100,
+            "font.size": 10
+          },
+          "color": "#333333",
+          "trigger_conditions": ["undefined", "null", "unknown"]
+        },
+        "error_recovery": {
+          "style_name": "error_safe",
+          "rcParams": {
+            "figure.figsize": [6, 4],
+            "figure.dpi": 72,
+            "font.size": 8
+          },
+          "color": "#ff0000",
+          "trigger_conditions": ["error", "invalid", "malformed"]
+        }
+      }
+    }
+  },
+  "versioning_and_audit": {
+    "_description": "Experimental protocol versioning and audit information for testing dataset versioning compatibility per advanced scenarios",
+    "protocol_versioning": {
+      "current_version": "2.1",
+      "version_history": [
+        {
+          "version": "1.0",
+          "date": "2024-09-15",
+          "changes": ["Initial protocol definition"],
+          "approved_by": "PI-001",
+          "compatibility": {
+            "figregistry": ">=0.2.0",
+            "kedro": ">=0.18.0"
+          }
+        },
+        {
+          "version": "2.0",
+          "date": "2024-10-15",
+          "changes": [
+            "Added multi-environment support",
+            "Enhanced condition hierarchies",
+            "Improved error handling"
+          ],
+          "approved_by": "PI-001",
+          "compatibility": {
+            "figregistry": ">=0.3.0",
+            "kedro": ">=0.18.0"
+          }
+        },
+        {
+          "version": "2.1",
+          "date": "2024-11-10",
+          "changes": [
+            "Added complex parameter extraction scenarios",
+            "Enhanced versioning compatibility testing",
+            "Updated performance benchmarks"
+          ],
+          "approved_by": "PI-001",
+          "compatibility": {
+            "figregistry": ">=0.3.0",
+            "kedro": ">=0.18.0,<0.20.0"
+          }
+        }
+      ],
+      "breaking_changes": [
+        {
+          "version": "2.0",
+          "change_description": "Restructured condition hierarchy format",
+          "migration_required": true,
+          "migration_guide": "Update condition references to use new nested format"
+        }
+      ]
+    },
+    "audit_trail": {
+      "creation_metadata": {
+        "created_by": "DS-001",
+        "creation_date": "2024-11-15T10:30:00Z",
+        "creation_tool": "manual_json_editing",
+        "initial_version": "1.0"
+      },
+      "modification_history": [
+        {
+          "modification_id": "MOD-001",
+          "modified_by": "DS-002",
+          "modification_date": "2024-11-15T12:15:00Z",
+          "modification_type": "content_update",
+          "changes_summary": "Added environment-specific configurations",
+          "affected_sections": ["environment_configurations"],
+          "review_status": "approved",
+          "approved_by": "CI-001"
+        },
+        {
+          "modification_id": "MOD-002",
+          "modified_by": "CI-002",
+          "modification_date": "2024-11-15T14:45:30Z",
+          "modification_type": "enhancement",
+          "changes_summary": "Enhanced styling patterns and catalog scenarios",
+          "affected_sections": [
+            "figregistry_styling_patterns",
+            "catalog_parameter_scenarios"
+          ],
+          "review_status": "approved",
+          "approved_by": "PI-001"
+        }
+      ],
+      "access_control": {
+        "read_permissions": ["DS-001", "DS-002", "CI-001", "CI-002", "PI-001"],
+        "write_permissions": ["DS-001", "DS-002"],
+        "admin_permissions": ["CI-001", "CI-002", "PI-001"],
+        "last_access_audit": "2024-11-15T15:00:00Z"
+      }
+    },
+    "compatibility_tracking": {
+      "figregistry_compatibility": {
+        "minimum_version": "0.3.0",
+        "tested_versions": ["0.3.0", "0.3.1", "0.3.2"],
+        "known_issues": [],
+        "performance_validated": true
+      },
+      "kedro_compatibility": {
+        "minimum_version": "0.18.0",
+        "maximum_version": "0.19.9",
+        "tested_versions": ["0.18.0", "0.18.14", "0.19.0", "0.19.8"],
+        "known_issues": [
+          {
+            "kedro_version": "0.19.1",
+            "issue": "ConfigLoader path resolution inconsistency",
+            "workaround": "Use absolute paths in catalog configuration",
+            "status": "resolved_in_0.19.2"
+          }
+        ],
+        "performance_validated": true
+      },
+      "python_compatibility": {
+        "minimum_version": "3.10",
+        "tested_versions": ["3.10", "3.11", "3.12"],
+        "platform_testing": ["linux", "macos", "windows"],
+        "known_platform_issues": []
+      }
+    }
+  },
+  "test_validation_criteria": {
+    "_description": "Success criteria and validation benchmarks for testing scenarios",
+    "performance_targets": {
+      "configuration_bridge": {
+        "merge_time_target": "< 10ms",
+        "memory_overhead_target": "< 2MB",
+        "cache_hit_ratio_target": "> 95%"
+      },
+      "figure_dataset": {
+        "save_overhead_target": "< 200ms",
+        "memory_overhead_target": "< 5%",
+        "concurrent_operations_target": "4 per CPU core"
+      },
+      "hook_operations": {
+        "initialization_time_target": "< 50ms",
+        "memory_footprint_target": "< 1MB",
+        "hook_execution_overhead": "< 5ms per hook"
+      }
+    },
+    "functional_validation": {
+      "condition_resolution_accuracy": "> 99%",
+      "style_application_consistency": "100%",
+      "error_handling_coverage": "> 95%",
+      "environment_configuration_compatibility": "100%"
+    },
+    "integration_validation": {
+      "kedro_catalog_compatibility": "100%",
+      "versioning_system_compatibility": "100%",
+      "parallel_execution_reliability": "> 99.9%",
+      "cross_platform_consistency": "100%"
+    }
+  }
+}
