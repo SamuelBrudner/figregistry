@@ -1,0 +1,140 @@
+# =============================================================================
+# Temporal Analysis Dataset - FigRegistry Automated Time Series Styling
+# =============================================================================
+# This dataset demonstrates how FigRegistry's condition-based styling automation
+# transforms temporal visualization workflows by eliminating manual time series
+# styling decisions. Each row represents a temporal data point with metadata
+# that enables sophisticated automatic styling through condition resolution.
+#
+# Key Benefits Demonstrated:
+# 1. Automated temporal phase styling (baseline, intervention, followup)
+# 2. Automatic trend direction visualization through condition mapping  
+# 3. Dynamic quality-based styling without manual color/line management
+# 4. Seamless integration with Kedro's temporal pipeline workflows
+# 5. Zero manual matplotlib styling code required in temporal analysis nodes
+#
+# Integration Points:
+# - analysis_phase column → maps to figregistry.yml condition styles
+# - trend_direction column → enables automatic trend visualization styling
+# - data_quality column → drives quality-appropriate temporal styling
+# - time_period column → supports temporal organization and labeling
+# =============================================================================
+time_period,analysis_phase,trend_direction,trend_strength,seasonality_index,data_quality,temporal_variance,baseline_deviation,intervention_effect,measurement_confidence,temporal_stability
+2023-Q1,baseline,stable,0.12,0.05,high_quality,0.08,0.00,0.00,0.95,0.88
+2023-Q1,baseline,stable,0.15,0.06,high_quality,0.09,0.00,0.00,0.94,0.87
+2023-Q1,baseline,stable,0.11,0.04,high_quality,0.07,0.00,0.00,0.96,0.89
+2023-Q2,baseline,increasing,0.25,0.08,high_quality,0.12,0.03,0.00,0.93,0.85
+2023-Q2,baseline,increasing,0.28,0.09,high_quality,0.13,0.04,0.00,0.92,0.84
+2023-Q2,baseline,stable,0.18,0.07,high_quality,0.10,0.01,0.00,0.94,0.86
+2023-Q3,intervention,increasing,0.45,0.15,high_quality,0.22,0.15,0.18,0.91,0.78
+2023-Q3,intervention,increasing,0.52,0.18,high_quality,0.25,0.18,0.22,0.89,0.76
+2023-Q3,intervention,increasing,0.48,0.16,high_quality,0.23,0.16,0.20,0.90,0.77
+2023-Q4,intervention,stable,0.38,0.12,high_quality,0.18,0.12,0.15,0.92,0.80
+2023-Q4,intervention,stable,0.41,0.13,high_quality,0.19,0.13,0.16,0.91,0.79
+2023-Q4,intervention,decreasing,0.35,0.11,high_quality,0.16,0.10,0.13,0.93,0.81
+2024-Q1,followup,stable,0.32,0.10,high_quality,0.15,0.08,0.11,0.94,0.83
+2024-Q1,followup,stable,0.29,0.09,high_quality,0.14,0.07,0.10,0.95,0.84
+2024-Q1,followup,increasing,0.36,0.11,high_quality,0.17,0.09,0.13,0.93,0.82
+2024-Q2,followup,stable,0.31,0.10,high_quality,0.15,0.08,0.11,0.94,0.83
+2024-Q2,followup,decreasing,0.27,0.08,high_quality,0.13,0.06,0.09,0.95,0.85
+2024-Q2,followup,stable,0.33,0.10,high_quality,0.16,0.08,0.12,0.94,0.82
+2023-Q1,exploratory,stable,0.14,0.05,medium_quality,0.11,0.02,0.00,0.88,0.82
+2023-Q1,exploratory,stable,0.16,0.06,medium_quality,0.12,0.03,0.00,0.87,0.81
+2023-Q2,exploratory,increasing,0.22,0.08,medium_quality,0.14,0.05,0.00,0.86,0.79
+2023-Q2,exploratory,increasing,0.26,0.09,medium_quality,0.15,0.06,0.00,0.85,0.78
+2023-Q3,validation,increasing,0.43,0.16,high_quality,0.21,0.14,0.17,0.92,0.77
+2023-Q3,validation,increasing,0.47,0.17,high_quality,0.23,0.16,0.19,0.91,0.76
+2023-Q4,validation,stable,0.39,0.13,high_quality,0.18,0.12,0.15,0.93,0.79
+2023-Q4,validation,stable,0.37,0.12,high_quality,0.17,0.11,0.14,0.94,0.80
+2024-Q1,detailed,stable,0.33,0.10,high_quality,0.16,0.08,0.12,0.95,0.83
+2024-Q1,detailed,stable,0.30,0.09,high_quality,0.15,0.07,0.11,0.96,0.84
+2024-Q2,detailed,stable,0.32,0.10,high_quality,0.15,0.08,0.12,0.95,0.83
+2024-Q2,detailed,decreasing,0.28,0.08,high_quality,0.13,0.06,0.10,0.96,0.85
+2023-Q1,baseline,stable,0.13,0.05,medium_quality,0.10,0.01,0.00,0.89,0.83
+2023-Q2,baseline,increasing,0.24,0.08,medium_quality,0.13,0.04,0.00,0.88,0.80
+2023-Q3,intervention,increasing,0.49,0.17,medium_quality,0.24,0.17,0.21,0.86,0.73
+2023-Q4,intervention,stable,0.40,0.13,medium_quality,0.19,0.13,0.16,0.87,0.76
+2024-Q1,followup,stable,0.34,0.11,medium_quality,0.16,0.09,0.13,0.89,0.79
+2024-Q2,followup,stable,0.31,0.10,medium_quality,0.15,0.08,0.12,0.90,0.81
+2023-Q1,baseline,stable,0.10,0.04,low_quality,0.15,0.02,0.00,0.78,0.70
+2023-Q2,baseline,increasing,0.20,0.07,low_quality,0.18,0.05,0.00,0.76,0.68
+2023-Q3,intervention,increasing,0.42,0.16,low_quality,0.28,0.18,0.20,0.72,0.62
+2023-Q4,intervention,stable,0.36,0.12,low_quality,0.22,0.14,0.16,0.74,0.65
+2024-Q1,followup,stable,0.30,0.10,low_quality,0.19,0.10,0.12,0.77,0.68
+2024-Q2,followup,decreasing,0.25,0.08,low_quality,0.17,0.08,0.10,0.79,0.71
+2023-Q1,technical,stable,0.12,0.05,high_quality,0.08,0.00,0.00,0.97,0.90
+2023-Q2,technical,increasing,0.23,0.08,high_quality,0.12,0.04,0.00,0.96,0.87
+2023-Q3,technical,increasing,0.46,0.16,high_quality,0.22,0.15,0.19,0.94,0.79
+2023-Q4,technical,stable,0.38,0.12,high_quality,0.18,0.12,0.15,0.95,0.81
+2024-Q1,technical,stable,0.31,0.10,high_quality,0.15,0.08,0.12,0.96,0.84
+2024-Q2,technical,stable,0.32,0.10,high_quality,0.15,0.08,0.12,0.96,0.84
+2023-Q1,stakeholder,stable,0.14,0.05,high_quality,0.09,0.01,0.00,0.94,0.87
+2023-Q2,stakeholder,increasing,0.26,0.09,high_quality,0.13,0.05,0.00,0.92,0.84
+2023-Q3,stakeholder,increasing,0.50,0.18,high_quality,0.25,0.18,0.22,0.88,0.75
+2023-Q4,stakeholder,stable,0.42,0.14,high_quality,0.20,0.14,0.17,0.90,0.78
+2024-Q1,stakeholder,stable,0.35,0.11,high_quality,0.17,0.09,0.13,0.92,0.81
+2024-Q2,stakeholder,stable,0.33,0.11,high_quality,0.16,0.09,0.13,0.93,0.82
+2023-Q1,review,stable,0.13,0.05,high_quality,0.08,0.01,0.00,0.95,0.88
+2023-Q2,review,increasing,0.25,0.08,high_quality,0.12,0.04,0.00,0.93,0.85
+2023-Q3,review,increasing,0.47,0.17,high_quality,0.23,0.16,0.20,0.89,0.77
+2023-Q4,review,stable,0.39,0.13,high_quality,0.18,0.13,0.16,0.91,0.79
+2024-Q1,review,stable,0.32,0.10,high_quality,0.15,0.08,0.12,0.93,0.83
+2024-Q2,review,stable,0.31,0.10,high_quality,0.15,0.08,0.12,0.94,0.83
+2023-Q3,optimized,increasing,0.51,0.18,high_quality,0.26,0.19,0.23,0.90,0.75
+2023-Q4,optimized,stable,0.43,0.14,high_quality,0.21,0.15,0.18,0.92,0.78
+2024-Q1,optimized,stable,0.36,0.12,high_quality,0.17,0.10,0.14,0.94,0.81
+2024-Q2,optimized,stable,0.34,0.11,high_quality,0.16,0.09,0.13,0.95,0.82
+2023-Q1,moderate,stable,0.11,0.04,high_quality,0.07,0.00,0.00,0.96,0.89
+2023-Q2,moderate,increasing,0.21,0.07,high_quality,0.11,0.03,0.00,0.94,0.86
+2023-Q3,moderate,increasing,0.41,0.15,high_quality,0.20,0.14,0.17,0.92,0.78
+2023-Q4,moderate,stable,0.35,0.11,high_quality,0.16,0.10,0.13,0.93,0.81
+2024-Q1,moderate,stable,0.29,0.09,high_quality,0.14,0.07,0.11,0.95,0.84
+2024-Q2,moderate,stable,0.30,0.09,high_quality,0.14,0.07,0.11,0.95,0.84
+2023-Q1,real_world,stable,0.15,0.06,medium_quality,0.12,0.02,0.00,0.87,0.80
+2023-Q2,real_world,increasing,0.27,0.10,medium_quality,0.16,0.06,0.00,0.85,0.77
+2023-Q3,real_world,increasing,0.48,0.18,medium_quality,0.26,0.19,0.22,0.81,0.71
+2023-Q4,real_world,stable,0.41,0.14,medium_quality,0.21,0.15,0.18,0.83,0.74
+2024-Q1,real_world,stable,0.35,0.12,medium_quality,0.18,0.10,0.14,0.86,0.78
+2024-Q2,real_world,stable,0.33,0.11,medium_quality,0.17,0.09,0.13,0.87,0.79
+2023-Q1,standard,stable,0.12,0.05,high_quality,0.08,0.00,0.00,0.95,0.88
+2023-Q2,standard,increasing,0.24,0.08,high_quality,0.12,0.04,0.00,0.93,0.85
+2023-Q3,standard,increasing,0.45,0.16,high_quality,0.22,0.15,0.19,0.90,0.77
+2023-Q4,standard,stable,0.38,0.12,high_quality,0.18,0.12,0.15,0.92,0.80
+2024-Q1,standard,stable,0.31,0.10,high_quality,0.15,0.08,0.12,0.94,0.83
+2024-Q2,standard,stable,0.32,0.10,high_quality,0.15,0.08,0.12,0.94,0.83
+2023-Q1,testing,stable,0.09,0.03,low_quality,0.14,0.01,0.00,0.82,0.74
+2023-Q2,testing,increasing,0.19,0.06,low_quality,0.17,0.04,0.00,0.80,0.72
+2023-Q3,testing,increasing,0.38,0.14,low_quality,0.25,0.16,0.18,0.76,0.66
+2023-Q4,testing,stable,0.33,0.11,low_quality,0.20,0.12,0.15,0.78,0.69
+2024-Q1,testing,stable,0.27,0.09,low_quality,0.17,0.09,0.11,0.81,0.73
+2024-Q2,testing,decreasing,0.23,0.07,low_quality,0.15,0.07,0.09,0.83,0.75
+2023-Q1,colorblind_safe,stable,0.13,0.05,high_quality,0.08,0.01,0.00,0.95,0.88
+2023-Q2,colorblind_safe,increasing,0.25,0.08,high_quality,0.12,0.04,0.00,0.93,0.85
+2023-Q3,colorblind_safe,increasing,0.47,0.17,high_quality,0.23,0.16,0.20,0.89,0.77
+2023-Q4,colorblind_safe,stable,0.39,0.13,high_quality,0.18,0.13,0.16,0.91,0.79
+2024-Q1,colorblind_safe,stable,0.32,0.10,high_quality,0.15,0.08,0.12,0.93,0.83
+2024-Q2,colorblind_safe,stable,0.31,0.10,high_quality,0.15,0.08,0.12,0.94,0.83
+2023-Q1,screen,stable,0.12,0.05,high_quality,0.08,0.00,0.00,0.95,0.88
+2023-Q2,screen,increasing,0.24,0.08,high_quality,0.12,0.04,0.00,0.93,0.85
+2023-Q3,screen,increasing,0.46,0.16,high_quality,0.22,0.15,0.19,0.90,0.77
+2023-Q4,screen,stable,0.38,0.12,high_quality,0.18,0.12,0.15,0.92,0.80
+2024-Q1,screen,stable,0.31,0.10,high_quality,0.15,0.08,0.12,0.94,0.83
+2024-Q2,screen,stable,0.32,0.10,high_quality,0.15,0.08,0.12,0.94,0.83
+2023-Q1,medium_sample,stable,0.14,0.05,medium_quality,0.11,0.02,0.00,0.88,0.82
+2023-Q2,medium_sample,increasing,0.26,0.09,medium_quality,0.15,0.05,0.00,0.86,0.79
+2023-Q3,medium_sample,increasing,0.48,0.17,medium_quality,0.24,0.17,0.21,0.82,0.72
+2023-Q4,medium_sample,stable,0.40,0.13,medium_quality,0.19,0.13,0.16,0.84,0.75
+2024-Q1,medium_sample,stable,0.34,0.11,medium_quality,0.16,0.09,0.13,0.87,0.79
+2024-Q2,medium_sample,stable,0.32,0.10,medium_quality,0.15,0.08,0.12,0.88,0.80
+2023-Q1,random_forest,stable,0.11,0.04,high_quality,0.07,0.00,0.00,0.96,0.89
+2023-Q2,random_forest,increasing,0.22,0.07,high_quality,0.11,0.03,0.00,0.94,0.86
+2023-Q3,random_forest,increasing,0.44,0.15,high_quality,0.21,0.14,0.18,0.91,0.78
+2023-Q4,random_forest,stable,0.37,0.12,high_quality,0.17,0.11,0.14,0.93,0.81
+2024-Q1,random_forest,stable,0.30,0.09,high_quality,0.14,0.07,0.11,0.95,0.84
+2024-Q2,random_forest,stable,0.31,0.10,high_quality,0.14,0.07,0.11,0.95,0.84
+2023-Q1,exploratory_analysis,stable,0.13,0.05,high_quality,0.08,0.01,0.00,0.95,0.88
+2023-Q2,exploratory_analysis,increasing,0.25,0.08,high_quality,0.12,0.04,0.00,0.93,0.85
+2023-Q3,exploratory_analysis,increasing,0.47,0.17,high_quality,0.23,0.16,0.20,0.89,0.77
+2023-Q4,exploratory_analysis,stable,0.39,0.13,high_quality,0.18,0.13,0.16,0.91,0.79
+2024-Q1,exploratory_analysis,stable,0.32,0.10,high_quality,0.15,0.08,0.12,0.93,0.83
+2024-Q2,exploratory_analysis,stable,0.31,0.10,high_quality,0.15,0.08,0.12,0.94,0.83
