@@ -1,0 +1,296 @@
+experiment_id,condition,treatment_type,measurement_value,timestamp,researcher_id,batch_id,replicate,sample_size,temperature_c,ph_level,notes
+EXP_001,control,baseline,24.73,2023-11-01T09:30:00.000Z,researcher_001,BATCH_A,1,100,22.5,7.2,Initial baseline measurement
+EXP_001,control,baseline,23.89,2023-11-01T09:45:00.000Z,researcher_001,BATCH_A,2,100,22.5,7.2,
+EXP_001,control,baseline,25.12,2023-11-01T10:00:00.000Z,researcher_001,BATCH_A,3,100,22.5,7.2,
+EXP_001,treatment_a,compound_x,31.45,2023-11-01T10:30:00.000Z,researcher_001,BATCH_A,1,100,22.5,7.2,First treatment application
+EXP_001,treatment_a,compound_x,32.18,2023-11-01T10:45:00.000Z,researcher_001,BATCH_A,2,100,22.5,7.2,
+EXP_001,treatment_a,compound_x,30.94,2023-11-01T11:00:00.000Z,researcher_001,BATCH_A,3,100,22.5,7.2,
+EXP_001,treatment_b,compound_y,28.67,2023-11-01T11:30:00.000Z,researcher_001,BATCH_A,1,100,22.5,7.2,Alternative treatment
+EXP_001,treatment_b,compound_y,29.34,2023-11-01T11:45:00.000Z,researcher_001,BATCH_A,2,100,22.5,7.2,
+EXP_001,treatment_b,compound_y,27.98,2023-11-01T12:00:00.000Z,researcher_001,BATCH_A,3,100,22.5,7.2,
+EXP_001,exploratory,dose_response,26.81,2023-11-01T13:00:00.000Z,researcher_001,BATCH_A,1,50,22.5,7.2,Exploratory dose testing
+EXP_001,exploratory,dose_response,35.67,2023-11-01T13:15:00.000Z,researcher_001,BATCH_A,2,50,22.5,7.2,Higher dose
+EXP_001,exploratory,dose_response,41.23,2023-11-01T13:30:00.000Z,researcher_001,BATCH_A,3,50,22.5,7.2,Maximum dose
+EXP_002,control,baseline,23.45,2023-11-02T09:30:00.000Z,researcher_002,BATCH_B,1,120,23.0,7.1,Second experiment baseline
+EXP_002,control,baseline,24.12,2023-11-02T09:45:00.000Z,researcher_002,BATCH_B,2,120,23.0,7.1,
+EXP_002,control,baseline,22.89,2023-11-02T10:00:00.000Z,researcher_002,BATCH_B,3,120,23.0,7.1,
+EXP_002,treatment_a,compound_x,30.78,2023-11-02T10:30:00.000Z,researcher_002,BATCH_B,1,120,23.0,7.1,Replication of treatment A
+EXP_002,treatment_a,compound_x,31.56,2023-11-02T10:45:00.000Z,researcher_002,BATCH_B,2,120,23.0,7.1,
+EXP_002,treatment_a,compound_x,29.89,2023-11-02T11:00:00.000Z,researcher_002,BATCH_B,3,120,23.0,7.1,
+EXP_002,treatment_b,compound_y,27.34,2023-11-02T11:30:00.000Z,researcher_002,BATCH_B,1,120,23.0,7.1,Replication of treatment B
+EXP_002,treatment_b,compound_y,28.91,2023-11-02T11:45:00.000Z,researcher_002,BATCH_B,2,120,23.0,7.1,
+EXP_002,treatment_b,compound_y,26.78,2023-11-02T12:00:00.000Z,researcher_002,BATCH_B,3,120,23.0,7.1,
+EXP_002,presentation,summary_stats,29.45,2023-11-02T14:00:00.000Z,researcher_002,BATCH_B,1,360,23.0,7.1,Data for presentation
+EXP_002,presentation,summary_stats,28.67,2023-11-02T14:15:00.000Z,researcher_002,BATCH_B,2,360,23.0,7.1,
+EXP_002,presentation,summary_stats,30.12,2023-11-02T14:30:00.000Z,researcher_002,BATCH_B,3,360,23.0,7.1,
+EXP_003,control,baseline,25.01,2023-11-03T08:00:00.000Z,researcher_003,BATCH_C,1,80,21.8,7.3,Weekend experiment
+EXP_003,control,baseline,24.67,2023-11-03T08:15:00.000Z,researcher_003,BATCH_C,2,80,21.8,7.3,
+EXP_003,control,baseline,,2023-11-03T08:30:00.000Z,researcher_003,BATCH_C,3,80,21.8,7.3,Equipment malfunction - missing data
+EXP_003,treatment_a,compound_x,32.89,2023-11-03T09:00:00.000Z,researcher_003,BATCH_C,1,80,21.8,7.3,
+EXP_003,treatment_a,compound_x,33.45,2023-11-03T09:15:00.000Z,researcher_003,BATCH_C,2,80,21.8,7.3,
+EXP_003,treatment_a,compound_x,31.78,2023-11-03T09:30:00.000Z,researcher_003,BATCH_C,3,80,21.8,7.3,
+EXP_003,treatment_b,compound_y,27.12,2023-11-03T10:00:00.000Z,researcher_003,BATCH_C,1,80,21.8,7.3,
+EXP_003,treatment_b,compound_y,28.45,2023-11-03T10:15:00.000Z,researcher_003,BATCH_C,2,80,21.8,7.3,
+EXP_003,treatment_b,compound_y,26.89,2023-11-03T10:30:00.000Z,researcher_003,BATCH_C,3,80,21.8,7.3,
+EXP_003,exploratory,time_course,24.56,2023-11-03T11:00:00.000Z,researcher_003,BATCH_C,1,40,21.8,7.3,Time course analysis
+EXP_003,exploratory,time_course,26.78,2023-11-03T11:30:00.000Z,researcher_003,BATCH_C,2,40,21.8,7.3,30-minute timepoint
+EXP_003,exploratory,time_course,29.34,2023-11-03T12:00:00.000Z,researcher_003,BATCH_C,3,40,21.8,7.3,60-minute timepoint
+EXP_003,exploratory,time_course,32.11,2023-11-03T12:30:00.000Z,researcher_003,BATCH_C,4,40,21.8,7.3,90-minute timepoint
+EXP_003,publication,final_analysis,30.89,2023-11-03T15:00:00.000Z,researcher_003,BATCH_C,1,200,21.8,7.3,Publication quality data
+EXP_003,publication,final_analysis,31.45,2023-11-03T15:15:00.000Z,researcher_003,BATCH_C,2,200,21.8,7.3,
+EXP_003,publication,final_analysis,30.12,2023-11-03T15:30:00.000Z,researcher_003,BATCH_C,3,200,21.8,7.3,
+EXP_004,control,baseline,23.78,2023-11-06T10:00:00.000Z,researcher_001,BATCH_D,1,150,22.2,7.0,Monday restart
+EXP_004,control,baseline,24.34,2023-11-06T10:15:00.000Z,researcher_001,BATCH_D,2,150,22.2,7.0,
+EXP_004,control,baseline,23.12,2023-11-06T10:30:00.000Z,researcher_001,BATCH_D,3,150,22.2,7.0,
+EXP_004,treatment_a,compound_x,30.45,2023-11-06T11:00:00.000Z,researcher_001,BATCH_D,1,150,22.2,7.0,
+EXP_004,treatment_a,compound_x,31.23,2023-11-06T11:15:00.000Z,researcher_001,BATCH_D,2,150,22.2,7.0,
+EXP_004,treatment_a,compound_x,29.89,2023-11-06T11:30:00.000Z,researcher_001,BATCH_D,3,150,22.2,7.0,
+EXP_004,treatment_b,compound_y,28.12,2023-11-06T12:00:00.000Z,researcher_001,BATCH_D,1,150,22.2,7.0,
+EXP_004,treatment_b,compound_y,28.89,2023-11-06T12:15:00.000Z,researcher_001,BATCH_D,2,150,22.2,7.0,
+EXP_004,treatment_b,compound_y,27.45,2023-11-06T12:30:00.000Z,researcher_001,BATCH_D,3,150,22.2,7.0,
+EXP_004,exploratory,ph_variation,22.34,2023-11-06T13:00:00.000Z,researcher_001,BATCH_D,1,75,22.2,6.5,pH stress test
+EXP_004,exploratory,ph_variation,19.67,2023-11-06T13:15:00.000Z,researcher_001,BATCH_D,2,75,22.2,6.0,Lower pH
+EXP_004,exploratory,ph_variation,15.23,2023-11-06T13:30:00.000Z,researcher_001,BATCH_D,3,75,22.2,5.5,Very low pH
+EXP_004,exploratory,ph_variation,32.45,2023-11-06T13:45:00.000Z,researcher_001,BATCH_D,4,75,22.2,8.0,High pH
+EXP_004,exploratory,ph_variation,35.78,2023-11-06T14:00:00.000Z,researcher_001,BATCH_D,5,75,22.2,8.5,Very high pH
+EXP_005,control,baseline,24.89,2023-11-07T09:00:00.000Z,researcher_004,BATCH_E,1,200,22.0,7.2,Large sample control
+EXP_005,control,baseline,25.12,2023-11-07T09:15:00.000Z,researcher_004,BATCH_E,2,200,22.0,7.2,
+EXP_005,control,baseline,24.67,2023-11-07T09:30:00.000Z,researcher_004,BATCH_E,3,200,22.0,7.2,
+EXP_005,control,baseline,23.98,2023-11-07T09:45:00.000Z,researcher_004,BATCH_E,4,200,22.0,7.2,
+EXP_005,control,baseline,25.34,2023-11-07T10:00:00.000Z,researcher_004,BATCH_E,5,200,22.0,7.2,
+EXP_005,treatment_a,compound_x,31.78,2023-11-07T10:30:00.000Z,researcher_004,BATCH_E,1,200,22.0,7.2,
+EXP_005,treatment_a,compound_x,32.45,2023-11-07T10:45:00.000Z,researcher_004,BATCH_E,2,200,22.0,7.2,
+EXP_005,treatment_a,compound_x,30.89,2023-11-07T11:00:00.000Z,researcher_004,BATCH_E,3,200,22.0,7.2,
+EXP_005,treatment_a,compound_x,33.12,2023-11-07T11:15:00.000Z,researcher_004,BATCH_E,4,200,22.0,7.2,
+EXP_005,treatment_a,compound_x,31.56,2023-11-07T11:30:00.000Z,researcher_004,BATCH_E,5,200,22.0,7.2,
+EXP_005,treatment_b,compound_y,28.45,2023-11-07T12:00:00.000Z,researcher_004,BATCH_E,1,200,22.0,7.2,
+EXP_005,treatment_b,compound_y,29.12,2023-11-07T12:15:00.000Z,researcher_004,BATCH_E,2,200,22.0,7.2,
+EXP_005,treatment_b,compound_y,27.89,2023-11-07T12:30:00.000Z,researcher_004,BATCH_E,3,200,22.0,7.2,
+EXP_005,treatment_b,compound_y,28.67,2023-11-07T12:45:00.000Z,researcher_004,BATCH_E,4,200,22.0,7.2,
+EXP_005,treatment_b,compound_y,29.34,2023-11-07T13:00:00.000Z,researcher_004,BATCH_E,5,200,22.0,7.2,
+EXP_005,presentation,weekly_review,29.67,2023-11-07T16:00:00.000Z,researcher_004,BATCH_E,1,1000,22.0,7.2,Weekly presentation data
+EXP_005,presentation,weekly_review,30.12,2023-11-07T16:15:00.000Z,researcher_004,BATCH_E,2,1000,22.0,7.2,
+EXP_005,presentation,weekly_review,28.98,2023-11-07T16:30:00.000Z,researcher_004,BATCH_E,3,1000,22.0,7.2,
+EXP_006,control,baseline,24.12,2023-11-08T08:30:00.000Z,researcher_002,BATCH_F,1,90,23.5,7.4,Temperature variation test
+EXP_006,control,baseline,23.89,2023-11-08T08:45:00.000Z,researcher_002,BATCH_F,2,90,23.5,7.4,
+EXP_006,control,baseline,24.45,2023-11-08T09:00:00.000Z,researcher_002,BATCH_F,3,90,23.5,7.4,
+EXP_006,treatment_a,compound_x,30.12,2023-11-08T09:30:00.000Z,researcher_002,BATCH_F,1,90,25.0,7.4,Higher temperature
+EXP_006,treatment_a,compound_x,31.89,2023-11-08T09:45:00.000Z,researcher_002,BATCH_F,2,90,25.0,7.4,
+EXP_006,treatment_a,compound_x,29.67,2023-11-08T10:00:00.000Z,researcher_002,BATCH_F,3,90,25.0,7.4,
+EXP_006,treatment_b,compound_y,27.78,2023-11-08T10:30:00.000Z,researcher_002,BATCH_F,1,90,25.0,7.4,
+EXP_006,treatment_b,compound_y,28.34,2023-11-08T10:45:00.000Z,researcher_002,BATCH_F,2,90,25.0,7.4,
+EXP_006,treatment_b,compound_y,26.98,2023-11-08T11:00:00.000Z,researcher_002,BATCH_F,3,90,25.0,7.4,
+EXP_006,exploratory,temperature_response,25.67,2023-11-08T11:30:00.000Z,researcher_002,BATCH_F,1,45,20.0,7.4,Cold stress
+EXP_006,exploratory,temperature_response,23.12,2023-11-08T11:45:00.000Z,researcher_002,BATCH_F,2,45,18.0,7.4,Very cold
+EXP_006,exploratory,temperature_response,36.78,2023-11-08T12:00:00.000Z,researcher_002,BATCH_F,3,45,30.0,7.4,Heat stress
+EXP_006,exploratory,temperature_response,42.34,2023-11-08T12:15:00.000Z,researcher_002,BATCH_F,4,45,35.0,7.4,Extreme heat
+EXP_007,control,baseline,23.67,2023-11-09T14:00:00.000Z,researcher_005,BATCH_G,1,110,22.8,7.1,Afternoon experiment
+EXP_007,control,baseline,24.23,2023-11-09T14:15:00.000Z,researcher_005,BATCH_G,2,110,22.8,7.1,
+EXP_007,control,baseline,23.45,2023-11-09T14:30:00.000Z,researcher_005,BATCH_G,3,110,22.8,7.1,
+EXP_007,treatment_a,compound_x,31.12,2023-11-09T15:00:00.000Z,researcher_005,BATCH_G,1,110,22.8,7.1,
+EXP_007,treatment_a,compound_x,30.89,2023-11-09T15:15:00.000Z,researcher_005,BATCH_G,2,110,22.8,7.1,
+EXP_007,treatment_a,compound_x,32.34,2023-11-09T15:30:00.000Z,researcher_005,BATCH_G,3,110,22.8,7.1,
+EXP_007,treatment_b,compound_y,28.56,2023-11-09T16:00:00.000Z,researcher_005,BATCH_G,1,110,22.8,7.1,
+EXP_007,treatment_b,compound_y,27.89,2023-11-09T16:15:00.000Z,researcher_005,BATCH_G,2,110,22.8,7.1,
+EXP_007,treatment_b,compound_y,28.12,2023-11-09T16:30:00.000Z,researcher_005,BATCH_G,3,110,22.8,7.1,
+EXP_007,publication,manuscript_fig1,30.45,2023-11-09T17:00:00.000Z,researcher_005,BATCH_G,1,330,22.8,7.1,Figure 1 for manuscript
+EXP_007,publication,manuscript_fig1,31.23,2023-11-09T17:15:00.000Z,researcher_005,BATCH_G,2,330,22.8,7.1,
+EXP_007,publication,manuscript_fig1,29.89,2023-11-09T17:30:00.000Z,researcher_005,BATCH_G,3,330,22.8,7.1,
+EXP_008,control,baseline,24.78,2023-11-10T07:30:00.000Z,researcher_003,BATCH_H,1,180,21.5,7.3,Early morning run
+EXP_008,control,baseline,25.12,2023-11-10T07:45:00.000Z,researcher_003,BATCH_H,2,180,21.5,7.3,
+EXP_008,control,baseline,24.34,2023-11-10T08:00:00.000Z,researcher_003,BATCH_H,3,180,21.5,7.3,
+EXP_008,treatment_a,compound_x,32.67,2023-11-10T08:30:00.000Z,researcher_003,BATCH_H,1,180,21.5,7.3,
+EXP_008,treatment_a,compound_x,31.89,2023-11-10T08:45:00.000Z,researcher_003,BATCH_H,2,180,21.5,7.3,
+EXP_008,treatment_a,compound_x,33.45,2023-11-10T09:00:00.000Z,researcher_003,BATCH_H,3,180,21.5,7.3,
+EXP_008,treatment_b,compound_y,28.91,2023-11-10T09:30:00.000Z,researcher_003,BATCH_H,1,180,21.5,7.3,
+EXP_008,treatment_b,compound_y,27.56,2023-11-10T09:45:00.000Z,researcher_003,BATCH_H,2,180,21.5,7.3,
+EXP_008,treatment_b,compound_y,29.12,2023-11-10T10:00:00.000Z,researcher_003,BATCH_H,3,180,21.5,7.3,
+EXP_008,exploratory,dose_titration,26.34,2023-11-10T10:30:00.000Z,researcher_003,BATCH_H,1,60,21.5,7.3,Low dose titration
+EXP_008,exploratory,dose_titration,28.78,2023-11-10T10:45:00.000Z,researcher_003,BATCH_H,2,60,21.5,7.3,Medium dose
+EXP_008,exploratory,dose_titration,33.45,2023-11-10T11:00:00.000Z,researcher_003,BATCH_H,3,60,21.5,7.3,High dose
+EXP_008,exploratory,dose_titration,39.12,2023-11-10T11:15:00.000Z,researcher_003,BATCH_H,4,60,21.5,7.3,Maximum dose
+EXP_008,exploratory,dose_titration,44.67,2023-11-10T11:30:00.000Z,researcher_003,BATCH_H,5,60,21.5,7.3,Overdose test
+EXP_009,control,baseline,23.89,2023-11-13T11:00:00.000Z,researcher_006,BATCH_I,1,130,22.3,7.2,New researcher validation
+EXP_009,control,baseline,24.56,2023-11-13T11:15:00.000Z,researcher_006,BATCH_I,2,130,22.3,7.2,
+EXP_009,control,baseline,23.34,2023-11-13T11:30:00.000Z,researcher_006,BATCH_I,3,130,22.3,7.2,
+EXP_009,treatment_a,compound_x,30.78,2023-11-13T12:00:00.000Z,researcher_006,BATCH_I,1,130,22.3,7.2,
+EXP_009,treatment_a,compound_x,31.45,2023-11-13T12:15:00.000Z,researcher_006,BATCH_I,2,130,22.3,7.2,
+EXP_009,treatment_a,compound_x,29.89,2023-11-13T12:30:00.000Z,researcher_006,BATCH_I,3,130,22.3,7.2,
+EXP_009,treatment_b,compound_y,27.67,2023-11-13T13:00:00.000Z,researcher_006,BATCH_I,1,130,22.3,7.2,
+EXP_009,treatment_b,compound_y,28.34,2023-11-13T13:15:00.000Z,researcher_006,BATCH_I,2,130,22.3,7.2,
+EXP_009,treatment_b,compound_y,26.98,2023-11-13T13:30:00.000Z,researcher_006,BATCH_I,3,130,22.3,7.2,
+EXP_009,presentation,team_meeting,29.34,2023-11-13T15:30:00.000Z,researcher_006,BATCH_I,1,390,22.3,7.2,Team presentation data
+EXP_009,presentation,team_meeting,30.12,2023-11-13T15:45:00.000Z,researcher_006,BATCH_I,2,390,22.3,7.2,
+EXP_009,presentation,team_meeting,28.67,2023-11-13T16:00:00.000Z,researcher_006,BATCH_I,3,390,22.3,7.2,
+EXP_010,control,baseline,24.45,2023-11-14T09:15:00.000Z,researcher_001,BATCH_J,1,160,22.7,7.0,Cross-validation experiment
+EXP_010,control,baseline,23.78,2023-11-14T09:30:00.000Z,researcher_001,BATCH_J,2,160,22.7,7.0,
+EXP_010,control,baseline,25.12,2023-11-14T09:45:00.000Z,researcher_001,BATCH_J,3,160,22.7,7.0,
+EXP_010,treatment_a,compound_x,31.56,2023-11-14T10:15:00.000Z,researcher_001,BATCH_J,1,160,22.7,7.0,
+EXP_010,treatment_a,compound_x,32.23,2023-11-14T10:30:00.000Z,researcher_001,BATCH_J,2,160,22.7,7.0,
+EXP_010,treatment_a,compound_x,30.89,2023-11-14T10:45:00.000Z,researcher_001,BATCH_J,3,160,22.7,7.0,
+EXP_010,treatment_b,compound_y,28.12,2023-11-14T11:15:00.000Z,researcher_001,BATCH_J,1,160,22.7,7.0,
+EXP_010,treatment_b,compound_y,27.45,2023-11-14T11:30:00.000Z,researcher_001,BATCH_J,2,160,22.7,7.0,
+EXP_010,treatment_b,compound_y,28.78,2023-11-14T11:45:00.000Z,researcher_001,BATCH_J,3,160,22.7,7.0,
+EXP_010,exploratory,solvent_comparison,24.89,2023-11-14T12:15:00.000Z,researcher_001,BATCH_J,1,80,22.7,7.0,DMSO solvent
+EXP_010,exploratory,solvent_comparison,25.67,2023-11-14T12:30:00.000Z,researcher_001,BATCH_J,2,80,22.7,7.0,Ethanol solvent
+EXP_010,exploratory,solvent_comparison,23.12,2023-11-14T12:45:00.000Z,researcher_001,BATCH_J,3,80,22.7,7.0,Water solvent
+EXP_010,exploratory,solvent_comparison,26.45,2023-11-14T13:00:00.000Z,researcher_001,BATCH_J,4,80,22.7,7.0,Acetone solvent
+EXP_010,publication,supplementary_fig,30.78,2023-11-14T16:00:00.000Z,researcher_001,BATCH_J,1,480,22.7,7.0,Supplementary figure data
+EXP_010,publication,supplementary_fig,31.34,2023-11-14T16:15:00.000Z,researcher_001,BATCH_J,2,480,22.7,7.0,
+EXP_010,publication,supplementary_fig,29.89,2023-11-14T16:30:00.000Z,researcher_001,BATCH_J,3,480,22.7,7.0,
+EXP_011,control,baseline,25.23,2023-11-15T13:45:00.000Z,researcher_004,BATCH_K,1,140,23.2,7.5,Late afternoon run
+EXP_011,control,baseline,24.67,2023-11-15T14:00:00.000Z,researcher_004,BATCH_K,2,140,23.2,7.5,
+EXP_011,control,baseline,25.78,2023-11-15T14:15:00.000Z,researcher_004,BATCH_K,3,140,23.2,7.5,
+EXP_011,treatment_a,compound_x,32.45,2023-11-15T14:45:00.000Z,researcher_004,BATCH_K,1,140,23.2,7.5,
+EXP_011,treatment_a,compound_x,31.78,2023-11-15T15:00:00.000Z,researcher_004,BATCH_K,2,140,23.2,7.5,
+EXP_011,treatment_a,compound_x,33.12,2023-11-15T15:15:00.000Z,researcher_004,BATCH_K,3,140,23.2,7.5,
+EXP_011,treatment_b,compound_y,28.89,2023-11-15T15:45:00.000Z,researcher_004,BATCH_K,1,140,23.2,7.5,
+EXP_011,treatment_b,compound_y,27.34,2023-11-15T16:00:00.000Z,researcher_004,BATCH_K,2,140,23.2,7.5,
+EXP_011,treatment_b,compound_y,29.56,2023-11-15T16:15:00.000Z,researcher_004,BATCH_K,3,140,23.2,7.5,
+EXP_011,exploratory,stability_test,25.78,2023-11-15T16:45:00.000Z,researcher_004,BATCH_K,1,70,23.2,7.5,Day 0 stability
+EXP_011,exploratory,stability_test,25.12,2023-11-15T17:00:00.000Z,researcher_004,BATCH_K,2,70,23.2,7.5,Day 1 stability
+EXP_011,exploratory,stability_test,24.45,2023-11-15T17:15:00.000Z,researcher_004,BATCH_K,3,70,23.2,7.5,Day 3 stability
+EXP_011,exploratory,stability_test,23.67,2023-11-15T17:30:00.000Z,researcher_004,BATCH_K,4,70,23.2,7.5,Day 7 stability
+EXP_011,exploratory,stability_test,22.34,2023-11-15T17:45:00.000Z,researcher_004,BATCH_K,5,70,23.2,7.5,Day 14 stability
+EXP_012,control,baseline,,2023-11-16T08:00:00.000Z,researcher_002,BATCH_L,1,170,21.9,7.1,Equipment failure - data lost
+EXP_012,control,baseline,24.12,2023-11-16T08:30:00.000Z,researcher_002,BATCH_L,2,170,21.9,7.1,Equipment repaired
+EXP_012,control,baseline,23.89,2023-11-16T08:45:00.000Z,researcher_002,BATCH_L,3,170,21.9,7.1,
+EXP_012,treatment_a,compound_x,30.67,2023-11-16T09:15:00.000Z,researcher_002,BATCH_L,1,170,21.9,7.1,
+EXP_012,treatment_a,compound_x,31.34,2023-11-16T09:30:00.000Z,researcher_002,BATCH_L,2,170,21.9,7.1,
+EXP_012,treatment_a,compound_x,29.78,2023-11-16T09:45:00.000Z,researcher_002,BATCH_L,3,170,21.9,7.1,
+EXP_012,treatment_b,compound_y,27.89,2023-11-16T10:15:00.000Z,researcher_002,BATCH_L,1,170,21.9,7.1,
+EXP_012,treatment_b,compound_y,28.45,2023-11-16T10:30:00.000Z,researcher_002,BATCH_L,2,170,21.9,7.1,
+EXP_012,treatment_b,compound_y,26.78,2023-11-16T10:45:00.000Z,researcher_002,BATCH_L,3,170,21.9,7.1,
+EXP_012,exploratory,buffer_screen,25.34,2023-11-16T11:15:00.000Z,researcher_002,BATCH_L,1,85,21.9,6.8,Phosphate buffer
+EXP_012,exploratory,buffer_screen,26.78,2023-11-16T11:30:00.000Z,researcher_002,BATCH_L,2,85,21.9,7.2,Tris buffer
+EXP_012,exploratory,buffer_screen,24.12,2023-11-16T11:45:00.000Z,researcher_002,BATCH_L,3,85,21.9,7.6,HEPES buffer
+EXP_012,exploratory,buffer_screen,23.56,2023-11-16T12:00:00.000Z,researcher_002,BATCH_L,4,85,21.9,8.0,Bicine buffer
+EXP_012,presentation,progress_update,29.12,2023-11-16T14:30:00.000Z,researcher_002,BATCH_L,1,510,21.9,7.1,Monthly progress review
+EXP_012,presentation,progress_update,30.45,2023-11-16T14:45:00.000Z,researcher_002,BATCH_L,2,510,21.9,7.1,
+EXP_012,presentation,progress_update,28.67,2023-11-16T15:00:00.000Z,researcher_002,BATCH_L,3,510,21.9,7.1,
+EXP_013,control,baseline,24.56,2023-11-17T10:30:00.000Z,researcher_007,BATCH_M,1,190,22.1,7.3,New batch validation
+EXP_013,control,baseline,25.12,2023-11-17T10:45:00.000Z,researcher_007,BATCH_M,2,190,22.1,7.3,
+EXP_013,control,baseline,23.78,2023-11-17T11:00:00.000Z,researcher_007,BATCH_M,3,190,22.1,7.3,
+EXP_013,treatment_a,compound_x,31.89,2023-11-17T11:30:00.000Z,researcher_007,BATCH_M,1,190,22.1,7.3,
+EXP_013,treatment_a,compound_x,30.45,2023-11-17T11:45:00.000Z,researcher_007,BATCH_M,2,190,22.1,7.3,
+EXP_013,treatment_a,compound_x,32.67,2023-11-17T12:00:00.000Z,researcher_007,BATCH_M,3,190,22.1,7.3,
+EXP_013,treatment_b,compound_y,28.34,2023-11-17T12:30:00.000Z,researcher_007,BATCH_M,1,190,22.1,7.3,
+EXP_013,treatment_b,compound_y,27.78,2023-11-17T12:45:00.000Z,researcher_007,BATCH_M,2,190,22.1,7.3,
+EXP_013,treatment_b,compound_y,29.12,2023-11-17T13:00:00.000Z,researcher_007,BATCH_M,3,190,22.1,7.3,
+EXP_013,exploratory,incubation_time,26.45,2023-11-17T13:30:00.000Z,researcher_007,BATCH_M,1,95,22.1,7.3,5 minute incubation
+EXP_013,exploratory,incubation_time,28.67,2023-11-17T13:45:00.000Z,researcher_007,BATCH_M,2,95,22.1,7.3,15 minute incubation
+EXP_013,exploratory,incubation_time,31.23,2023-11-17T14:00:00.000Z,researcher_007,BATCH_M,3,95,22.1,7.3,30 minute incubation
+EXP_013,exploratory,incubation_time,34.78,2023-11-17T14:15:00.000Z,researcher_007,BATCH_M,4,95,22.1,7.3,60 minute incubation
+EXP_013,exploratory,incubation_time,37.45,2023-11-17T14:30:00.000Z,researcher_007,BATCH_M,5,95,22.1,7.3,120 minute incubation
+EXP_013,publication,figure_2,31.67,2023-11-17T16:00:00.000Z,researcher_007,BATCH_M,1,570,22.1,7.3,Manuscript Figure 2
+EXP_013,publication,figure_2,32.34,2023-11-17T16:15:00.000Z,researcher_007,BATCH_M,2,570,22.1,7.3,
+EXP_013,publication,figure_2,30.89,2023-11-17T16:30:00.000Z,researcher_007,BATCH_M,3,570,22.1,7.3,
+EXP_014,control,baseline,23.34,2023-11-20T07:45:00.000Z,researcher_005,BATCH_N,1,210,21.7,7.0,Monday morning experiment
+EXP_014,control,baseline,24.78,2023-11-20T08:00:00.000Z,researcher_005,BATCH_N,2,210,21.7,7.0,
+EXP_014,control,baseline,23.56,2023-11-20T08:15:00.000Z,researcher_005,BATCH_N,3,210,21.7,7.0,
+EXP_014,treatment_a,compound_x,30.12,2023-11-20T08:45:00.000Z,researcher_005,BATCH_N,1,210,21.7,7.0,
+EXP_014,treatment_a,compound_x,31.78,2023-11-20T09:00:00.000Z,researcher_005,BATCH_N,2,210,21.7,7.0,
+EXP_014,treatment_a,compound_x,29.45,2023-11-20T09:15:00.000Z,researcher_005,BATCH_N,3,210,21.7,7.0,
+EXP_014,treatment_b,compound_y,27.56,2023-11-20T09:45:00.000Z,researcher_005,BATCH_N,1,210,21.7,7.0,
+EXP_014,treatment_b,compound_y,28.89,2023-11-20T10:00:00.000Z,researcher_005,BATCH_N,2,210,21.7,7.0,
+EXP_014,treatment_b,compound_y,26.34,2023-11-20T10:15:00.000Z,researcher_005,BATCH_N,3,210,21.7,7.0,
+EXP_014,exploratory,competition_assay,22.45,2023-11-20T10:45:00.000Z,researcher_005,BATCH_N,1,105,21.7,7.0,No competitor
+EXP_014,exploratory,competition_assay,25.78,2023-11-20T11:00:00.000Z,researcher_005,BATCH_N,2,105,21.7,7.0,Low competitor
+EXP_014,exploratory,competition_assay,29.12,2023-11-20T11:15:00.000Z,researcher_005,BATCH_N,3,105,21.7,7.0,Medium competitor
+EXP_014,exploratory,competition_assay,32.67,2023-11-20T11:30:00.000Z,researcher_005,BATCH_N,4,105,21.7,7.0,High competitor
+EXP_014,exploratory,competition_assay,35.89,2023-11-20T11:45:00.000Z,researcher_005,BATCH_N,5,105,21.7,7.0,Saturating competitor
+EXP_015,control,baseline,25.01,2023-11-21T12:00:00.000Z,researcher_008,BATCH_O,1,120,22.4,7.2,Midday control experiment
+EXP_015,control,baseline,24.34,2023-11-21T12:15:00.000Z,researcher_008,BATCH_O,2,120,22.4,7.2,
+EXP_015,control,baseline,25.67,2023-11-21T12:30:00.000Z,researcher_008,BATCH_O,3,120,22.4,7.2,
+EXP_015,treatment_a,compound_x,31.45,2023-11-21T13:00:00.000Z,researcher_008,BATCH_O,1,120,22.4,7.2,
+EXP_015,treatment_a,compound_x,32.78,2023-11-21T13:15:00.000Z,researcher_008,BATCH_O,2,120,22.4,7.2,
+EXP_015,treatment_a,compound_x,30.23,2023-11-21T13:30:00.000Z,researcher_008,BATCH_O,3,120,22.4,7.2,
+EXP_015,treatment_b,compound_y,28.12,2023-11-21T14:00:00.000Z,researcher_008,BATCH_O,1,120,22.4,7.2,
+EXP_015,treatment_b,compound_y,27.89,2023-11-21T14:15:00.000Z,researcher_008,BATCH_O,2,120,22.4,7.2,
+EXP_015,treatment_b,compound_y,28.56,2023-11-21T14:30:00.000Z,researcher_008,BATCH_O,3,120,22.4,7.2,
+EXP_015,presentation,department_seminar,29.78,2023-11-21T16:30:00.000Z,researcher_008,BATCH_O,1,360,22.4,7.2,Department seminar data
+EXP_015,presentation,department_seminar,30.45,2023-11-21T16:45:00.000Z,researcher_008,BATCH_O,2,360,22.4,7.2,
+EXP_015,presentation,department_seminar,29.12,2023-11-21T17:00:00.000Z,researcher_008,BATCH_O,3,360,22.4,7.2,
+EXP_016,control,baseline,24.89,2023-11-22T15:30:00.000Z,researcher_003,BATCH_P,1,250,23.8,7.4,Large-scale validation
+EXP_016,control,baseline,25.45,2023-11-22T15:45:00.000Z,researcher_003,BATCH_P,2,250,23.8,7.4,
+EXP_016,control,baseline,24.12,2023-11-22T16:00:00.000Z,researcher_003,BATCH_P,3,250,23.8,7.4,
+EXP_016,control,baseline,23.78,2023-11-22T16:15:00.000Z,researcher_003,BATCH_P,4,250,23.8,7.4,
+EXP_016,control,baseline,25.67,2023-11-22T16:30:00.000Z,researcher_003,BATCH_P,5,250,23.8,7.4,
+EXP_016,treatment_a,compound_x,32.23,2023-11-22T17:00:00.000Z,researcher_003,BATCH_P,1,250,23.8,7.4,
+EXP_016,treatment_a,compound_x,31.56,2023-11-22T17:15:00.000Z,researcher_003,BATCH_P,2,250,23.8,7.4,
+EXP_016,treatment_a,compound_x,33.12,2023-11-22T17:30:00.000Z,researcher_003,BATCH_P,3,250,23.8,7.4,
+EXP_016,treatment_a,compound_x,30.78,2023-11-22T17:45:00.000Z,researcher_003,BATCH_P,4,250,23.8,7.4,
+EXP_016,treatment_a,compound_x,32.89,2023-11-22T18:00:00.000Z,researcher_003,BATCH_P,5,250,23.8,7.4,
+EXP_016,treatment_b,compound_y,28.67,2023-11-22T18:30:00.000Z,researcher_003,BATCH_P,1,250,23.8,7.4,
+EXP_016,treatment_b,compound_y,27.34,2023-11-22T18:45:00.000Z,researcher_003,BATCH_P,2,250,23.8,7.4,
+EXP_016,treatment_b,compound_y,29.45,2023-11-22T19:00:00.000Z,researcher_003,BATCH_P,3,250,23.8,7.4,
+EXP_016,treatment_b,compound_y,28.12,2023-11-22T19:15:00.000Z,researcher_003,BATCH_P,4,250,23.8,7.4,
+EXP_016,treatment_b,compound_y,27.89,2023-11-22T19:30:00.000Z,researcher_003,BATCH_P,5,250,23.8,7.4,
+EXP_016,exploratory,batch_effect,25.89,2023-11-22T20:00:00.000Z,researcher_003,BATCH_P,1,125,23.8,7.4,Batch effect analysis
+EXP_016,exploratory,batch_effect,26.34,2023-11-22T20:15:00.000Z,researcher_003,BATCH_P,2,125,23.8,7.4,
+EXP_016,exploratory,batch_effect,24.78,2023-11-22T20:30:00.000Z,researcher_003,BATCH_P,3,125,23.8,7.4,
+EXP_016,publication,main_figure,31.23,2023-11-22T21:00:00.000Z,researcher_003,BATCH_P,1,750,23.8,7.4,Main manuscript figure
+EXP_016,publication,main_figure,32.45,2023-11-22T21:15:00.000Z,researcher_003,BATCH_P,2,750,23.8,7.4,
+EXP_016,publication,main_figure,30.67,2023-11-22T21:30:00.000Z,researcher_003,BATCH_P,3,750,23.8,7.4,
+EXP_017,control,baseline,23.45,2023-11-23T09:00:00.000Z,researcher_006,BATCH_Q,1,160,22.6,7.1,Thursday morning run
+EXP_017,control,baseline,24.78,2023-11-23T09:15:00.000Z,researcher_006,BATCH_Q,2,160,22.6,7.1,
+EXP_017,control,baseline,23.12,2023-11-23T09:30:00.000Z,researcher_006,BATCH_Q,3,160,22.6,7.1,
+EXP_017,treatment_a,compound_x,30.89,2023-11-23T10:00:00.000Z,researcher_006,BATCH_Q,1,160,22.6,7.1,
+EXP_017,treatment_a,compound_x,31.67,2023-11-23T10:15:00.000Z,researcher_006,BATCH_Q,2,160,22.6,7.1,
+EXP_017,treatment_a,compound_x,29.34,2023-11-23T10:30:00.000Z,researcher_006,BATCH_Q,3,160,22.6,7.1,
+EXP_017,treatment_b,compound_y,27.78,2023-11-23T11:00:00.000Z,researcher_006,BATCH_Q,1,160,22.6,7.1,
+EXP_017,treatment_b,compound_y,28.45,2023-11-23T11:15:00.000Z,researcher_006,BATCH_Q,2,160,22.6,7.1,
+EXP_017,treatment_b,compound_y,26.89,2023-11-23T11:30:00.000Z,researcher_006,BATCH_Q,3,160,22.6,7.1,
+EXP_017,exploratory,media_optimization,29.67,2023-11-23T12:00:00.000Z,researcher_006,BATCH_Q,1,80,22.6,7.1,Standard media
+EXP_017,exploratory,media_optimization,32.45,2023-11-23T12:15:00.000Z,researcher_006,BATCH_Q,2,80,22.6,7.1,Rich media
+EXP_017,exploratory,media_optimization,26.12,2023-11-23T12:30:00.000Z,researcher_006,BATCH_Q,3,80,22.6,7.1,Minimal media
+EXP_017,exploratory,media_optimization,34.78,2023-11-23T12:45:00.000Z,researcher_006,BATCH_Q,4,80,22.6,7.1,Enhanced media
+EXP_018,control,baseline,24.67,2023-11-24T14:15:00.000Z,researcher_009,BATCH_R,1,180,22.9,7.3,Friday afternoon
+EXP_018,control,baseline,25.34,2023-11-24T14:30:00.000Z,researcher_009,BATCH_R,2,180,22.9,7.3,
+EXP_018,control,baseline,23.89,2023-11-24T14:45:00.000Z,researcher_009,BATCH_R,3,180,22.9,7.3,
+EXP_018,treatment_a,compound_x,31.12,2023-11-24T15:15:00.000Z,researcher_009,BATCH_R,1,180,22.9,7.3,
+EXP_018,treatment_a,compound_x,32.78,2023-11-24T15:30:00.000Z,researcher_009,BATCH_R,2,180,22.9,7.3,
+EXP_018,treatment_a,compound_x,30.45,2023-11-24T15:45:00.000Z,researcher_009,BATCH_R,3,180,22.9,7.3,
+EXP_018,treatment_b,compound_y,28.23,2023-11-24T16:15:00.000Z,researcher_009,BATCH_R,1,180,22.9,7.3,
+EXP_018,treatment_b,compound_y,27.67,2023-11-24T16:30:00.000Z,researcher_009,BATCH_R,2,180,22.9,7.3,
+EXP_018,treatment_b,compound_y,28.89,2023-11-24T16:45:00.000Z,researcher_009,BATCH_R,3,180,22.9,7.3,
+EXP_018,presentation,weekly_summary,29.34,2023-11-24T17:30:00.000Z,researcher_009,BATCH_R,1,540,22.9,7.3,Weekly summary presentation
+EXP_018,presentation,weekly_summary,30.78,2023-11-24T17:45:00.000Z,researcher_009,BATCH_R,2,540,22.9,7.3,
+EXP_018,presentation,weekly_summary,28.56,2023-11-24T18:00:00.000Z,researcher_009,BATCH_R,3,540,22.9,7.3,
+EXP_019,control,baseline,68.34,2023-11-27T10:30:00.000Z,researcher_001,BATCH_S,1,75,22.1,7.2,Outlier measurement - possible contamination
+EXP_019,control,baseline,24.78,2023-11-27T10:45:00.000Z,researcher_001,BATCH_S,2,75,22.1,7.2,Normal after cleaning
+EXP_019,control,baseline,23.45,2023-11-27T11:00:00.000Z,researcher_001,BATCH_S,3,75,22.1,7.2,
+EXP_019,treatment_a,compound_x,31.56,2023-11-27T11:30:00.000Z,researcher_001,BATCH_S,1,75,22.1,7.2,
+EXP_019,treatment_a,compound_x,30.89,2023-11-27T11:45:00.000Z,researcher_001,BATCH_S,2,75,22.1,7.2,
+EXP_019,treatment_a,compound_x,32.23,2023-11-27T12:00:00.000Z,researcher_001,BATCH_S,3,75,22.1,7.2,
+EXP_019,treatment_b,compound_y,27.34,2023-11-27T12:30:00.000Z,researcher_001,BATCH_S,1,75,22.1,7.2,
+EXP_019,treatment_b,compound_y,28.67,2023-11-27T12:45:00.000Z,researcher_001,BATCH_S,2,75,22.1,7.2,
+EXP_019,treatment_b,compound_y,26.78,2023-11-27T13:00:00.000Z,researcher_001,BATCH_S,3,75,22.1,7.2,
+EXP_019,exploratory,error_detection,3.45,2023-11-27T13:30:00.000Z,researcher_001,BATCH_S,1,25,22.1,7.2,Extreme low value - instrument error
+EXP_019,exploratory,error_detection,24.89,2023-11-27T13:45:00.000Z,researcher_001,BATCH_S,2,25,22.1,7.2,Recalibrated instrument
+EXP_019,exploratory,error_detection,25.67,2023-11-27T14:00:00.000Z,researcher_001,BATCH_S,3,25,22.1,7.2,Normal operation
+EXP_020,control,baseline,24.45,2023-11-28T08:45:00.000Z,researcher_010,BATCH_T,1,300,21.6,6.9,Final validation experiment
+EXP_020,control,baseline,25.12,2023-11-28T09:00:00.000Z,researcher_010,BATCH_T,2,300,21.6,6.9,
+EXP_020,control,baseline,23.78,2023-11-28T09:15:00.000Z,researcher_010,BATCH_T,3,300,21.6,6.9,
+EXP_020,control,baseline,24.89,2023-11-28T09:30:00.000Z,researcher_010,BATCH_T,4,300,21.6,6.9,
+EXP_020,control,baseline,25.67,2023-11-28T09:45:00.000Z,researcher_010,BATCH_T,5,300,21.6,6.9,
+EXP_020,treatment_a,compound_x,31.23,2023-11-28T10:15:00.000Z,researcher_010,BATCH_T,1,300,21.6,6.9,
+EXP_020,treatment_a,compound_x,32.56,2023-11-28T10:30:00.000Z,researcher_010,BATCH_T,2,300,21.6,6.9,
+EXP_020,treatment_a,compound_x,30.78,2023-11-28T10:45:00.000Z,researcher_010,BATCH_T,3,300,21.6,6.9,
+EXP_020,treatment_a,compound_x,31.89,2023-11-28T11:00:00.000Z,researcher_010,BATCH_T,4,300,21.6,6.9,
+EXP_020,treatment_a,compound_x,33.12,2023-11-28T11:15:00.000Z,researcher_010,BATCH_T,5,300,21.6,6.9,
+EXP_020,treatment_b,compound_y,28.45,2023-11-28T11:45:00.000Z,researcher_010,BATCH_T,1,300,21.6,6.9,
+EXP_020,treatment_b,compound_y,27.89,2023-11-28T12:00:00.000Z,researcher_010,BATCH_T,2,300,21.6,6.9,
+EXP_020,treatment_b,compound_y,29.12,2023-11-28T12:15:00.000Z,researcher_010,BATCH_T,3,300,21.6,6.9,
+EXP_020,treatment_b,compound_y,28.67,2023-11-28T12:30:00.000Z,researcher_010,BATCH_T,4,300,21.6,6.9,
+EXP_020,treatment_b,compound_y,27.34,2023-11-28T12:45:00.000Z,researcher_010,BATCH_T,5,300,21.6,6.9,
+EXP_020,exploratory,final_screen,26.78,2023-11-28T13:15:00.000Z,researcher_010,BATCH_T,1,150,21.6,6.9,Final screening
+EXP_020,exploratory,final_screen,28.23,2023-11-28T13:30:00.000Z,researcher_010,BATCH_T,2,150,21.6,6.9,
+EXP_020,exploratory,final_screen,30.45,2023-11-28T13:45:00.000Z,researcher_010,BATCH_T,3,150,21.6,6.9,
+EXP_020,exploratory,final_screen,32.89,2023-11-28T14:00:00.000Z,researcher_010,BATCH_T,4,150,21.6,6.9,
+EXP_020,exploratory,final_screen,35.67,2023-11-28T14:15:00.000Z,researcher_010,BATCH_T,5,150,21.6,6.9,
+EXP_020,publication,comprehensive_analysis,31.45,2023-11-28T16:00:00.000Z,researcher_010,BATCH_T,1,1500,21.6,6.9,Comprehensive final analysis
+EXP_020,publication,comprehensive_analysis,32.12,2023-11-28T16:15:00.000Z,researcher_010,BATCH_T,2,1500,21.6,6.9,
+EXP_020,publication,comprehensive_analysis,30.78,2023-11-28T16:30:00.000Z,researcher_010,BATCH_T,3,1500,21.6,6.9,
+EXP_020,publication,comprehensive_analysis,31.89,2023-11-28T16:45:00.000Z,researcher_010,BATCH_T,4,1500,21.6,6.9,
+EXP_020,publication,comprehensive_analysis,32.67,2023-11-28T17:00:00.000Z,researcher_010,BATCH_T,5,1500,21.6,6.9,
