@@ -1,0 +1,46 @@
+# Empty/Minimal Configuration for Default Value Testing
+# 
+# This configuration file provides minimal or empty sections to test:
+# - Default value handling and configuration completion per Section 5.2.5
+# - Configuration bridge behavior with minimal inputs
+# - Graceful handling of empty/missing configuration sections
+# - Default population mechanisms for all configuration categories
+# - Edge case validation for configuration parsing and merging
+#
+# Test Scenarios Covered:
+# - Empty styles dict testing default styling behavior
+# - Missing palettes testing default color scheme population
+# - Minimal outputs testing default path generation and naming
+# - Empty defaults testing matplotlib rcParams fallback behavior
+# - Missing kedro section testing integration default values
+# - Empty cache/performance settings testing optimization defaults
+
+# Minimal version specification (required field)
+figregistry_version: "0.3.0"
+
+# Empty styles section - tests default styling behavior and fallback mechanisms
+styles: {}
+
+# Empty palettes section - tests default color palette population
+palettes: {}
+
+# Minimal outputs section - tests default path generation and naming conventions
+outputs: {}
+
+# Empty defaults section - tests default matplotlib styling application
+defaults: {}
+
+# Optional metadata section with minimal content
+metadata:
+  project_name: "empty-config-test"
+  description: "Minimal configuration for testing default value handling"
+
+# Empty kedro section - tests integration default values
+kedro: {}
+
+# Environment setting - tests environment-based default resolution
+environment: "test"
+
+# Minimal boolean flags - tests default boolean value handling
+enable_concurrent_access: null
+validation_enabled: null
