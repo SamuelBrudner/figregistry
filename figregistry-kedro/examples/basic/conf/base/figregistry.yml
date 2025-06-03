@@ -1,0 +1,637 @@
+# =============================================================================
+# FigRegistry Configuration for Kedro Integration - Basic Example
+# =============================================================================
+# This configuration file demonstrates the integration bridge between Kedro's
+# ConfigLoader system and FigRegistry's YAML-based configuration management.
+# The FigRegistryConfigBridge automatically merges this configuration with
+# Kedro project parameters to enable seamless condition-based styling and
+# automated figure management within Kedro pipelines.
+#
+# Key Integration Features:
+# - Compatible with both standalone FigRegistry and Kedro ConfigLoader (F-007)
+# - Condition-based styling for experimental visualizations (F-002)
+# - Automated output management integrated with Kedro project structure (F-004)
+# - Configuration merging with precedence rules (F-007-RQ-002)
+# - Educational demonstration of FigRegistry-Kedro capabilities
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# FigRegistry Version and Metadata
+# -----------------------------------------------------------------------------
+# Version constraint for FigRegistry compatibility and validation
+figregistry_version: ">=0.3.0"
+
+# Metadata for configuration tracking and validation
+metadata:
+  config_version: "1.0.0"
+  created_by: "figregistry-kedro basic example"
+  description: "Educational configuration demonstrating Kedro integration"
+  environment: "development"
+  last_updated: "2024-01-01"
+
+# -----------------------------------------------------------------------------
+# Condition-Based Style Mappings (F-002)
+# -----------------------------------------------------------------------------
+# Maps experimental condition parameters to visual style dictionaries
+# These styles are automatically applied by FigureDataSet based on 
+# condition_param resolution from Kedro pipeline parameters
+
+styles:
+  # Primary experimental conditions from parameters.yml
+  treatment_group_a:
+    color: "#FF6B6B"           # Vibrant red for treatment group A
+    marker: "o"                # Circle markers for group identification
+    linestyle: "-"             # Solid lines for primary data
+    linewidth: 2.5             # Moderate line thickness
+    alpha: 0.8                 # Slight transparency for overlays
+    label: "Treatment Group A" # Descriptive label for legends
+    markersize: 8              # Standard marker size
+    
+  treatment_group_b:
+    color: "#4ECDC4"           # Teal for treatment group B
+    marker: "s"                # Square markers for differentiation
+    linestyle: "-"             # Solid lines for primary data
+    linewidth: 2.5             # Consistent line thickness
+    alpha: 0.8                 # Matching transparency
+    label: "Treatment Group B" # Descriptive label
+    markersize: 8              # Consistent sizing
+    
+  control_group:
+    color: "#45B7D1"           # Blue for control group
+    marker: "^"                # Triangle markers for distinction
+    linestyle: "--"            # Dashed lines for reference
+    linewidth: 2.0             # Slightly thinner for reference
+    alpha: 0.7                 # More transparency for background
+    label: "Control Group"     # Clear identification
+    markersize: 7              # Slightly smaller for hierarchy
+    
+  combined_groups:
+    color: "#96CEB4"           # Green for combined analysis
+    marker: "D"                # Diamond markers for special analysis
+    linestyle: "-"             # Solid lines for final results
+    linewidth: 3.0             # Thicker lines for emphasis
+    alpha: 0.9                 # Higher opacity for prominence
+    label: "Combined Analysis" # Aggregate label
+    markersize: 9              # Larger size for importance
+
+  # Experimental phase conditions
+  training:
+    color: "#FFEAA7"           # Light yellow for training phase
+    marker: "x"                # X markers for training data
+    linestyle: ":"             # Dotted lines for intermediate results
+    linewidth: 1.5             # Thinner for development phase
+    alpha: 0.6                 # Lower opacity for draft results
+    label: "Training Phase"    # Phase identification
+    markersize: 6              # Smaller for development data
+    
+  validation:
+    color: "#DDA0DD"           # Plum for validation phase
+    marker: "+"                # Plus markers for validation
+    linestyle: "-."            # Dash-dot for validation results
+    linewidth: 2.0             # Standard thickness
+    alpha: 0.7                 # Moderate opacity
+    label: "Validation Phase"  # Clear phase label
+    markersize: 7              # Standard sizing
+    
+  testing:
+    color: "#F0A500"           # Orange for testing phase
+    marker: "*"                # Star markers for test results
+    linestyle: "-"             # Solid lines for test data
+    linewidth: 2.2             # Slightly thicker for importance
+    alpha: 0.8                 # Good visibility
+    label: "Testing Phase"     # Test identification
+    markersize: 8              # Standard test marker size
+    
+  final:
+    color: "#2D3436"           # Dark gray for final results
+    marker: "o"                # Circle markers for final data
+    linestyle: "-"             # Solid lines for publication
+    linewidth: 3.0             # Thick lines for emphasis
+    alpha: 1.0                 # Full opacity for final results
+    label: "Final Results"     # Definitive labeling
+    markersize: 10             # Larger for final presentation
+
+  # Analysis stage conditions for different output purposes
+  exploratory:
+    color: "#A8E6CF"           # Light green for exploration
+    marker: "."                # Point markers for exploratory
+    linestyle: "-"             # Simple solid lines
+    linewidth: 1.0             # Thin lines for sketching
+    alpha: 0.5                 # High transparency for drafts
+    label: "Exploratory"       # Exploration label
+    markersize: 4              # Small markers for density
+    
+  presentation:
+    color: "#FFB6C1"           # Light pink for presentations
+    marker: "o"                # Standard circle markers
+    linestyle: "-"             # Clean solid lines
+    linewidth: 2.0             # Good visibility
+    alpha: 0.8                 # Professional transparency
+    label: "Presentation"      # Presentation ready
+    markersize: 8              # Clear visibility
+    
+  publication:
+    color: "#1A1A1A"           # Black for publication
+    marker: "o"                # Standard professional markers
+    linestyle: "-"             # Clean solid lines
+    linewidth: 2.5             # Publication weight
+    alpha: 1.0                 # Full opacity for print
+    label: "Publication"       # Publication ready
+    markersize: 8              # Standard professional size
+
+  # Model type conditions for algorithm-specific styling
+  linear_regression:
+    color: "#87CEEB"           # Sky blue for linear models
+    marker: "o"                # Circle for continuous
+    linestyle: "-"             # Straight lines
+    linewidth: 2.0             # Standard thickness
+    alpha: 0.8                 # Good visibility
+    label: "Linear Regression" # Algorithm label
+    markersize: 7              # Moderate size
+    
+  random_forest:
+    color: "#228B22"           # Forest green for random forest
+    marker: "s"                # Square for tree-based
+    linestyle: "-"             # Solid connection
+    linewidth: 2.2             # Slightly thicker
+    alpha: 0.8                 # Consistent transparency
+    label: "Random Forest"     # Algorithm identification
+    markersize: 8              # Good visibility
+    
+  ensemble:
+    color: "#8A2BE2"           # Blue violet for ensemble
+    marker: "D"                # Diamond for complex models
+    linestyle: "-"             # Solid representation
+    linewidth: 2.5             # Emphasis thickness
+    alpha: 0.9                 # High visibility
+    label: "Ensemble Model"    # Complex model label
+    markersize: 9              # Larger for complexity
+
+# -----------------------------------------------------------------------------
+# Color Palettes and Defaults
+# -----------------------------------------------------------------------------
+# Default color palettes and fallback styling for undefined conditions
+
+palettes:
+  # Primary palette for automatic color cycling
+  primary:
+    - "#FF6B6B"  # Red
+    - "#4ECDC4"  # Teal  
+    - "#45B7D1"  # Blue
+    - "#96CEB4"  # Green
+    - "#FFEAA7"  # Yellow
+    - "#DDA0DD"  # Plum
+    - "#F0A500"  # Orange
+    - "#2D3436"  # Dark gray
+    
+  # Experimental conditions palette (maps to above styles)
+  experimental:
+    treatment_a: "#FF6B6B"
+    treatment_b: "#4ECDC4"
+    control: "#45B7D1"
+    combined: "#96CEB4"
+    
+  # Analysis phase palette
+  phases:
+    training: "#FFEAA7"
+    validation: "#DDA0DD"
+    testing: "#F0A500"
+    final: "#2D3436"
+    
+  # Output purpose palette
+  purposes:
+    exploratory: "#A8E6CF"
+    presentation: "#FFB6C1"
+    publication: "#1A1A1A"
+    
+  # Grayscale palette for publication
+  grayscale:
+    - "#000000"  # Black
+    - "#404040"  # Dark gray
+    - "#808080"  # Medium gray
+    - "#C0C0C0"  # Light gray
+    - "#E0E0E0"  # Very light gray
+
+# -----------------------------------------------------------------------------
+# Default Styling Parameters
+# -----------------------------------------------------------------------------
+# Fallback styling applied when specific conditions are not matched
+# These defaults ensure consistent visualization even with undefined conditions
+
+defaults:
+  # Basic matplotlib styling defaults
+  figure:
+    figsize: [10, 8]           # Standard figure dimensions
+    dpi: 150                   # High resolution for quality
+    facecolor: "white"         # Clean white background
+    edgecolor: "none"          # No border
+    
+  # Line and marker defaults
+  line:
+    color: "#2E86AB"           # Professional blue default
+    linewidth: 2.0             # Standard line weight
+    linestyle: "-"             # Solid lines by default
+    alpha: 0.8                 # Slight transparency
+    
+  marker:
+    marker: "o"                # Circle markers by default
+    markersize: 8              # Standard marker size
+    markerfacecolor: "auto"    # Match line color
+    markeredgecolor: "auto"    # Match line color
+    markeredgewidth: 0.5       # Thin edge
+    
+  # Text and labeling defaults
+  text:
+    fontsize: 12               # Readable font size
+    fontweight: "normal"       # Standard weight
+    fontfamily: "sans-serif"   # Clean font family
+    color: "#2D3436"           # Dark text color
+    
+  # Legend defaults
+  legend:
+    loc: "best"                # Automatic positioning
+    fontsize: 10               # Slightly smaller for legend
+    frameon: true              # Show legend frame
+    fancybox: true             # Rounded corners
+    shadow: false              # No shadow for cleanliness
+    framealpha: 0.9            # Slight transparency
+    
+  # Grid defaults
+  grid:
+    visible: true              # Show grid by default
+    alpha: 0.3                 # Light grid
+    linestyle: "--"            # Dashed grid lines
+    linewidth: 0.5             # Thin grid
+    color: "#CCCCCC"           # Light gray grid
+    
+  # Axes defaults
+  axes:
+    labelsize: 12              # Standard axis label size
+    titlesize: 14              # Larger title size
+    linewidth: 1.0             # Standard axis line weight
+    edgecolor: "#2D3436"       # Dark axis color
+    facecolor: "white"         # White plot area
+    
+  # Fallback condition style (applied when condition not found)
+  fallback_style:
+    color: "#95A5A6"           # Neutral gray
+    marker: "o"                # Standard marker
+    linestyle: "-"             # Solid line
+    linewidth: 1.5             # Moderate thickness
+    alpha: 0.7                 # Moderate transparency
+    label: "Unknown Condition" # Generic label
+    markersize: 6              # Standard size
+
+# -----------------------------------------------------------------------------
+# Output Management Configuration (F-004)
+# -----------------------------------------------------------------------------
+# Automated output management integrated with Kedro project structure
+# Path aliases and naming conventions for organized figure storage
+
+outputs:
+  # Base output directory (relative to Kedro project root)
+  base_path: "data/08_reporting"
+  
+  # Path aliases for different output purposes (F-004-RQ-002)
+  aliases:
+    expl: "data/08_reporting/exploratory"      # Exploratory analysis
+    pres: "data/08_reporting/presentation"     # Presentation figures
+    pub: "data/08_reporting/publication"       # Publication-ready figures
+    temp: "data/08_reporting/temporary"        # Temporary outputs
+    archive: "data/08_reporting/archive"       # Archived figures
+    
+  # Naming convention configuration (F-004-RQ-001)
+  naming:
+    # Template for automatic filename generation
+    # Available tokens: {name}, {ts}, {condition}, {purpose}, {env}
+    template: "{name}_{condition}_{ts}"
+    
+    # Timestamp format for unique file identification
+    timestamp_format: "%Y%m%d_%H%M%S"
+    
+    # Purpose suffixes for output organization
+    purpose_suffixes:
+      exploratory: "_explore"
+      presentation: "_present"
+      publication: "_pub"
+      
+    # Condition suffixes for experimental tracking
+    condition_suffixes:
+      treatment_group_a: "_trt_a"
+      treatment_group_b: "_trt_b"
+      control_group: "_ctrl"
+      combined_groups: "_combined"
+      
+  # File format configuration (F-004-RQ-004)
+  formats:
+    # Default formats by purpose
+    defaults:
+      exploratory: ["png"]              # Quick PNG for exploration
+      presentation: ["png", "pdf"]      # Both formats for presentations
+      publication: ["pdf", "eps"]       # Vector formats for publication
+      
+    # Format-specific settings
+    png:
+      dpi: 300                          # High resolution
+      bbox_inches: "tight"              # Tight bounding box
+      pad_inches: 0.1                   # Small padding
+      
+    pdf:
+      dpi: 300                          # Vector resolution
+      bbox_inches: "tight"              # Tight bounding box
+      pad_inches: 0.05                  # Minimal padding
+      
+    eps:
+      dpi: 300                          # Vector resolution
+      bbox_inches: "tight"              # Publication standard
+      pad_inches: 0.0                   # No padding
+      
+    svg:
+      bbox_inches: "tight"              # Web-friendly vector
+      pad_inches: 0.1                   # Small padding
+      
+  # Directory management (F-004-RQ-003)
+  directories:
+    create_missing: true                # Auto-create directories
+    permissions: 0o755                  # Standard permissions
+    
+    # Directory structure for organization
+    structure:
+      by_date: true                     # Organize by date
+      by_condition: true                # Organize by experimental condition
+      by_purpose: false                 # Don't sub-organize by purpose
+      
+  # Versioning integration with Kedro
+  versioning:
+    enabled: true                       # Enable version tracking
+    strategy: "timestamp"               # Use timestamp versioning
+    keep_versions: 10                   # Retain recent versions
+    
+# -----------------------------------------------------------------------------
+# Kedro-Specific Integration Settings
+# -----------------------------------------------------------------------------
+# Configuration extensions specific to Kedro pipeline integration
+# These settings are used by the FigRegistryConfigBridge and hooks
+
+kedro:
+  # Configuration bridge settings (F-007)
+  config_bridge:
+    enabled: true                       # Enable config bridge
+    merge_strategy: "override"          # Kedro params override FigRegistry
+    validation_strict: true             # Strict validation on merge
+    cache_enabled: true                 # Cache merged configurations
+    performance_target_ms: 10           # Target merge time < 10ms
+    
+  # Dataset integration settings (F-005)
+  datasets:
+    # Default parameters for FigureDataSet instances
+    default_purpose: "exploratory"      # Default output purpose
+    default_condition_param: "experiment_condition"  # Default condition lookup
+    enable_versioning: true             # Enable Kedro versioning
+    auto_create_dirs: true              # Auto-create output directories
+    
+    # Style parameter resolution
+    style_resolution:
+      fallback_enabled: true            # Use fallback styles
+      parameter_sources:                # Sources for condition parameters
+        - "params:experiment_condition" # Primary experimental condition
+        - "params:analysis_stage"       # Analysis stage condition
+        - "params:experiment_phase"     # Experimental phase condition
+        - "params:model_type"           # Model type condition
+        
+    # Performance settings
+    performance:
+      save_overhead_target: 5           # Target <5% overhead vs manual saves
+      style_lookup_cache: true          # Cache style lookups
+      
+  # Lifecycle hooks settings (F-006)
+  hooks:
+    enabled: true                       # Enable FigRegistry hooks
+    
+    # Hook execution configuration
+    execution:
+      before_pipeline_run: true         # Initialize before pipeline
+      after_pipeline_run: true          # Cleanup after pipeline
+      before_node_run: false            # Don't hook individual nodes
+      after_node_run: false             # Don't hook individual nodes
+      
+    # Context management
+    context:
+      share_config: true                # Share config across datasets
+      thread_safe: true                 # Enable thread-safe operations
+      cleanup_on_exit: true             # Clean up on pipeline exit
+      
+    # Performance targets
+    performance:
+      hook_overhead_ms: 50              # Target <50ms hook overhead
+      initialization_timeout: 5000     # 5 second timeout for init
+      
+  # Environment-specific overrides
+  environments:
+    # Development environment settings
+    development:
+      outputs:
+        formats:
+          defaults:
+            exploratory: ["png"]        # PNG only for speed
+            presentation: ["png"]       # PNG for quick iteration
+            publication: ["png"]        # PNG for development
+            
+      defaults:
+        figure:
+          dpi: 100                      # Lower DPI for speed
+          
+    # Production environment settings  
+    production:
+      kedro:
+        config_bridge:
+          validation_strict: true       # Strict validation in production
+          cache_enabled: true           # Enable caching for performance
+          
+      outputs:
+        formats:
+          defaults:
+            publication: ["pdf", "eps", "png"]  # Multiple formats
+            
+      defaults:
+        figure:
+          dpi: 300                      # High DPI for production
+
+# -----------------------------------------------------------------------------
+# Advanced Configuration for Educational Purposes
+# -----------------------------------------------------------------------------
+# Additional configuration sections demonstrating advanced integration features
+
+# Style inheritance and composition
+style_inheritance:
+  # Base styles that can be inherited
+  base_styles:
+    scientific:
+      fontfamily: "serif"
+      fontsize: 11
+      linewidth: 1.5
+      
+    presentation:
+      fontfamily: "sans-serif"
+      fontsize: 12
+      linewidth: 2.0
+      
+    publication:
+      fontfamily: "serif"
+      fontsize: 10
+      linewidth: 1.0
+      
+  # Inheritance rules for combining styles
+  inheritance_rules:
+    treatment_group_a: "scientific"
+    presentation: "presentation"
+    publication: "publication"
+
+# Conditional styling rules for complex scenarios
+conditional_rules:
+  # Multi-condition styling (when multiple conditions present)
+  multi_condition:
+    # Rule format: condition1 AND condition2 -> style_modifications
+    "treatment_group_a AND training":
+      alpha: 0.6                        # Lower alpha during training
+      linestyle: ":"                    # Dotted for training
+      
+    "control_group AND validation":
+      color: "#87CEEB"                  # Lighter blue for validation
+      marker: "^"                       # Triangle markers
+      
+    "publication AND final":
+      linewidth: 2.5                    # Thicker for final publication
+      alpha: 1.0                        # Full opacity
+      markersize: 8                     # Standard publication size
+      
+  # Fallback chains for missing conditions
+  fallback_chains:
+    - ["experiment_condition", "analysis_stage", "experiment_phase"]
+    - ["model_type", "experiment_phase"]
+    - ["analysis_stage"]
+    
+# Performance monitoring and optimization
+performance:
+  # Monitoring settings
+  monitoring:
+    enabled: true                       # Enable performance monitoring
+    log_slow_operations: true           # Log operations >target time
+    collect_metrics: true               # Collect timing metrics
+    
+  # Optimization settings
+  optimization:
+    style_cache_size: 1000             # Cache up to 1000 styles
+    config_cache_ttl: 3600             # Cache TTL in seconds
+    lazy_loading: true                 # Lazy load configurations
+    
+  # Performance targets (from technical requirements)
+  targets:
+    config_load_ms: 100                # Configuration load <100ms
+    style_lookup_ms: 1                 # Style lookup <1ms
+    save_overhead_percent: 5           # Save overhead <5%
+    hook_overhead_ms: 50               # Hook overhead <50ms
+    merge_time_ms: 10                  # Config merge <10ms
+
+# -----------------------------------------------------------------------------
+# Usage Examples and Documentation
+# -----------------------------------------------------------------------------
+# Embedded examples showing how this configuration integrates with Kedro
+
+examples:
+  # Basic usage in catalog.yml
+  basic_catalog_usage: |
+    training_plot:
+      type: figregistry_kedro.FigureDataSet
+      filepath: data/08_reporting/training_results.png
+      purpose: exploratory
+      condition_param: experiment_condition
+      
+  # Advanced usage with multiple conditions
+  advanced_catalog_usage: |
+    validation_metrics:
+      type: figregistry_kedro.FigureDataSet
+      filepath: data/08_reporting/validation_{condition}.pdf
+      purpose: presentation
+      condition_param: experiment_phase
+      style_params:
+        additional_alpha: 0.9
+        
+  # Hook registration in settings.py
+  hook_registration: |
+    from figregistry_kedro.hooks import FigRegistryHooks
+    
+    HOOKS = (FigRegistryHooks(),)
+    
+  # Usage in pipeline nodes
+  node_usage: |
+    def create_training_plot(data, params):
+        fig, ax = plt.subplots()
+        ax.plot(data['x'], data['y'])
+        ax.set_title('Training Results')
+        return fig  # FigureDataSet handles styling automatically
+
+# Configuration validation schema
+validation:
+  # Schema version for validation
+  schema_version: "1.0.0"
+  
+  # Required sections for basic functionality
+  required_sections:
+    - "styles"
+    - "outputs"
+    - "defaults"
+    
+  # Optional sections for enhanced functionality
+  optional_sections:
+    - "palettes"
+    - "kedro"
+    - "style_inheritance"
+    - "conditional_rules"
+    - "performance"
+    
+  # Validation rules
+  rules:
+    styles:
+      required_fields: ["color"]
+      optional_fields: ["marker", "linestyle", "linewidth", "alpha", "label", "markersize"]
+      
+    outputs:
+      required_fields: ["base_path"]
+      optional_fields: ["aliases", "naming", "formats", "directories", "versioning"]
+      
+# =============================================================================
+# Integration Notes for Developers
+# =============================================================================
+#
+# 1. FigRegistryConfigBridge Operation:
+#    - This file is loaded via Kedro's ConfigLoader (F-007-RQ-001)
+#    - Merged with parameters.yml and other Kedro configurations (F-007-RQ-002)
+#    - Validated against Pydantic schema for type safety (F-007-RQ-003)
+#    - Available to FigureDataSet instances through bridge context
+#
+# 2. Condition-Based Styling (F-002):
+#    - Styles defined here are resolved via get_style(condition) calls
+#    - FigureDataSet uses condition_param to lookup parameter values
+#    - Example: condition_param="experiment_condition" resolves to "treatment_group_a"
+#    - Corresponding style applied automatically during figure save
+#
+# 3. Output Management (F-004):
+#    - Path aliases (expl, pres, pub) map to Kedro data layer structure
+#    - Automatic filename generation with timestamp and condition tokens
+#    - Multiple format support with purpose-specific defaults
+#    - Integration with Kedro versioning system
+#
+# 4. Educational Value:
+#    - Demonstrates separation of styling configuration from pipeline logic
+#    - Shows how condition-based styling eliminates manual plot customization
+#    - Illustrates integration patterns between Kedro and external visualization systems
+#    - Provides template for teams adopting similar integration patterns
+#
+# 5. Performance Considerations:
+#    - Configuration cached for <10ms merge time target (F-007-RQ-002)
+#    - Style lookups optimized for <1ms resolution (F-002 requirements)
+#    - Minimal overhead for save operations <5% (F-005 requirements)
+#    - Thread-safe for parallel Kedro runners
+#
+# =============================================================================
