@@ -1,0 +1,313 @@
+# =============================================================================
+# SYSTEMATICALLY CORRUPTED YAML CONFIGURATION FOR SECURITY TESTING
+# =============================================================================
+# 
+# This file contains deliberately corrupted YAML structures designed to test
+# configuration parser resilience, error handling robustness, and security
+# boundary maintenance as specified in Section 6.6.8.1.
+#
+# TESTING OBJECTIVES:
+# - Validate PyYAML safe_load protection against code injection
+# - Test Pydantic validation robustness under malformed inputs
+# - Verify graceful degradation when processing corrupted data
+# - Ensure memory exhaustion protection during parsing
+# - Validate Unicode and encoding attack resistance
+# - Test configuration bridge error recovery mechanisms
+#
+# WARNING: This file contains intentionally malformed YAML that WILL cause
+# parsing errors. It is designed for negative testing scenarios only.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SECTION 1: STRUCTURAL CORRUPTION AND SYNTAX DAMAGE
+# -----------------------------------------------------------------------------
+
+# Basic syntax corruption - missing closing quotes
+figregistry_version: "0.3.0
+incomplete_version: "missing quote
+
+# Duplicate keys to test parser collision handling
+styles:
+  control:
+    color: "#1f77b4"
+    marker: "o"
+    color: "#ff0000"  # Duplicate key - should override or cause error
+    marker: "s"       # Another duplicate
+
+# Malformed key-value pairs
+styles
+  broken_key_syntax: "no colon after styles"
+  : "empty key"
+  "": "empty string key"
+  null: "null key"
+  123: "numeric key"
+
+# -----------------------------------------------------------------------------
+# SECTION 2: INDENTATION CORRUPTION AND STRUCTURE DAMAGE
+# -----------------------------------------------------------------------------
+
+# Mixed tab and space indentation (tabs represented as wide spaces here)
+outputs:
+  base_path: "figures"
+    dpi: 300  # Wrong indentation level
+  formats:
+    - "png"
+  - "pdf"    # Wrong list indentation
+     - "svg"   # Another wrong indentation
+
+# Severely broken indentation
+defaults:
+figure_size: [10, 6]  # No indentation
+    font_size: 12     # Too much indentation
+ grid: true           # Wrong indentation
+
+# -----------------------------------------------------------------------------
+# SECTION 3: UNICODE AND ENCODING ATTACKS  
+# -----------------------------------------------------------------------------
+
+# Invalid Unicode sequences and encoding manipulation
+unicode_corruption:
+  # Invalid UTF-8 sequences (represented as escape sequences)
+  invalid_utf8: "\xC0\xAE"
+  # Unicode surrogate pairs
+  surrogate_pair: "\uD800\uDC00"
+  # Invalid surrogates
+  invalid_surrogate: "\uDC80"
+  # Null bytes in strings
+  null_injection: "test\x00injection"
+  # Control characters
+  control_chars: "\x01\x02\x03\x04"
+  # Zero-width characters
+  zero_width: "test\u200B\u200C\u200Dinjection"
+  # Bidirectional override characters
+  bidi_override: "\u202E\u202D"
+  # Overlong UTF-8 sequences
+  overlong: "\xF0\x80\x80\xAF"
+
+# -----------------------------------------------------------------------------
+# SECTION 4: MEMORY EXHAUSTION AND PARSER STRESS VECTORS
+# -----------------------------------------------------------------------------
+
+# Extremely deep nesting to test stack overflow protection
+deep_nesting:
+  level1:
+    level2:
+      level3:
+        level4:
+          level5:
+            level6:
+              level7:
+                level8:
+                  level9:
+                    level10:
+                      level11:
+                        level12:
+                          level13:
+                            level14:
+                              level15:
+                                level16:
+                                  level17:
+                                    level18:
+                                      level19:
+                                        level20:
+                                          dangerous_depth: "potential stack overflow"
+
+# Massive key generation for memory exhaustion
+massive_keys: &massive_anchor
+  key_000001: "value"
+  key_000002: "value"
+  key_000003: "value"
+  # ... (this would continue for thousands of entries in a real attack)
+  key_999999: "value"
+
+# Circular references and anchor abuse
+circular_reference: 
+  anchor1: &anchor1
+    ref: *anchor2
+  anchor2: &anchor2  
+    ref: *anchor1
+
+# Large string payload to test memory limits
+memory_bomb: "A" * 1000000  # Would be 1MB string in real attack
+
+# -----------------------------------------------------------------------------
+# SECTION 5: YAML PARSER EXPLOITATION ATTEMPTS
+# -----------------------------------------------------------------------------
+
+# Billion laughs attack (exponential entity expansion)
+exponential_expansion: &lol9 [*lol8, *lol8, *lol8, *lol8, *lol8, *lol8, *lol8, *lol8, *lol8, *lol8]
+exponential_expansion2: &lol8 [*lol7, *lol7, *lol7, *lol7, *lol7, *lol7, *lol7, *lol7, *lol7, *lol7]
+exponential_expansion3: &lol7 [*lol6, *lol6, *lol6, *lol6, *lol6, *lol6, *lol6, *lol6, *lol6, *lol6]
+exponential_expansion4: &lol6 [*lol5, *lol5, *lol5, *lol5, *lol5, *lol5, *lol5, *lol5, *lol5, *lol5]
+exponential_expansion5: &lol5 [*lol4, *lol4, *lol4, *lol4, *lol4, *lol4, *lol4, *lol4, *lol4, *lol4]
+exponential_expansion6: &lol4 [*lol3, *lol3, *lol3, *lol3, *lol3, *lol3, *lol3, *lol3, *lol3, *lol3]
+exponential_expansion7: &lol3 [*lol2, *lol2, *lol2, *lol2, *lol2, *lol2, *lol2, *lol2, *lol2, *lol2]
+exponential_expansion8: &lol2 [*lol1, *lol1, *lol1, *lol1, *lol1, *lol1, *lol1, *lol1, *lol1, *lol1]
+exponential_expansion9: &lol1 ["lol", "lol", "lol", "lol", "lol", "lol", "lol", "lol", "lol", "lol"]
+
+# Python code injection attempts (should be blocked by safe_load)
+code_injection_attempt: !!python/object/apply:os.system ["rm -rf /"]
+exec_injection: !!python/object/apply:builtins.exec ["import os; os.system('malicious command')"]
+eval_injection: !!python/object/apply:builtins.eval ["__import__('os').system('pwd')"]
+
+# -----------------------------------------------------------------------------
+# SECTION 6: MALFORMED DATA TYPES AND TYPE CONFUSION
+# -----------------------------------------------------------------------------
+
+# Type confusion attacks
+type_confusion:
+  # Invalid numeric formats
+  invalid_float: "1.2.3.4"
+  nan_injection: .nan
+  inf_injection: .inf
+  negative_inf: -.inf
+  
+  # Boolean confusion
+  bool_string: "True"  # String not boolean
+  bool_numeric: 1      # Number not boolean
+  
+  # Array/object confusion
+  array_as_object: [{"key": "value"}]
+  object_as_array: {"0": "first", "1": "second"}
+  
+  # Null confusion
+  null_string: "null"
+  null_number: 0
+  undefined_value: ~
+
+# -----------------------------------------------------------------------------
+# SECTION 7: PATH TRAVERSAL AND INJECTION ATTACKS
+# -----------------------------------------------------------------------------
+
+# Path traversal attempts in configuration values
+path_attacks:
+  base_path: "../../../etc/passwd"
+  relative_escape: "figures/../../../sensitive_data"
+  null_byte_injection: "figures\x00malicious_path"
+  windows_path_attack: "C:\\Windows\\System32\\config"
+  unc_path_attack: "\\\\malicious-server\\share"
+  
+  # Purpose parameter attacks for FigureDataSet
+  purpose_attack: "../../../escape/path"
+  condition_injection: "control; rm -rf /"
+  
+  # Alias attacks
+  path_aliases:
+    escape_alias: "../../../"
+    null_alias: "\x00"
+    command_alias: "; rm -rf /"
+
+# -----------------------------------------------------------------------------
+# SECTION 8: CONFIGURATION BRIDGE SPECIFIC ATTACKS
+# -----------------------------------------------------------------------------
+
+# Attacks targeting FigRegistryConfigBridge validation
+bridge_attacks:
+  # Pydantic validation bypass attempts
+  styles:
+    "__class__": "malicious_class"
+    "__dict__": {"injected": "data"}
+    "__module__": "os"
+    
+  # Kedro section manipulation
+  kedro:
+    "__import__": "os"
+    "system": "malicious_command"
+    "eval": "__import__('os').system('pwd')"
+    
+  # Environment manipulation
+  environment: "../../../etc"
+  
+  # Boolean bypass attempts
+  enable_concurrent_access: "yes"  # String instead of boolean
+  validation_enabled: 1            # Number instead of boolean
+
+# -----------------------------------------------------------------------------
+# SECTION 9: RECURSIVE STRUCTURE CORRUPTION
+# -----------------------------------------------------------------------------
+
+# Self-referencing structures to cause infinite loops
+recursive_corruption:
+  self_ref: &self_ref
+    child: *self_ref
+    
+  mutual_ref_a: &ref_a
+    partner: *ref_b
+    
+  mutual_ref_b: &ref_b  
+    partner: *ref_a
+
+# Complex nested corruption
+nested_corruption:
+  styles:
+    [corrupted_list_as_key]:
+      color: "#invalid"
+    {"dict": "as_key"}:
+      marker: 123  # Invalid marker type
+    null:
+      null: null
+    "": 
+      "": ""
+
+# -----------------------------------------------------------------------------
+# SECTION 10: EDGE CASE SYNTAX CORRUPTION
+# -----------------------------------------------------------------------------
+
+# Unterminated structures
+unterminated_list: [
+  "item1",
+  "item2",
+  # Missing closing bracket
+
+unterminated_dict: {
+  "key1": "value1",
+  "key2": "value2"
+  # Missing closing brace
+
+# Mismatched delimiters
+mismatched: [
+  "item1": "value1",  # Colon in list
+  "item2"             # Missing comma
+}
+
+# Invalid escaping
+invalid_escaping:
+  bad_escape: "invalid \q escape"
+  incomplete_unicode: "\u12"  # Incomplete Unicode escape
+  octal_escape: "\777"        # Invalid octal
+  
+# Malformed anchors and aliases
+malformed_anchors:
+  bad_anchor: &123invalid
+    value: "test"
+  bad_alias: *nonexistent
+  recursive_alias: &recursive *recursive
+
+# -----------------------------------------------------------------------------
+# SECTION 11: FINAL CORRUPTION LAYER
+# -----------------------------------------------------------------------------
+
+# Multiple corruption types combined
+compound_corruption:
+  # Encoding + syntax corruption
+  "\xC0\xAE_key": "value"  # Invalid UTF-8 in key
+  valid_key: "\uDC80 invalid surrogate in value"
+  
+  # Type + structure corruption  
+  123: {
+    nested: [
+      broken_item": "missing quote
+      123.456.789: "invalid number as key"
+    ]
+  }
+  
+  # Memory + recursion corruption
+  memory_recursive: &mem_rec
+    data: "A" * 10000  # Large string
+    child: *mem_rec    # Self-reference
+
+# Deliberately broken YAML at end of file to test parser recovery
+broken_final_section:
+  this_will_break: "unclosed string
+  and_this: [unclosed, list
+  final_corruption
