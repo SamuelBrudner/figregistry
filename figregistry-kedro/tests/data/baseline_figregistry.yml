@@ -1,0 +1,403 @@
+# Baseline FigRegistry Configuration for Plugin Testing
+# This configuration provides well-formed, comprehensive settings that serve as the foundation
+# for testing figregistry-kedro plugin integration, configuration merging, and validation workflows.
+# 
+# Performance-optimized settings target <200ms FigureDataSet overhead, <50ms config bridge resolution,
+# and <25ms hook initialization per Section 6.6.4.3 requirements.
+
+# =============================================================================
+# PURPOSE-BASED OUTPUT CONFIGURATION
+# =============================================================================
+# Standard output purposes aligned with scientific workflow stages
+# Used for automated style application and output path organization
+
+outputs:
+  # Base output directory for all generated figures
+  base_path: "data/08_reporting"
+  
+  # Purpose-specific subdirectory organization
+  purposes:
+    exploratory:
+      path: "exploratory"
+      description: "Initial data exploration and hypothesis formation"
+      timestamp_format: "%Y%m%d_%H%M%S"
+      
+    presentation:
+      path: "presentation" 
+      description: "Meeting presentations and interim reporting"
+      timestamp_format: "%Y%m%d_%H%M"
+      
+    publication:
+      path: "publication"
+      description: "Final publication-ready figures"
+      timestamp_format: "%Y%m%d"
+
+  # Default file naming pattern for consistent output organization
+  filename_pattern: "{purpose}_{condition}_{timestamp}"
+  
+  # Supported output formats for cross-platform compatibility
+  formats:
+    - "png"
+    - "pdf" 
+    - "svg"
+    
+  # Default format selection
+  default_format: "png"
+
+# =============================================================================
+# CONDITION-BASED STYLING CONFIGURATION
+# =============================================================================
+# Comprehensive condition mappings covering common experimental scenarios
+# Supports pattern matching and hierarchical fallback mechanisms
+
+styles:
+  # Core experimental conditions with distinctive styling
+  conditions:
+    # Treatment vs Control comparisons
+    "treatment":
+      color: "#2E86AB"
+      marker: "o"
+      linestyle: "-"
+      linewidth: 2.5
+      alpha: 0.8
+      
+    "control":
+      color: "#A23B72"
+      marker: "s"
+      linestyle: "--"
+      linewidth: 2.0
+      alpha: 0.8
+      
+    # Temporal analysis conditions
+    "baseline":
+      color: "#F18F01"
+      marker: "^"
+      linestyle: "-"
+      linewidth: 2.0
+      alpha: 0.9
+      
+    "followup":
+      color: "#C73E1D"
+      marker: "v"
+      linestyle: "-"
+      linewidth: 2.0
+      alpha: 0.9
+      
+    # Model comparison conditions
+    "model_a":
+      color: "#1B998B"
+      marker: "D"
+      linestyle: "-"
+      linewidth: 2.5
+      alpha: 0.8
+      
+    "model_b":
+      color: "#84D2F6"
+      marker: "X"
+      linestyle: "-"
+      linewidth: 2.5
+      alpha: 0.8
+      
+    # Statistical significance indicators
+    "significant":
+      color: "#16537E"
+      marker: "*"
+      markersize: 10
+      linestyle: "-"
+      linewidth: 3.0
+      alpha: 1.0
+      
+    "non_significant":
+      color: "#666666"
+      marker: "."
+      markersize: 8
+      linestyle: ":"
+      linewidth: 1.5
+      alpha: 0.6
+
+  # Wildcard pattern support for flexible condition matching
+  patterns:
+    "experiment_*":
+      color: "#4C956C"
+      marker: "h"
+      linestyle: "-"
+      linewidth: 2.0
+      alpha: 0.8
+      
+    "*_high":
+      color: "#D32F2F"
+      marker: "^"
+      linestyle: "-"
+      linewidth: 2.5
+      alpha: 0.9
+      
+    "*_low":
+      color: "#1976D2"
+      marker: "v"
+      linestyle: "-"
+      linewidth: 2.5
+      alpha: 0.9
+
+  # Default fallback styling for unmatched conditions
+  default:
+    color: "#424242"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.7
+    markersize: 6
+
+# =============================================================================
+# PURPOSE-SPECIFIC MATPLOTLIB RCPARAMS
+# =============================================================================
+# Comprehensive rcParams configurations optimized for different usage contexts
+# Ensures consistent cross-platform rendering and publication-ready output
+
+rcparams:
+  # Exploratory analysis settings - optimized for rapid iteration
+  exploratory:
+    # Figure and layout settings
+    "figure.figsize": [10, 6]
+    "figure.dpi": 100
+    "figure.facecolor": "white"
+    "figure.edgecolor": "none"
+    
+    # Font settings for readability
+    "font.size": 12
+    "font.family": ["sans-serif"]
+    "font.sans-serif": ["Arial", "Helvetica", "Liberation Sans", "DejaVu Sans"]
+    
+    # Axes and grid configuration
+    "axes.titlesize": 14
+    "axes.labelsize": 12
+    "axes.linewidth": 1.0
+    "axes.grid": true
+    "axes.grid.alpha": 0.3
+    "grid.linewidth": 0.5
+    
+    # Tick parameters
+    "xtick.labelsize": 10
+    "ytick.labelsize": 10
+    "xtick.direction": "out"
+    "ytick.direction": "out"
+    
+    # Legend settings
+    "legend.fontsize": 10
+    "legend.frameon": true
+    "legend.fancybox": true
+    "legend.shadow": false
+    
+    # Performance optimization for rapid iteration
+    "agg.path.chunksize": 10000
+    "path.simplify": true
+
+  # Presentation settings - balanced quality and readability
+  presentation:
+    # Enhanced figure settings for display
+    "figure.figsize": [12, 8]
+    "figure.dpi": 150
+    "figure.facecolor": "white"
+    "figure.edgecolor": "none"
+    
+    # Clear, readable fonts
+    "font.size": 14
+    "font.family": ["sans-serif"]
+    "font.sans-serif": ["Arial", "Helvetica", "Liberation Sans", "DejaVu Sans"]
+    
+    # Professional axes styling
+    "axes.titlesize": 16
+    "axes.labelsize": 14
+    "axes.linewidth": 1.2
+    "axes.grid": true
+    "axes.grid.alpha": 0.4
+    "grid.linewidth": 0.8
+    
+    # Enhanced tick styling
+    "xtick.labelsize": 12
+    "ytick.labelsize": 12
+    "xtick.direction": "out"
+    "ytick.direction": "out"
+    "xtick.major.size": 6
+    "ytick.major.size": 6
+    
+    # Professional legend
+    "legend.fontsize": 12
+    "legend.frameon": true
+    "legend.fancybox": true
+    "legend.shadow": true
+    
+    # Balanced performance and quality
+    "agg.path.chunksize": 20000
+    "path.simplify": false
+
+  # Publication settings - maximum quality and precision
+  publication:
+    # High-quality figure settings
+    "figure.figsize": [10, 6]
+    "figure.dpi": 300
+    "figure.facecolor": "white"
+    "figure.edgecolor": "none"
+    
+    # Publication-quality fonts
+    "font.size": 11
+    "font.family": ["serif"]
+    "font.serif": ["Times New Roman", "Liberation Serif", "DejaVu Serif"]
+    
+    # Precise axes configuration
+    "axes.titlesize": 12
+    "axes.labelsize": 11
+    "axes.linewidth": 0.8
+    "axes.grid": false
+    "axes.spines.top": false
+    "axes.spines.right": false
+    
+    # Fine-tuned tick parameters
+    "xtick.labelsize": 10
+    "ytick.labelsize": 10
+    "xtick.direction": "in"
+    "ytick.direction": "in"
+    "xtick.major.size": 4
+    "ytick.major.size": 4
+    "xtick.minor.size": 2
+    "ytick.minor.size": 2
+    
+    # Minimal legend styling
+    "legend.fontsize": 10
+    "legend.frameon": false
+    "legend.fancybox": false
+    "legend.shadow": false
+    
+    # Maximum quality settings
+    "agg.path.chunksize": 0
+    "path.simplify": false
+    "pdf.fonttype": 42
+    "ps.fonttype": 42
+
+# =============================================================================
+# PERFORMANCE AND CACHING CONFIGURATION
+# =============================================================================
+# Optimized settings for plugin performance benchmarking and thread-safe operation
+# Targets: <200ms FigureDataSet overhead, <50ms config bridge resolution
+
+performance:
+  # Configuration caching for reduced overhead
+  cache:
+    enabled: true
+    max_size: 1000
+    ttl_seconds: 3600
+    
+  # Concurrency settings for thread-safe operation
+  concurrency:
+    max_workers: 4
+    thread_safe: true
+    lock_timeout_seconds: 5.0
+    
+  # Memory optimization
+  memory:
+    figure_cache_limit: 50
+    cleanup_threshold_mb: 100
+    gc_frequency: 100
+    
+  # I/O optimization
+  io:
+    buffer_size: 8192
+    async_writes: false
+    compression_level: 6
+
+# =============================================================================
+# VALIDATION AND ERROR HANDLING
+# =============================================================================
+# Robust configuration validation and graceful error handling
+
+validation:
+  # Schema validation settings
+  strict_mode: false
+  allow_extra_fields: true
+  validate_colors: true
+  validate_paths: true
+  
+  # Error handling behavior
+  error_handling:
+    on_invalid_condition: "warn"
+    on_missing_style: "fallback"
+    on_file_error: "raise"
+    on_validation_error: "raise"
+    
+  # Logging configuration
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    handlers: ["console"]
+
+# =============================================================================
+# PLUGIN INTEGRATION SETTINGS
+# =============================================================================
+# Kedro-specific configuration supporting seamless plugin integration
+
+kedro_integration:
+  # Hook configuration
+  hooks:
+    auto_register: true
+    priority: 100
+    
+  # Catalog integration
+  catalog:
+    auto_discover: true
+    validate_entries: true
+    
+  # Environment handling
+  environments:
+    merge_strategy: "override"
+    precedence: ["local", "base"]
+    
+  # Pipeline integration
+  pipeline:
+    node_tagging: true
+    auto_versioning: true
+
+# =============================================================================
+# CROSS-PLATFORM COMPATIBILITY
+# =============================================================================
+# Settings ensuring consistent behavior across Windows, macOS, and Linux
+
+compatibility:
+  # Path handling
+  paths:
+    use_posix: false
+    normalize_separators: true
+    resolve_symlinks: true
+    
+  # Font fallbacks for cross-platform consistency
+  fonts:
+    fallback_order: ["system", "bundled", "default"]
+    cache_fonts: true
+    
+  # Backend configuration
+  matplotlib:
+    backend: "Agg"
+    interactive: false
+    
+# =============================================================================
+# SECURITY SETTINGS
+# =============================================================================
+# Security constraints for safe configuration processing
+
+security:
+  # YAML loading constraints
+  yaml:
+    safe_load: true
+    max_file_size_mb: 10
+    allow_code_execution: false
+    
+  # Path security
+  paths:
+    allow_absolute: false
+    allow_parent_traversal: false
+    sandbox_enabled: true
+    allowed_extensions: [".png", ".pdf", ".svg", ".jpg", ".jpeg"]
+    
+  # Validation constraints
+  validation:
+    max_condition_length: 255
+    max_style_properties: 100
+    validate_injections: true
