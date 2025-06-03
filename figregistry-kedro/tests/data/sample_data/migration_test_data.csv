@@ -1,0 +1,72 @@
+# Migration Test Dataset for FigRegistry-Kedro Plugin
+# This dataset supports migration scenario testing from manual figure management to automated plugin integration
+# Contains legacy data patterns that historically required manual plt.savefig() calls and styling decisions
+# Enables validation that automated plugin behavior matches previous manual workflows
+# Designed to test backward compatibility and robustness during migration scenarios
+
+# Columns:
+# - experiment_id: Unique identifier for experimental runs
+# - condition: Primary experimental condition that would trigger different styling rules
+# - timepoint: Temporal dimension for baseline/followup analysis
+# - treatment_group: Treatment vs control grouping for comparative analysis
+# - model_type: Model comparison scenarios for algorithm evaluation
+# - significance_level: Statistical significance indicators for result visualization
+# - metric_value: Primary measurement value for plotting
+# - secondary_metric: Additional measurement for multi-dimensional analysis
+# - error_margin: Error bars or confidence intervals
+# - sample_size: Number of observations for statistical validation
+# - outlier_flag: Identifies data points that would need special handling
+# - legacy_filename: Historical naming patterns that manual workflows would have used
+# - manual_style_notes: Comments indicating what manual styling decisions would have been made
+
+experiment_id,condition,timepoint,treatment_group,model_type,significance_level,metric_value,secondary_metric,error_margin,sample_size,outlier_flag,legacy_filename,manual_style_notes
+EXP001,treatment,baseline,treatment,model_a,significant,85.3,72.1,3.2,45,FALSE,treatment_baseline_20231201.png,"Manual: blue markers with solid lines for treatment group"
+EXP002,control,baseline,control,model_a,non_significant,78.9,69.4,4.1,42,FALSE,control_baseline_20231201.png,"Manual: red squares with dashed lines for control"
+EXP003,treatment,followup,treatment,model_a,significant,91.7,78.5,2.8,45,FALSE,treatment_followup_20231215.png,"Manual: darker blue with thicker lines for significant results"
+EXP004,control,followup,control,model_a,non_significant,80.2,70.1,3.9,42,FALSE,control_followup_20231215.png,"Manual: gray with dotted lines for non-significant"
+EXP005,experiment_alpha,baseline,treatment,model_b,significant,88.1,75.3,3.5,38,FALSE,exp_alpha_baseline_v1.png,"Manual: green hexagons with pattern matching for experiment_*"
+EXP006,experiment_beta,baseline,treatment,model_b,significant,82.4,71.8,4.0,40,FALSE,exp_beta_baseline_v1.png,"Manual: different green shade for beta variant"
+EXP007,treatment_high,baseline,treatment,model_a,significant,95.2,82.7,2.1,35,FALSE,treatment_high_dose_baseline.png,"Manual: red upward triangles for *_high pattern"
+EXP008,treatment_low,baseline,treatment,model_a,non_significant,79.6,68.9,3.7,37,FALSE,treatment_low_dose_baseline.png,"Manual: blue downward triangles for *_low pattern"
+EXP009,control_high,baseline,control,model_b,non_significant,76.8,66.2,4.3,33,FALSE,control_high_dose_baseline.png,"Manual: larger markers for high dose control"
+EXP010,control_low,baseline,control,model_b,non_significant,74.1,64.5,4.8,35,FALSE,control_low_dose_baseline.png,"Manual: smaller markers for low dose control"
+EXP011,treatment,baseline,treatment,model_a,significant,87.9,74.6,3.1,45,TRUE,treatment_baseline_outlier_flagged.png,"Manual: red circle around outlier point"
+EXP012,control,baseline,control,model_a,significant,83.5,71.2,3.6,42,TRUE,control_baseline_anomaly.png,"Manual: special annotation for unexpected significant control"
+EXP013,experiment_gamma,followup,treatment,model_c,significant,93.8,80.9,2.4,50,FALSE,exp_gamma_followup_final.png,"Manual: publication-ready styling with serif fonts"
+EXP014,baseline_reference,baseline,control,reference,non_significant,70.0,60.0,5.0,100,FALSE,reference_baseline_standard.png,"Manual: black diamonds for reference standard"
+EXP015,treatment,intermediate,treatment,model_a,significant,89.1,76.2,2.9,45,FALSE,treatment_week4_intermediate.png,"Manual: intermediate timepoint with special styling"
+EXP016,control,intermediate,control,model_a,non_significant,79.4,69.8,4.2,42,FALSE,control_week4_intermediate.png,"Manual: consistent with baseline but different marker"
+EXP017,experiment_delta,baseline,treatment,model_d,significant,90.5,77.8,2.7,42,FALSE,exp_delta_model_d_baseline.png,"Manual: novel model type requiring custom legend"
+EXP018,treatment_medium,baseline,treatment,model_a,significant,86.7,73.4,3.3,39,FALSE,treatment_med_dose_baseline.png,"Manual: medium dose with intermediate styling"
+EXP019,validation_set,baseline,validation,model_a,significant,84.2,72.0,3.4,25,FALSE,validation_baseline_small_n.png,"Manual: hollow markers for small sample size"
+EXP020,treatment,followup,treatment,model_a,significant,94.1,81.3,2.5,45,TRUE,treatment_followup_extreme_value.png,"Manual: highlighted extreme positive outcome"
+EXP021,pilot_study,baseline,treatment,prototype,non_significant,75.8,65.4,5.2,15,FALSE,pilot_prototype_baseline.png,"Manual: dashed everything for pilot study uncertainty"
+EXP022,control,followup,control,model_a,significant,85.7,73.1,3.0,42,TRUE,control_followup_unexpected_sig.png,"Manual: double-check annotation for unexpected control significance"
+EXP023,experiment_epsilon,intermediate,treatment,model_e,significant,91.3,78.9,2.6,48,FALSE,exp_epsilon_model_e_week4.png,"Manual: complex multi-condition styling decision"
+EXP024,treatment_high,followup,treatment,model_b,significant,97.2,84.5,1.9,35,FALSE,treatment_high_followup_peak.png,"Manual: star markers for peak performance"
+EXP025,control_low,followup,control,model_b,non_significant,75.9,66.8,4.6,35,FALSE,control_low_followup_stable.png,"Manual: stable trend line annotation"
+EXP026,replication_1,baseline,treatment,model_a,significant,86.1,73.7,3.0,45,FALSE,replication_study_1_baseline.png,"Manual: rep1 prefix for replication study tracking"
+EXP027,replication_2,baseline,treatment,model_a,significant,85.8,73.2,3.1,45,FALSE,replication_study_2_baseline.png,"Manual: rep2 prefix, slight variation to show reproducibility"
+EXP028,negative_control,baseline,control,blank,non_significant,65.2,55.8,6.1,20,FALSE,negative_control_baseline.png,"Manual: gray with cross-hatching for negative control"
+EXP029,positive_control,baseline,control,standard,significant,95.0,82.0,2.0,20,FALSE,positive_control_baseline.png,"Manual: gold color for positive control standard"
+EXP030,treatment,endpoint,treatment,model_a,significant,92.8,79.7,2.7,45,FALSE,treatment_final_endpoint.png,"Manual: bold outline for final endpoint"
+EXP031,control,endpoint,control,model_a,non_significant,81.3,70.5,3.8,42,FALSE,control_final_endpoint.png,"Manual: consistent endpoint styling"
+EXP032,crossover_t2c,followup,crossover,model_a,significant,88.9,76.4,3.2,22,FALSE,crossover_treatment_to_control.png,"Manual: gradient color for crossover transition"
+EXP033,crossover_c2t,followup,crossover,model_a,significant,89.7,77.1,3.0,23,FALSE,crossover_control_to_treatment.png,"Manual: reverse gradient for opposite crossover"
+EXP034,dose_response_1,baseline,treatment,model_a,non_significant,77.2,67.3,4.4,30,FALSE,dose_response_level_1.png,"Manual: dose-response curve point 1"
+EXP035,dose_response_2,baseline,treatment,model_a,significant,84.6,72.8,3.5,30,FALSE,dose_response_level_2.png,"Manual: dose-response curve point 2"
+EXP036,dose_response_3,baseline,treatment,model_a,significant,90.1,77.2,2.8,30,FALSE,dose_response_level_3.png,"Manual: dose-response curve point 3"
+EXP037,dose_response_4,baseline,treatment,model_a,significant,94.7,81.6,2.4,30,FALSE,dose_response_level_4.png,"Manual: dose-response curve point 4"
+EXP038,washout_period,intermediate,washout,none,non_significant,72.3,62.1,4.9,40,FALSE,washout_intermediate.png,"Manual: hollow gray for washout period"
+EXP039,treatment,recovery,treatment,model_a,significant,87.4,75.0,3.3,40,FALSE,treatment_recovery_phase.png,"Manual: recovery phase with healing green"
+EXP040,control,recovery,control,model_a,non_significant,79.8,69.2,4.0,38,FALSE,control_recovery_phase.png,"Manual: muted recovery styling for control"
+EXP041,sensitivity_analysis,baseline,treatment,model_a_modified,significant,86.9,74.1,3.2,45,FALSE,sensitivity_modified_model.png,"Manual: model modification annotation"
+EXP042,robustness_check,baseline,treatment,model_a,significant,85.7,73.5,3.3,45,FALSE,robustness_validation.png,"Manual: validation check styling"
+EXP043,outlier_removed,baseline,treatment,model_a,significant,87.1,74.4,2.9,44,FALSE,outlier_excluded_analysis.png,"Manual: annotation showing outlier exclusion"
+EXP044,full_dataset,baseline,treatment,model_a,significant,85.9,73.3,3.1,45,FALSE,full_dataset_analysis.png,"Manual: complete dataset reference"
+EXP045,subgroup_young,baseline,treatment,model_a,significant,89.3,76.7,3.0,22,FALSE,subgroup_age_under_30.png,"Manual: subgroup analysis with age annotation"
+EXP046,subgroup_old,baseline,treatment,model_a,non_significant,83.1,71.5,3.7,23,FALSE,subgroup_age_over_30.png,"Manual: different subgroup styling"
+EXP047,meta_analysis,baseline,combined,meta,significant,87.8,75.1,2.1,200,FALSE,meta_analysis_combined.png,"Manual: meta-analysis diamond markers"
+EXP048,missing_data_10,baseline,treatment,model_a,significant,86.4,73.9,3.4,40,FALSE,missing_10_percent_imputed.png,"Manual: missing data handling annotation"
+EXP049,missing_data_20,baseline,treatment,model_a,non_significant,84.7,72.2,3.8,36,FALSE,missing_20_percent_imputed.png,"Manual: higher missingness with uncertainty styling"
+EXP050,bootstrap_median,baseline,treatment,model_a,significant,86.8,74.0,2.8,1000,FALSE,bootstrap_median_estimate.png,"Manual: bootstrap with confidence band"
