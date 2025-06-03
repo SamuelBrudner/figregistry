@@ -1,0 +1,656 @@
+{
+  "metadata_version": "1.0.0",
+  "description": "Expected FigureDataSet save operation metadata for comprehensive dataset validation testing. This file contains reference data for validating catalog parameter extraction, condition resolution outcomes, styling application confirmations, and versioning compatibility between FigRegistry and Kedro systems.",
+  "generation_timestamp": "2024-01-15T10:30:00.000Z",
+  "test_scenarios": {
+    "basic_save_operation": {
+      "description": "Minimal FigureDataSet save operation with default parameters",
+      "catalog_configuration": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/basic_figure.png",
+        "purpose": "exploratory"
+      },
+      "expected_metadata": {
+        "parameter_extraction": {
+          "filepath": "data/08_reporting/basic_figure.png",
+          "purpose": "exploratory",
+          "condition_param": null,
+          "style_params": {},
+          "save_args": {},
+          "version": null
+        },
+        "condition_resolution": {
+          "resolved_condition": "exploratory",
+          "resolution_method": "purpose_fallback",
+          "pipeline_params_used": false,
+          "fallback_applied": true
+        },
+        "styling_application": {
+          "get_style_called": true,
+          "condition_used": "exploratory",
+          "base_style_properties": {
+            "color": "blue",
+            "linestyle": "-",
+            "linewidth": 1.0
+          },
+          "final_style_properties": {
+            "color": "blue",
+            "linestyle": "-",
+            "linewidth": 1.0
+          },
+          "style_merge_performed": false,
+          "rcparams_applied": true
+        },
+        "save_operation": {
+          "figregistry_save_called": true,
+          "matplotlib_fallback_used": false,
+          "output_file_created": true,
+          "directory_created": true,
+          "actual_filepath": "data/08_reporting/basic_figure.png"
+        },
+        "performance_metrics": {
+          "style_resolution_time_ms": 0.8,
+          "save_operation_time_ms": 45.2,
+          "total_operation_time_ms": 46.0,
+          "overhead_percentage": 2.1,
+          "target_threshold_ms": 200.0,
+          "performance_compliant": true
+        },
+        "versioning": {
+          "kedro_versioning_enabled": false,
+          "figregistry_timestamp_used": true,
+          "version_conflicts": false,
+          "versioning_method": "timestamp_only"
+        }
+      }
+    },
+    "full_parameter_save_operation": {
+      "description": "Complete FigureDataSet save with all parameters configured",
+      "catalog_configuration": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/presentation_figure.png",
+        "purpose": "presentation",
+        "condition_param": "experiment_condition",
+        "style_params": {
+          "font.size": 14,
+          "figure.dpi": 300,
+          "axes.linewidth": 1.5
+        },
+        "save_args": {
+          "bbox_inches": "tight",
+          "transparent": false
+        }
+      },
+      "pipeline_context": {
+        "experiment_condition": "high_contrast_presentation",
+        "sample_size": 1000,
+        "treatment_group": "variant_a"
+      },
+      "expected_metadata": {
+        "parameter_extraction": {
+          "filepath": "data/08_reporting/presentation_figure.png",
+          "purpose": "presentation",
+          "condition_param": "experiment_condition",
+          "style_params": {
+            "font.size": 14,
+            "figure.dpi": 300,
+            "axes.linewidth": 1.5
+          },
+          "save_args": {
+            "bbox_inches": "tight",
+            "transparent": false
+          },
+          "version": null
+        },
+        "condition_resolution": {
+          "resolved_condition": "high_contrast_presentation",
+          "resolution_method": "pipeline_parameter",
+          "pipeline_params_used": true,
+          "parameter_key": "experiment_condition",
+          "parameter_value": "high_contrast_presentation",
+          "fallback_applied": false
+        },
+        "styling_application": {
+          "get_style_called": true,
+          "condition_used": "high_contrast_presentation",
+          "base_style_properties": {
+            "color": "red",
+            "linestyle": "--",
+            "linewidth": 2.0,
+            "font.size": 12
+          },
+          "dataset_style_overrides": {
+            "font.size": 14,
+            "figure.dpi": 300,
+            "axes.linewidth": 1.5
+          },
+          "final_style_properties": {
+            "color": "red",
+            "linestyle": "--",
+            "linewidth": 2.0,
+            "font.size": 14,
+            "figure.dpi": 300,
+            "axes.linewidth": 1.5
+          },
+          "style_merge_performed": true,
+          "merge_precedence": "dataset_overrides_base",
+          "rcparams_applied": true
+        },
+        "save_operation": {
+          "figregistry_save_called": true,
+          "save_args_applied": {
+            "bbox_inches": "tight",
+            "transparent": false
+          },
+          "matplotlib_fallback_used": false,
+          "output_file_created": true,
+          "directory_created": true,
+          "actual_filepath": "data/08_reporting/presentation_figure.png"
+        },
+        "performance_metrics": {
+          "style_resolution_time_ms": 1.2,
+          "save_operation_time_ms": 78.5,
+          "total_operation_time_ms": 79.7,
+          "overhead_percentage": 3.8,
+          "target_threshold_ms": 200.0,
+          "performance_compliant": true
+        },
+        "versioning": {
+          "kedro_versioning_enabled": false,
+          "figregistry_timestamp_used": true,
+          "version_conflicts": false,
+          "versioning_method": "timestamp_only"
+        }
+      }
+    },
+    "versioned_dataset_save": {
+      "description": "FigureDataSet save with Kedro versioning enabled",
+      "catalog_configuration": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/versioned_figure.png",
+        "purpose": "publication",
+        "condition_param": "version_test",
+        "versioned": true
+      },
+      "pipeline_context": {
+        "version_test": "publication_ready",
+        "run_id": "2024-01-15T10:30:00.000Z"
+      },
+      "expected_metadata": {
+        "parameter_extraction": {
+          "filepath": "data/08_reporting/versioned_figure.png",
+          "purpose": "publication",
+          "condition_param": "version_test",
+          "style_params": {},
+          "save_args": {},
+          "version": null,
+          "versioned": true
+        },
+        "condition_resolution": {
+          "resolved_condition": "publication_ready",
+          "resolution_method": "pipeline_parameter",
+          "pipeline_params_used": true,
+          "parameter_key": "version_test",
+          "parameter_value": "publication_ready",
+          "fallback_applied": false
+        },
+        "styling_application": {
+          "get_style_called": true,
+          "condition_used": "publication_ready",
+          "base_style_properties": {
+            "color": "black",
+            "linestyle": "-",
+            "linewidth": 1.0,
+            "font.family": "serif",
+            "figure.dpi": 600
+          },
+          "final_style_properties": {
+            "color": "black",
+            "linestyle": "-",
+            "linewidth": 1.0,
+            "font.family": "serif",
+            "figure.dpi": 600
+          },
+          "style_merge_performed": false,
+          "rcparams_applied": true
+        },
+        "save_operation": {
+          "figregistry_save_called": true,
+          "matplotlib_fallback_used": false,
+          "output_file_created": true,
+          "directory_created": true,
+          "versioned_path_used": true,
+          "actual_filepath": "data/08_reporting/2024-01-15T10.30.00.000Z/versioned_figure.png"
+        },
+        "performance_metrics": {
+          "style_resolution_time_ms": 0.9,
+          "save_operation_time_ms": 92.3,
+          "total_operation_time_ms": 93.2,
+          "overhead_percentage": 4.2,
+          "target_threshold_ms": 200.0,
+          "performance_compliant": true
+        },
+        "versioning": {
+          "kedro_versioning_enabled": true,
+          "figregistry_timestamp_used": true,
+          "version_conflicts": false,
+          "versioning_method": "kedro_and_figregistry",
+          "kedro_version_path": "2024-01-15T10.30.00.000Z",
+          "figregistry_timestamp": "2024-01-15T10:30:00.123Z",
+          "compatibility_validated": true
+        }
+      }
+    },
+    "condition_fallback_scenario": {
+      "description": "Parameter resolution with fallback to purpose when condition_param not found",
+      "catalog_configuration": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/fallback_figure.png",
+        "purpose": "exploratory",
+        "condition_param": "missing_parameter"
+      },
+      "pipeline_context": {
+        "other_parameter": "some_value",
+        "experiment_id": 12345
+      },
+      "expected_metadata": {
+        "parameter_extraction": {
+          "filepath": "data/08_reporting/fallback_figure.png",
+          "purpose": "exploratory",
+          "condition_param": "missing_parameter",
+          "style_params": {},
+          "save_args": {},
+          "version": null
+        },
+        "condition_resolution": {
+          "resolved_condition": "exploratory",
+          "resolution_method": "purpose_fallback",
+          "pipeline_params_used": false,
+          "parameter_key": "missing_parameter",
+          "parameter_found": false,
+          "fallback_applied": true,
+          "fallback_value": "exploratory"
+        },
+        "styling_application": {
+          "get_style_called": true,
+          "condition_used": "exploratory",
+          "base_style_properties": {
+            "color": "blue",
+            "linestyle": "-",
+            "linewidth": 1.0
+          },
+          "final_style_properties": {
+            "color": "blue",
+            "linestyle": "-",
+            "linewidth": 1.0
+          },
+          "style_merge_performed": false,
+          "rcparams_applied": true
+        },
+        "save_operation": {
+          "figregistry_save_called": true,
+          "matplotlib_fallback_used": false,
+          "output_file_created": true,
+          "directory_created": true,
+          "actual_filepath": "data/08_reporting/fallback_figure.png"
+        },
+        "performance_metrics": {
+          "style_resolution_time_ms": 0.7,
+          "save_operation_time_ms": 41.8,
+          "total_operation_time_ms": 42.5,
+          "overhead_percentage": 1.9,
+          "target_threshold_ms": 200.0,
+          "performance_compliant": true
+        },
+        "versioning": {
+          "kedro_versioning_enabled": false,
+          "figregistry_timestamp_used": true,
+          "version_conflicts": false,
+          "versioning_method": "timestamp_only"
+        }
+      }
+    },
+    "cache_performance_scenario": {
+      "description": "Style resolution with cache hit for performance validation",
+      "catalog_configuration": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/cached_figure.png",
+        "purpose": "presentation",
+        "condition_param": "experiment_type"
+      },
+      "pipeline_context": {
+        "experiment_type": "cached_condition"
+      },
+      "cache_state": {
+        "cache_primed": true,
+        "existing_entries": 1,
+        "cache_key": "md5_hash_of_condition_and_params"
+      },
+      "expected_metadata": {
+        "parameter_extraction": {
+          "filepath": "data/08_reporting/cached_figure.png",
+          "purpose": "presentation",
+          "condition_param": "experiment_type",
+          "style_params": {},
+          "save_args": {},
+          "version": null
+        },
+        "condition_resolution": {
+          "resolved_condition": "cached_condition",
+          "resolution_method": "pipeline_parameter",
+          "pipeline_params_used": true,
+          "parameter_key": "experiment_type",
+          "parameter_value": "cached_condition",
+          "fallback_applied": false
+        },
+        "styling_application": {
+          "get_style_called": true,
+          "condition_used": "cached_condition",
+          "cache_hit": true,
+          "cache_key_used": "md5_hash_of_condition_and_params",
+          "base_style_properties": {
+            "color": "green",
+            "linestyle": ":",
+            "linewidth": 1.5
+          },
+          "final_style_properties": {
+            "color": "green",
+            "linestyle": ":",
+            "linewidth": 1.5
+          },
+          "style_merge_performed": false,
+          "rcparams_applied": true
+        },
+        "save_operation": {
+          "figregistry_save_called": true,
+          "matplotlib_fallback_used": false,
+          "output_file_created": true,
+          "directory_created": true,
+          "actual_filepath": "data/08_reporting/cached_figure.png"
+        },
+        "performance_metrics": {
+          "style_resolution_time_ms": 0.3,
+          "cache_hit_improvement": true,
+          "cache_hit_speedup_factor": 2.7,
+          "save_operation_time_ms": 43.1,
+          "total_operation_time_ms": 43.4,
+          "overhead_percentage": 1.5,
+          "target_threshold_ms": 200.0,
+          "performance_compliant": true,
+          "cache_performance_target_ms": 1.0,
+          "cache_performance_met": true
+        },
+        "versioning": {
+          "kedro_versioning_enabled": false,
+          "figregistry_timestamp_used": true,
+          "version_conflicts": false,
+          "versioning_method": "timestamp_only"
+        }
+      }
+    },
+    "error_handling_scenario": {
+      "description": "Save operation with graceful error handling and fallback behavior",
+      "catalog_configuration": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/error_test_figure.png",
+        "purpose": "presentation",
+        "condition_param": "error_condition"
+      },
+      "pipeline_context": {
+        "error_condition": "failing_style_resolution"
+      },
+      "error_simulation": {
+        "figregistry_get_style_fails": true,
+        "error_type": "StyleResolutionError",
+        "fallback_expected": true
+      },
+      "expected_metadata": {
+        "parameter_extraction": {
+          "filepath": "data/08_reporting/error_test_figure.png",
+          "purpose": "presentation",
+          "condition_param": "error_condition",
+          "style_params": {},
+          "save_args": {},
+          "version": null
+        },
+        "condition_resolution": {
+          "resolved_condition": "failing_style_resolution",
+          "resolution_method": "pipeline_parameter",
+          "pipeline_params_used": true,
+          "parameter_key": "error_condition",
+          "parameter_value": "failing_style_resolution",
+          "fallback_applied": false
+        },
+        "styling_application": {
+          "get_style_called": true,
+          "condition_used": "failing_style_resolution",
+          "get_style_failed": true,
+          "error_handled_gracefully": true,
+          "fallback_style_used": true,
+          "base_style_properties": {},
+          "final_style_properties": {},
+          "style_merge_performed": false,
+          "rcparams_applied": false
+        },
+        "save_operation": {
+          "figregistry_save_called": true,
+          "figregistry_save_failed": false,
+          "matplotlib_fallback_used": false,
+          "output_file_created": true,
+          "directory_created": true,
+          "actual_filepath": "data/08_reporting/error_test_figure.png"
+        },
+        "performance_metrics": {
+          "style_resolution_time_ms": 5.2,
+          "error_handling_overhead_ms": 3.8,
+          "save_operation_time_ms": 47.6,
+          "total_operation_time_ms": 52.8,
+          "overhead_percentage": 2.4,
+          "target_threshold_ms": 200.0,
+          "performance_compliant": true
+        },
+        "versioning": {
+          "kedro_versioning_enabled": false,
+          "figregistry_timestamp_used": true,
+          "version_conflicts": false,
+          "versioning_method": "timestamp_only"
+        }
+      }
+    }
+  },
+  "validation_requirements": {
+    "abstract_dataset_compliance": {
+      "description": "Validation criteria for AbstractDataSet interface compliance per F-005",
+      "required_methods": {
+        "_save": {
+          "signature": "def _save(self, data: Figure) -> None",
+          "behavior": "Must save matplotlib Figure objects with FigRegistry styling",
+          "error_handling": "Must raise FigureDataSetError for invalid inputs"
+        },
+        "_load": {
+          "signature": "def _load(self) -> None",
+          "behavior": "Must raise FigureDataSetError indicating loading not supported",
+          "error_handling": "Must provide clear error message about write-only nature"
+        },
+        "_describe": {
+          "signature": "def _describe(self) -> Dict[str, Any]",
+          "behavior": "Must return comprehensive dataset metadata dictionary",
+          "required_keys": [
+            "filepath", "purpose", "condition_param", "style_params",
+            "save_args", "version", "operation_stats", "cache_stats", "dependencies"
+          ]
+        },
+        "_exists": {
+          "signature": "def _exists(self) -> bool",
+          "behavior": "Must check file existence with version handling",
+          "error_handling": "Must handle file system errors gracefully"
+        }
+      },
+      "catalog_integration": {
+        "parameter_validation": "All catalog parameters must be validated during initialization",
+        "type_registration": "Must be discoverable as 'figregistry_kedro.datasets.FigureDataSet'",
+        "versioning_support": "Must integrate with Kedro's versioning system when enabled"
+      }
+    },
+    "condition_parameter_extraction": {
+      "description": "Validation of automated styling application per F-005.2",
+      "parameter_resolution": {
+        "condition_param_extraction": "Must extract condition value from pipeline parameters",
+        "fallback_behavior": "Must fall back to purpose when condition_param not found",
+        "type_conversion": "Must convert non-string condition values to strings"
+      },
+      "style_application": {
+        "figregistry_integration": "Must call figregistry.get_style() with resolved condition",
+        "style_merging": "Must merge dataset style_params with base styles",
+        "precedence_rules": "Dataset style_params must override base styles",
+        "rcparams_application": "Must apply final styles via matplotlib rcParams"
+      }
+    },
+    "versioning_compatibility": {
+      "description": "Validation of coexistence with Kedro versioning per dataset versioning workflow requirements",
+      "kedro_versioning": {
+        "version_path_handling": "Must use Kedro version paths when versioned=true",
+        "version_timestamp_format": "Must support Kedro timestamp format",
+        "catalog_version_integration": "Must integrate with catalog versioning metadata"
+      },
+      "figregistry_versioning": {
+        "timestamp_preservation": "Must preserve FigRegistry timestamp versioning",
+        "no_conflicts": "Must not conflict with Kedro versioning system",
+        "independent_operation": "Both systems must operate independently"
+      },
+      "compatibility_testing": {
+        "concurrent_versioning": "Must handle concurrent version creation",
+        "version_uniqueness": "Must ensure all versions are unique",
+        "version_accessibility": "Must allow access to historical versions"
+      }
+    },
+    "performance_validation": {
+      "description": "Performance reference targeting <200ms save operation overhead per Section 6.6.4.3",
+      "save_operation_performance": {
+        "target_overhead_ms": 200.0,
+        "maximum_overhead_percentage": 5.0,
+        "baseline_measurement": "Manual matplotlib.pyplot.savefig() operation",
+        "measurement_method": "Average over 10 repeated operations"
+      },
+      "style_resolution_performance": {
+        "target_resolution_time_ms": 1.0,
+        "cache_hit_requirement": "Cache hits must be <1ms",
+        "cache_miss_tolerance": "Cache misses must be <10ms",
+        "cache_efficiency": "Cache hit rate must be >80% under normal usage"
+      },
+      "memory_performance": {
+        "memory_overhead_limit_mb": 10.0,
+        "no_memory_leaks": "No memory leaks allowed during repeated operations",
+        "memory_scaling": "Memory usage must scale linearly with figure complexity"
+      }
+    }
+  },
+  "test_data_specifications": {
+    "required_test_figures": {
+      "basic_line_plot": {
+        "type": "matplotlib.pyplot line plot",
+        "complexity": "simple",
+        "expected_save_time_ms": "40-50"
+      },
+      "complex_subplot": {
+        "type": "matplotlib.pyplot subplots with multiple axes",
+        "complexity": "medium",
+        "expected_save_time_ms": "60-80"
+      },
+      "high_dpi_figure": {
+        "type": "matplotlib.pyplot figure with DPI=600",
+        "complexity": "high",
+        "expected_save_time_ms": "80-120"
+      }
+    },
+    "required_conditions": {
+      "exploratory": {
+        "expected_style": {"color": "blue", "linestyle": "-"},
+        "purpose": "development and data exploration"
+      },
+      "presentation": {
+        "expected_style": {"color": "red", "linestyle": "--"},
+        "purpose": "stakeholder presentations"
+      },
+      "publication": {
+        "expected_style": {"color": "black", "linestyle": "-", "font.family": "serif"},
+        "purpose": "academic publication"
+      }
+    },
+    "pipeline_parameter_scenarios": {
+      "simple_string_condition": "Direct string value in pipeline parameters",
+      "nested_parameter_access": "Dot notation access to nested parameter values",
+      "missing_parameter_fallback": "Graceful handling when parameter not found",
+      "type_conversion": "Automatic conversion of non-string values to strings"
+    }
+  },
+  "integration_checkpoints": {
+    "catalog_parameter_extraction": {
+      "checkpoint_name": "Parameter extraction validation",
+      "validation_method": "Compare extracted parameters with catalog configuration",
+      "success_criteria": "All catalog parameters correctly extracted and typed"
+    },
+    "condition_resolution_outcomes": {
+      "checkpoint_name": "Condition resolution validation",
+      "validation_method": "Verify condition resolution logic with various parameter scenarios",
+      "success_criteria": "Correct condition resolved for all parameter combinations"
+    },
+    "styling_application_confirmation": {
+      "checkpoint_name": "Style application validation",
+      "validation_method": "Verify FigRegistry styles correctly applied to matplotlib figures",
+      "success_criteria": "rcParams updated and figure styling matches expected results"
+    },
+    "versioning_metadata_validation": {
+      "checkpoint_name": "Versioning compatibility validation",
+      "validation_method": "Test both Kedro and FigRegistry versioning systems",
+      "success_criteria": "Both versioning systems operate without conflicts"
+    },
+    "performance_reference_validation": {
+      "checkpoint_name": "Performance overhead validation",
+      "validation_method": "Measure operation times and compare to thresholds",
+      "success_criteria": "All operations complete within performance targets"
+    }
+  },
+  "compliance_matrix": {
+    "f_005_abstract_dataset_compliance": {
+      "requirement": "Complete AbstractDataSet interface implementation",
+      "validation_data_location": "test_scenarios.*.expected_metadata.parameter_extraction",
+      "compliance_indicators": [
+        "save_operation_successful",
+        "load_operation_properly_handled",
+        "describe_method_comprehensive",
+        "exists_check_functional"
+      ]
+    },
+    "f_005_2_automated_styling": {
+      "requirement": "Condition parameter extraction and automated styling application",
+      "validation_data_location": "test_scenarios.*.expected_metadata.styling_application",
+      "compliance_indicators": [
+        "condition_extracted_correctly",
+        "figregistry_get_style_called",
+        "style_merge_performed",
+        "rcparams_applied_successfully"
+      ]
+    },
+    "versioning_workflow_compatibility": {
+      "requirement": "No conflicts between FigRegistry and Kedro versioning systems",
+      "validation_data_location": "test_scenarios.*.expected_metadata.versioning",
+      "compliance_indicators": [
+        "version_conflicts_false",
+        "kedro_versioning_functional",
+        "figregistry_timestamp_preserved",
+        "compatibility_validated_true"
+      ]
+    },
+    "performance_section_6_6_4_3": {
+      "requirement": "<200ms save operation overhead target",
+      "validation_data_location": "test_scenarios.*.expected_metadata.performance_metrics",
+      "compliance_indicators": [
+        "total_operation_time_ms_under_threshold",
+        "overhead_percentage_under_5",
+        "performance_compliant_true",
+        "cache_performance_met_true"
+      ]
+    }
+  }
+}
