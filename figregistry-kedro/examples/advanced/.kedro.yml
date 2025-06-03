@@ -1,0 +1,52 @@
+# Kedro project configuration for figregistry-kedro advanced example
+# This configuration demonstrates sophisticated multi-environment project setup
+# with enterprise-grade settings and advanced figregistry-kedro integration patterns
+
+# Project metadata following enterprise naming conventions
+project_name: "FigRegistry-Kedro Advanced Example"
+package_name: "figregistry_kedro_advanced_example"
+
+# Kedro version compatibility matching plugin requirements
+# Supports advanced features in Kedro >=0.18.0,<0.20.0 range
+kedro_init_version: "0.19.0"
+
+# Sophisticated source directory structure for enterprise project organization
+# Follows Kedro enterprise conventions for complex pipeline and node organization
+source_dir: "src"
+
+# Context path for advanced project context management
+# Enables custom context implementations for enterprise scenarios
+context_path: "figregistry_kedro_advanced_example.run.ProjectContext"
+
+# Advanced hook registration for comprehensive figregistry-kedro integration
+# Supports FigRegistryHooks lifecycle management per F-006 requirements
+# Enables configuration bridge functionality per F-007 requirements  
+hooks:
+  - figregistry_kedro.hooks.FigRegistryHooks
+
+# Multi-environment project configuration settings
+# Supports development, staging, and production deployment contexts
+# Enables environment-specific configuration overrides and advanced feature management
+project_settings:
+  # Enterprise-grade configuration management
+  environments:
+    - base
+    - local
+    - staging  
+    - production
+  
+  # Advanced feature enablement for comprehensive demonstration
+  features:
+    versioning: true
+    environment_management: true
+    plugin_integration: true
+    configuration_bridge: true
+    lifecycle_hooks: true
+    
+  # Sophisticated project organization patterns
+  pipeline_discovery: true
+  package_discovery: true
+  
+  # Production deployment readiness
+  deployment_ready: true
+  enterprise_features: true
