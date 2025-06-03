@@ -1,0 +1,411 @@
+# FigRegistry Local Environment Configuration Override
+# Purpose: Local development environment overrides for conf/local/figregistry.yml testing scenarios
+# Requirements: F-007.2 local environment override configuration for precedence testing
+# Section: 5.2.5 configuration precedence rules during bridge merging operations
+
+# This configuration demonstrates environment-specific customization and validates
+# configuration precedence behavior during FigRegistryConfigBridge merging operations.
+# Local overrides take precedence over base configurations, enabling development
+# workflow optimization with appropriate debugging and performance settings.
+
+---
+# FigRegistry version constraint for validation
+figregistry_version: ">=0.3.0"
+
+# Local Development Environment Metadata
+environment: "local"
+debug: true
+verbose_logging: true
+
+# Local Development Styling Conditions - Extended for Testing
+# Override base conditions with development-specific experimental styling
+condition_styles:
+  # Development-specific experimental conditions
+  experimental_dev:
+    color: "#FF6B35"  # Orange for development visibility
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.8
+    label: "Dev Experiment"
+  
+  # Local debugging condition with high contrast
+  debug_local:
+    color: "#FF1744"  # Bright red for debugging
+    marker: "s"
+    linestyle: "--"
+    linewidth: 3
+    alpha: 1.0
+    label: "Local Debug"
+  
+  # Override production exploratory style for local development
+  exploratory:
+    color: "#4CAF50"  # Green override for local
+    marker: "^"
+    linestyle: "-."
+    linewidth: 2
+    alpha: 0.9
+    label: "Local Exploratory"
+    # Additional local development properties
+    markersize: 8
+    markeredgewidth: 1.5
+    markeredgecolor: "#2E7D32"
+  
+  # Extended presentation style for local testing
+  presentation:
+    color: "#2196F3"  # Blue override
+    marker: "D"
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.95
+    label: "Local Presentation"
+    # Local development enhancements
+    markersize: 6
+    markerfacecolor: "#1976D2"
+    markeredgecolor: "#0D47A1"
+  
+  # Publication style with local debugging aids
+  publication:
+    color: "#9C27B0"  # Purple override
+    marker: "v"
+    linestyle: "-"
+    linewidth: 2
+    alpha: 1.0
+    label: "Local Publication"
+    # Additional debugging properties
+    zorder: 10
+    clip_on: false
+  
+  # Local-only testing conditions
+  unit_test:
+    color: "#FFC107"  # Amber for test visibility
+    marker: "x"
+    linestyle: ":"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Unit Test"
+  
+  integration_test:
+    color: "#795548"  # Brown for integration tests
+    marker: "+"
+    linestyle: "-"
+    linewidth: 2
+    alpha: 0.8
+    label: "Integration Test"
+  
+  # Development iteration conditions
+  iteration_1:
+    color: "#E91E63"
+    marker: "p"
+    linestyle: "-"
+    linewidth: 1.8
+    alpha: 0.85
+    label: "Iteration 1"
+  
+  iteration_2:
+    color: "#3F51B5"
+    marker: "h"
+    linestyle: "--"
+    linewidth: 1.8
+    alpha: 0.85
+    label: "Iteration 2"
+
+# Enhanced Color Palettes for Local Development
+palettes:
+  # Local development palette with high contrast
+  local_dev:
+    primary: "#FF5722"
+    secondary: "#4CAF50"
+    accent: "#2196F3"
+    warning: "#FF9800"
+    error: "#F44336"
+    info: "#00BCD4"
+    success: "#8BC34A"
+  
+  # Extended debugging palette
+  debug_palette:
+    trace: "#E91E63"
+    debug: "#9C27B0"
+    info: "#2196F3"
+    warn: "#FF9800"
+    error: "#F44336"
+    fatal: "#B71C1C"
+  
+  # Override default palette for local visibility
+  default:
+    - "#FF6B35"  # High contrast orange
+    - "#4ECDC4"  # Teal
+    - "#45B7D1"  # Sky blue
+    - "#96CEB4"  # Mint green
+    - "#FFEAA7"  # Light yellow
+    - "#DDA0DD"  # Plum
+    - "#98D8C8"  # Seafoam
+    - "#F7DC6F"  # Light gold
+
+# Local Development Output Configuration Overrides
+outputs:
+  # Override base paths for local development
+  base_path: "./data/08_reporting/local_figures"
+  
+  # Local-specific path aliases for development workflow
+  expl: "./data/08_reporting/local_exploratory"
+  pres: "./data/08_reporting/local_presentation"
+  pub: "./data/08_reporting/local_publication"
+  debug: "./data/08_reporting/local_debug"
+  test: "./data/08_reporting/local_test"
+  
+  # Development-optimized naming patterns
+  naming:
+    timestamp_format: "%Y%m%d_%H%M%S"  # More precise for rapid iteration
+    name_template: "{purpose}_{name}_{ts}_local"
+    slug_separator: "_"
+    
+  # Local development format preferences
+  formats:
+    default: "png"
+    high_res: "png"
+    vector: "svg"
+    print: "pdf"
+  
+  # Development-specific DPI and quality settings
+  dpi:
+    screen: 72      # Lower DPI for faster development
+    print: 150      # Reduced from production for speed
+    high_res: 200   # Moderate high-res for local testing
+  
+  # Local file management
+  create_directories: true
+  overwrite_existing: true  # Allow overwriting for development
+  backup_existing: false    # Disable backup for local development
+
+# Local Development Default Style Overrides
+defaults:
+  # Enhanced figure size for local development visibility
+  figure_size: [12, 8]  # Larger for development review
+  
+  # Development-optimized rcParams
+  rcparams:
+    # Font settings for local readability
+    font.size: 12
+    font.family: "sans-serif"
+    font.sans-serif: ["Arial", "DejaVu Sans", "Liberation Sans"]
+    
+    # Axis and grid settings for development
+    axes.grid: true
+    axes.grid.alpha: 0.3
+    axes.edgecolor: "#333333"
+    axes.linewidth: 1.2
+    axes.labelsize: 11
+    axes.titlesize: 14
+    axes.titleweight: "bold"
+    
+    # Development color cycle
+    axes.prop_cycle: "cycler('color', ['#FF6B35', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD'])"
+    
+    # Figure settings for local development
+    figure.facecolor: "#FAFAFA"  # Light gray background for development
+    figure.edgecolor: "#E0E0E0"
+    figure.dpi: 100
+    figure.figsize: [12, 8]
+    
+    # Save settings optimized for development
+    savefig.dpi: 100
+    savefig.facecolor: "white"
+    savefig.edgecolor: "none"
+    savefig.bbox: "tight"
+    savefig.pad_inches: 0.1
+    
+    # Legend settings for local visibility
+    legend.fontsize: 10
+    legend.frameon: true
+    legend.fancybox: true
+    legend.shadow: true
+    legend.framealpha: 0.9
+    
+    # Line and marker settings for development
+    lines.linewidth: 2
+    lines.markersize: 6
+    lines.markeredgewidth: 1
+    
+    # Grid settings for development assistance
+    grid.alpha: 0.4
+    grid.linewidth: 0.8
+    grid.linestyle: ":"
+
+# Kedro-Specific Local Development Configuration
+kedro:
+  # Local environment configuration for Kedro integration
+  environment: "local"
+  
+  # Local data layer mapping for development
+  data_layers:
+    raw: "01_raw"
+    intermediate: "02_intermediate"  
+    primary: "03_primary"
+    feature: "04_feature"
+    model_input: "05_model_input"
+    models: "06_models"
+    model_output: "07_model_output"
+    reporting: "08_reporting"
+  
+  # Development-specific catalog configuration
+  catalog_config:
+    versioning: true
+    version_format: "YYYY-MM-DD_HH-mm-ss"
+    enable_memory_datasets: true
+    dataset_patterns:
+      figures: "figregistry_kedro.datasets.FigureDataSet"
+  
+  # Local development pipeline settings
+  pipeline_config:
+    parallel_execution: false  # Disable for easier debugging
+    log_level: "DEBUG"
+    enable_profiling: true
+    cache_enabled: true
+  
+  # Local configuration bridge settings
+  config_bridge:
+    merge_strategy: "deep_merge"
+    validation_enabled: true
+    cache_enabled: true
+    precedence_order:
+      - "kedro_local"      # Highest precedence
+      - "kedro_base"
+      - "figregistry_local"
+      - "figregistry_base"  # Lowest precedence
+
+# Local Development Performance and Cache Configuration
+performance:
+  # Cache settings optimized for rapid development iteration
+  enable_caching: true
+  cache_size: 100  # Smaller cache for development
+  cache_ttl: 300   # 5 minutes for rapid iteration
+  
+  # Memory management for development
+  memory_limit: "512MB"
+  gc_threshold: 50
+  
+  # Concurrent access settings for local development
+  enable_concurrent_access: false  # Disable for debugging
+  max_workers: 1
+  thread_safety: true
+
+# Local Development Debugging and Monitoring
+debugging:
+  # Verbose logging for development troubleshooting
+  log_level: "DEBUG"
+  log_format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  log_file: "./logs/figregistry_local.log"
+  
+  # Development profiling
+  enable_profiling: true
+  profile_output: "./logs/figregistry_profile.log"
+  
+  # Configuration validation debugging
+  validate_on_load: true
+  strict_validation: true
+  warn_on_override: true
+  
+  # Performance monitoring for development
+  monitor_performance: true
+  performance_threshold_ms: 100
+  log_slow_operations: true
+
+# Local Development Testing Configuration
+testing:
+  # Test-specific overrides for local development
+  test_data_path: "./tests/data"
+  test_output_path: "./tests/outputs"
+  
+  # Mock settings for testing
+  enable_mocking: true
+  mock_external_deps: true
+  
+  # Test performance thresholds
+  max_figure_save_time_ms: 200
+  max_style_resolution_time_ms: 10
+  max_config_load_time_ms: 50
+
+# Environment-Specific Validation Rules for Precedence Testing
+validation:
+  # Validate that local overrides take precedence
+  required_overrides:
+    - "condition_styles.exploratory.color"
+    - "outputs.base_path"
+    - "defaults.figure_size"
+    - "kedro.environment"
+  
+  # Ensure local-specific conditions are present
+  local_conditions:
+    - "experimental_dev"
+    - "debug_local"
+    - "unit_test"
+    - "integration_test"
+  
+  # Validate development-specific settings
+  development_settings:
+    debug: true
+    verbose_logging: true
+    environment: "local"
+
+# Override Parameters for Testing Configuration Precedence Rules
+# These parameters specifically test the bridge merging operations
+override_tests:
+  # Test simple value override
+  simple_override:
+    base_value: "production"
+    local_value: "development"
+    expected: "development"
+  
+  # Test nested dictionary override
+  nested_override:
+    base:
+      color: "#000000"
+      size: 10
+    local:
+      color: "#FF0000"  # Should override
+      alpha: 0.8        # Should be added
+    expected:
+      color: "#FF0000"
+      size: 10          # Should be preserved
+      alpha: 0.8        # Should be added
+  
+  # Test list replacement (not merging)
+  list_override:
+    base: ["red", "blue", "green"]
+    local: ["orange", "purple"]
+    expected: ["orange", "purple"]  # Complete replacement
+
+# Additional Local Development Extensions
+extensions:
+  # Development-specific extensions
+  enable_dev_tools: true
+  enable_hot_reload: false  # Disabled for stability
+  enable_debug_plots: true
+  
+  # Local development integrations
+  jupyter_integration: true
+  vscode_integration: true
+  
+  # Development workflow support
+  auto_save_on_change: false
+  backup_before_override: false
+  validate_before_save: true
+
+# Comments and Documentation for Local Development
+comments:
+  purpose: "Local development environment configuration for FigRegistry-Kedro integration testing"
+  precedence: "This configuration overrides base settings for local development workflow optimization"
+  testing: "Validates F-007.2 requirements for environment-specific configuration precedence"
+  usage: "Place in conf/local/figregistry.yml for Kedro projects or use directly for testing"
+  
+  # Configuration merging behavior notes
+  merging_notes:
+    - "Simple values (strings, numbers, booleans) are replaced entirely"
+    - "Dictionaries are deep-merged with local values taking precedence"
+    - "Lists are replaced entirely (no merging)"
+    - "New keys in local configuration are added to the merged result"
+    - "Null values in local configuration remove keys from merged result"
+
+# End of Local Environment Configuration
+...
