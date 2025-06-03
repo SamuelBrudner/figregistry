@@ -1,0 +1,438 @@
+# Invalid FigRegistry-Kedro Configuration Schema
+# This file intentionally contains comprehensive schema violations, type mismatches,
+# and structural errors for testing error handling, validation robustness, and 
+# graceful degradation of the FigRegistryConfigBridge per Section 6.6.8.1
+#
+# Categories of invalid configurations tested:
+# 1. Pydantic schema validation failures per Section 5.2.5
+# 2. Type mismatches and invalid field combinations
+# 3. Malformed YAML structures and syntax errors  
+# 4. Invalid condition mappings and style parameters
+# 5. Security testing scenarios for configuration injection prevention
+# 6. Invalid rcParams configurations for matplotlib integration
+# 7. Configuration conflicts and contradictory settings
+
+# =============================================================================
+# BASIC SCHEMA VIOLATIONS
+# =============================================================================
+
+# Missing required figregistry_version field (should cause validation error)
+# figregistry_version: "0.3.0"  # Intentionally commented out
+
+# Invalid version format (should be string, not number)
+figregistry_version: 123.45
+
+# =============================================================================
+# STYLES SECTION VIOLATIONS
+# =============================================================================
+
+styles:
+  # Valid style for baseline comparison
+  valid_control:
+    color: "#1f77b4"
+    marker: "o"
+    linewidth: 2.0
+    alpha: 0.8
+  
+  # Type mismatch: styles should be dict but condition points to string
+  invalid_string_style: "not_a_dictionary"
+  
+  # Type mismatch: styles should be dict but condition points to list  
+  invalid_list_style: ["color", "marker", "linewidth"]
+  
+  # Type mismatch: styles should be dict but condition points to number
+  invalid_numeric_style: 42
+  
+  # Invalid color format violations
+  invalid_color_format:
+    color: "not_a_valid_color"  # Invalid color specification
+    marker: "o"
+    
+  # Invalid color type (should be string)
+  invalid_color_type:
+    color: 123456  # Should be string like "#123456"
+    marker: "o"
+    
+  # Invalid matplotlib marker
+  invalid_marker:
+    color: "#ff0000"
+    marker: "invalid_marker_type"  # Not a valid matplotlib marker
+    
+  # Invalid numeric type for linewidth (should be number, not string)
+  invalid_linewidth_type:
+    color: "#00ff00"
+    linewidth: "not_a_number"
+    
+  # Invalid negative values
+  invalid_negative_values:
+    color: "#0000ff"
+    linewidth: -2.5  # Negative linewidth invalid
+    markersize: -10  # Negative markersize invalid
+    alpha: -0.5      # Alpha below 0.0 invalid
+    
+  # Invalid alpha range (should be 0.0-1.0)
+  invalid_alpha_range:
+    color: "#ff00ff"
+    alpha: 1.5  # Alpha above 1.0 invalid
+    
+  # Missing required color field in style definition
+  missing_color:
+    marker: "s"
+    linewidth: 2.0
+    # color field missing
+    
+  # Invalid linestyle
+  invalid_linestyle:
+    color: "#ffff00"
+    linestyle: "invalid_style"  # Not a valid matplotlib linestyle
+    
+  # Mixed type errors in single style
+  mixed_type_errors:
+    color: 42          # Should be string
+    marker: true       # Should be string  
+    linewidth: "two"   # Should be number
+    alpha: "half"      # Should be number
+    label: 123         # Should be string
+
+# Non-dictionary styles section (should be dict)
+# styles: "completely_invalid"
+
+# =============================================================================
+# PALETTES SECTION VIOLATIONS
+# =============================================================================
+
+palettes:
+  # Valid palette for comparison
+  valid_palette: ["#1f77b4", "#ff7f0e", "#2ca02c"]
+  
+  # Invalid color format in palette
+  invalid_palette_colors: ["#1f77b4", "not_a_color", "#2ca02c"]
+  
+  # Non-list palette (should be list of colors)
+  invalid_palette_type: "not_a_list"
+  
+  # Empty palette (invalid)
+  empty_palette: []
+  
+  # Mixed types in palette
+  mixed_type_palette: ["#1f77b4", 42, true, "#2ca02c"]
+  
+  # Invalid hex color format
+  invalid_hex_format: ["#1f77b4", "#gggggg", "#2ca02c"]  # Invalid hex chars
+  
+  # Incomplete hex colors
+  incomplete_hex: ["#1f7", "#ff7f0e", "#2ca02c"]  # Too short
+
+# Non-dictionary palettes section
+# palettes: ["should", "be", "dictionary"]
+
+# =============================================================================
+# OUTPUTS SECTION VIOLATIONS  
+# =============================================================================
+
+outputs:
+  # Invalid base_path type (should be string or Path, not number)
+  base_path: 12345
+  
+  # Invalid DPI type (should be number, not string)
+  dpi: "not_a_number"
+  
+  # Invalid DPI value (negative)
+  # dpi: -300
+  
+  # Invalid path traversal attempt (security testing)
+  malicious_path: "../../../etc/passwd"
+  
+  # Absolute path injection attempt
+  injection_path: "/etc/shadow"
+  
+  # Invalid format specification
+  default_format: "invalid_format"  # Should be png, pdf, svg, etc.
+  
+  # Invalid formats list type
+  formats: "should_be_list"
+  
+  # Invalid format in formats list
+  invalid_formats: ["png", "invalid_format", "pdf"]
+  
+  # Invalid bbox_inches (should be string or number)
+  bbox_inches: true
+  
+  # Invalid pad_inches type
+  pad_inches: "not_a_number"
+  
+  # Invalid boolean type for transparent
+  transparent: "maybe"  # Should be boolean
+  
+  # Invalid facecolor type
+  facecolor: 42
+  
+  # Path aliases with invalid types
+  path_aliases:
+    valid_alias: "valid_path"
+    invalid_alias: 123  # Should be string
+    another_invalid: true  # Should be string
+    
+  # Invalid timestamp format (not a string)
+  timestamp_format: 123
+
+# =============================================================================
+# DEFAULTS SECTION VIOLATIONS
+# =============================================================================
+
+defaults:
+  # Invalid figure_size type (should be list, not string)
+  figure_size: "not_a_list"
+  
+  # Invalid figure_size values (should be numbers)
+  # figure_size: ["ten", "six"]
+  
+  # Invalid font_size type (should be number)
+  font_size: "not_a_number"
+  
+  # Invalid negative font_size
+  # font_size: -12
+  
+  # Invalid font_family type (should be string)
+  font_family: 123
+  
+  # Invalid line_width type
+  line_width: "not_a_number"
+  
+  # Invalid marker_size type  
+  marker_size: "not_a_number"
+  
+  # Invalid grid type (should be boolean)
+  grid: "maybe"
+  
+  # Invalid color_cycle type (should be string)
+  color_cycle: 42
+  
+  # Invalid spine_visibility structure
+  spine_visibility:
+    top: "not_boolean"     # Should be boolean
+    right: "also_invalid"  # Should be boolean
+    bottom: 42             # Should be boolean
+    left: []               # Should be boolean
+    
+  # Invalid grid_alpha type and range
+  grid_alpha: "not_a_number"
+  # grid_alpha: 1.5  # Out of range
+  
+  # Invalid tick_direction
+  tick_direction: "invalid_direction"  # Should be 'in', 'out', or 'inout'
+
+# =============================================================================
+# KEDRO SECTION VIOLATIONS
+# =============================================================================
+
+kedro:
+  # Invalid boolean types (should be boolean, not string)
+  enable_versioning: "not_a_boolean"
+  parallel_execution: "maybe"
+  debug_mode: "yes"
+  cache_styling: "true"  # String instead of boolean
+  
+  # Invalid type for enable_concurrent_access (should be boolean)
+  enable_concurrent_access: "definitely"
+  
+  # Invalid validation_enabled type
+  validation_enabled: 123
+  
+  # Invalid performance_monitoring type
+  performance_monitoring: "monitor_this"
+
+# =============================================================================
+# TOP-LEVEL FIELD VIOLATIONS
+# =============================================================================
+
+# Invalid environment type (should be string)
+environment: 123
+
+# Invalid boolean types for top-level fields
+enable_concurrent_access: "not_boolean"
+validation_enabled: "invalid"
+
+# =============================================================================
+# MALFORMED YAML SYNTAX ERRORS
+# =============================================================================
+
+# Intentional YAML syntax errors (commented out to keep file parseable for testing)
+# malformed_section:
+#   invalid_syntax: "missing closing quote
+#   duplicate_key: "first value"
+#   duplicate_key: "second value"  # Duplicate key
+
+# Invalid Unicode sequences (commented to prevent parsing failure)
+# invalid_unicode: "\uDC80"  # Invalid surrogate
+
+# =============================================================================
+# CONFIGURATION INJECTION ATTEMPTS (Security Testing)
+# =============================================================================
+
+# Attempt to inject dangerous configurations
+security_test:
+  # Path traversal attempts
+  path_traversal_1: "../../sensitive_file"
+  path_traversal_2: "../../../etc/passwd"
+  path_traversal_3: "..\\..\\windows\\system32"
+  
+  # Absolute path injections  
+  absolute_path_1: "/etc/shadow"
+  absolute_path_2: "C:\\Windows\\System32\\config"
+  absolute_path_3: "/root/.ssh/id_rsa"
+  
+  # Command injection attempts (should be sanitized)
+  command_injection_1: "$(rm -rf /)"
+  command_injection_2: "`cat /etc/passwd`"
+  command_injection_3: "; rm -rf /"
+  
+  # Environment variable injection
+  env_injection_1: "$HOME/.ssh"
+  env_injection_2: "${PATH}"
+  env_injection_3: "%USERPROFILE%\\Documents"
+
+# =============================================================================
+# INVALID RCPARAMS CONFIGURATIONS
+# =============================================================================
+
+# Invalid matplotlib rcParams that should fail validation
+invalid_rcparams:
+  # Invalid font configurations
+  font_invalid:
+    family: 123  # Should be string
+    size: "not_a_number"  # Should be number
+    weight: "invalid_weight"  # Should be valid weight
+    
+  # Invalid figure configurations  
+  figure_invalid:
+    figsize: "not_a_tuple"  # Should be tuple/list
+    dpi: "not_a_number"     # Should be number
+    facecolor: 12345        # Should be color string
+    
+  # Invalid axes configurations
+  axes_invalid:
+    linewidth: "not_a_number"  # Should be number
+    labelsize: "not_a_number"  # Should be number
+    titlesize: true            # Should be number
+    
+  # Invalid legend configurations
+  legend_invalid:
+    fontsize: "not_a_number"   # Should be number
+    frameon: "not_boolean"     # Should be boolean
+    loc: 123                   # Should be string
+
+# =============================================================================
+# CONTRADICTORY SETTINGS AND CONFLICTS  
+# =============================================================================
+
+# Configuration conflicts that should trigger validation errors
+conflicts:
+  # Conflicting output settings
+  output_conflicts:
+    dpi: 300
+    default_format: "vector"  # Conflicts with DPI setting
+    bbox_inches: "tight"
+    pad_inches: -0.5  # Negative padding conflicts with tight bbox
+    
+  # Conflicting style settings
+  style_conflicts:
+    color: "#1f77b4"
+    alpha: 0.0      # Invisible alpha conflicts with color specification
+    linewidth: 0    # Zero linewidth conflicts with line color
+    
+  # Conflicting grid settings
+  grid_conflicts:
+    grid: false
+    grid_alpha: 0.5  # Grid alpha specified but grid disabled
+    
+  # Conflicting font settings
+  font_conflicts:
+    font_size: 0     # Zero font size invalid
+    title_size: -5   # Negative title size invalid
+
+# =============================================================================
+# EDGE CASE VALUES
+# =============================================================================
+
+edge_cases:
+  # Extreme numeric values
+  extreme_values:
+    linewidth: 999999999  # Extremely large value
+    markersize: 0.000001  # Extremely small value
+    alpha: 0.999999999999999  # Maximum precision alpha
+    
+  # Empty strings and null values
+  empty_values:
+    color: ""          # Empty color string
+    marker: ""         # Empty marker string  
+    label: ""          # Empty label
+    font_family: ""    # Empty font family
+    
+  # Special float values (should be handled gracefully)
+  special_floats:
+    linewidth: .inf    # Infinity
+    alpha: .nan        # NaN
+    markersize: -.inf  # Negative infinity
+
+# =============================================================================
+# NESTED STRUCTURE VIOLATIONS
+# =============================================================================
+
+# Deeply nested invalid structures
+deeply_nested:
+  level1:
+    level2:
+      level3:
+        # Invalid types at deep nesting levels
+        invalid_deep_color: 123
+        invalid_deep_marker: true
+        invalid_deep_config:
+          # Multiple violations in deeply nested structure
+          color: "invalid_color"
+          marker: 42
+          linewidth: "not_a_number"
+          alpha: "definitely_not_a_number"
+          nested_invalid:
+            more_invalid: "keeps going"
+            type_mismatch: true
+            number_as_string: "123.45"
+
+# =============================================================================
+# LIST AND DICT STRUCTURE VIOLATIONS
+# =============================================================================
+
+# Invalid list structures where dicts expected
+list_instead_of_dict:
+  - "should"
+  - "be" 
+  - "dictionary"
+  - "not"
+  - "list"
+
+# Invalid dict structures where lists expected  
+dict_instead_of_list:
+  should: "be"
+  a: "list"
+  not: "dict"
+
+# Mixed invalid structures
+mixed_invalid:
+  valid_start: "this is fine"
+  then_becomes_invalid: 
+    - "list where dict expected"
+    - 123
+    - true
+  and_more_invalid:
+    nested_list_wrong: ["should", "be", "dict"]
+    nested_dict_wrong: 
+      should: "be"
+      a: "list"
+
+# =============================================================================
+# END OF INVALID CONFIGURATION
+# =============================================================================
+
+# This configuration file intentionally violates multiple schema requirements
+# to test comprehensive error handling and validation robustness in the 
+# FigRegistryConfigBridge component per testing requirements in Section 6.6.8.1
