@@ -1,29 +1,35 @@
-"""
-Main pytest configuration file for figregistry-kedro test suite.
+"""Main pytest configuration file for figregistry-kedro test suite.
 
-This module provides comprehensive test configuration, shared fixtures, and setup
-patterns for testing the figregistry-kedro plugin. It establishes testing patterns
-used across all test modules and ensures proper isolation and cleanup for reliable
-test execution.
+This module provides comprehensive test configuration for the figregistry-kedro plugin
+testing per Section 6.6.2.1 with kedro-pytest framework integration. Establishes
+shared fixtures, test setup, configuration management, and testing patterns used
+across all test modules.
 
-Key Responsibilities:
-- Configure pytest for comprehensive plugin testing with kedro-pytest framework
-- Provide shared fixtures for Kedro session simulation and plugin component testing
-- Implement test isolation and cleanup patterns for reliable test execution
-- Setup performance testing infrastructure with pytest-benchmark integration
-- Configure comprehensive mocking of Kedro components and FigRegistry API calls
+Key capabilities per Section 6.6 Testing Strategy:
+- pytest configuration for plugin testing with coverage settings for both core and plugin modules
+- Shared fixtures for matplotlib figure mocking, temporary directory management, and test data generation
+- kedro-pytest integration with TestKedro fixtures for in-process pipeline context simulation
+- pytest-mock configuration for comprehensive mocking of Kedro components and FigRegistry API calls
+- Test isolation and cleanup patterns to prevent cross-test contamination per Section 6.6.5.6
+- Performance testing infrastructure with pytest-benchmark integration for plugin overhead measurement
 
-Testing Framework Integration per Section 6.6.2.1:
-- pytest >=8.0.0 as core test runner with advanced fixture support
-- pytest-cov >=6.1.0 for code coverage measurement and reporting
-- pytest-mock >=3.14.0 for mocking capabilities with Kedro components
-- kedro-pytest >=0.1.3 for Kedro plugin testing with TestKedro fixtures
-- pytest-benchmark for performance overhead measurement
+Testing Framework Stack (Section 6.6.2.1):
+- pytest >=8.0.0: Core test runner with advanced fixture support
+- pytest-cov >=6.1.0: Code coverage measurement and reporting
+- pytest-mock >=3.14.0: Mocking capabilities for external dependencies
+- hypothesis >=6.0.0: Property-based testing for configuration validation
+- kedro-pytest >=0.1.3: Kedro plugin testing framework providing TestKedro fixtures
+- pytest-benchmark: Performance testing infrastructure for plugin overhead measurement
 
-Coverage Targets per Section 6.6.2.4:
-- ≥90% coverage for all figregistry_kedro modules
-- 100% coverage for critical paths (config merge, hook registration, dataset operations)
-- Comprehensive validation of plugin integration without core system modifications
+Performance Requirements (Section 6.6.4.3):
+- Plugin Pipeline Execution Overhead: <200ms per FigureDataSet save
+- Configuration Bridge Merge Time: <50ms per pipeline run
+- Hook Initialization Overhead: <25ms per project startup
+
+Coverage Requirements (Section 6.6.2.4):
+- Minimum Coverage: 90% overall coverage across all figregistry_kedro modules
+- Critical Path Coverage: 100% coverage for configuration bridge, hook registration, dataset save operations
+- Module-Specific Targets: ≥90% for all figregistry_kedro modules with 100% for critical paths
 """
 
 import os
@@ -32,496 +38,511 @@ import tempfile
 import shutil
 import warnings
 from pathlib import Path
-from typing import Any, Dict, Generator, Optional, Union
+from typing import Any, Dict, List, Optional, Generator, Iterator, Union, Callable
 from unittest.mock import Mock, MagicMock, patch
-
 import pytest
-import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-from kedro.io import DataCatalog
-from kedro.config import ConfigLoader
-from kedro.framework.context import KedroContext
-from kedro.framework.hooks import _create_hook_manager
-from kedro.framework.session import KedroSession
-from kedro.pipeline import Pipeline
+import logging
 
-# Test isolation and performance requirements
-matplotlib.use('Agg')  # Non-interactive backend for headless testing
-warnings.filterwarnings('ignore', category=UserWarning, module='matplotlib')
-warnings.filterwarnings('ignore', category=FutureWarning, module='kedro')
-
+# Configure warnings for clean test output
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
+warnings.filterwarnings("ignore", category=FutureWarning)
 
 # =============================================================================
-# PYTEST CONFIGURATION AND HOOKS
+# PYTEST CONFIGURATION
 # =============================================================================
 
 def pytest_configure(config):
+    """Configure pytest for figregistry-kedro plugin testing per Section 6.6.2.1.
+    
+    Sets up comprehensive testing environment including coverage measurement,
+    performance monitoring, and kedro-pytest integration for plugin validation.
     """
-    Configure pytest for comprehensive figregistry-kedro plugin testing.
+    # Configure coverage for both core and plugin modules
+    config.option.cov = ["figregistry", "figregistry_kedro"]
+    config.option.cov_report = ["term-missing", "html", "xml"]
+    config.option.cov_fail_under = 90.0
     
-    Sets up testing environment with enhanced coverage settings, performance
-    monitoring, and plugin-specific validation patterns per Section 6.6.2.1.
-    """
-    # Configure matplotlib for consistent test behavior
-    matplotlib.rcdefaults()
-    plt.ioff()  # Turn off interactive mode
-    
-    # Set up test environment variables
-    os.environ['FIGREGISTRY_TEST_MODE'] = 'true'
-    os.environ['KEDRO_DISABLE_TELEMETRY'] = 'true'
-    
-    # Configure kedro-pytest settings per Section 6.6.2.1
-    config.option.kedro_project_template = 'minimal'
-    config.option.kedro_enable_hooks = True
-    config.option.kedro_catalog_fixtures = True
-    
-    # Add custom markers for plugin testing
+    # Configure test markers for organized test execution
     config.addinivalue_line(
-        "markers",
-        "kedro_integration: marks tests as Kedro integration tests"
+        "markers", 
+        "unit: Unit tests for individual components"
     )
     config.addinivalue_line(
         "markers", 
-        "plugin_performance: marks tests as plugin performance benchmarks"
+        "integration: Integration tests for component interactions"
     )
     config.addinivalue_line(
-        "markers",
-        "security_test: marks tests as security validation tests"
+        "markers", 
+        "kedro_plugin: Tests specific to Kedro plugin functionality"
     )
     config.addinivalue_line(
-        "markers",
-        "cross_platform: marks tests for cross-platform compatibility"
+        "markers", 
+        "performance: Performance tests with timing requirements"
     )
+    config.addinivalue_line(
+        "markers", 
+        "security: Security tests for injection prevention"
+    )
+    config.addinivalue_line(
+        "markers", 
+        "slow: Tests that take longer than 10 seconds"
+    )
+    config.addinivalue_line(
+        "markers", 
+        "kedro_version: Tests for specific Kedro version compatibility"
+    )
+    
+    # Configure logging for test debugging
+    logging.basicConfig(
+        level=logging.DEBUG if config.option.verbose > 1 else logging.WARNING,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    
+    # Suppress matplotlib backend warnings in tests
+    try:
+        import matplotlib
+        matplotlib.use('Agg')  # Use non-interactive backend for testing
+    except ImportError:
+        pass
 
 
-def pytest_unconfigure(config):
+def pytest_collection_modifyitems(config, items):
+    """Modify test collection for performance and organization per Section 6.6.7.
+    
+    Organizes test execution with proper markers and performance considerations.
     """
-    Clean up test configuration and ensure proper resource cleanup.
-    
-    Performs comprehensive cleanup of test artifacts, temporary directories,
-    and plugin state to prevent cross-test contamination per Section 6.6.5.6.
-    """
-    # Reset matplotlib state
-    matplotlib.rcdefaults()
-    plt.close('all')
-    
-    # Clean up environment variables
-    os.environ.pop('FIGREGISTRY_TEST_MODE', None)
-    os.environ.pop('KEDRO_DISABLE_TELEMETRY', None)
-    
-    # Clear any cached module state
-    _clear_plugin_module_cache()
+    for item in items:
+        # Mark tests based on file location
+        if "test_performance" in str(item.fspath):
+            item.add_marker(pytest.mark.performance)
+        if "test_security" in str(item.fspath):
+            item.add_marker(pytest.mark.security)
+        if "kedro" in str(item.fspath).lower():
+            item.add_marker(pytest.mark.kedro_plugin)
+        
+        # Mark slow tests
+        if "slow" in item.name or "stress" in item.name:
+            item.add_marker(pytest.mark.slow)
 
 
-def pytest_runtest_setup(item):
-    """
-    Set up individual test execution with proper isolation.
-    
-    Ensures each test starts with clean matplotlib state and isolated
-    temporary directories per Section 6.6.5.6 isolation requirements.
-    """
-    # Reset matplotlib to default state before each test
-    matplotlib.rcdefaults()
-    plt.close('all')
-    
-    # Clear any figure registry module caches
-    _clear_figregistry_cache()
-
-
-def pytest_runtest_teardown(item, nextitem):
-    """
-    Clean up after individual test execution.
-    
-    Ensures proper cleanup of matplotlib figures, temporary files,
-    and plugin state between tests per Section 6.6.5.6.
-    """
-    # Close all matplotlib figures to prevent memory leaks
-    plt.close('all')
-    
-    # Reset any modified matplotlib rcParams
-    matplotlib.rcdefaults()
-    
-    # Clear plugin state for next test
-    _clear_plugin_state()
+def pytest_benchmark_group_stats(benchmarks):
+    """Configure benchmark grouping for performance analysis per Section 6.6.4.3."""
+    return {
+        'group': 'plugin_component',
+        'param': benchmarks[0]['param'] if benchmarks else None
+    }
 
 
 # =============================================================================
-# CORE TESTING INFRASTRUCTURE FIXTURES
+# KEDRO FRAMEWORK IMPORTS AND AVAILABILITY
+# =============================================================================
+
+# Import Kedro components with graceful fallback
+try:
+    from kedro.framework.context import KedroContext
+    from kedro.framework.session import KedroSession
+    from kedro.config import ConfigLoader, OmegaConfigLoader
+    from kedro.io import DataCatalog, AbstractDataSet
+    from kedro.pipeline import Pipeline
+    from kedro.runner import AbstractRunner
+    from kedro.framework.hooks import PluginManager
+    KEDRO_AVAILABLE = True
+except ImportError:
+    # Graceful fallback for environments without Kedro
+    KedroContext = None
+    KedroSession = None
+    ConfigLoader = None
+    OmegaConfigLoader = None
+    DataCatalog = None
+    AbstractDataSet = None
+    Pipeline = None
+    AbstractRunner = None
+    PluginManager = None
+    KEDRO_AVAILABLE = False
+
+# kedro-pytest integration with fallback
+try:
+    from kedro_pytest import TestKedro
+    KEDRO_PYTEST_AVAILABLE = True
+except ImportError:
+    TestKedro = None
+    KEDRO_PYTEST_AVAILABLE = False
+
+# Hypothesis for property-based testing
+try:
+    import hypothesis
+    from hypothesis import strategies as st
+    HYPOTHESIS_AVAILABLE = True
+except ImportError:
+    HYPOTHESIS_AVAILABLE = False
+
+# pytest-benchmark for performance testing
+try:
+    import pytest_benchmark
+    BENCHMARK_AVAILABLE = True
+except ImportError:
+    BENCHMARK_AVAILABLE = False
+
+# Matplotlib for figure testing
+try:
+    import matplotlib
+    import matplotlib.pyplot as plt
+    from matplotlib.figure import Figure
+    matplotlib.use('Agg')  # Non-interactive backend for testing
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    MATPLOTLIB_AVAILABLE = False
+
+
+# =============================================================================
+# FIXTURE IMPORTS FROM DEPENDENCY MODULES
+# =============================================================================
+
+# Import all fixtures from kedro_fixtures.py
+from figregistry_kedro.tests.fixtures.kedro_fixtures import (
+    # Core Kedro component mocks
+    minimal_kedro_context,
+    mock_config_loader,
+    test_catalog_with_figregistry,
+    mock_kedro_session,
+    mock_hook_manager,
+    
+    # FigRegistry integration fixtures
+    figregistry_config_bridge,
+    mock_figregistry_hooks,
+    mock_figure_dataset,
+    
+    # TestKedro integration
+    test_kedro_instance,
+    kedro_pytest_session,
+    
+    # Project scaffolding
+    minimal_project_scaffolding,
+    project_scaffolding_factory,
+    
+    # Performance and validation
+    hook_performance_tracker,
+    mock_matplotlib_figure,
+    kedro_integration_validators,
+    
+    # Fixture collections
+    complete_kedro_mock_stack,
+    kedro_testing_utilities
+)
+
+# Import configuration test data generators
+from figregistry_kedro.tests.data.config_test_data import (
+    # Configuration generators
+    generate_baseline_config,
+    generate_kedro_specific_config,
+    generate_environment_configs,
+    
+    # Invalid configuration generators  
+    generate_invalid_config_scenarios,
+    generate_malformed_yaml_strings,
+    
+    # Merge testing
+    generate_merge_test_scenarios,
+    
+    # Security testing
+    generate_security_test_configs,
+    generate_yaml_injection_vectors,
+    
+    # Performance testing
+    generate_performance_config_datasets,
+    generate_concurrent_access_configs,
+    
+    # Cross-platform testing
+    generate_cross_platform_config_variations,
+    generate_filesystem_edge_cases,
+    
+    # Utilities
+    create_temporary_config_file,
+    create_temporary_directory_structure,
+    validate_config_against_schema,
+    generate_test_report_summary,
+    
+    # Hypothesis strategies
+    yaml_config_strategy,
+    kedro_config_strategy,
+    valid_color_strategy,
+    valid_marker_strategy,
+    style_dict_strategy
+)
+
+
+# =============================================================================
+# SHARED PYTEST FIXTURES FOR TEST INFRASTRUCTURE
 # =============================================================================
 
 @pytest.fixture(scope="session", autouse=True)
-def test_session_setup():
+def configure_test_environment():
+    """Configure test environment for reliable execution per Section 6.6.5.6.
+    
+    Sets up session-wide test configuration including environment variables,
+    logging, and infrastructure required for comprehensive plugin testing.
     """
-    Session-wide test setup and configuration.
+    # Set environment variables for testing
+    os.environ["FIGREGISTRY_ENV"] = "test"
+    os.environ["KEDRO_ENV"] = "test"
+    os.environ["FIGREGISTRY_DISABLE_TELEMETRY"] = "1"
     
-    Establishes global test environment settings, performance baselines,
-    and security constraints for the entire test session per testing
-    strategy requirements.
-    """
-    # Ensure matplotlib backend consistency
-    matplotlib.use('Agg')
-    plt.ioff()
+    # Configure matplotlib for testing
+    if MATPLOTLIB_AVAILABLE:
+        import matplotlib
+        matplotlib.use('Agg')
+        plt.ioff()  # Turn off interactive mode
     
-    # Set global test configuration
-    os.environ['FIGREGISTRY_LOG_LEVEL'] = 'DEBUG'
-    os.environ['KEDRO_LOGGING_CONFIG'] = str(
-        Path(__file__).parent / "data" / "logging.yml"
-    )
+    # Configure logging for tests
+    logging.getLogger("figregistry").setLevel(logging.WARNING)
+    logging.getLogger("kedro").setLevel(logging.WARNING)
     
-    # Create session-wide temporary directory
-    session_temp_dir = tempfile.mkdtemp(prefix="figregistry_kedro_test_")
+    # Ensure clean test state
+    yield
     
-    yield session_temp_dir
-    
-    # Cleanup session resources
-    shutil.rmtree(session_temp_dir, ignore_errors=True)
-    
+    # Cleanup after all tests
+    for key in ["FIGREGISTRY_ENV", "KEDRO_ENV", "FIGREGISTRY_DISABLE_TELEMETRY"]:
+        os.environ.pop(key, None)
 
-@pytest.fixture(autouse=True)
-def reset_matplotlib_state():
-    """
-    Reset matplotlib state between tests for isolation.
+
+@pytest.fixture(scope="function", autouse=True)
+def test_isolation():
+    """Implement test isolation patterns per Section 6.6.5.6.
     
-    Ensures clean matplotlib environment for each test execution,
-    preventing cross-test contamination per Section 6.6.5.6.
+    Ensures each test runs in isolation with clean state and proper cleanup
+    to prevent cross-test contamination of plugin components.
     """
-    # Store initial rcParams state
-    initial_rcparams = matplotlib.rcParams.copy()
+    # Store original state
+    original_cwd = os.getcwd()
+    original_sys_path = sys.path.copy()
     
-    # Reset to defaults before test
-    matplotlib.rcdefaults()
-    plt.close('all')
+    # Reset matplotlib state if available
+    if MATPLOTLIB_AVAILABLE:
+        plt.close('all')  # Close all figures
+        plt.rcdefaults()  # Reset rcParams to defaults
     
     yield
     
-    # Restore initial state and close figures
-    matplotlib.rcParams.update(initial_rcparams)
-    plt.close('all')
+    # Restore original state
+    os.chdir(original_cwd)
+    sys.path = original_sys_path
+    
+    # Clean up matplotlib state
+    if MATPLOTLIB_AVAILABLE:
+        plt.close('all')
+        plt.rcdefaults()
+    
+    # Force garbage collection for memory management
+    import gc
+    gc.collect()
 
 
 @pytest.fixture
-def temp_work_dir():
-    """
-    Provide isolated temporary working directory for test operations.
+def temp_directory():
+    """Provide temporary directory with automatic cleanup per Section 6.6.2.6.
     
-    Creates unique temporary directory for each test to ensure file
-    system isolation and prevent cross-test contamination.
+    Creates isolated temporary directory for each test with guaranteed cleanup
+    to prevent filesystem contamination during testing.
+    
+    Returns:
+        Path to temporary directory
     """
-    with tempfile.TemporaryDirectory(prefix="kedro_test_") as temp_dir:
-        original_cwd = os.getcwd()
-        os.chdir(temp_dir)
-        
-        yield Path(temp_dir)
-        
-        os.chdir(original_cwd)
+    temp_dir = Path(tempfile.mkdtemp(prefix="figregistry_test_"))
+    try:
+        yield temp_dir
+    finally:
+        # Ensure cleanup even if test fails
+        if temp_dir.exists():
+            shutil.rmtree(temp_dir, ignore_errors=True)
 
 
 @pytest.fixture
-def mock_file_operations(mocker):
-    """
-    Mock file system operations for testing isolation.
+def temp_project_directory(temp_directory):
+    """Create temporary Kedro project directory structure per Section 6.6.7.2.
     
-    Provides controlled file system mocking for testing file operations
-    without actual disk I/O, supporting security testing per Section 6.6.8.2.
-    """
-    # Mock pathlib operations
-    mock_path = mocker.patch('pathlib.Path')
-    mock_path.return_value.exists.return_value = True
-    mock_path.return_value.is_file.return_value = True
-    mock_path.return_value.mkdir.return_value = None
+    Provides realistic Kedro project structure for plugin testing with
+    proper directory hierarchy and configuration placeholders.
     
-    # Mock file operations
-    mock_open = mocker.patch('builtins.open', mocker.mock_open())
+    Args:
+        temp_directory: Base temporary directory fixture
+        
+    Returns:
+        Dict with project paths and configuration
+    """
+    project_path = temp_directory / "test_kedro_project"
+    project_path.mkdir()
+    
+    # Create standard Kedro directory structure
+    directories = [
+        "conf/base",
+        "conf/local", 
+        "data/01_raw",
+        "data/02_intermediate",
+        "data/03_primary",
+        "data/08_reporting",
+        "src/test_kedro_project",
+        "logs"
+    ]
+    
+    for directory in directories:
+        (project_path / directory).mkdir(parents=True, exist_ok=True)
+    
+    # Create minimal pyproject.toml
+    pyproject_content = '''[tool.kedro]
+package_name = "test_kedro_project"
+project_name = "Test Kedro Project"
+kedro_init_version = "0.19.0"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+'''
+    
+    with open(project_path / "pyproject.toml", "w") as f:
+        f.write(pyproject_content)
     
     return {
-        'path': mock_path,
-        'open': mock_open,
-        'mkdir': mock_path.return_value.mkdir,
-        'exists': mock_path.return_value.exists,
+        "project_path": project_path,
+        "conf_path": project_path / "conf",
+        "data_path": project_path / "data",
+        "src_path": project_path / "src",
+        "logs_path": project_path / "logs"
     }
 
 
-# =============================================================================
-# KEDRO TESTING INFRASTRUCTURE FIXTURES
-# =============================================================================
-
 @pytest.fixture
-def mock_kedro_context(mocker):
+def mock_matplotlib_rcparams():
+    """Mock matplotlib rcParams for testing without GUI dependencies.
+    
+    Provides controlled matplotlib rcParams environment for testing
+    style application without requiring full matplotlib GUI stack.
+    
+    Returns:
+        Mock rcParams object for testing
     """
-    Provide mock Kedro ProjectContext for plugin testing.
+    if not MATPLOTLIB_AVAILABLE:
+        # Create mock rcParams when matplotlib not available
+        mock_rcparams = Mock()
+        mock_rcparams.update = Mock()
+        mock_rcparams.get = Mock(return_value="default_value")
+        mock_rcparams.__getitem__ = Mock(return_value="default_value")
+        mock_rcparams.__setitem__ = Mock()
+        return mock_rcparams
     
-    Creates comprehensive mock of Kedro ProjectContext with ConfigLoader,
-    DataCatalog, and session components for isolated plugin testing
-    per Section 6.6.2.3 mocking strategy.
-    """
-    # Create mock context with required attributes
-    context = mocker.Mock(spec=KedroContext)
-    
-    # Mock ConfigLoader with figregistry configuration
-    config_loader = mocker.Mock(spec=ConfigLoader)
-    config_loader.get.return_value = {
-        'styles': {
-            'exploratory': {'figure.figsize': [10, 6]},
-            'presentation': {'figure.figsize': [12, 8]},
-            'publication': {'figure.figsize': [8, 6]}
-        },
-        'outputs': {
-            'base_path': 'data/08_reporting/figures',
-            'timestamp_format': '%Y%m%d_%H%M%S'
-        }
-    }
-    context.config_loader = config_loader
-    
-    # Mock DataCatalog
-    catalog = mocker.Mock(spec=DataCatalog)
-    catalog.save = mocker.Mock()
-    catalog.load = mocker.Mock()
-    context.catalog = catalog
-    
-    # Mock project path and configuration
-    context.project_path = Path('/tmp/test_project')
-    context.package_name = 'test_project'
-    context.project_version = '0.1.0'
-    
-    return context
+    # Use real rcParams but reset after test
+    original_params = plt.rcParams.copy()
+    try:
+        yield plt.rcParams
+    finally:
+        plt.rcParams.update(original_params)
 
-
-@pytest.fixture
-def mock_kedro_session(mock_kedro_context, mocker, temp_work_dir):
-    """
-    Provide mock Kedro session for complete pipeline simulation.
-    
-    Creates comprehensive Kedro session mock with proper context
-    initialization for testing hook lifecycle and plugin integration
-    per Section 6.6.2.6 TestKedro fixture requirements.
-    """
-    # Create mock session
-    session = mocker.Mock(spec=KedroSession)
-    session.load_context.return_value = mock_kedro_context
-    
-    # Mock session properties
-    session.store = {}
-    session._project_path = temp_work_dir
-    session._package_name = 'test_project'
-    
-    # Mock run method for pipeline execution testing
-    def mock_run(pipeline_name=None, **kwargs):
-        return {'pipeline_output': 'success'}
-    
-    session.run = mock_run
-    
-    # Setup session context manager behavior
-    session.__enter__ = mocker.Mock(return_value=session)
-    session.__exit__ = mocker.Mock(return_value=None)
-    
-    return session
-
-
-@pytest.fixture
-def mock_hook_manager(mocker):
-    """
-    Provide mock hook manager for hook registration testing.
-    
-    Creates mock hook manager for testing FigRegistryHooks registration
-    and lifecycle integration per Section 6.6.3.8 hook testing requirements.
-    """
-    hook_manager = mocker.Mock()
-    
-    # Mock hook registration methods
-    hook_manager.register = mocker.Mock()
-    hook_manager.unregister = mocker.Mock()
-    hook_manager.get_plugins = mocker.Mock(return_value=[])
-    
-    # Mock hook execution methods
-    hook_manager.hook = mocker.Mock()
-    hook_manager.hook.before_pipeline_run = mocker.Mock()
-    hook_manager.hook.after_pipeline_run = mocker.Mock()
-    hook_manager.hook.after_config_loaded = mocker.Mock()
-    
-    return hook_manager
-
-
-@pytest.fixture
-def sample_catalog_config():
-    """
-    Provide sample Kedro catalog configuration with FigureDataSet entries.
-    
-    Returns comprehensive catalog configuration for testing FigureDataSet
-    integration, parameter extraction, and versioning scenarios
-    per Section 5.2.6 dataset requirements.
-    """
-    return {
-        'exploratory_plot': {
-            'type': 'figregistry_kedro.datasets.FigureDataSet',
-            'filepath': 'data/08_reporting/figures/exploratory_plot.png',
-            'purpose': 'exploratory',
-            'condition_param': 'experiment_type',
-            'save_args': {
-                'dpi': 150,
-                'bbox_inches': 'tight'
-            }
-        },
-        'presentation_plot': {
-            'type': 'figregistry_kedro.datasets.FigureDataSet',
-            'filepath': 'data/08_reporting/figures/presentation_plot.pdf',
-            'purpose': 'presentation',
-            'condition_param': 'analysis_mode',
-            'style_params': {
-                'figure.figsize': [12, 8],
-                'axes.labelsize': 14
-            },
-            'versioned': True
-        },
-        'publication_plot': {
-            'type': 'figregistry_kedro.datasets.FigureDataSet',
-            'filepath': 'data/08_reporting/figures/publication_plot.svg',
-            'purpose': 'publication',
-            'condition_param': 'publication_target',
-            'save_args': {
-                'format': 'svg',
-                'transparent': True
-            }
-        }
-    }
-
-
-# =============================================================================
-# MATPLOTLIB AND FIGREGISTRY TESTING FIXTURES
-# =============================================================================
 
 @pytest.fixture
 def sample_matplotlib_figure():
-    """
-    Create sample matplotlib figure for dataset testing.
+    """Generate sample matplotlib figure for dataset testing.
     
-    Provides standard matplotlib figure object with basic plot content
-    for testing FigureDataSet save/load operations and styling application
-    per Section 5.2.6 testing requirements.
+    Creates a representative matplotlib figure for testing FigureDataSet
+    operations, styling application, and save functionality.
+    
+    Returns:
+        Matplotlib Figure object for testing
     """
+    if not MATPLOTLIB_AVAILABLE:
+        # Create mock figure when matplotlib not available
+        mock_figure = Mock()
+        mock_figure.savefig = Mock()
+        mock_figure.get_size_inches = Mock(return_value=(8, 6))
+        mock_figure.get_dpi = Mock(return_value=100)
+        mock_figure.axes = [Mock()]
+        return mock_figure
+    
+    # Create real matplotlib figure
     fig, ax = plt.subplots(figsize=(8, 6))
     
-    # Create sample data
+    # Add sample data for realistic testing
+    import numpy as np
     x = np.linspace(0, 10, 100)
-    y = np.sin(x)
-    
-    # Create plot
-    ax.plot(x, y, label='sin(x)')
-    ax.set_xlabel('X values')
-    ax.set_ylabel('Y values')
-    ax.set_title('Sample Plot for Testing')
+    y = np.sin(x) + 0.1 * np.random.randn(100)
+    ax.plot(x, y, 'b-', label='Sample Data', linewidth=2)
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel('Amplitude')
+    ax.set_title('Sample Figure for Testing')
     ax.legend()
     ax.grid(True, alpha=0.3)
     
     return fig
 
 
+# =============================================================================
+# CONFIGURATION FIXTURES
+# =============================================================================
+
 @pytest.fixture
-def complex_matplotlib_figure():
+def base_figregistry_config():
+    """Provide base FigRegistry configuration for testing.
+    
+    Returns standard baseline configuration for component testing
+    with comprehensive style definitions and output settings.
+    
+    Returns:
+        Dict containing base FigRegistry configuration
     """
-    Create complex matplotlib figure for advanced testing scenarios.
-    
-    Provides matplotlib figure with subplots, multiple data series,
-    and complex styling for testing performance and advanced features.
-    """
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
-    
-    # Generate sample data
-    x = np.linspace(0, 10, 100)
-    y1 = np.sin(x)
-    y2 = np.cos(x)
-    y3 = np.exp(-x/5)
-    
-    # Plot 1: Line plot
-    ax1.plot(x, y1, 'b-', label='sin(x)')
-    ax1.plot(x, y2, 'r--', label='cos(x)')
-    ax1.set_title('Trigonometric Functions')
-    ax1.legend()
-    ax1.grid(True)
-    
-    # Plot 2: Scatter plot
-    np.random.seed(42)
-    x_scatter = np.random.randn(100)
-    y_scatter = np.random.randn(100)
-    ax2.scatter(x_scatter, y_scatter, alpha=0.6)
-    ax2.set_title('Random Scatter')
-    ax2.grid(True)
-    
-    # Plot 3: Bar plot
-    categories = ['A', 'B', 'C', 'D', 'E']
-    values = [23, 45, 56, 78, 32]
-    ax3.bar(categories, values, color='green', alpha=0.7)
-    ax3.set_title('Category Data')
-    ax3.set_ylabel('Values')
-    
-    # Plot 4: Exponential decay
-    ax4.plot(x, y3, 'purple', linewidth=2)
-    ax4.set_title('Exponential Decay')
-    ax4.set_xlabel('Time')
-    ax4.set_ylabel('Amplitude')
-    ax4.grid(True)
-    
-    plt.tight_layout()
-    return fig
+    return generate_baseline_config()
 
 
 @pytest.fixture
-def figregistry_test_config():
-    """
-    Provide test FigRegistry configuration for plugin testing.
+def local_override_config():
+    """Provide local environment configuration overrides.
     
-    Returns valid FigRegistry configuration dictionary for testing
-    configuration bridge, style resolution, and plugin integration
-    per Section 5.2.5 configuration requirements.
+    Returns configuration overrides for testing environment-specific
+    behavior and configuration merging functionality.
+    
+    Returns:
+        Dict containing local configuration overrides
+    """
+    return generate_environment_configs()["development"]
+
+
+@pytest.fixture
+def minimal_figregistry_config():
+    """Provide minimal FigRegistry configuration for lightweight testing.
+    
+    Returns:
+        Dict containing minimal valid configuration
     """
     return {
-        'styles': {
-            'exploratory': {
-                'figure.figsize': [10, 6],
-                'axes.grid': True,
-                'axes.grid.alpha': 0.3,
-                'font.size': 10
-            },
-            'presentation': {
-                'figure.figsize': [12, 8],
-                'axes.grid': True,
-                'axes.grid.alpha': 0.2,
-                'font.size': 12,
-                'axes.labelsize': 14,
-                'axes.titlesize': 16
-            },
-            'publication': {
-                'figure.figsize': [8, 6],
-                'axes.grid': False,
-                'font.size': 11,
-                'axes.labelsize': 12,
-                'axes.titlesize': 14,
-                'legend.fontsize': 10
-            }
+        "figregistry_version": "0.3.0",
+        "styles": {
+            "test": {"color": "#1f77b4", "marker": "o"}
         },
-        'outputs': {
-            'base_path': 'data/08_reporting/figures',
-            'timestamp_format': '%Y%m%d_%H%M%S',
-            'path_aliases': {
-                'expl': 'exploratory',
-                'pres': 'presentation',
-                'pub': 'publication'
-            }
-        },
-        'conditions': {
-            'experiment_type': {
-                'baseline': 'exploratory',
-                'optimization': 'presentation',
-                'final_results': 'publication'
-            },
-            'analysis_mode': {
-                'development': 'exploratory',
-                'review': 'presentation',
-                'publication': 'publication'
-            }
+        "outputs": {
+            "base_path": "test_outputs"
         }
     }
+
+
+@pytest.fixture
+def invalid_config_scenarios():
+    """Provide invalid configuration scenarios for error testing.
+    
+    Returns:
+        Dict mapping scenario names to invalid configurations
+    """
+    return generate_invalid_config_scenarios()
+
+
+@pytest.fixture
+def security_test_configs():
+    """Provide security test configurations per Section 6.6.8.1.
+    
+    Returns malicious configuration structures for testing security
+    validation including path traversal and injection prevention.
+    
+    Returns:
+        Dict mapping attack vector names to malicious configurations
+    """
+    return generate_security_test_configs()
 
 
 # =============================================================================
@@ -529,312 +550,523 @@ def figregistry_test_config():
 # =============================================================================
 
 @pytest.fixture
-def performance_baseline():
-    """
-    Provide performance baseline measurements for plugin overhead testing.
+def benchmark_config():
+    """Configure benchmark settings for performance testing per Section 6.6.4.3.
     
-    Establishes baseline timing measurements for configuration loading,
-    style resolution, and dataset operations per Section 6.6.4.3
-    performance requirements.
+    Returns benchmark configuration for measuring plugin performance
+    against specified targets (<200ms dataset save, <50ms config merge, <25ms hook init).
+    
+    Returns:
+        Dict containing benchmark configuration
     """
+    if not BENCHMARK_AVAILABLE:
+        pytest.skip("pytest-benchmark not available for performance testing")
+    
     return {
-        'config_load_time': 0.050,  # 50ms target
-        'style_resolution_time': 0.001,  # 1ms target
-        'dataset_save_overhead': 0.200,  # 200ms target
-        'hook_initialization_time': 0.025,  # 25ms target
-        'memory_overhead_mb': 5.0  # 5MB target
-    }
-
-
-@pytest.fixture
-def benchmark_config(benchmark):
-    """
-    Configure pytest-benchmark for plugin performance testing.
-    
-    Sets up benchmark configuration for measuring plugin operations
-    with appropriate warmup rounds and timing precision per performance
-    testing requirements.
-    """
-    # Configure benchmark settings
-    benchmark.weave = lambda func, *args, **kwargs: func(*args, **kwargs)
-    benchmark.group = "figregistry_kedro_plugin"
-    
-    # Set performance thresholds
-    benchmark.stats = {
-        'rounds': 100,
-        'warmup_rounds': 10,
+        'min_rounds': 5,
+        'max_time': 10.0,  # Maximum 10 seconds per benchmark
+        'timer': 'time.perf_counter',
         'disable_gc': True,
-        'timer': 'time.perf_counter'
-    }
-    
-    return benchmark
-
-
-# =============================================================================
-# SECURITY TESTING FIXTURES
-# =============================================================================
-
-@pytest.fixture
-def security_test_configs():
-    """
-    Provide malicious configuration test data for security validation.
-    
-    Returns configuration scenarios for testing path traversal prevention,
-    YAML injection protection, and configuration validation security
-    per Section 6.6.8.1 security requirements.
-    """
-    return {
-        'path_traversal_config': {
-            'outputs': {
-                'base_path': '../../../etc/passwd',
-                'path_aliases': {
-                    'evil': '../../home/user/.ssh/id_rsa'
-                }
-            }
-        },
-        'yaml_injection_config': {
-            'styles': {
-                '!!python/object/apply:os.system': ['rm -rf /']
-            }
-        },
-        'oversized_config': {
-            'styles': {f'condition_{i}': {'figure.figsize': [10, 6]} 
-                      for i in range(10000)}
-        },
-        'invalid_types_config': {
-            'styles': {
-                'test': {
-                    'figure.figsize': 'not_a_list',
-                    'axes.grid': 'not_a_boolean'
-                }
-            }
-        }
+        'warmup': True,
+        'warmup_iterations': 2
     }
 
 
 @pytest.fixture
-def catalog_security_test_data():
-    """
-    Provide malicious catalog configurations for security testing.
+def performance_config_datasets():
+    """Provide configuration datasets for performance benchmarking.
     
-    Returns catalog entry configurations for testing parameter validation,
-    path security, and injection prevention per Section 6.6.8.2.
+    Returns iterator of configuration datasets with varying complexity
+    for measuring configuration bridge performance.
+    
+    Returns:
+        Iterator of (test_name, config_dict, expected_time_ms) tuples
     """
-    return {
-        'path_traversal_catalog': {
-            'malicious_dataset': {
-                'type': 'figregistry_kedro.datasets.FigureDataSet',
-                'filepath': '../../../etc/passwd',
-                'purpose': 'publication'
-            }
-        },
-        'parameter_injection_catalog': {
-            'injection_dataset': {
-                'type': 'figregistry_kedro.datasets.FigureDataSet',
-                'filepath': 'data/08_reporting/test.png',
-                'condition_param': '"; rm -rf /; echo "',
-                'purpose': 'exploratory'
-            }
-        },
-        'oversized_parameters_catalog': {
-            'oversized_dataset': {
-                'type': 'figregistry_kedro.datasets.FigureDataSet',
-                'filepath': 'data/08_reporting/test.png',
-                'style_params': {f'param_{i}': f'value_{i}' 
-                               for i in range(10000)}
-            }
-        }
-    }
+    return generate_performance_config_datasets()
 
-
-# =============================================================================
-# CROSS-PLATFORM TESTING FIXTURES
-# =============================================================================
 
 @pytest.fixture
-def cross_platform_test_env(monkeypatch):
-    """
-    Provide cross-platform testing environment simulation.
+def performance_validator():
+    """Provide performance validation utilities.
     
-    Simulates different operating systems and path conventions for
-    testing cross-platform compatibility per Section 6.6.1.4.
-    """
-    platforms = {
-        'windows': {
-            'os.name': 'nt',
-            'os.sep': '\\',
-            'pathlib.Path.home': lambda: Path('C:/Users/testuser')
-        },
-        'linux': {
-            'os.name': 'posix',
-            'os.sep': '/',
-            'pathlib.Path.home': lambda: Path('/home/testuser')
-        },
-        'macos': {
-            'os.name': 'posix',
-            'os.sep': '/',
-            'pathlib.Path.home': lambda: Path('/Users/testuser')
-        }
-    }
+    Returns utilities for validating plugin performance against
+    specified targets from Section 6.6.4.3.
     
-    def set_platform(platform_name):
-        if platform_name not in platforms:
-            raise ValueError(f"Unsupported platform: {platform_name}")
+    Returns:
+        Dict containing performance validation functions
+    """
+    def validate_dataset_save_time(execution_time_ms: float) -> bool:
+        """Validate FigureDataSet save operation against 200ms target."""
+        return execution_time_ms < 200.0
+    
+    def validate_config_bridge_time(execution_time_ms: float) -> bool:
+        """Validate config bridge merge against 50ms target."""
+        return execution_time_ms < 50.0
+    
+    def validate_hook_init_time(execution_time_ms: float) -> bool:
+        """Validate hook initialization against 25ms target."""
+        return execution_time_ms < 25.0
+    
+    def create_performance_report(results: Dict[str, float]) -> str:
+        """Create performance validation report."""
+        report_lines = ["Performance Validation Report", "=" * 30]
         
-        platform_config = platforms[platform_name]
-        for attr, value in platform_config.items():
-            if '.' in attr:
-                module_name, attr_name = attr.rsplit('.', 1)
-                monkeypatch.setattr(f"{module_name}.{attr_name}", value)
+        for metric, time_ms in results.items():
+            if "dataset_save" in metric:
+                status = "PASS" if validate_dataset_save_time(time_ms) else "FAIL"
+                target = "200ms"
+            elif "config_bridge" in metric:
+                status = "PASS" if validate_config_bridge_time(time_ms) else "FAIL"
+                target = "50ms"
+            elif "hook_init" in metric:
+                status = "PASS" if validate_hook_init_time(time_ms) else "FAIL"
+                target = "25ms"
             else:
-                monkeypatch.setattr(attr, value)
-    
-    return set_platform
-
-
-# =============================================================================
-# UTILITY FUNCTIONS FOR TEST CLEANUP AND STATE MANAGEMENT
-# =============================================================================
-
-def _clear_plugin_module_cache():
-    """
-    Clear cached plugin modules to prevent cross-test contamination.
-    
-    Removes figregistry_kedro modules from sys.modules cache to ensure
-    clean import state for each test execution.
-    """
-    modules_to_clear = [
-        mod for mod in sys.modules.keys() 
-        if mod.startswith('figregistry_kedro')
-    ]
-    
-    for module in modules_to_clear:
-        sys.modules.pop(module, None)
-
-
-def _clear_figregistry_cache():
-    """
-    Clear FigRegistry internal caches and state.
-    
-    Resets FigRegistry configuration cache and style resolution cache
-    to ensure clean state for each test.
-    """
-    try:
-        import figregistry
-        # Clear configuration cache if available
-        if hasattr(figregistry, '_config_cache'):
-            figregistry._config_cache.clear()
-        
-        # Clear style cache if available  
-        if hasattr(figregistry, '_style_cache'):
-            figregistry._style_cache.clear()
+                status = "UNKNOWN"
+                target = "N/A"
             
-    except ImportError:
-        # FigRegistry not available, skip clearing
-        pass
-
-
-def _clear_plugin_state():
-    """
-    Clear plugin-specific state and caches.
-    
-    Ensures plugin components start with clean state for each test,
-    preventing cross-test contamination per Section 6.6.5.6.
-    """
-    try:
-        # Clear any plugin-specific caches
-        import figregistry_kedro
+            report_lines.append(f"{metric}: {time_ms:.2f}ms (target: <{target}) [{status}]")
         
-        # Clear hook state if available
-        if hasattr(figregistry_kedro, '_hook_state'):
-            figregistry_kedro._hook_state.clear()
+        return "\n".join(report_lines)
+    
+    return {
+        'validate_dataset_save': validate_dataset_save_time,
+        'validate_config_bridge': validate_config_bridge_time,
+        'validate_hook_init': validate_hook_init_time,
+        'create_report': create_performance_report
+    }
+
+
+# =============================================================================
+# MOCK CONFIGURATION AND UTILITIES
+# =============================================================================
+
+@pytest.fixture
+def comprehensive_mock_stack(
+    mocker,
+    minimal_kedro_context,
+    test_catalog_with_figregistry,
+    mock_kedro_session,
+    mock_hook_manager,
+    figregistry_config_bridge
+):
+    """Comprehensive mock stack for plugin testing per Section 6.6.2.3.
+    
+    Combines all essential Kedro component mocks with FigRegistry integration
+    for comprehensive plugin testing without full framework overhead.
+    
+    Args:
+        mocker: pytest-mock fixture
+        Various component fixtures from kedro_fixtures.py
+        
+    Returns:
+        Dict containing complete mock infrastructure
+    """
+    # Create additional mocks for comprehensive coverage
+    mock_pipeline = mocker.Mock(spec=Pipeline if KEDRO_AVAILABLE else None)
+    mock_pipeline.nodes = []
+    mock_pipeline.describe = Mock(return_value="Mock Pipeline")
+    
+    mock_runner = mocker.Mock(spec=AbstractRunner if KEDRO_AVAILABLE else None)
+    mock_runner.run = Mock(return_value={})
+    
+    # Mock FigRegistry core components
+    mock_figregistry_init = mocker.patch('figregistry.init_config')
+    mock_figregistry_get_style = mocker.patch('figregistry.get_style')
+    mock_figregistry_save_figure = mocker.patch('figregistry.save_figure')
+    
+    mock_figregistry_get_style.return_value = {
+        'color': '#1f77b4',
+        'marker': 'o', 
+        'linestyle': '-'
+    }
+    mock_figregistry_save_figure.return_value = "test_figure.png"
+    
+    return {
+        # Kedro components
+        'context': minimal_kedro_context,
+        'catalog': test_catalog_with_figregistry,
+        'session': mock_kedro_session,
+        'hook_manager': mock_hook_manager,
+        'pipeline': mock_pipeline,
+        'runner': mock_runner,
+        
+        # FigRegistry integration
+        'config_bridge': figregistry_config_bridge,
+        'figregistry_init': mock_figregistry_init,
+        'figregistry_get_style': mock_figregistry_get_style,
+        'figregistry_save_figure': mock_figregistry_save_figure,
+        
+        # Utilities
+        'mocker': mocker
+    }
+
+
+@pytest.fixture
+def mock_figregistry_api(mocker):
+    """Mock FigRegistry API calls for isolated testing.
+    
+    Provides comprehensive mocking of FigRegistry's public API to enable
+    plugin testing without dependencies on core FigRegistry functionality.
+    
+    Args:
+        mocker: pytest-mock fixture
+        
+    Returns:
+        Dict containing mocked FigRegistry API functions
+    """
+    # Mock core FigRegistry functions
+    mock_init_config = mocker.patch('figregistry.init_config')
+    mock_get_style = mocker.patch('figregistry.get_style')
+    mock_save_figure = mocker.patch('figregistry.save_figure')
+    mock_load_config = mocker.patch('figregistry.config.load_config')
+    mock_validate_config = mocker.patch('figregistry.config.validate_config')
+    
+    # Configure mock return values
+    mock_get_style.return_value = {
+        'figure.figsize': [8, 6],
+        'axes.labelsize': 12,
+        'lines.linewidth': 2.0,
+        'lines.markersize': 8,
+        'axes.prop_cycle': "cycler('color', ['#1f77b4', '#ff7f0e'])"
+    }
+    
+    mock_save_figure.return_value = Path("test_output.png")
+    mock_load_config.return_value = generate_baseline_config()
+    mock_validate_config.return_value = True
+    
+    return {
+        'init_config': mock_init_config,
+        'get_style': mock_get_style,
+        'save_figure': mock_save_figure,
+        'load_config': mock_load_config,
+        'validate_config': mock_validate_config
+    }
+
+
+# =============================================================================
+# HYPOTHESIS CONFIGURATION FOR PROPERTY-BASED TESTING
+# =============================================================================
+
+if HYPOTHESIS_AVAILABLE:
+    # Configure Hypothesis for property-based testing per Section 6.6.2.6
+    from hypothesis import settings, HealthCheck
+    
+    @pytest.fixture
+    def hypothesis_config():
+        """Configure Hypothesis for property-based testing.
+        
+        Returns:
+            Hypothesis settings for configuration validation testing
+        """
+        return settings(
+            max_examples=50,
+            deadline=5000,  # 5 second deadline per test
+            suppress_health_check=[HealthCheck.too_slow],
+            verbosity=hypothesis.Verbosity.verbose if pytest.config.option.verbose > 1 else hypothesis.Verbosity.normal
+        )
+    
+    @pytest.fixture
+    def config_generation_strategies():
+        """Provide Hypothesis strategies for configuration generation.
+        
+        Returns:
+            Dict containing Hypothesis strategies for testing
+        """
+        return {
+            'yaml_config': yaml_config_strategy,
+            'kedro_config': kedro_config_strategy,
+            'valid_color': valid_color_strategy,
+            'valid_marker': valid_marker_strategy,
+            'style_dict': style_dict_strategy
+        }
+
+else:
+    @pytest.fixture
+    def hypothesis_config():
+        """Fallback when Hypothesis not available."""
+        pytest.skip("Hypothesis not available for property-based testing")
+    
+    @pytest.fixture
+    def config_generation_strategies():
+        """Fallback when Hypothesis not available."""
+        pytest.skip("Hypothesis strategies not available")
+
+
+# =============================================================================
+# TEST DATA FIXTURES
+# =============================================================================
+
+@pytest.fixture
+def comprehensive_test_data():
+    """Provide comprehensive test data for all testing scenarios.
+    
+    Combines all test data generators into a single fixture for convenient
+    access to baseline configs, invalid scenarios, security tests, and
+    performance datasets.
+    
+    Returns:
+        Dict containing all test data categories
+    """
+    return {
+        'baseline_configs': {
+            'basic': generate_baseline_config(),
+            'kedro_specific': generate_kedro_specific_config(),
+            'minimal': {
+                "figregistry_version": "0.3.0",
+                "styles": {"test": {"color": "#000000"}},
+                "outputs": {"base_path": "test"}
+            }
+        },
+        'environment_configs': generate_environment_configs(),
+        'invalid_configs': generate_invalid_config_scenarios(),
+        'malformed_yaml': generate_malformed_yaml_strings(),
+        'merge_scenarios': generate_merge_test_scenarios(),
+        'security_configs': generate_security_test_configs(),
+        'yaml_injection_vectors': generate_yaml_injection_vectors(),
+        'cross_platform_configs': generate_cross_platform_config_variations(),
+        'filesystem_edge_cases': generate_filesystem_edge_cases()
+    }
+
+
+@pytest.fixture
+def config_file_factory(temp_directory):
+    """Factory for creating temporary configuration files.
+    
+    Provides a callable factory for creating temporary YAML configuration
+    files with automatic cleanup for configuration testing scenarios.
+    
+    Args:
+        temp_directory: Base temporary directory fixture
+        
+    Returns:
+        Callable factory for creating config files
+    """
+    created_files = []
+    
+    def create_config_file(config_dict: Dict[str, Any], filename: str = "test_config.yml") -> Path:
+        """Create temporary configuration file.
+        
+        Args:
+            config_dict: Configuration dictionary to write
+            filename: Name for the configuration file
             
-        # Clear dataset cache if available
-        if hasattr(figregistry_kedro, '_dataset_cache'):
-            figregistry_kedro._dataset_cache.clear()
-            
-        # Clear config bridge cache if available
-        if hasattr(figregistry_kedro, '_bridge_cache'):
-            figregistry_kedro._bridge_cache.clear()
-            
-    except ImportError:
-        # Plugin not available, skip clearing
-        pass
-
-
-# =============================================================================
-# TEST DATA IMPORT AND INTEGRATION
-# =============================================================================
-
-# Import shared test fixtures from dedicated modules
-try:
-    from .fixtures.kedro_fixtures import *
-    from .fixtures.config_fixtures import *
-    from .fixtures.dataset_fixtures import *
-    from .fixtures.hook_fixtures import *
-    from .fixtures.matplotlib_fixtures import *
-    from .fixtures.project_fixtures import *
-except ImportError as e:
-    # Graceful handling for missing fixture modules during development
-    warnings.warn(f"Could not import test fixtures: {e}", UserWarning)
-
-# Import test data modules
-try:
-    from .data.config_test_data import *
-except ImportError as e:
-    warnings.warn(f"Could not import test data: {e}", UserWarning)
-
-
-# =============================================================================
-# PYTEST COLLECTION AND EXECUTION HOOKS
-# =============================================================================
-
-def pytest_collection_modifyitems(config, items):
-    """
-    Modify collected test items for enhanced plugin testing.
-    
-    Adds automatic markers based on test patterns and configures
-    test execution order for optimal performance and reliability.
-    """
-    for item in items:
-        # Add kedro_integration marker for kedro-related tests
-        if 'kedro' in item.nodeid.lower():
-            item.add_marker(pytest.mark.kedro_integration)
+        Returns:
+            Path to created configuration file
+        """
+        config_path = temp_directory / filename
+        config_path.parent.mkdir(parents=True, exist_ok=True)
         
-        # Add plugin_performance marker for benchmark tests
-        if 'benchmark' in item.nodeid.lower() or 'performance' in item.nodeid.lower():
-            item.add_marker(pytest.mark.plugin_performance)
+        import yaml
+        with open(config_path, 'w') as f:
+            yaml.dump(config_dict, f, default_flow_style=False, sort_keys=False)
         
-        # Add security_test marker for security validation
-        if 'security' in item.nodeid.lower() or 'malicious' in item.nodeid.lower():
-            item.add_marker(pytest.mark.security_test)
-        
-        # Add cross_platform marker for platform compatibility tests
-        if 'cross_platform' in item.nodeid.lower() or 'platform' in item.nodeid.lower():
-            item.add_marker(pytest.mark.cross_platform)
+        created_files.append(config_path)
+        return config_path
+    
+    yield create_config_file
+    
+    # Cleanup created files (temp_directory cleanup handles parent directory)
+    for file_path in created_files:
+        try:
+            if file_path.exists():
+                file_path.unlink()
+        except Exception:
+            pass  # Ignore cleanup errors
 
 
-def pytest_sessionfinish(session, exitstatus):
+# =============================================================================
+# VALIDATION AND ASSERTION UTILITIES
+# =============================================================================
+
+@pytest.fixture
+def validation_utilities():
+    """Provide validation utilities for comprehensive testing.
+    
+    Returns utilities for validating plugin behavior, configuration
+    correctness, and integration compliance across test scenarios.
+    
+    Returns:
+        Dict containing validation utility functions
     """
-    Clean up after complete test session.
+    def validate_figregistry_config(config_dict: Dict[str, Any]) -> Tuple[bool, List[str]]:
+        """Validate FigRegistry configuration structure and content."""
+        return validate_config_against_schema(config_dict)
     
-    Performs final cleanup of session-wide resources and generates
-    summary reports for plugin testing validation.
+    def validate_kedro_integration(component_name: str, component) -> bool:
+        """Validate Kedro component integration compliance."""
+        if component_name == "dataset":
+            required_methods = ['_save', '_load', '_describe']
+            return all(hasattr(component, method) for method in required_methods)
+        elif component_name == "hook":
+            lifecycle_methods = ['before_pipeline_run', 'after_pipeline_run']
+            return any(hasattr(component, method) for method in lifecycle_methods)
+        elif component_name == "config_bridge":
+            bridge_methods = ['get_merged_config', 'init_config']
+            return any(hasattr(component, method) for method in bridge_methods)
+        return False
+    
+    def validate_plugin_performance(timings: Dict[str, float]) -> Dict[str, bool]:
+        """Validate plugin performance against targets."""
+        results = {}
+        if 'dataset_save' in timings:
+            results['dataset_save'] = timings['dataset_save'] < 200.0
+        if 'config_bridge' in timings:
+            results['config_bridge'] = timings['config_bridge'] < 50.0
+        if 'hook_init' in timings:
+            results['hook_init'] = timings['hook_init'] < 25.0
+        return results
+    
+    def validate_security_protection(test_name: str, config_dict: Dict[str, Any]) -> bool:
+        """Validate security protection against malicious configurations."""
+        # Check for path traversal patterns
+        if any("../" in str(value) or "..\\" in str(value) 
+               for value in str(config_dict).split()):
+            return False
+        
+        # Check for injection patterns
+        injection_patterns = ["!!python", "!!map", "!!set", "__import__"]
+        if any(pattern in str(config_dict) for pattern in injection_patterns):
+            return False
+        
+        return True
+    
+    return {
+        'validate_figregistry_config': validate_figregistry_config,
+        'validate_kedro_integration': validate_kedro_integration,
+        'validate_plugin_performance': validate_plugin_performance,
+        'validate_security_protection': validate_security_protection
+    }
+
+
+# =============================================================================
+# SESSION AND MODULE CLEANUP
+# =============================================================================
+
+@pytest.fixture(scope="session", autouse=True)
+def cleanup_test_session():
+    """Session-level cleanup for comprehensive test isolation.
+    
+    Ensures clean session state before and after test execution
+    with proper resource cleanup and state reset.
     """
-    # Generate test summary for plugin validation
-    if hasattr(session.config, 'figregistry_test_summary'):
-        summary = session.config.figregistry_test_summary
-        print(f"\nFigRegistry-Kedro Plugin Test Summary:")
-        print(f"  Total Tests: {summary.get('total', 0)}")
-        print(f"  Plugin Tests: {summary.get('plugin_tests', 0)}")
-        print(f"  Performance Tests: {summary.get('performance_tests', 0)}")
-        print(f"  Security Tests: {summary.get('security_tests', 0)}")
+    # Pre-test session setup
+    import gc
+    gc.collect()
     
-    # Final cleanup
-    _clear_plugin_module_cache()
-    _clear_figregistry_cache()
-    _clear_plugin_state()
+    yield
     
-    # Reset matplotlib
-    matplotlib.rcdefaults()
-    plt.close('all')
+    # Post-test session cleanup
+    if MATPLOTLIB_AVAILABLE:
+        plt.close('all')
+        plt.rcdefaults()
+    
+    # Force garbage collection
+    gc.collect()
+
+
+# =============================================================================
+# PYTEST PLUGIN REGISTRATION
+# =============================================================================
+
+def pytest_plugins():
+    """Register pytest plugins for enhanced testing capabilities.
+    
+    Returns:
+        List of pytest plugin names for automatic loading
+    """
+    plugins = ['pytest_mock']
+    
+    if BENCHMARK_AVAILABLE:
+        plugins.append('pytest_benchmark')
+    
+    if HYPOTHESIS_AVAILABLE:
+        plugins.append('hypothesis.extra.pytest')
+    
+    return plugins
+
+
+# =============================================================================
+# MODULE EXPORTS AND AVAILABILITY FLAGS
+# =============================================================================
+
+# Export availability flags for conditional test execution
+__all__ = [
+    # Availability flags
+    'KEDRO_AVAILABLE',
+    'KEDRO_PYTEST_AVAILABLE', 
+    'HYPOTHESIS_AVAILABLE',
+    'BENCHMARK_AVAILABLE',
+    'MATPLOTLIB_AVAILABLE',
+    
+    # Core fixtures (re-exported from kedro_fixtures.py)
+    'minimal_kedro_context',
+    'mock_config_loader',
+    'test_catalog_with_figregistry',
+    'mock_kedro_session',
+    'mock_hook_manager',
+    'figregistry_config_bridge',
+    'mock_figregistry_hooks',
+    'mock_figure_dataset',
+    'test_kedro_instance',
+    'kedro_pytest_session',
+    'minimal_project_scaffolding',
+    'project_scaffolding_factory',
+    'hook_performance_tracker',
+    'mock_matplotlib_figure',
+    'kedro_integration_validators',
+    'complete_kedro_mock_stack',
+    'kedro_testing_utilities',
+    
+    # Configuration fixtures
+    'base_figregistry_config',
+    'local_override_config',
+    'minimal_figregistry_config',
+    'invalid_config_scenarios',
+    'security_test_configs',
+    
+    # Infrastructure fixtures
+    'temp_directory',
+    'temp_project_directory',
+    'mock_matplotlib_rcparams',
+    'sample_matplotlib_figure',
+    
+    # Performance fixtures
+    'benchmark_config',
+    'performance_config_datasets',
+    'performance_validator',
+    
+    # Mock fixtures
+    'comprehensive_mock_stack',
+    'mock_figregistry_api',
+    
+    # Test data fixtures
+    'comprehensive_test_data',
+    'config_file_factory',
+    
+    # Validation fixtures
+    'validation_utilities'
+]
+
+# Add conditional exports based on availability
+if HYPOTHESIS_AVAILABLE:
+    __all__.extend(['hypothesis_config', 'config_generation_strategies'])
+
+# Module information for test reporting
+TEST_MODULE_INFO = {
+    'version': '1.0.0',
+    'description': 'Main pytest configuration for figregistry-kedro testing',
+    'kedro_available': KEDRO_AVAILABLE,
+    'kedro_pytest_available': KEDRO_PYTEST_AVAILABLE,
+    'hypothesis_available': HYPOTHESIS_AVAILABLE,
+    'benchmark_available': BENCHMARK_AVAILABLE,
+    'matplotlib_available': MATPLOTLIB_AVAILABLE,
+    'fixture_count': len(__all__),
+    'testing_frameworks': [
+        'pytest >=8.0.0',
+        'pytest-cov >=6.1.0', 
+        'pytest-mock >=3.14.0'
+    ] + (['kedro-pytest >=0.1.3'] if KEDRO_PYTEST_AVAILABLE else []) +
+        (['hypothesis >=6.0.0'] if HYPOTHESIS_AVAILABLE else []) +
+        (['pytest-benchmark'] if BENCHMARK_AVAILABLE else [])
+}
