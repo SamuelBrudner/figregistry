@@ -1,0 +1,236 @@
+# FigRegistry Kedro Configuration Override - Merge Conflict Testing
+#
+# This configuration file is designed to conflict with merge_conflict_base.yml
+# for comprehensive testing of configuration precedence resolution and conflict
+# handling within the FigRegistryConfigBridge component.
+#
+# Purpose: Validate that override configurations correctly take precedence over
+# base configurations during the merging process, testing the precedence rules:
+# 1. Environment-specific Kedro configurations override base configurations
+# 2. Kedro configurations override standalone figregistry.yaml settings
+# 3. Deep merging for nested dictionaries
+# 4. Lists are replaced entirely (no merging)
+
+# Override styling conditions with conflicting values
+styles:
+  # Conflict: Override exploratory styling with different parameters
+  exploratory:
+    figure_size: [12, 8]  # Conflicting with base [10, 6]
+    dpi: 150             # Conflicting with base 100
+    font_size: 14        # Conflicting with base 12
+    line_width: 2.5      # Conflicting with base 1.5
+    color_palette: "viridis"  # Conflicting with base "Set1"
+    grid: false          # Conflicting with base true
+    spine_visibility:
+      top: true          # Conflicting with base false
+      right: true        # Conflicting with base false
+      bottom: false      # Conflicting with base true
+      left: false        # Conflicting with base true
+  
+  # Conflict: Override presentation styling with different values  
+  presentation:
+    figure_size: [16, 10]  # Conflicting with base [14, 8]
+    dpi: 300              # Conflicting with base 200
+    font_size: 18         # Conflicting with base 16
+    line_width: 3.0       # Conflicting with base 2.0
+    color_palette: "plasma"  # Conflicting with base "Dark2"
+    background_color: "#f8f8f8"  # Conflicting with base "#ffffff"
+    title_size: 22        # Conflicting with base 20
+    legend_position: "upper right"  # Conflicting with base "upper left"
+  
+  # Conflict: Override publication styling with different rcParams
+  publication:
+    figure_size: [8, 6]   # Conflicting with base [7, 5]
+    dpi: 600             # Conflicting with base 400
+    font_family: "serif"  # Conflicting with base "sans-serif"
+    font_size: 11        # Conflicting with base 10
+    line_width: 1.0      # Conflicting with base 0.8
+    color_palette: "tab10"  # Conflicting with base "gray"
+    edge_color: "#333333"  # Conflicting with base "#000000"
+    save_transparent: true  # Conflicting with base false
+
+# Override color palette definitions with conflicting values
+palettes:
+  # Conflict: Override default palette configuration
+  default: "plasma"      # Conflicting with base "viridis"
+  
+  # Conflict: Override custom palette definitions
+  custom_sequential:
+    - "#440154"          # Conflicting with base different colors
+    - "#31688e" 
+    - "#35b779"
+    - "#fde725"
+  
+  custom_diverging:
+    - "#d73027"          # Conflicting with base different colors
+    - "#f46d43"
+    - "#fdae61"
+    - "#fee08b"
+    - "#e6f598"
+    - "#abdda4"
+    - "#66c2a5"
+    - "#3288bd"
+    - "#5e4fa2"
+
+# Override output configuration with conflicting paths and settings
+outputs:
+  # Conflict: Override base output directory and naming
+  base_path: "/tmp/override_figures"  # Conflicting with base "/tmp/base_figures"
+  
+  # Conflict: Override path aliases with different mappings
+  path_aliases:
+    expl: "exploratory_override"     # Conflicting with base "exploratory_base"
+    pres: "presentation_override"    # Conflicting with base "presentation_base"
+    pub: "publication_override"      # Conflicting with base "publication_base"
+  
+  # Conflict: Override file naming conventions
+  naming_convention: "{condition}_{timestamp}_override_{index}.png"  # Conflicting with base pattern
+  
+  # Conflict: Override save format preferences
+  formats:
+    default: "pdf"       # Conflicting with base "png"
+    high_quality: "svg"  # Conflicting with base "pdf"
+    web_optimized: "png" # Conflicting with base "jpg"
+  
+  # Conflict: Override save arguments with different compression
+  save_args:
+    dpi: 300            # Conflicting with base 150
+    bbox_inches: "standard"  # Conflicting with base "tight"
+    facecolor: "#f0f0f0"    # Conflicting with base "#ffffff"
+    transparent: true   # Conflicting with base false
+    optimize: false     # Conflicting with base true
+
+# Override default rcParams with conflicting matplotlib settings
+defaults:
+  # Conflict: Override figure defaults
+  figure:
+    figsize: [10, 8]    # Conflicting with base [8, 6]
+    dpi: 120           # Conflicting with base 100
+    facecolor: "#fafafa"  # Conflicting with base "#ffffff"
+    edgecolor: "#cccccc"  # Conflicting with base "#000000"
+    autolayout: true   # Conflicting with base false
+  
+  # Conflict: Override font settings
+  font:
+    family: "serif"     # Conflicting with base "sans-serif"
+    size: 13           # Conflicting with base 11
+    weight: "bold"     # Conflicting with base "normal"
+    style: "italic"    # Conflicting with base "normal"
+  
+  # Conflict: Override axes settings
+  axes:
+    linewidth: 2.0     # Conflicting with base 1.0
+    edgecolor: "#666666"  # Conflicting with base "#000000"
+    facecolor: "#f5f5f5"  # Conflicting with base "#ffffff"
+    grid: false        # Conflicting with base true
+    grid_alpha: 0.3    # Conflicting with base 0.5
+    spines_top: true   # Conflicting with base false
+    spines_right: true # Conflicting with base false
+  
+  # Conflict: Override line properties
+  lines:
+    linewidth: 2.5     # Conflicting with base 1.5
+    markersize: 8      # Conflicting with base 6
+    markeredgewidth: 1.5  # Conflicting with base 1.0
+    solid_capstyle: "round"  # Conflicting with base "butt"
+  
+  # Conflict: Override legend settings
+  legend:
+    frameon: false     # Conflicting with base true
+    fancybox: true     # Conflicting with base false
+    shadow: true       # Conflicting with base false
+    numpoints: 2       # Conflicting with base 1
+    fontsize: "large"  # Conflicting with base "medium"
+
+# Override performance and cache settings with conflicting values
+performance:
+  # Conflict: Override caching behavior
+  enable_cache: false        # Conflicting with base true
+  cache_max_size: 50         # Conflicting with base 100
+  cache_ttl: 600            # Conflicting with base 3600
+  
+  # Conflict: Override parallel processing settings
+  max_workers: 2            # Conflicting with base 4
+  batch_size: 5             # Conflicting with base 10
+  timeout: 30               # Conflicting with base 60
+  
+  # Conflict: Override memory management
+  memory_limit: "256MB"     # Conflicting with base "512MB"
+  gc_threshold: 50          # Conflicting with base 100
+  preload_fonts: false      # Conflicting with base true
+
+# Override Kedro-specific settings with conflicting integration values
+kedro:
+  # Conflict: Override catalog integration settings
+  auto_register_datasets: false   # Conflicting with base true
+  default_dataset_type: "pickle"  # Conflicting with base "json"
+  enable_versioning: false        # Conflicting with base true
+  
+  # Conflict: Override hook configuration
+  hooks:
+    priority: "low"              # Conflicting with base "high"
+    auto_init: false             # Conflicting with base true
+    fail_on_error: true          # Conflicting with base false
+  
+  # Conflict: Override environment resolution
+  environment_precedence:
+    - "override"                 # Conflicting with base order
+    - "local"
+    - "base"
+  
+  # Conflict: Override parameter mapping
+  parameter_mapping:
+    condition_param: "override_condition"  # Conflicting with base "experiment_type"
+    style_param: "override_style"         # Conflicting with base "visualization_type"
+    purpose_param: "override_purpose"     # Conflicting with base "output_purpose"
+
+# Override validation settings with conflicting strictness levels
+validation:
+  # Conflict: Override schema validation behavior
+  strict_mode: false          # Conflicting with base true
+  allow_extra_fields: true    # Conflicting with base false
+  validate_on_load: false     # Conflicting with base true
+  
+  # Conflict: Override error handling
+  fail_on_invalid: false      # Conflicting with base true
+  log_warnings: false         # Conflicting with base true
+  suppress_errors: true       # Conflicting with base false
+
+# Override experimental condition mappings with conflicting pattern matching
+condition_mappings:
+  # Conflict: Override pattern matching rules
+  patterns:
+    "exp_*": "experimental_override"     # Conflicting with base "experimental_base"
+    "test_*": "testing_override"         # Conflicting with base "testing_base"
+    "prod_*": "production_override"      # Conflicting with base "production_base"
+  
+  # Conflict: Override fallback behavior
+  fallback_style: "publication"         # Conflicting with base "exploratory"
+  case_sensitive: true                  # Conflicting with base false
+  regex_enabled: false                  # Conflicting with base true
+
+# Override logging configuration with conflicting verbosity levels
+logging:
+  # Conflict: Override log levels
+  level: "ERROR"              # Conflicting with base "INFO"
+  format: "%(message)s"       # Conflicting with base detailed format
+  
+  # Conflict: Override output destinations
+  console: false              # Conflicting with base true
+  file: true                  # Conflicting with base false
+  file_path: "/tmp/override.log"  # Conflicting with base path
+
+# Override metadata with conflicting version and environment information
+metadata:
+  # Conflict: Override configuration metadata
+  version: "override-1.0.0"    # Conflicting with base version
+  environment: "override"      # Conflicting with base "testing"
+  created_by: "override_system"  # Conflicting with base "test_system"
+  priority: 999                # Conflicting with base lower priority
+  
+  # Conflict: Override feature flags
+  features:
+    advanced_styling: false    # Conflicting with base true
+    pattern_matching: false    # Conflicting with base true
+    parallel_processing: false # Conflicting with base true
+    automatic_cleanup: false   # Conflicting with base true
