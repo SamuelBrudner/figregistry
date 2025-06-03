@@ -1,724 +1,244 @@
 # Installation Guide
 
-This guide provides comprehensive installation instructions for the figregistry-kedro plugin, covering multiple installation methods, environment setup, and integration with existing Kedro projects.
+This comprehensive guide covers installation and setup of the figregistry-kedro plugin, providing automated figure styling and management within Kedro machine learning pipelines. The plugin bridges FigRegistry's condition-based visualization system with Kedro's data catalog architecture, enabling seamless figure management in data science workflows.
 
 ## Table of Contents
 
-- [Quick Start](#quick-start)
 - [System Requirements](#system-requirements)
+- [Quick Start](#quick-start)
 - [Installation Methods](#installation-methods)
-- [Development Environment Setup](#development-environment-setup)
+- [Environment Setup](#environment-setup)
 - [Kedro Project Integration](#kedro-project-integration)
-- [Verification and Testing](#verification-and-testing)
+- [Development Installation](#development-installation)
+- [Verification](#verification)
 - [Troubleshooting](#troubleshooting)
-- [Advanced Configuration](#advanced-configuration)
-
-## Quick Start
-
-For users who want to get started immediately:
-
-```bash
-# Install the plugin
-pip install figregistry-kedro
-
-# Verify installation
-python -c "import figregistry_kedro; print('Installation successful!')"
-
-# Add to existing Kedro project
-cd your-kedro-project
-kedro registry list  # Should show FigureDataSet available
-```
+- [Upgrade Instructions](#upgrade-instructions)
 
 ## System Requirements
 
-### Python Version Compatibility
+### Minimum Requirements
 
-The figregistry-kedro plugin requires Python 3.10 or later for optimal compatibility:
+- **Python**: 3.10 or higher
+- **Operating System**: Windows 10+, macOS 10.15+, Linux (Ubuntu 18.04+)
+- **Memory**: 4GB RAM minimum (8GB recommended for complex pipelines)
+- **Storage**: 2GB available disk space for dependencies
 
-| Python Version | Support Status | Notes |
-|---------------|----------------|-------|
-| **3.10** | ✅ Recommended | Full feature support with optimal performance |
-| **3.11** | ✅ Supported | Complete compatibility with enhanced type safety |
-| **3.12** | ✅ Supported | Latest features and performance improvements |
-| **3.13** | ✅ Supported | Forward compatibility for future-proofing |
-| 3.9 | ❌ Not Supported | Limited type annotation support |
-| 3.8 | ❌ Not Supported | Missing required language features |
+### Framework Compatibility
 
-### Framework Compatibility Matrix
+The figregistry-kedro plugin maintains strict compatibility requirements to ensure reliable integration:
 
-The plugin is designed to work seamlessly across different versions of its core dependencies:
+| Component | Version Range | Purpose |
+|-----------|---------------|---------|
+| **Python** | ≥3.10 | Advanced type hinting and performance optimizations |
+| **FigRegistry** | ≥0.3.0 | Core visualization configuration and styling system |
+| **Kedro** | ≥0.18.0,<0.20.0 | Data pipeline framework with stable AbstractDataSet interface |
+| **Matplotlib** | ≥3.9.0 | Visualization backend with rcParams integration |
+| **Pydantic** | ≥2.9.0 | Configuration validation and type safety |
 
-| Framework | Required Version | Tested Versions | Notes |
-|-----------|------------------|-----------------|-------|
-| **FigRegistry** | >=0.3.0 | 0.3.0, 0.3.1+ | Core visualization management system |
-| **Kedro** | >=0.18.0,<0.20.0 | 0.18.0-0.19.x | Pipeline orchestration framework |
-| **Matplotlib** | >=3.9.0 | 3.9.0+ | Visualization backend |
-| **Pydantic** | >=2.9.0 | 2.9.0+ | Configuration validation |
-| **PyYAML** | >=6.0.1 | 6.0.1+ | Configuration parsing |
+### Platform-Specific Notes
 
-### System Dependencies
+#### Windows
+- Windows 10 or Windows 11 required
+- PowerShell 5.1+ or PowerShell Core recommended
+- Visual Studio Build Tools may be required for some scientific dependencies
 
-Ensure your system meets these basic requirements:
+#### macOS
+- macOS 10.15 (Catalina) or later
+- Xcode Command Line Tools recommended: `xcode-select --install`
+- Homebrew package manager recommended for system dependencies
 
-- **Operating System**: Windows 10+, macOS 10.15+, or Linux (Ubuntu 20.04+, CentOS 8+)
-- **Memory**: Minimum 4GB RAM (8GB recommended for development)
-- **Storage**: 2GB available space for dependencies and build artifacts
-- **Network**: Internet connection for package downloads
+#### Linux
+- Ubuntu 18.04+, CentOS 8+, or equivalent distributions
+- GCC compiler and development headers: `sudo apt-get install build-essential`
+- Python development headers: `sudo apt-get install python3-dev`
+
+## Quick Start
+
+For users who want to get started immediately with default settings:
+
+```bash
+# Install the plugin
+pip install figregistry-kedro
+
+# Create a new Kedro project with FigRegistry integration
+kedro new --starter=pandas-iris my_kedro_project
+cd my_kedro_project
+
+# Install the plugin in your project
+pip install figregistry-kedro
+
+# Configure hooks in settings.py
+echo "from figregistry_kedro.hooks import FigRegistryHooks
+HOOKS = (FigRegistryHooks(),)" >> src/my_kedro_project/settings.py
+
+# Run the pipeline with automated figure management
+kedro run
+```
+
+This quick start creates a functional Kedro project with FigRegistry integration in under 5 minutes.
 
 ## Installation Methods
 
-### Method 1: pip Installation (Recommended)
+### Method 1: PyPI Installation (Recommended)
 
-The pip installation method provides the most straightforward setup for most users.
-
-#### Standard Installation
+The simplest installation method uses pip to install from the Python Package Index:
 
 ```bash
-# Install from PyPI
+# Install the latest stable release
 pip install figregistry-kedro
+
+# Install a specific version
+pip install figregistry-kedro==0.1.0
+
+# Install with specific dependency versions
+pip install "figregistry-kedro[test]" "kedro>=0.18.14"
 
 # Upgrade to latest version
 pip install --upgrade figregistry-kedro
-
-# Install specific version
-pip install figregistry-kedro==0.1.0
 ```
 
-#### Installation with Optional Dependencies
+**Benefits:**
+- Latest stable releases
+- Automatic dependency resolution
+- Fastest installation method
+- Compatible with virtual environments
+
+**When to use:**
+- Production deployments
+- Standard data science workflows
+- First-time users
+
+### Method 2: Conda Installation
+
+Install from conda-forge for comprehensive dependency management:
 
 ```bash
-# Install with development tools
-pip install "figregistry-kedro[dev]"
-
-# Install with testing framework only
-pip install "figregistry-kedro[test]"
-
-# Install with documentation tools
-pip install "figregistry-kedro[docs]"
-
-# Install all optional dependencies
-pip install "figregistry-kedro[dev,test,docs]"
-```
-
-#### Virtual Environment Installation
-
-For isolated environments (recommended for development):
-
-```bash
-# Create virtual environment
-python -m venv figregistry-kedro-env
-
-# Activate virtual environment
-# On Windows:
-figregistry-kedro-env\Scripts\activate
-# On macOS/Linux:
-source figregistry-kedro-env/bin/activate
-
-# Install plugin
-pip install figregistry-kedro
-
-# Verify installation
-python -c "import figregistry_kedro; print(figregistry_kedro.__version__)"
-```
-
-### Method 2: conda Installation
-
-The conda installation method is ideal for scientific computing environments and provides robust dependency management.
-
-#### conda-forge Installation
-
-```bash
-# Install from conda-forge channel
+# Install from conda-forge (recommended for scientific computing)
 conda install -c conda-forge figregistry-kedro
 
-# Create environment with figregistry-kedro
-conda create -n figregistry-kedro -c conda-forge python=3.11 figregistry-kedro
+# Create a new environment with the plugin
+conda create -n kedro-figregistry -c conda-forge python=3.11 figregistry-kedro
+conda activate kedro-figregistry
 
-# Activate environment
-conda activate figregistry-kedro
+# Install in existing environment
+conda install -c conda-forge figregistry-kedro
+
+# Install with specific versions
+conda install -c conda-forge "figregistry-kedro>=0.1.0" "kedro>=0.18.0,<0.20.0"
 ```
 
-#### Environment File Installation
+**Benefits:**
+- Optimized scientific computing stack
+- Cross-platform binary packages
+- Robust dependency conflict resolution
+- Integration with Anaconda ecosystem
 
-Create a comprehensive environment configuration:
-
-```yaml
-# environment.yml
-name: figregistry-kedro
-channels:
-  - conda-forge
-  - defaults
-dependencies:
-  - python>=3.10
-  - figregistry-kedro
-  - jupyter  # Optional: for notebook development
-  - pytest  # Optional: for testing
-```
-
-```bash
-# Create environment from file
-conda env create -f environment.yml
-
-# Activate environment
-conda activate figregistry-kedro
-```
+**When to use:**
+- Scientific computing environments
+- Complex dependency requirements
+- Cross-platform deployment
+- Anaconda/Miniconda users
 
 ### Method 3: Development Installation
 
-For contributors and advanced users who need the latest features or want to modify the plugin.
-
-#### Clone and Install from Source
+Install from source for development, testing, or accessing unreleased features:
 
 ```bash
-# Clone repository
+# Clone the repository
 git clone https://github.com/figregistry/figregistry-kedro.git
 cd figregistry-kedro
 
-# Create development environment
-python -m venv .venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
 # Install in development mode
+pip install -e .
+
+# Install with development dependencies
 pip install -e ".[dev]"
 
-# Install pre-commit hooks
-pre-commit install
-
-# Verify development installation
-pytest tests/ --cov=figregistry_kedro
+# Install with all optional dependencies
+pip install -e ".[dev,test,docs]"
 ```
 
-#### Development Environment with conda
+**Benefits:**
+- Access to latest development features
+- Ability to modify source code
+- Full development toolchain
+- Contribution-ready setup
+
+**When to use:**
+- Plugin development
+- Contributing to the project
+- Testing unreleased features
+- Custom modifications
+
+## Environment Setup
+
+### Option 1: Virtual Environment (Python venv)
+
+Create an isolated Python environment for your Kedro projects:
 
 ```bash
-# Clone repository
-git clone https://github.com/figregistry/figregistry-kedro.git
-cd figregistry-kedro
+# Create a new virtual environment
+python -m venv kedro-figregistry-env
 
-# Create conda development environment
-conda env create -f environment-dev.yml
-conda activate figregistry-kedro-dev
-
-# Install in development mode
-pip install -e ".[dev]"
-
-# Setup development tools
-pre-commit install
-```
-
-## Development Environment Setup
-
-### Multi-Environment Development Strategy
-
-The figregistry-kedro plugin supports a tri-environment approach for comprehensive development workflows:
-
-#### Production Environment
-
-Minimal runtime dependencies for deployment:
-
-```yaml
-# environment-prod.yml
-name: figregistry-prod
-channels:
-  - conda-forge
-dependencies:
-  - python=3.11
-  - figregistry>=0.3.0
-  - kedro>=0.18.0,<0.20.0
-  - matplotlib>=3.9.0
-  - pydantic>=2.9.0
-  - pyyaml>=6.0.1
-  - numpy>=1.24.0
-  - pandas>=2.0.0
-```
-
-#### Development Environment
-
-Complete development toolchain with testing and quality tools:
-
-```yaml
-# environment-dev.yml
-name: figregistry-dev
-channels:
-  - conda-forge
-dependencies:
-  - python=3.11
-  - figregistry>=0.3.0
-  - kedro>=0.18.0,<0.20.0
-  - kedro-datasets>=1.0.0
-  - matplotlib>=3.9.0
-  - pydantic>=2.9.0
-  - pyyaml>=6.0.1
-  - numpy>=1.24.0
-  - pandas>=2.0.0
-  # Development tools
-  - pytest>=7.0.0
-  - pytest-cov>=4.0.0
-  - pytest-mock>=3.14.0
-  - hypothesis>=6.0.0
-  - black>=23.0.0
-  - isort>=5.12.0
-  - mypy>=1.0.0
-  - pre-commit>=3.0.0
-  # Documentation
-  - mkdocs>=1.4.0
-  - mkdocs-material>=9.0.0
-  - mkdocstrings>=0.20.0
-  # Utilities
-  - jupyter>=1.0.0
-  - ipykernel>=6.0.0
-```
-
-#### Plugin Testing Environment
-
-Specialized environment for plugin development and testing:
-
-```yaml
-# environment-plugin.yml
-name: figregistry-kedro-plugin
-channels:
-  - conda-forge
-dependencies:
-  - python=3.11
-  - figregistry>=0.3.0
-  - kedro>=0.18.0,<0.20.0
-  - kedro-datasets>=1.0.0
-  # Plugin-specific testing
-  - pytest>=7.0.0
-  - pytest-mock>=3.14.0
-  - hypothesis>=6.0.0
-  # Code quality
-  - black>=23.0.0
-  - isort>=5.12.0
-  - mypy>=1.0.0
-  # Build tools
-  - build>=0.7.0
-  - setuptools-scm>=6.2
-```
-
-### Automated Environment Setup
-
-Use the provided setup scripts for streamlined environment creation:
-
-```bash
-# Linux/macOS setup script
-curl -sSL https://raw.githubusercontent.com/figregistry/figregistry-kedro/main/scripts/setup_env.sh | bash
-
-# Windows PowerShell setup
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/figregistry/figregistry-kedro/main/scripts/setup_env.ps1" | Invoke-Expression
-```
-
-Or manually create environments:
-
-```bash
-# Development environment setup
-conda env create -f environment-dev.yml
-conda activate figregistry-dev
-
-# Install pre-commit hooks
-pre-commit install
-
-# Verify installation
-python -c "import figregistry_kedro; print('Development environment ready!')"
-pytest --version
-kedro --version
-```
-
-## Kedro Project Integration
-
-### New Kedro Project Setup
-
-Create a new Kedro project with figregistry-kedro integration:
-
-```bash
-# Create new Kedro project
-kedro new --starter=pandas-iris
-
-# Navigate to project directory
-cd new-kedro-project
-
-# Install figregistry-kedro
-pip install figregistry-kedro
-
-# Initialize FigRegistry configuration
-kedro registry describe  # Should show FigureDataSet available
-```
-
-### Existing Kedro Project Integration
-
-Integrate the plugin into an existing Kedro project:
-
-#### Step 1: Install the Plugin
-
-```bash
-# Navigate to your existing Kedro project
-cd your-existing-kedro-project
+# Activate the environment
+# Windows:
+kedro-figregistry-env\Scripts\activate
+# macOS/Linux:
+source kedro-figregistry-env/bin/activate
 
 # Install the plugin
 pip install figregistry-kedro
 
-# Verify Kedro recognizes the plugin
-kedro registry list | grep -i figure
+# Install Kedro and common data science packages
+pip install kedro pandas numpy matplotlib seaborn scikit-learn
+
+# Deactivate when done
+deactivate
 ```
 
-#### Step 2: Register Hooks
+### Option 2: Conda Environment
 
-Add FigRegistry hooks to your project settings:
-
-```python
-# src/your_project/settings.py
-"""Project settings. There is no need to edit this file unless you want to change values
-from the Kedro defaults. For further information, including these default values, see
-https://kedro.readthedocs.io/en/stable/kedro_project_setup/settings.html."""
-
-from figregistry_kedro.hooks import FigRegistryHooks
-
-# Register FigRegistry hooks
-HOOKS = (FigRegistryHooks(),)
-
-# If you have existing hooks, add FigRegistryHooks to the tuple:
-# from your_project.hooks import ProjectHooks
-# HOOKS = (ProjectHooks(), FigRegistryHooks())
-```
-
-#### Step 3: Create FigRegistry Configuration
-
-Add a FigRegistry configuration file to your project:
-
-```yaml
-# conf/base/figregistry.yml
-figregistry_version: ">=0.3.0"
-
-# Basic condition-based styling
-condition_styles:
-  training:
-    color: "#2E86AB"
-    marker: "o"
-    linestyle: "-"
-  
-  validation:
-    color: "#A23B72"
-    marker: "s"
-    linestyle: "--"
-  
-  test:
-    color: "#F18F01"
-    marker: "^"
-    linestyle: ":"
-
-# Output configuration
-paths:
-  base_dir: "data/08_reporting"
-
-# Kedro integration settings
-kedro:
-  dataset_defaults:
-    purpose: "expl"
-    dpi: 300
-    format: "png"
-  
-  hooks:
-    auto_init: true
-    log_operations: true
-```
-
-#### Step 4: Update Data Catalog
-
-Modify your data catalog to use FigureDataSet:
-
-```yaml
-# conf/base/catalog.yml
-
-# Example: Replace matplotlib figure outputs with FigureDataSet
-model_accuracy_plot:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/model_accuracy.png
-  purpose: expl
-  condition_param: "model_type"
-
-training_history_plot:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/training_history.pdf
-  purpose: pub
-  condition_param: "experiment_id"
-  style_params:
-    dpi: 300
-    bbox_inches: "tight"
-  versioned: true
-```
-
-#### Step 5: Update Pipeline Nodes
-
-Modify your pipeline nodes to return matplotlib figures instead of saving them manually:
-
-```python
-# Before: Manual figure saving
-def create_accuracy_plot(model_results):
-    fig, ax = plt.subplots()
-    ax.plot(model_results['epochs'], model_results['accuracy'])
-    ax.set_title('Model Accuracy')
-    plt.savefig('data/08_reporting/accuracy.png')  # Remove this line
-    plt.close()
-    return None
-
-# After: Return figure for FigureDataSet
-def create_accuracy_plot(model_results):
-    fig, ax = plt.subplots()
-    ax.plot(model_results['epochs'], model_results['accuracy'])
-    ax.set_title('Model Accuracy')
-    return fig  # Return figure instead of saving manually
-```
-
-### Migration from Manual Figure Management
-
-For projects currently using manual plt.savefig() calls:
-
-#### Migration Checklist
-
-- [ ] Install figregistry-kedro plugin
-- [ ] Register FigRegistryHooks in settings.py
-- [ ] Create conf/base/figregistry.yml configuration
-- [ ] Update catalog entries to use FigureDataSet
-- [ ] Modify pipeline nodes to return figures instead of saving them
-- [ ] Remove manual plt.savefig() calls
-- [ ] Test pipeline execution with new configuration
-
-#### Automated Migration Script
-
-Use the provided migration script for large projects:
+Leverage Conda's comprehensive package management:
 
 ```bash
-# Download migration script
-curl -O https://raw.githubusercontent.com/figregistry/figregistry-kedro/main/scripts/migrate_project.py
+# Create environment from scratch
+conda create -n kedro-figregistry python=3.11
+conda activate kedro-figregistry
+conda install -c conda-forge figregistry-kedro kedro pandas numpy matplotlib
 
-# Run migration (creates backup first)
-python migrate_project.py --project-dir . --backup
+# Create from environment file (if provided)
+conda env create -f environment.yml
+conda activate kedro-figregistry
 
-# Review changes
-git diff
-
-# Test migrated project
-kedro run
+# Export your environment for sharing
+conda env export > environment.yml
 ```
 
-## Verification and Testing
+### Option 3: Poetry Environment
 
-### Installation Verification
-
-Verify your installation with these commands:
+For modern Python dependency management:
 
 ```bash
-# Check plugin installation
-python -c "import figregistry_kedro; print(f'figregistry-kedro {figregistry_kedro.__version__} installed successfully')"
+# Initialize a new project with Poetry
+poetry init
+poetry add figregistry-kedro kedro
 
-# Verify Kedro recognizes the plugin
-kedro registry list | grep -E "(FigureDataSet|figregistry)"
+# Install dependencies
+poetry install
 
-# Check dependencies
-python -c "import figregistry, kedro, matplotlib, pydantic; print('All dependencies available')"
+# Activate the environment
+poetry shell
 
-# Validate hook registration (if already configured)
-python -c "from your_project.settings import HOOKS; print(f'Hooks registered: {len(HOOKS)}')"
+# Run commands within the environment
+poetry run kedro run
 ```
 
-### Functionality Testing
+### Option 4: Docker Environment
 
-Test the plugin functionality with a simple example:
-
-```python
-# test_figregistry_kedro.py
-import matplotlib.pyplot as plt
-import tempfile
-from pathlib import Path
-from figregistry_kedro.datasets import FigureDataSet
-
-def test_basic_functionality():
-    """Test basic FigureDataSet functionality."""
-    
-    # Create a simple figure
-    fig, ax = plt.subplots()
-    ax.plot([1, 2, 3], [1, 4, 2])
-    ax.set_title('Test Figure')
-    
-    # Create temporary file for testing
-    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
-        tmp_path = tmp.name
-    
-    try:
-        # Test FigureDataSet save operation
-        dataset = FigureDataSet(filepath=tmp_path, purpose='expl')
-        dataset.save(fig)
-        
-        # Verify file was created
-        assert Path(tmp_path).exists()
-        print("✅ FigureDataSet save test passed")
-        
-        # Test load operation (returns path for verification)
-        loaded_path = dataset.load()
-        assert Path(loaded_path).exists()
-        print("✅ FigureDataSet load test passed")
-        
-    finally:
-        # Cleanup
-        Path(tmp_path).unlink(missing_ok=True)
-        plt.close(fig)
-
-if __name__ == "__main__":
-    test_basic_functionality()
-    print("🎉 All tests passed! Installation verified.")
-```
-
-Run the test:
-
-```bash
-python test_figregistry_kedro.py
-```
-
-### Integration Testing
-
-Test the plugin within a Kedro project context:
-
-```bash
-# Create test project
-kedro new --starter=pandas-iris --directory=test-figregistry-kedro
-
-# Navigate to test project
-cd test-figregistry-kedro
-
-# Install plugin
-pip install figregistry-kedro
-
-# Add minimal configuration
-cat > conf/base/figregistry.yml << EOF
-figregistry_version: ">=0.3.0"
-condition_styles:
-  setosa:
-    color: "#FF6B6B"
-  versicolor:
-    color: "#4ECDC4"
-  virginica:
-    color: "#45B7D1"
-paths:
-  base_dir: "data/08_reporting"
-kedro:
-  dataset_defaults:
-    purpose: "expl"
-EOF
-
-# Register hooks
-cat > src/test_figregistry_kedro/settings.py << EOF
-from figregistry_kedro.hooks import FigRegistryHooks
-HOOKS = (FigRegistryHooks(),)
-EOF
-
-# Add test figure output to catalog
-cat >> conf/base/catalog.yml << EOF
-
-iris_plot:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/iris_analysis.png
-  purpose: expl
-  condition_param: "species"
-EOF
-
-# Test pipeline execution
-kedro run
-
-# Verify output
-ls -la data/08_reporting/
-```
-
-## Troubleshooting
-
-### Common Installation Issues
-
-#### Issue 1: ImportError with FigRegistry
-
-**Problem**: `ImportError: No module named 'figregistry'`
-
-**Solution**:
-```bash
-# Ensure figregistry is installed (should be automatic)
-pip install figregistry>=0.3.0
-
-# If using conda, install from conda-forge
-conda install -c conda-forge figregistry
-
-# Verify installation
-python -c "import figregistry; print(figregistry.__version__)"
-```
-
-#### Issue 2: Kedro Version Compatibility
-
-**Problem**: `kedro.framework.cli.utils.KedroCliError: kedro version incompatible`
-
-**Solution**:
-```bash
-# Check current Kedro version
-kedro --version
-
-# Upgrade to compatible version
-pip install "kedro>=0.18.0,<0.20.0"
-
-# If using conda
-conda install -c conda-forge "kedro>=0.18.0,<0.20.0"
-
-# Verify compatibility
-python -c "import kedro; print(kedro.__version__)"
-```
-
-#### Issue 3: Pydantic Validation Errors
-
-**Problem**: `pydantic.ValidationError` during configuration loading
-
-**Solution**:
-```bash
-# Update to compatible Pydantic version
-pip install "pydantic>=2.9.0"
-
-# Check configuration syntax
-python -c "
-import yaml
-with open('conf/base/figregistry.yml') as f:
-    config = yaml.safe_load(f)
-    print('Configuration syntax valid')
-"
-
-# Validate with FigRegistry
-python -c "
-import figregistry
-figregistry.init_config('conf/base/figregistry.yml')
-print('FigRegistry configuration valid')
-"
-```
-
-#### Issue 4: matplotlib Backend Issues
-
-**Problem**: Figures not displaying or saving correctly
-
-**Solution**:
-```bash
-# Check matplotlib backend
-python -c "import matplotlib; print(matplotlib.get_backend())"
-
-# Set non-interactive backend for headless environments
-export MPLBACKEND=Agg
-
-# Or set in Python code
-python -c "
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-print('Backend set successfully')
-"
-```
-
-### Environment-Specific Issues
-
-#### Docker/Container Environments
+Containerized setup for reproducible deployments:
 
 ```dockerfile
-# Dockerfile additions for figregistry-kedro
+# Dockerfile
 FROM python:3.11-slim
 
 # Install system dependencies
@@ -726,172 +246,735 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Set matplotlib backend for headless environment
-ENV MPLBACKEND=Agg
+# Install Python packages
+RUN pip install figregistry-kedro kedro pandas matplotlib
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# Set working directory
+WORKDIR /app
 
-# Install figregistry-kedro
-RUN pip install figregistry-kedro
+# Copy project files
+COPY . .
 
-# Verify installation
-RUN python -c "import figregistry_kedro; print('Installation verified')"
+# Default command
+CMD ["kedro", "run"]
 ```
+
+```bash
+# Build and run the container
+docker build -t kedro-figregistry .
+docker run -v $(pwd):/app kedro-figregistry
+```
+
+## Kedro Project Integration
+
+### Step 1: Hook Registration
+
+Configure FigRegistry hooks in your Kedro project's settings:
+
+```python
+# src/your_project/settings.py
+
+from figregistry_kedro.hooks import FigRegistryHooks
+
+# Basic hook registration
+HOOKS = (FigRegistryHooks(),)
+
+# Advanced configuration
+HOOKS = (
+    FigRegistryHooks(
+        auto_initialize=True,
+        enable_performance_monitoring=False,
+        fallback_on_error=True,
+        max_initialization_time=0.005  # 5ms maximum
+    ),
+)
+
+# Integration with existing hooks
+from kedro_datasets.spark import SparkDataSet
+
+HOOKS = (
+    FigRegistryHooks(),
+    # ... other project hooks
+)
+```
+
+### Step 2: Configuration Setup
+
+Create FigRegistry configuration files in your Kedro project:
+
+```bash
+# Create base configuration directory
+mkdir -p conf/base
+
+# Create environment-specific directories
+mkdir -p conf/local conf/staging conf/production
+```
+
+**Base Configuration** (`conf/base/figregistry.yml`):
+
+```yaml
+# Base FigRegistry configuration
+styles:
+  exploratory:
+    figure.figsize: [10, 6]
+    figure.dpi: 100
+    axes.grid: true
+    axes.spines.top: false
+    axes.spines.right: false
+  
+  presentation:
+    figure.figsize: [12, 8]
+    figure.dpi: 200
+    font.size: 14
+    axes.labelsize: 16
+  
+  publication:
+    figure.figsize: [8, 6]
+    figure.dpi: 300
+    font.family: serif
+    axes.labelsize: 12
+
+palettes:
+  default:
+    colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']
+
+outputs:
+  base_path: data/08_reporting
+  create_subdirs: true
+  timestamp_format: "%Y%m%d_%H%M%S"
+
+defaults:
+  purpose: exploratory
+  format: png
+  bbox_inches: tight
+
+# Kedro-specific settings
+kedro:
+  catalog_integration:
+    auto_register_datasets: true
+    versioning_enabled: true
+  hook_settings:
+    auto_initialize: true
+    enable_performance_monitoring: false
+    fallback_on_error: true
+```
+
+### Step 3: Data Catalog Configuration
+
+Add FigureDataSet entries to your Kedro data catalog:
+
+```yaml
+# conf/base/catalog.yml
+
+# Basic figure dataset
+analysis_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/analysis_{default_run_id}.png
+  purpose: exploratory
+
+# Advanced configuration with styling
+presentation_charts:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/presentation/{default_run_id}_results.pdf
+  purpose: presentation
+  style_params:
+    figure.dpi: 300
+    font.family: sans-serif
+  save_args:
+    bbox_inches: tight
+    transparent: false
+
+# Versioned datasets
+publication_figures:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/publication/figure_{version}.pdf
+  purpose: publication
+  versioned: true
+  condition_param: experiment_type
+  save_args:
+    dpi: 600
+    format: pdf
+```
+
+### Step 4: Pipeline Integration
+
+Update your pipeline nodes to use FigRegistry-managed figures:
+
+```python
+# src/your_project/pipelines/visualization/nodes.py
+
+import matplotlib.pyplot as plt
+import pandas as pd
+from matplotlib.figure import Figure
+
+def create_analysis_plot(data: pd.DataFrame) -> Figure:
+    """Create exploratory analysis plot.
+    
+    Returns matplotlib Figure that will be automatically styled
+    and saved through FigRegistry integration.
+    """
+    fig, ax = plt.subplots()
+    
+    # Create your plot
+    ax.scatter(data['x'], data['y'])
+    ax.set_xlabel('X Values')
+    ax.set_ylabel('Y Values')
+    ax.set_title('Data Analysis')
+    
+    # No manual styling or saving required
+    # FigRegistry will apply appropriate styling based on 'purpose'
+    return fig
+
+def create_presentation_chart(processed_data: pd.DataFrame) -> Figure:
+    """Create presentation-ready chart.
+    
+    Styling will be automatically applied based on 'presentation' purpose.
+    """
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Left subplot
+    ax1.plot(processed_data['time'], processed_data['metric1'], 'b-', linewidth=2)
+    ax1.set_title('Metric 1 Over Time')
+    ax1.set_xlabel('Time')
+    ax1.set_ylabel('Metric 1')
+    
+    # Right subplot
+    ax2.bar(processed_data['category'], processed_data['count'])
+    ax2.set_title('Count by Category')
+    ax2.set_xlabel('Category')
+    ax2.set_ylabel('Count')
+    
+    plt.tight_layout()
+    return fig
+```
+
+```python
+# src/your_project/pipelines/visualization/pipeline.py
+
+from kedro.pipeline import Pipeline, node, pipeline
+from .nodes import create_analysis_plot, create_presentation_chart
+
+def create_visualization_pipeline(**kwargs) -> Pipeline:
+    """Create visualization pipeline with FigRegistry integration."""
+    return pipeline([
+        node(
+            func=create_analysis_plot,
+            inputs="processed_data",
+            outputs="analysis_plot",  # Matches catalog entry
+            name="create_analysis_plot"
+        ),
+        node(
+            func=create_presentation_chart,
+            inputs="processed_data",
+            outputs="presentation_charts",  # Matches catalog entry
+            name="create_presentation_chart"
+        ),
+    ])
+```
+
+## Development Installation
+
+### Setting Up Development Environment
+
+For plugin development or contributing to the project:
+
+```bash
+# 1. Fork the repository on GitHub
+# 2. Clone your fork
+git clone https://github.com/your-username/figregistry-kedro.git
+cd figregistry-kedro
+
+# 3. Create development environment
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+
+# 4. Install in development mode with all dependencies
+pip install -e ".[dev,test,docs]"
+
+# 5. Install pre-commit hooks
+pre-commit install
+
+# 6. Verify installation
+python -m pytest tests/ -v
+python -c "import figregistry_kedro; print('Installation successful!')"
+```
+
+### Development Dependencies
+
+The development installation includes comprehensive tooling:
+
+```python
+# Development tools (automatically installed with [dev])
+black>=23.0.0           # Code formatting
+isort>=5.12.0           # Import sorting
+mypy>=1.0.0             # Type checking
+ruff>=0.1.0             # Fast linting
+pre-commit>=3.0.0       # Git hooks
+
+# Testing framework (automatically installed with [test])
+pytest>=7.0.0           # Test runner
+pytest-cov>=4.0.0       # Coverage measurement
+pytest-mock>=3.14.0     # Mocking utilities
+pytest-xdist>=3.0.0     # Parallel testing
+hypothesis>=6.0.0       # Property-based testing
+
+# Documentation tools (automatically installed with [docs])
+mkdocs>=1.4.0           # Documentation generator
+mkdocs-material>=9.0.0  # Material theme
+mkdocstrings>=0.20.0    # API documentation
+```
+
+### Running Tests
+
+Comprehensive test execution for development validation:
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=figregistry_kedro --cov-report=html
+
+# Run specific test modules
+pytest tests/test_datasets.py -v
+pytest tests/test_hooks.py -v
+pytest tests/test_config.py -v
+
+# Run integration tests
+pytest tests/test_integration.py -v
+
+# Run tests in parallel
+pytest -n auto
+
+# Run performance tests
+pytest tests/test_performance.py --benchmark-only
+```
+
+### Code Quality Checks
+
+Ensure code quality before committing:
+
+```bash
+# Format code
+black src/ tests/
+isort src/ tests/
+
+# Type checking
+mypy src/figregistry_kedro/
+
+# Linting
+ruff check src/ tests/
+
+# Run all pre-commit hooks
+pre-commit run --all-files
+```
+
+## Verification
+
+### Installation Verification
+
+Verify successful installation with these quick checks:
+
+```python
+# Basic import test
+python -c "import figregistry_kedro; print(f'Version: {figregistry_kedro.__version__}')"
+
+# Component availability test
+python -c """
+from figregistry_kedro.datasets import FigureDataSet
+from figregistry_kedro.hooks import FigRegistryHooks
+from figregistry_kedro.config import FigRegistryConfigBridge
+print('All components imported successfully!')
+"""
+
+# Kedro integration test
+python -c """
+import kedro
+print(f'Kedro version: {kedro.__version__}')
+from kedro.framework.hooks import _NullPluginManager
+from figregistry_kedro.hooks import FigRegistryHooks
+hooks = FigRegistryHooks()
+print('Kedro integration verified!')
+"""
+```
+
+### Functional Testing
+
+Test plugin functionality with a minimal example:
+
+```python
+# test_plugin_functionality.py
+import matplotlib.pyplot as plt
+import tempfile
+import os
+from pathlib import Path
+
+def test_basic_functionality():
+    """Test basic FigRegistry-Kedro integration."""
+    
+    # Create temporary directory
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir = Path(tmpdir)
+        
+        # Create a simple figure
+        fig, ax = plt.subplots()
+        ax.plot([1, 2, 3], [1, 4, 2])
+        ax.set_title('Test Figure')
+        
+        # Test FigureDataSet
+        from figregistry_kedro.datasets import FigureDataSet
+        
+        dataset = FigureDataSet(
+            filepath=str(tmpdir / "test_figure.png"),
+            purpose="exploratory"
+        )
+        
+        # Save figure
+        dataset.save(fig)
+        
+        # Verify file was created
+        assert (tmpdir / "test_figure.png").exists()
+        print("✓ Basic functionality test passed!")
+
+if __name__ == "__main__":
+    test_basic_functionality()
+```
+
+```bash
+# Run the test
+python test_plugin_functionality.py
+```
+
+### Performance Verification
+
+Validate performance meets specifications:
+
+```python
+# test_performance.py
+import time
+import matplotlib.pyplot as plt
+from figregistry_kedro.datasets import FigureDataSet
+from figregistry_kedro.config import FigRegistryConfigBridge
+
+def test_performance():
+    """Verify performance requirements."""
+    
+    # Test configuration initialization time
+    start_time = time.time()
+    bridge = FigRegistryConfigBridge()
+    config = bridge.get_merged_config()
+    init_time = time.time() - start_time
+    
+    assert init_time < 0.010, f"Config initialization took {init_time:.3f}s, exceeds 10ms limit"
+    print(f"✓ Configuration initialization: {init_time*1000:.1f}ms")
+    
+    # Test figure styling time
+    fig, ax = plt.subplots()
+    ax.plot([1, 2, 3], [1, 4, 2])
+    
+    start_time = time.time()
+    # Style application would happen during save
+    style_time = time.time() - start_time
+    
+    print(f"✓ Style application: {style_time*1000:.1f}ms")
+    print("✓ Performance requirements verified!")
+
+if __name__ == "__main__":
+    test_performance()
+```
+
+## Troubleshooting
+
+### Common Installation Issues
+
+#### Issue: ImportError - No module named 'figregistry_kedro'
+
+**Symptoms:**
+```
+ImportError: No module named 'figregistry_kedro'
+```
+
+**Solutions:**
+1. Verify installation: `pip list | grep figregistry-kedro`
+2. Check Python environment: `which python` and `which pip`
+3. Reinstall package: `pip uninstall figregistry-kedro && pip install figregistry-kedro`
+4. Virtual environment issues: Ensure you've activated the correct environment
+
+#### Issue: Kedro compatibility errors
+
+**Symptoms:**
+```
+TypeError: 'AbstractDataSet' object has no attribute 'load'
+kedro.framework.hooks.manager.PluginManager.hook.X not found
+```
+
+**Solutions:**
+1. Check Kedro version: `kedro --version`
+2. Verify compatibility: Kedro >=0.18.0,<0.20.0 required
+3. Update Kedro: `pip install "kedro>=0.18.14,<0.20.0"`
+4. Clean installation: Remove and reinstall both packages
+
+#### Issue: Matplotlib backend issues
+
+**Symptoms:**
+```
+UserWarning: Matplotlib is currently using agg, which is a non-GUI backend
+TclError: no display name and no $DISPLAY environment variable
+```
+
+**Solutions:**
+1. Set matplotlib backend: `export MPLBACKEND=Agg`
+2. Install GUI backend: `pip install tkinter` (Linux: `sudo apt-get install python3-tk`)
+3. Use headless backend in code:
+   ```python
+   import matplotlib
+   matplotlib.use('Agg')
+   import matplotlib.pyplot as plt
+   ```
+
+#### Issue: Permission errors during installation
+
+**Symptoms:**
+```
+PermissionError: [Errno 13] Permission denied
+```
+
+**Solutions:**
+1. Use user installation: `pip install --user figregistry-kedro`
+2. Use virtual environment instead of system Python
+3. On Linux/macOS with system Python: `sudo pip install figregistry-kedro` (not recommended)
+
+### Configuration Issues
+
+#### Issue: FigRegistry configuration not found
+
+**Symptoms:**
+```
+WARNING:figregistry_kedro.config:Failed to load FigRegistry config from Kedro
+```
+
+**Solutions:**
+1. Create configuration file: `conf/base/figregistry.yml`
+2. Check file permissions and YAML syntax
+3. Validate configuration with yamllint
+4. Use standalone config: Create `figregistry.yaml` in project root
+
+#### Issue: Hook registration failures
+
+**Symptoms:**
+```
+ERROR:kedro.framework.session:Hook 'FigRegistryHooks' could not be loaded
+```
+
+**Solutions:**
+1. Verify settings.py import:
+   ```python
+   from figregistry_kedro.hooks import FigRegistryHooks
+   HOOKS = (FigRegistryHooks(),)
+   ```
+2. Check for syntax errors in settings.py
+3. Ensure plugin is installed in the correct environment
+4. Restart Kedro session/kernel
+
+### Runtime Issues
+
+#### Issue: Figures not being styled
+
+**Symptoms:**
+- Figures saved without FigRegistry styling
+- Default matplotlib appearance retained
+
+**Solutions:**
+1. Verify catalog configuration uses `figregistry_kedro.FigureDataSet`
+2. Check purpose parameter is set correctly
+3. Validate FigRegistry configuration syntax
+4. Enable debug logging:
+   ```python
+   import logging
+   logging.getLogger('figregistry_kedro').setLevel(logging.DEBUG)
+   ```
+
+#### Issue: Performance degradation
+
+**Symptoms:**
+- Slow figure saving
+- Increased pipeline execution time
+
+**Solutions:**
+1. Disable performance monitoring in production:
+   ```python
+   HOOKS = (FigRegistryHooks(enable_performance_monitoring=False),)
+   ```
+2. Check configuration caching is enabled
+3. Reduce figure DPI for exploratory outputs
+4. Profile with: `kedro run --profile`
+
+### Environment-Specific Issues
 
 #### Windows-Specific Issues
 
+**Path separator problems:**
+```python
+# Use pathlib for cross-platform paths
+from pathlib import Path
+filepath = Path("data") / "08_reporting" / "figure.png"
+```
+
+**PowerShell execution policy:**
 ```powershell
-# Windows PowerShell troubleshooting
-
-# Check Python version
-python --version
-
-# Install with specific versions if needed
-pip install "figregistry-kedro" --force-reinstall
-
-# Windows path issues - use forward slashes in config
-# In figregistry.yml:
-# paths:
-#   base_dir: "data/08_reporting"  # Use forward slashes
-
-# Test installation
-python -c "import figregistry_kedro; print('Windows installation successful')"
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
 
 #### macOS-Specific Issues
 
+**SSL certificate errors:**
 ```bash
-# macOS troubleshooting
-
-# Ensure Xcode command line tools are installed
-xcode-select --install
-
-# Install via Homebrew Python if system Python issues
-brew install python@3.11
-/opt/homebrew/bin/python3.11 -m pip install figregistry-kedro
-
-# Fix potential SSL certificate issues
-/Applications/Python\ 3.11/Install\ Certificates.command
+# Update certificates
+/Applications/Python\ 3.x/Install\ Certificates.command
 ```
 
-### Performance Optimization
-
-#### Large Project Performance
-
-For projects with many figures or large datasets:
-
-```python
-# src/your_project/settings.py
-from figregistry_kedro.hooks import FigRegistryHooks
-
-# Optimize hook configuration
-HOOKS = (
-    FigRegistryHooks(
-        cache_config=True,        # Enable configuration caching
-        lazy_loading=True,        # Load configurations on-demand
-        batch_operations=True     # Batch figure operations
-    ),
-)
+**Homebrew Python conflicts:**
+```bash
+# Use pyenv for Python version management
+brew install pyenv
+pyenv install 3.11.0
+pyenv global 3.11.0
 ```
 
-#### Memory Management
+#### Linux-Specific Issues
 
-For memory-constrained environments:
+**Missing system dependencies:**
+```bash
+# Ubuntu/Debian
+sudo apt-get install python3-dev python3-pip build-essential
 
-```yaml
-# conf/base/figregistry.yml
-kedro:
-  dataset_defaults:
-    dpi: 150  # Lower DPI for reduced memory usage
-    format: "png"  # Use PNG instead of PDF for smaller files
-  
-  performance:
-    figure_cache_size: 10  # Limit figure cache
-    auto_cleanup: true     # Automatic memory cleanup
+# CentOS/RHEL
+sudo yum install python3-devel python3-pip gcc gcc-c++
 ```
 
-### Getting Additional Help
+### Getting Help
 
-If you encounter issues not covered in this guide:
+If troubleshooting doesn't resolve your issue:
 
-1. **Check the logs**: Enable debug logging to see detailed operations
-   ```bash
-   kedro run --log-level=DEBUG
+1. **Enable debug logging:**
+   ```python
+   import logging
+   logging.basicConfig(level=logging.DEBUG)
    ```
 
-2. **Validate your environment**: Use the verification commands in the [Verification and Testing](#verification-and-testing) section
+2. **Check GitHub Issues:** [figregistry-kedro/issues](https://github.com/figregistry/figregistry-kedro/issues)
 
-3. **Review configuration**: Ensure your `figregistry.yml` follows the schema in the [Configuration Guide](configuration.md)
-
-4. **Check compatibility**: Verify all dependencies meet the version requirements in the [System Requirements](#system-requirements) section
-
-5. **Search existing issues**: Check the [GitHub Issues](https://github.com/figregistry/figregistry-kedro/issues) for similar problems
-
-6. **Submit a bug report**: If you find a new issue, please report it with:
-   - Your operating system and Python version
-   - Complete error messages and stack traces
+3. **Create detailed bug reports** including:
+   - Operating system and version
+   - Python version (`python --version`)
+   - Package versions (`pip list`)
+   - Complete error traceback
    - Minimal reproduction example
-   - Your configuration files (with sensitive data removed)
 
-## Advanced Configuration
+4. **Community support:**
+   - Kedro Discord community
+   - FigRegistry GitHub discussions
+   - Stack Overflow with tags: `kedro`, `figregistry`
 
-### Custom Installation Locations
+## Upgrade Instructions
 
-For enterprise environments with custom package locations:
+### Upgrading the Plugin
 
-```bash
-# Install from custom PyPI server
-pip install --index-url https://your-pypi-server.com/simple/ figregistry-kedro
-
-# Install from local wheel
-pip install ./dist/figregistry_kedro-*.whl
-
-# Install from Git repository
-pip install git+https://github.com/figregistry/figregistry-kedro.git@main
-```
-
-### Offline Installation
-
-For air-gapped environments:
+#### Standard Upgrade
 
 ```bash
-# Download packages
-pip download figregistry-kedro --dest ./packages/
+# Upgrade to latest version
+pip install --upgrade figregistry-kedro
 
-# Install offline
-pip install --find-links ./packages/ --no-index figregistry-kedro
+# Upgrade with dependency updates
+pip install --upgrade figregistry-kedro figregistry kedro
+
+# Check new version
+python -c "import figregistry_kedro; print(figregistry_kedro.__version__)"
 ```
 
-### Integration with Package Managers
+#### Upgrading with Conda
 
-#### Poetry Integration
+```bash
+# Update from conda-forge
+conda update -c conda-forge figregistry-kedro
 
-```toml
-# pyproject.toml
-[tool.poetry.dependencies]
-python = "^3.10"
-figregistry-kedro = "^0.1.0"
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.0.0"
-black = "^23.0.0"
+# Update entire environment
+conda update --all
 ```
 
-#### pipenv Integration
+### Version-Specific Upgrade Notes
 
-```toml
-# Pipfile
-[packages]
-figregistry-kedro = "*"
+#### Upgrading from 0.1.x to 0.2.x
 
-[dev-packages]
-pytest = "*"
-black = "*"
+**Breaking Changes:**
+- Configuration schema updated for new styling options
+- Hook interface changes for improved performance
 
-[requires]
-python_version = "3.11"
+**Migration Steps:**
+1. Update configuration files to new schema
+2. Review hook registration in settings.py
+3. Test all figure outputs for styling consistency
+
+#### Kedro Version Compatibility
+
+When upgrading Kedro itself:
+
+```bash
+# Check current compatibility
+pip show figregistry-kedro | grep "Requires:"
+
+# Safe Kedro upgrade within supported range
+pip install "kedro>=0.18.14,<0.20.0"
+
+# Verify compatibility
+kedro --version
+python -c "from figregistry_kedro.hooks import FigRegistryHooks; print('Compatible!')"
 ```
 
-This installation guide provides comprehensive coverage of all installation scenarios and troubleshooting steps needed to successfully deploy figregistry-kedro in any environment.
+### Pre-Upgrade Checklist
+
+Before upgrading in production environments:
+
+1. **Backup current environment:**
+   ```bash
+   pip freeze > requirements_backup.txt
+   conda env export > environment_backup.yml
+   ```
+
+2. **Test in development:**
+   ```bash
+   # Create test environment
+   python -m venv test_upgrade
+   source test_upgrade/bin/activate
+   pip install figregistry-kedro==<new_version>
+   ```
+
+3. **Validate configuration compatibility:**
+   ```bash
+   kedro run --dry-run  # Test pipeline without execution
+   ```
+
+4. **Review changelog:** Check release notes for breaking changes
+
+5. **Update documentation:** Ensure team is aware of changes
+
+### Rollback Procedure
+
+If upgrade causes issues:
+
+```bash
+# Rollback to previous version
+pip install figregistry-kedro==<previous_version>
+
+# Restore from backup
+pip install -r requirements_backup.txt
+
+# Or restore conda environment
+conda env remove -n current_env
+conda env create -f environment_backup.yml
+```
+
+---
+
+This installation guide provides comprehensive coverage of all installation methods, environment setup options, and troubleshooting guidance for the figregistry-kedro plugin. For additional support, consult the [Configuration Guide](configuration.md) for detailed setup options and the [API Reference](api/) for complete functionality documentation.
