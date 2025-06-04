@@ -1,158 +1,178 @@
-# Basic Valid FigRegistry Configuration for Testing
-# This configuration provides minimal required fields for successful plugin testing
-# and serves as a positive test case for configuration parsing validation.
+# Basic Valid FigRegistry Configuration for Plugin Testing
+# This configuration provides minimal required fields for successful validation
+# and testing of the figregistry-kedro plugin functionality per Section 5.2.5
 
-figregistry_version: "0.3.0"
+# Configuration metadata for tracking and validation
+metadata:
+  config_version: "1.0.0"
+  created_by: "figregistry-kedro test suite"
+  description: "Basic valid configuration for plugin functionality testing"
+  last_updated: "2024-01-15T10:30:00Z"
+  project_name: "figregistry-kedro-basic-test"
 
 # Standard styling conditions for condition-based testing per F-002
 styles:
-  # Basic experimental conditions
-  control:
-    color: "#1f77b4"
+  # Exploratory analysis style
+  exploratory:
+    color: "#A8E6CF"
     marker: "o"
     linestyle: "-"
-    linewidth: 2.0
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Exploratory Analysis"
     markersize: 6
-    alpha: 0.8
-    label: "Control"
-    
-  treatment:
-    color: "#ff7f0e"
+
+  # Presentation-ready style
+  presentation:
+    color: "#FFB6C1"
     marker: "s"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.8
+    label: "Presentation Ready"
+    markersize: 8
+
+  # Publication-quality style
+  publication:
+    color: "#1A1A1A"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 1.0
+    label: "Publication Quality"
+    markersize: 10
+
+  # Additional test conditions for condition mapping
+  baseline:
+    color: "#2E86AB"
+    marker: "o"
     linestyle: "--"
     linewidth: 2.0
-    markersize: 6
-    alpha: 0.8
-    label: "Treatment"
-    
-  # Standard purpose-based conditions
-  exploratory:
-    color: "#2ca02c"
-    marker: "^"
-    linestyle: ":"
-    linewidth: 1.5
-    markersize: 5
-    alpha: 0.7
-    label: "Exploratory"
-    
-  presentation:
-    color: "#d62728"
-    marker: "v"
-    linestyle: "-."
-    linewidth: 2.5
-    markersize: 7
     alpha: 0.9
-    label: "Presentation"
-    
-  publication:
-    color: "#9467bd"
+    label: "Baseline Condition"
+
+  treatment:
+    color: "#F24236"
     marker: "D"
     linestyle: "-"
-    linewidth: 3.0
-    markersize: 8
-    alpha: 1.0
-    label: "Publication"
-    
-  # Wildcard pattern for testing pattern matching
-  "test_*":
-    color: "#8c564b"
-    marker: "x"
-    linestyle: ":"
-    linewidth: 1.0
-    markersize: 4
-    alpha: 0.6
-    label: "Test Pattern"
+    linewidth: 2.0
+    alpha: 0.9
+    label: "Treatment Condition"
 
-# Basic color palettes for testing
+# Color palettes for fallback styling
 palettes:
-  default:
-    - "#1f77b4"
-    - "#ff7f0e"
-    - "#2ca02c"
-    - "#d62728"
-    - "#9467bd"
-    
-  colorblind_safe:
-    - "#0173b2"
-    - "#de8f05"
-    - "#029e73"
-    - "#cc78bc"
-    - "#ca9161"
-    
+  default: ["#2E86AB", "#A23B72", "#F18F01", "#C73E1D"]
+  colorblind_safe: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
   publication:
-    - "#000000"
-    - "#404040"
-    - "#808080"
-    - "#b0b0b0"
-    - "#d0d0d0"
+    primary: "#000000"
+    secondary: "#666666"
+    accent: "#2E86AB"
+    highlight: "#F24236"
 
-# Basic output configuration with standard paths and file naming patterns
-outputs:
-  base_path: "test_figures"
-  path_aliases:
-    expl: "exploratory"
-    pres: "presentation"
-    pub: "publication"
-    temp: "temporary"
-  timestamp_format: "{name}_{ts}"
-  slug_format: "{purpose}_{name}"
-  default_format: "png"
-  formats:
-    - "png"
-    - "pdf"
-    - "svg"
-  dpi: 300
-  bbox_inches: "tight"
-  pad_inches: 0.1
-  facecolor: "white"
-  edgecolor: "none"
-  transparent: false
-
-# Default styling parameters and matplotlib rcParams settings
+# Default styling parameters and fallback configurations
 defaults:
-  figure_size: [10, 6]
-  font_family: "sans-serif"
-  font_size: 12
-  title_size: 14
-  label_size: 11
-  tick_size: 10
-  legend_size: 10
-  line_width: 1.5
-  marker_size: 6
-  color_cycle: "default"
-  grid: true
-  grid_alpha: 0.3
-  spine_visibility:
-    top: false
-    right: false
-    bottom: true
-    left: true
-  spine_linewidth: 1.0
-  tick_direction: "out"
-  legend_frameon: true
-  legend_fancybox: false
-  legend_shadow: false
+  figure:
+    figsize: [10, 8]
+    dpi: 150
+    facecolor: "white"
+    edgecolor: "none"
+  
+  line:
+    color: "#2E86AB"
+    linewidth: 2.0
+    alpha: 0.8
+  
+  scatter:
+    s: 50
+    alpha: 0.7
+    edgecolors: "black"
+    linewidth: 0.5
+  
+  # Fallback style for unknown conditions
+  fallback_style:
+    color: "#95A5A6"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Unknown Condition"
 
-# Minimal cache and performance settings for baseline testing
-cache:
+# Output configuration with standard paths and file naming patterns
+outputs:
+  base_path: "data/08_reporting"
+  naming:
+    template: "{name}_{condition}_{ts}"
+    timestamp_format: "%Y%m%d_%H%M%S"
+  
+  formats:
+    defaults:
+      exploratory: ["png"]
+      presentation: ["png", "pdf"]
+      publication: ["pdf", "svg"]
+    resolution:
+      png:
+        dpi: 300
+      pdf:
+        dpi: 300
+      svg:
+        dpi: 300
+  
+  paths:
+    exploratory: "exploratory"
+    presentation: "presentation" 
+    publication: "publication"
+
+# Style inheritance and composition rules
+style_inheritance:
   enabled: true
-  max_size: 100
-  ttl_seconds: 3600
+  hierarchy: ["specific", "category", "defaults"]
+  merge_strategy: "deep"
 
+# Conditional styling rules for complex scenarios
+conditional_rules:
+  wildcard_patterns: ["*_control", "*_treatment"]
+  partial_matching: true
+  case_sensitive: false
+
+# Performance monitoring and optimization settings for baseline testing
 performance:
-  style_resolution_timeout_ms: 1000
-  concurrent_access: true
-  validation_enabled: true
+  cache_enabled: true
+  max_cache_size: 1000
+  target_merge_time_ms: 10.0
 
-# Project metadata for testing
-metadata:
-  project_name: "figregistry-kedro-basic-test"
-  description: "Basic valid FigRegistry configuration for plugin testing"
-  version: "1.0.0"
-  created: "2024-01-01T00:00:00Z"
-  environment: "test"
-  tags:
-    - "basic"
-    - "testing"
-    - "kedro"
-    - "figregistry"
+# Configuration validation schema and rules
+validation:
+  strict_mode: true
+  required_fields: ["styles", "defaults", "outputs"]
+  schema_version: "1.0"
+
+# Kedro-specific integration settings for plugin testing
+kedro:
+  config_bridge:
+    enabled: true
+    merge_strategy: "override"
+  datasets:
+    default_purpose: "exploratory"
+  
+# Basic rcParams settings for matplotlib styling validation
+rcParams:
+  figure.facecolor: "white"
+  figure.edgecolor: "none"
+  axes.grid: true
+  axes.grid.alpha: 0.3
+  font.size: 12
+  font.family: "sans-serif"
+  lines.linewidth: 2.0
+  lines.markersize: 6
+
+# Simple condition mappings for testing get_style() integration
+condition_mappings:
+  test_condition: "exploratory"
+  dev_condition: "exploratory"
+  staging_condition: "presentation"
+  prod_condition: "publication"
+  experiment_a: "baseline"
+  experiment_b: "treatment"
+
+# Version constraint for compatibility validation
+figregistry_version: ">=0.3.0"
