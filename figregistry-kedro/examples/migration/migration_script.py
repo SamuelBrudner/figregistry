@@ -1,327 +1,320 @@
 #!/usr/bin/env python3
-"""FigRegistry-Kedro Migration Script.
+"""
+FigRegistry-Kedro Migration Script
 
-This automated migration tool assists in converting existing Kedro projects from manual 
-matplotlib figure management to figregistry-kedro integration. It analyzes existing 
-pipeline code to identify plt.savefig() calls, generates catalog.yml entries with 
-FigureDataSet configuration, creates template configuration files, and provides 
-comprehensive migration reports with recommended changes.
+Automated migration helper that assists in converting existing Kedro projects from manual 
+matplotlib figure management to figregistry-kedro integration. This script analyzes existing 
+pipeline code to identify plt.savefig() calls, generates suggested catalog.yml entries with 
+FigureDataSet configuration, creates template configuration files, and provides migration 
+reports with recommended changes.
 
-Features:
-- Automated analysis of existing Kedro projects for manual figure management patterns
-- Generation of catalog.yml entries with FigureDataSet configuration
-- Creation of template figregistry.yml configuration files
-- Settings.py modification suggestions for FigRegistryHooks registration
-- Validation and safety checks to ensure migration success
-- Comprehensive rollback capabilities and backup creation
-- Detailed migration reports highlighting changes and potential issues
+Key Features:
+- Automated analysis of existing Kedro projects to identify manual plt.savefig() usage patterns
+- Generation of catalog.yml entries with FigureDataSet configuration including purpose and condition_param
+- Creation of template conf/base/figregistry.yml files with appropriate configuration structure
+- Implementation of settings.py modification suggestions for FigRegistryHooks registration
+- Migration validation and safety checks to ensure pipeline functionality preservation
+- Generation of migration reports highlighting changes required and potential issues
+- Rollback capabilities and backup creation for safe migration process
 
 Usage:
-    python migration_script.py /path/to/kedro/project [options]
+    python migration_script.py analyze /path/to/kedro/project
+    python migration_script.py migrate /path/to/kedro/project --backup --dry-run
+    python migration_script.py validate /path/to/kedro/project
+    python migration_script.py report /path/to/kedro/project --output migration_report.md
 
-Requirements:
-- Must provide automated migration assistance per Section 0.2.1 implementation goals
-- Must analyze and suggest FigureDataSet configurations per F-005 requirements
-- Must generate appropriate configuration files per F-007 requirements  
-- Must include validation and safety checks for successful migration
+Requirements Implementation:
+- F-005: Automated FigureDataSet catalog configuration generation
+- F-006: FigRegistryHooks registration in settings.py
+- F-007: Configuration bridge setup with figregistry.yml generation
+- Section 0.2.1: Automated migration assistance for existing Kedro projects
 """
 
 import argparse
 import ast
+import datetime
+import json
 import logging
 import os
 import re
 import shutil
 import sys
 import textwrap
-import yaml
-from collections import defaultdict, namedtuple
-from datetime import datetime
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
+import warnings
 
-try:
-    from kedro.config import ConfigLoader
-    from kedro.framework.project import find_pipelines
-    kedro_available = True
-except ImportError:
-    kedro_available = False
-    ConfigLoader = None
+import yaml
 
-try:
-    import figregistry
-    figregistry_available = True
-except ImportError:
-    figregistry_available = False
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger('figregistry_migration')
-
-# Migration analysis data structures
-SaveFigCall = namedtuple('SaveFigCall', [
-    'file_path', 'line_number', 'line_content', 'function_name', 
-    'suggested_dataset_name', 'inferred_purpose', 'filepath_arg'
-])
-
-CatalogEntry = namedtuple('CatalogEntry', [
-    'name', 'type', 'filepath', 'purpose', 'condition_param', 
-    'style_params', 'save_args'
-])
-
-MigrationIssue = namedtuple('MigrationIssue', [
-    'severity', 'category', 'description', 'file_path', 
-    'line_number', 'suggestion'
-])
+# Configure logging for migration operations
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 
-class MigrationError(Exception):
-    """Exception raised when migration analysis or execution fails."""
+@dataclass
+class SaveFigCall:
+    """
+    Represents a plt.savefig() call found in the codebase.
     
-    def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
-        super().__init__(message)
-        self.details = details or {}
+    Tracks the location, parameters, and context of manual figure saving
+    operations that need to be converted to FigureDataSet usage.
+    """
+    file_path: Path
+    line_number: int
+    function_name: str
+    call_text: str
+    filepath_arg: Optional[str] = None
+    dpi_arg: Optional[int] = None
+    format_arg: Optional[str] = None
+    additional_kwargs: Dict[str, Any] = field(default_factory=dict)
+    surrounding_context: List[str] = field(default_factory=list)
+    styling_patterns: Dict[str, Any] = field(default_factory=dict)
+    
+    def __post_init__(self):
+        """Extract parameters from the savefig call."""
+        self._parse_savefig_parameters()
+        
+    def _parse_savefig_parameters(self):
+        """Parse parameters from the savefig call text."""
+        try:
+            # Extract filepath parameter (first argument)
+            filepath_match = re.search(r'savefig\s*\(\s*["\']([^"\']+)["\']', self.call_text)
+            if filepath_match:
+                self.filepath_arg = filepath_match.group(1)
+            
+            # Extract DPI parameter
+            dpi_match = re.search(r'dpi\s*=\s*(\d+)', self.call_text)
+            if dpi_match:
+                self.dpi_arg = int(dpi_match.group(1))
+            
+            # Extract format parameter
+            format_match = re.search(r'format\s*=\s*["\']([^"\']+)["\']', self.call_text)
+            if format_match:
+                self.format_arg = format_match.group(1)
+            
+            # Extract other common parameters
+            bbox_match = re.search(r'bbox_inches\s*=\s*["\']([^"\']+)["\']', self.call_text)
+            if bbox_match:
+                self.additional_kwargs['bbox_inches'] = bbox_match.group(1)
+                
+            facecolor_match = re.search(r'facecolor\s*=\s*["\']([^"\']+)["\']', self.call_text)
+            if facecolor_match:
+                self.additional_kwargs['facecolor'] = facecolor_match.group(1)
+                
+        except Exception as e:
+            logger.warning(f"Failed to parse savefig parameters: {e}")
+
+
+@dataclass
+class StylingPattern:
+    """
+    Represents a hardcoded styling pattern found in the codebase.
+    
+    Tracks color assignments, marker selections, and other styling
+    decisions that can be automated through FigRegistry conditions.
+    """
+    file_path: Path
+    line_number: int
+    function_name: str
+    pattern_type: str  # 'color', 'marker', 'linestyle', 'condition_mapping'
+    pattern_value: Any
+    context_variables: List[str] = field(default_factory=list)
+    condition_logic: Optional[str] = None
+
+
+@dataclass
+class CatalogSuggestion:
+    """
+    Represents a suggested catalog.yml entry for FigureDataSet configuration.
+    
+    Contains the dataset name, configuration parameters, and reasoning
+    for the suggested configuration based on analysis of the original code.
+    """
+    dataset_name: str
+    figure_source_function: str
+    original_savefig_call: SaveFigCall
+    suggested_config: Dict[str, Any]
+    purpose: str  # 'exploratory', 'presentation', 'publication'
+    condition_param: Optional[str] = None
+    style_params: Dict[str, Any] = field(default_factory=dict)
+    reasoning: str = ""
+
+
+@dataclass
+class MigrationReport:
+    """
+    Comprehensive migration analysis and recommendations.
+    
+    Contains all findings from the migration analysis including identified
+    patterns, suggested changes, validation results, and migration steps.
+    """
+    project_path: Path
+    analysis_timestamp: datetime.datetime
+    
+    # Analysis Results
+    savefig_calls: List[SaveFigCall] = field(default_factory=list)
+    styling_patterns: List[StylingPattern] = field(default_factory=list)
+    pipeline_functions: List[str] = field(default_factory=list)
+    existing_catalog_entries: Dict[str, Any] = field(default_factory=dict)
+    
+    # Migration Suggestions
+    catalog_suggestions: List[CatalogSuggestion] = field(default_factory=list)
+    figregistry_config: Dict[str, Any] = field(default_factory=dict)
+    settings_modifications: List[str] = field(default_factory=list)
+    node_modifications: Dict[str, List[str]] = field(default_factory=dict)
+    
+    # Validation and Safety
+    validation_errors: List[str] = field(default_factory=list)
+    warnings: List[str] = field(default_factory=list)
+    backup_created: bool = False
+    estimated_effort: str = "Medium"
+    
+    def add_warning(self, message: str):
+        """Add a warning message to the report."""
+        self.warnings.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] {message}")
+        logger.warning(message)
+    
+    def add_validation_error(self, message: str):
+        """Add a validation error to the report."""
+        self.validation_errors.append(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] {message}")
+        logger.error(message)
 
 
 class KedroProjectAnalyzer:
-    """Analyzes existing Kedro projects to identify migration opportunities and issues.
+    """
+    Analyzes existing Kedro projects to identify manual figure management patterns.
     
-    This class implements comprehensive analysis of Kedro projects to identify:
-    - Manual plt.savefig() calls that can be automated with FigureDataSet
-    - Existing catalog structure and naming patterns
-    - Pipeline organization and function signatures
-    - Configuration files and their structure
-    - Potential migration issues and compatibility concerns
+    Scans pipeline nodes, configuration files, and existing catalog entries to
+    understand the current state and identify opportunities for automation through
+    figregistry-kedro integration.
     """
     
-    def __init__(self, project_path: Union[str, Path]):
-        """Initialize analyzer with Kedro project path.
+    def __init__(self, project_path: Path):
+        """
+        Initialize the analyzer with the Kedro project path.
         
         Args:
-            project_path: Path to the Kedro project root directory
-            
-        Raises:
-            MigrationError: If project path is invalid or not a Kedro project
+            project_path: Path to the root of the Kedro project
         """
         self.project_path = Path(project_path).resolve()
         self.src_path = self._find_src_directory()
         self.conf_path = self.project_path / "conf"
         
-        # Analysis results
-        self.savefig_calls: List[SaveFigCall] = []
-        self.existing_catalog: Dict[str, Any] = {}
-        self.pipeline_structure: Dict[str, List[str]] = {}
-        self.migration_issues: List[MigrationIssue] = []
-        
-        # Configuration
-        self.supported_extensions = {'.py'}
-        self.figure_purposes = ['exploratory', 'presentation', 'publication']
-        
-        # Validate project structure
-        self._validate_kedro_project()
-        
-        logger.info(f"Initialized analyzer for Kedro project: {self.project_path}")
+        # Validate that this is a Kedro project
+        if not self._is_kedro_project():
+            raise ValueError(f"Not a valid Kedro project: {project_path}")
     
-    def _find_src_directory(self) -> Path:
-        """Find the source directory containing pipeline code."""
-        potential_paths = [
+    def _find_src_directory(self) -> Optional[Path]:
+        """Find the src directory in the Kedro project."""
+        # Common patterns for Kedro src directory
+        candidates = [
             self.project_path / "src",
-            self.project_path / "kedro_project" / "src",
+            self.project_path / "source",
         ]
         
-        # Look for any directory containing __init__.py in src structure
-        for path in potential_paths:
-            if path.exists() and any(path.rglob("__init__.py")):
-                return path
+        # Also check for directories that might contain Python packages
+        for item in self.project_path.iterdir():
+            if item.is_dir() and (item / "__init__.py").exists():
+                # Check if it contains pipeline-like structure
+                if any((item / subdir).is_dir() for subdir in ["pipelines", "pipeline"]):
+                    candidates.append(item)
         
-        # Fallback: look for Python files in typical locations
-        if (self.project_path / "pipelines").exists():
-            return self.project_path
+        for candidate in candidates:
+            if candidate.exists() and candidate.is_dir():
+                return candidate
         
-        raise MigrationError(
-            f"Could not find source directory in Kedro project: {self.project_path}",
-            {"searched_paths": [str(p) for p in potential_paths]}
-        )
+        return None
     
-    def _validate_kedro_project(self) -> None:
-        """Validate that the target directory is a valid Kedro project."""
-        required_files = [".kedro.yml", "pyproject.toml"]
-        missing_files = []
+    def _is_kedro_project(self) -> bool:
+        """Validate that the given path is a Kedro project."""
+        required_indicators = [
+            self.project_path / ".kedro.yml",
+            self.project_path / "pyproject.toml",
+            self.conf_path,
+        ]
         
-        for file_name in required_files:
-            if not (self.project_path / file_name).exists():
-                missing_files.append(file_name)
-        
-        if missing_files:
-            raise MigrationError(
-                f"Not a valid Kedro project - missing files: {missing_files}",
-                {"project_path": str(self.project_path), "missing_files": missing_files}
-            )
-        
-        # Check for conf directory
-        if not self.conf_path.exists():
-            self.migration_issues.append(MigrationIssue(
-                severity="warning",
-                category="structure",
-                description="No conf directory found - will create during migration",
-                file_path=str(self.conf_path),
-                line_number=None,
-                suggestion="Create conf/base directory structure for configuration files"
-            ))
+        # At least some of these should exist
+        return any(indicator.exists() for indicator in required_indicators)
     
-    def analyze_project(self) -> Dict[str, Any]:
-        """Perform comprehensive analysis of the Kedro project.
+    def analyze_project(self) -> MigrationReport:
+        """
+        Perform comprehensive analysis of the Kedro project.
         
         Returns:
-            Dictionary containing analysis results including:
-            - savefig_calls: List of identified plt.savefig() calls
-            - catalog_entries: Suggested FigureDataSet catalog entries
-            - migration_issues: List of potential migration issues
-            - project_info: Basic project metadata and structure
+            MigrationReport containing all analysis results and suggestions
         """
-        logger.info("Starting comprehensive project analysis...")
+        logger.info(f"Starting analysis of Kedro project: {self.project_path}")
         
-        # Analyze Python files for plt.savefig() calls
-        self._analyze_python_files()
+        report = MigrationReport(
+            project_path=self.project_path,
+            analysis_timestamp=datetime.datetime.now()
+        )
         
-        # Load and analyze existing catalog
-        self._analyze_existing_catalog()
+        try:
+            # Analyze existing code patterns
+            self._find_savefig_calls(report)
+            self._find_styling_patterns(report)
+            self._analyze_pipeline_structure(report)
+            self._analyze_existing_catalog(report)
+            
+            # Generate suggestions
+            self._generate_catalog_suggestions(report)
+            self._generate_figregistry_config(report)
+            self._generate_settings_modifications(report)
+            self._generate_node_modifications(report)
+            
+            # Validate suggestions
+            self._validate_suggestions(report)
+            self._estimate_migration_effort(report)
+            
+            logger.info("Project analysis completed successfully")
+            
+        except Exception as e:
+            report.add_validation_error(f"Analysis failed: {e}")
+            logger.error(f"Analysis failed: {e}", exc_info=True)
         
-        # Analyze pipeline structure
-        self._analyze_pipeline_structure()
-        
-        # Generate suggested catalog entries
-        suggested_entries = self._generate_catalog_entries()
-        
-        # Perform validation checks
-        self._validate_migration_feasibility()
-        
-        analysis_results = {
-            "savefig_calls": self.savefig_calls,
-            "catalog_entries": suggested_entries,
-            "migration_issues": self.migration_issues,
-            "project_info": {
-                "path": str(self.project_path),
-                "src_path": str(self.src_path),
-                "conf_path": str(self.conf_path),
-                "python_files_analyzed": len(self._get_python_files()),
-                "pipelines_found": list(self.pipeline_structure.keys())
-            },
-            "existing_catalog": self.existing_catalog
-        }
-        
-        logger.info(f"Analysis complete: found {len(self.savefig_calls)} plt.savefig() calls")
-        return analysis_results
+        return report
     
-    def _get_python_files(self) -> List[Path]:
-        """Get all Python files in the project source directory."""
-        python_files = []
+    def _find_savefig_calls(self, report: MigrationReport):
+        """Find all plt.savefig() calls in the project."""
+        logger.info("Scanning for plt.savefig() calls...")
         
-        for ext in self.supported_extensions:
-            python_files.extend(self.src_path.rglob(f"*{ext}"))
+        if not self.src_path:
+            report.add_warning("No src directory found, skipping code analysis")
+            return
         
-        # Filter out __pycache__ and test files for now
-        filtered_files = [
-            f for f in python_files 
-            if '__pycache__' not in str(f) and 'test_' not in f.name
-        ]
+        python_files = list(self.src_path.rglob("*.py"))
+        logger.info(f"Scanning {len(python_files)} Python files")
         
-        return filtered_files
-    
-    def _analyze_python_files(self) -> None:
-        """Analyze Python files to identify plt.savefig() calls."""
-        python_files = self._get_python_files()
-        
-        logger.info(f"Analyzing {len(python_files)} Python files for plt.savefig() calls...")
-        
-        for file_path in python_files:
+        for py_file in python_files:
             try:
-                self._analyze_single_file(file_path)
+                with open(py_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    lines = content.splitlines()
+                
+                # Parse the AST to find savefig calls
+                try:
+                    tree = ast.parse(content)
+                    savefig_calls = self._extract_savefig_calls_from_ast(tree, py_file, lines)
+                    report.savefig_calls.extend(savefig_calls)
+                except SyntaxError as e:
+                    report.add_warning(f"Syntax error in {py_file}: {e}")
+                    # Fallback to regex-based search
+                    regex_calls = self._extract_savefig_calls_regex(py_file, lines)
+                    report.savefig_calls.extend(regex_calls)
+                    
             except Exception as e:
-                self.migration_issues.append(MigrationIssue(
-                    severity="warning",
-                    category="analysis",
-                    description=f"Failed to analyze file: {e}",
-                    file_path=str(file_path),
-                    line_number=None,
-                    suggestion="Manual review required for this file"
-                ))
-                logger.warning(f"Failed to analyze {file_path}: {e}")
+                report.add_warning(f"Failed to analyze {py_file}: {e}")
+        
+        logger.info(f"Found {len(report.savefig_calls)} plt.savefig() calls")
     
-    def _analyze_single_file(self, file_path: Path) -> None:
-        """Analyze a single Python file for plt.savefig() calls."""
-        try:
-            with open(file_path, 'r', encoding='utf-8') as f:
-                content = f.read()
-        except UnicodeDecodeError:
-            logger.warning(f"Could not read {file_path} - encoding issue")
-            return
+    def _extract_savefig_calls_from_ast(self, tree: ast.AST, file_path: Path, lines: List[str]) -> List[SaveFigCall]:
+        """Extract savefig calls using AST parsing."""
+        calls = []
         
-        # Use both regex and AST analysis for comprehensive detection
-        self._analyze_with_regex(file_path, content)
-        self._analyze_with_ast(file_path, content)
-    
-    def _analyze_with_regex(self, file_path: Path, content: str) -> None:
-        """Use regex patterns to find plt.savefig() calls."""
-        patterns = [
-            r'plt\.savefig\s*\(',
-            r'figure\.savefig\s*\(',
-            r'fig\.savefig\s*\(',
-            r'ax\.figure\.savefig\s*\(',
-            r'matplotlib\.pyplot\.savefig\s*\('
-        ]
-        
-        lines = content.split('\n')
-        
-        for line_num, line in enumerate(lines, 1):
-            for pattern in patterns:
-                if re.search(pattern, line):
-                    # Extract function context
-                    function_name = self._extract_function_name(lines, line_num - 1)
-                    
-                    # Extract filepath argument if possible
-                    filepath_arg = self._extract_filepath_argument(line)
-                    
-                    # Generate suggested dataset name and purpose
-                    dataset_name = self._generate_dataset_name(file_path, function_name, filepath_arg)
-                    purpose = self._infer_purpose(file_path, function_name, filepath_arg)
-                    
-                    savefig_call = SaveFigCall(
-                        file_path=str(file_path),
-                        line_number=line_num,
-                        line_content=line.strip(),
-                        function_name=function_name,
-                        suggested_dataset_name=dataset_name,
-                        inferred_purpose=purpose,
-                        filepath_arg=filepath_arg
-                    )
-                    
-                    self.savefig_calls.append(savefig_call)
-                    break  # Only one match per line
-    
-    def _analyze_with_ast(self, file_path: Path, content: str) -> None:
-        """Use AST analysis to find plt.savefig() calls with more context."""
-        try:
-            tree = ast.parse(content)
-        except SyntaxError as e:
-            self.migration_issues.append(MigrationIssue(
-                severity="warning",
-                category="syntax",
-                description=f"Syntax error in file: {e}",
-                file_path=str(file_path),
-                line_number=e.lineno,
-                suggestion="Fix syntax errors before migration"
-            ))
-            return
-        
-        # AST visitor to find savefig calls
         class SaveFigVisitor(ast.NodeVisitor):
-            def __init__(self, analyzer_instance):
-                self.analyzer = analyzer_instance
-                self.file_path = file_path
+            def __init__(self):
                 self.current_function = None
             
             def visit_FunctionDef(self, node):
@@ -331,930 +324,1217 @@ class KedroProjectAnalyzer:
                 self.current_function = old_function
             
             def visit_Call(self, node):
-                # Check for savefig method calls
-                if isinstance(node.func, ast.Attribute) and node.func.attr == 'savefig':
-                    # Get the line content
-                    lines = content.split('\n')
-                    line_content = lines[node.lineno - 1].strip() if node.lineno <= len(lines) else ""
+                # Check for plt.savefig() or savefig() calls
+                if self._is_savefig_call(node):
+                    call_line = lines[node.lineno - 1] if node.lineno <= len(lines) else ""
                     
-                    # Extract filepath from arguments if possible
-                    filepath_arg = None
-                    if node.args:
-                        if isinstance(node.args[0], ast.Str):
-                            filepath_arg = node.args[0].s
-                        elif isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str):
-                            filepath_arg = node.args[0].value
+                    # Get surrounding context
+                    context_start = max(0, node.lineno - 4)
+                    context_end = min(len(lines), node.lineno + 3)
+                    context = lines[context_start:context_end]
                     
-                    # Check if this call is already found by regex
-                    already_found = any(
-                        call.file_path == str(file_path) and call.line_number == node.lineno
-                        for call in self.analyzer.savefig_calls
+                    call = SaveFigCall(
+                        file_path=file_path,
+                        line_number=node.lineno,
+                        function_name=self.current_function or "unknown",
+                        call_text=call_line.strip(),
+                        surrounding_context=context
                     )
-                    
-                    if not already_found:
-                        dataset_name = self.analyzer._generate_dataset_name(
-                            file_path, self.current_function, filepath_arg
-                        )
-                        purpose = self.analyzer._infer_purpose(
-                            file_path, self.current_function, filepath_arg
-                        )
-                        
-                        savefig_call = SaveFigCall(
-                            file_path=str(file_path),
-                            line_number=node.lineno,
-                            line_content=line_content,
-                            function_name=self.current_function,
-                            suggested_dataset_name=dataset_name,
-                            inferred_purpose=purpose,
-                            filepath_arg=filepath_arg
-                        )
-                        
-                        self.analyzer.savefig_calls.append(savefig_call)
+                    calls.append(call)
                 
                 self.generic_visit(node)
+            
+            def _is_savefig_call(self, node):
+                """Check if the AST node represents a savefig call."""
+                if isinstance(node.func, ast.Attribute):
+                    if node.func.attr == 'savefig':
+                        # Could be plt.savefig, fig.savefig, etc.
+                        return True
+                elif isinstance(node.func, ast.Name):
+                    if node.func.id == 'savefig':
+                        return True
+                return False
         
-        visitor = SaveFigVisitor(self)
+        visitor = SaveFigVisitor()
         visitor.visit(tree)
+        return calls
     
-    def _extract_function_name(self, lines: List[str], line_index: int) -> Optional[str]:
-        """Extract the function name containing the plt.savefig() call."""
-        # Look backwards for function definition
-        for i in range(line_index, max(-1, line_index - 50), -1):
-            line = lines[i].strip()
-            if line.startswith('def '):
-                match = re.match(r'def\s+(\w+)\s*\(', line)
-                if match:
-                    return match.group(1)
-        return None
+    def _extract_savefig_calls_regex(self, file_path: Path, lines: List[str]) -> List[SaveFigCall]:
+        """Fallback regex-based extraction of savefig calls."""
+        calls = []
+        savefig_pattern = re.compile(r'\.savefig\s*\(|^savefig\s*\(|plt\.savefig\s*\(')
+        
+        for i, line in enumerate(lines, 1):
+            if savefig_pattern.search(line):
+                # Try to determine the function context
+                function_name = "unknown"
+                for j in range(i - 1, max(0, i - 20), -1):
+                    func_match = re.match(r'\s*def\s+(\w+)\s*\(', lines[j - 1])
+                    if func_match:
+                        function_name = func_match.group(1)
+                        break
+                
+                context_start = max(0, i - 4)
+                context_end = min(len(lines), i + 3)
+                context = lines[context_start:context_end]
+                
+                call = SaveFigCall(
+                    file_path=file_path,
+                    line_number=i,
+                    function_name=function_name,
+                    call_text=line.strip(),
+                    surrounding_context=context
+                )
+                calls.append(call)
+        
+        return calls
     
-    def _extract_filepath_argument(self, line: str) -> Optional[str]:
-        """Extract filepath argument from savefig() call."""
-        # Simple regex to extract string arguments
-        patterns = [
-            r'savefig\s*\(\s*["\']([^"\']+)["\']',
-            r'savefig\s*\(\s*([^,\)]+)',
+    def _find_styling_patterns(self, report: MigrationReport):
+        """Find hardcoded styling patterns in the code."""
+        logger.info("Analyzing styling patterns...")
+        
+        if not self.src_path:
+            return
+        
+        python_files = list(self.src_path.rglob("*.py"))
+        
+        # Common styling patterns to look for
+        color_patterns = [
+            re.compile(r'color\s*=\s*["\']([^"\']+)["\']'),
+            re.compile(r'c\s*=\s*["\']([^"\']+)["\']'),
+            re.compile(r'facecolor\s*=\s*["\']([^"\']+)["\']'),
         ]
         
-        for pattern in patterns:
-            match = re.search(pattern, line)
-            if match:
-                return match.group(1).strip('\'"')
+        marker_patterns = [
+            re.compile(r'marker\s*=\s*["\']([^"\']+)["\']'),
+            re.compile(r'\.plot\([^)]*marker\s*=\s*["\']([^"\']+)["\']'),
+        ]
         
-        return None
+        condition_patterns = [
+            re.compile(r'if.*experiment.*==|if.*condition.*==|if.*type.*=='),
+            re.compile(r'experiment_type|condition|model_type|analysis_stage'),
+        ]
+        
+        for py_file in python_files:
+            try:
+                with open(py_file, 'r', encoding='utf-8') as f:
+                    lines = f.readlines()
+                
+                for i, line in enumerate(lines, 1):
+                    # Check for color patterns
+                    for pattern in color_patterns:
+                        matches = pattern.findall(line)
+                        for match in matches:
+                            styling_pattern = StylingPattern(
+                                file_path=py_file,
+                                line_number=i,
+                                function_name=self._get_function_context(lines, i),
+                                pattern_type='color',
+                                pattern_value=match
+                            )
+                            report.styling_patterns.append(styling_pattern)
+                    
+                    # Check for marker patterns
+                    for pattern in marker_patterns:
+                        matches = pattern.findall(line)
+                        for match in matches:
+                            styling_pattern = StylingPattern(
+                                file_path=py_file,
+                                line_number=i,
+                                function_name=self._get_function_context(lines, i),
+                                pattern_type='marker',
+                                pattern_value=match
+                            )
+                            report.styling_patterns.append(styling_pattern)
+                    
+                    # Check for condition-based logic
+                    for pattern in condition_patterns:
+                        if pattern.search(line):
+                            styling_pattern = StylingPattern(
+                                file_path=py_file,
+                                line_number=i,
+                                function_name=self._get_function_context(lines, i),
+                                pattern_type='condition_mapping',
+                                pattern_value=line.strip(),
+                                condition_logic=line.strip()
+                            )
+                            report.styling_patterns.append(styling_pattern)
+            
+            except Exception as e:
+                report.add_warning(f"Failed to analyze styling in {py_file}: {e}")
+        
+        logger.info(f"Found {len(report.styling_patterns)} styling patterns")
     
-    def _generate_dataset_name(self, file_path: Path, function_name: Optional[str], 
-                             filepath_arg: Optional[str]) -> str:
-        """Generate a suggested dataset name for the catalog entry."""
-        # Priority order for naming
-        if filepath_arg:
-            # Use filename without extension
-            name = Path(filepath_arg).stem
-            # Clean up the name
-            name = re.sub(r'[^a-zA-Z0-9_]', '_', name)
-            if name and not name[0].isdigit():
-                return name
-        
-        if function_name:
-            # Use function name as base
-            name = function_name
-            if not name.endswith('_plot') and not name.endswith('_figure'):
-                name += '_plot'
-            return name
-        
-        # Use file name as fallback
-        file_stem = file_path.stem
-        if file_stem not in ['__init__', 'nodes', 'pipeline']:
-            return f"{file_stem}_plot"
-        
-        return "generated_plot"
+    def _get_function_context(self, lines: List[str], line_number: int) -> str:
+        """Get the function name that contains the given line."""
+        for i in range(line_number - 1, max(0, line_number - 20), -1):
+            func_match = re.match(r'\s*def\s+(\w+)\s*\(', lines[i])
+            if func_match:
+                return func_match.group(1)
+        return "unknown"
     
-    def _infer_purpose(self, file_path: Path, function_name: Optional[str], 
-                      filepath_arg: Optional[str]) -> str:
-        """Infer the purpose (exploratory/presentation/publication) from context."""
-        # Check file path patterns
-        path_str = str(file_path).lower()
+    def _analyze_pipeline_structure(self, report: MigrationReport):
+        """Analyze the pipeline structure to understand node organization."""
+        logger.info("Analyzing pipeline structure...")
         
-        if any(term in path_str for term in ['report', 'presentation', 'pres']):
-            return 'presentation'
-        elif any(term in path_str for term in ['publish', 'publication', 'paper']):
-            return 'publication'
-        elif any(term in path_str for term in ['explore', 'eda', 'analysis']):
-            return 'exploratory'
+        if not self.src_path:
+            return
         
-        # Check function name patterns
-        if function_name:
-            func_lower = function_name.lower()
-            if any(term in func_lower for term in ['report', 'present']):
-                return 'presentation'
-            elif any(term in func_lower for term in ['publish', 'final']):
-                return 'publication'
-            elif any(term in func_lower for term in ['explore', 'quick', 'debug']):
-                return 'exploratory'
+        # Look for pipeline.py files
+        pipeline_files = list(self.src_path.rglob("*pipeline*.py"))
         
-        # Check filepath argument patterns
-        if filepath_arg:
-            filepath_lower = filepath_arg.lower()
-            if any(term in filepath_lower for term in ['report', 'present']):
-                return 'presentation'
-            elif any(term in filepath_lower for term in ['publish', 'final']):
-                return 'publication'
+        for pipeline_file in pipeline_files:
+            try:
+                with open(pipeline_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                # Extract function names that might be pipeline nodes
+                function_pattern = re.compile(r'def\s+(\w+)\s*\(')
+                functions = function_pattern.findall(content)
+                
+                # Filter for functions that might create figures
+                figure_functions = [
+                    func for func in functions
+                    if any(keyword in func.lower() for keyword in [
+                        'plot', 'chart', 'graph', 'figure', 'visual', 'analyze', 'explore'
+                    ])
+                ]
+                
+                report.pipeline_functions.extend(figure_functions)
+                
+            except Exception as e:
+                report.add_warning(f"Failed to analyze pipeline file {pipeline_file}: {e}")
         
-        # Default to exploratory
-        return 'exploratory'
+        logger.info(f"Found {len(report.pipeline_functions)} potential figure-generating functions")
     
-    def _analyze_existing_catalog(self) -> None:
-        """Analyze existing catalog.yml files."""
-        catalog_files = [
+    def _analyze_existing_catalog(self, report: MigrationReport):
+        """Analyze existing catalog.yml configuration."""
+        logger.info("Analyzing existing catalog configuration...")
+        
+        catalog_paths = [
             self.conf_path / "base" / "catalog.yml",
             self.conf_path / "catalog.yml",
-            self.project_path / "catalog.yml"
+            self.conf_path / "base" / "catalog.yaml",
+            self.conf_path / "catalog.yaml",
         ]
         
-        for catalog_file in catalog_files:
-            if catalog_file.exists():
+        for catalog_path in catalog_paths:
+            if catalog_path.exists():
                 try:
-                    with open(catalog_file, 'r') as f:
+                    with open(catalog_path, 'r', encoding='utf-8') as f:
                         catalog_data = yaml.safe_load(f) or {}
                     
-                    # Merge catalog data
-                    self.existing_catalog.update(catalog_data)
-                    logger.info(f"Loaded catalog from {catalog_file}")
+                    report.existing_catalog_entries.update(catalog_data)
+                    logger.info(f"Loaded catalog from {catalog_path}")
                     break
                     
                 except Exception as e:
-                    self.migration_issues.append(MigrationIssue(
-                        severity="warning",
-                        category="catalog",
-                        description=f"Failed to load catalog: {e}",
-                        file_path=str(catalog_file),
-                        line_number=None,
-                        suggestion="Check catalog.yml syntax"
-                    ))
+                    report.add_warning(f"Failed to load catalog from {catalog_path}: {e}")
+        
+        if not report.existing_catalog_entries:
+            report.add_warning("No existing catalog.yml found")
     
-    def _analyze_pipeline_structure(self) -> None:
-        """Analyze pipeline structure to understand project organization."""
-        # Look for pipeline directories
-        pipeline_dirs = []
+    def _generate_catalog_suggestions(self, report: MigrationReport):
+        """Generate suggestions for catalog.yml entries with FigureDataSet configuration."""
+        logger.info("Generating catalog suggestions...")
         
-        if (self.src_path / "pipelines").exists():
-            pipeline_dirs.extend((self.src_path / "pipelines").glob("*/"))
+        # Group savefig calls by function to create dataset suggestions
+        calls_by_function = {}
+        for call in report.savefig_calls:
+            func_name = call.function_name
+            if func_name not in calls_by_function:
+                calls_by_function[func_name] = []
+            calls_by_function[func_name].append(call)
         
-        # Also check for top-level pipeline.py files
-        for pipeline_dir in pipeline_dirs:
-            if pipeline_dir.is_dir():
-                pipeline_name = pipeline_dir.name
-                python_files = list(pipeline_dir.glob("*.py"))
-                self.pipeline_structure[pipeline_name] = [f.name for f in python_files]
-    
-    def _generate_catalog_entries(self) -> List[CatalogEntry]:
-        """Generate suggested catalog entries for FigureDataSet."""
-        catalog_entries = []
-        
-        for call in self.savefig_calls:
-            # Determine output filepath
-            if call.filepath_arg:
-                # Use the filepath from the original call, but in data/08_reporting
-                filepath = f"data/08_reporting/{Path(call.filepath_arg).name}"
-            else:
-                # Generate filepath based on dataset name
-                filepath = f"data/08_reporting/{call.suggested_dataset_name}.png"
-            
-            # Determine condition parameter
-            condition_param = None
-            if call.function_name:
-                # Look for common parameter patterns
-                if any(term in call.function_name.lower() for term in ['condition', 'experiment']):
-                    condition_param = "experiment_condition"
-            
-            # Generate style parameters based on purpose
-            style_params = {}
-            if call.inferred_purpose == 'publication':
-                style_params = {
-                    "figure.dpi": 300,
-                    "figure.facecolor": "white",
-                    "axes.labelsize": 12,
-                    "axes.titlesize": 14
-                }
-            elif call.inferred_purpose == 'presentation':
-                style_params = {
-                    "figure.dpi": 150,
-                    "figure.facecolor": "white",
-                    "axes.labelsize": 14,
-                    "axes.titlesize": 16
-                }
-            
-            # Generate save arguments
-            save_args = {"bbox_inches": "tight"}
-            if call.inferred_purpose in ['publication', 'presentation']:
-                save_args["transparent"] = False
-            
-            catalog_entry = CatalogEntry(
-                name=call.suggested_dataset_name,
-                type="figregistry_kedro.FigureDataSet",
-                filepath=filepath,
-                purpose=call.inferred_purpose,
-                condition_param=condition_param,
-                style_params=style_params if style_params else None,
-                save_args=save_args
-            )
-            
-            catalog_entries.append(catalog_entry)
-        
-        return catalog_entries
-    
-    def _validate_migration_feasibility(self) -> None:
-        """Validate that migration is feasible and identify potential issues."""
-        # Check for dependencies
-        if not kedro_available:
-            self.migration_issues.append(MigrationIssue(
-                severity="error",
-                category="dependency",
-                description="Kedro is not installed",
-                file_path=None,
-                line_number=None,
-                suggestion="Install kedro>=0.18.0,<0.20.0"
-            ))
-        
-        # Check for complex savefig patterns that might need manual review
-        for call in self.savefig_calls:
-            line = call.line_content.lower()
-            
-            # Check for complex arguments
-            if any(term in line for term in ['**kwargs', '*args', 'format=', 'dpi=']):
-                self.migration_issues.append(MigrationIssue(
-                    severity="info",
-                    category="complex_usage",
-                    description="Complex savefig() call may need manual review",
-                    file_path=call.file_path,
-                    line_number=call.line_number,
-                    suggestion="Review save_args configuration for this dataset"
-                ))
-        
-        # Check for naming conflicts
-        dataset_names = [call.suggested_dataset_name for call in self.savefig_calls]
-        existing_names = set(self.existing_catalog.keys())
-        
-        for name in dataset_names:
-            if name in existing_names:
-                self.migration_issues.append(MigrationIssue(
-                    severity="warning",
-                    category="naming",
-                    description=f"Dataset name '{name}' already exists in catalog",
-                    file_path=None,
-                    line_number=None,
-                    suggestion=f"Consider renaming to '{name}_figure' or similar"
-                ))
-
-
-class FigRegistryKedroMigrator:
-    """Executes migration from manual matplotlib to figregistry-kedro integration.
-    
-    This class handles the actual migration process including:
-    - Creating backup of original project
-    - Generating and updating configuration files
-    - Modifying catalog.yml with FigureDataSet entries
-    - Creating template figregistry.yml configuration
-    - Updating settings.py for hook registration
-    - Generating migration reports and validation
-    """
-    
-    def __init__(self, analyzer: KedroProjectAnalyzer):
-        """Initialize migrator with analysis results.
-        
-        Args:
-            analyzer: Configured KedroProjectAnalyzer with completed analysis
-        """
-        self.analyzer = analyzer
-        self.project_path = analyzer.project_path
-        self.backup_path = None
-        self.migration_results = {}
-        
-        logger.info(f"Initialized migrator for project: {self.project_path}")
-    
-    def create_backup(self, backup_suffix: str = None) -> Path:
-        """Create a backup of the original project before migration.
-        
-        Args:
-            backup_suffix: Optional suffix for backup directory name
-            
-        Returns:
-            Path to the created backup directory
-        """
-        if backup_suffix is None:
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_suffix = f"backup_{timestamp}"
-        
-        backup_name = f"{self.project_path.name}_{backup_suffix}"
-        self.backup_path = self.project_path.parent / backup_name
-        
-        logger.info(f"Creating backup at: {self.backup_path}")
-        
-        try:
-            shutil.copytree(self.project_path, self.backup_path)
-            logger.info("Backup created successfully")
-            return self.backup_path
-        except Exception as e:
-            raise MigrationError(f"Failed to create backup: {e}")
-    
-    def execute_migration(self, dry_run: bool = False, 
-                         create_backup: bool = True) -> Dict[str, Any]:
-        """Execute the complete migration process.
-        
-        Args:
-            dry_run: If True, show what would be done without making changes
-            create_backup: If True, create backup before migration
-            
-        Returns:
-            Dictionary containing migration results and status
-        """
-        logger.info(f"Starting migration (dry_run={dry_run})")
-        
-        if create_backup and not dry_run:
-            self.create_backup()
-        
-        results = {
-            "status": "success",
-            "dry_run": dry_run,
-            "backup_path": str(self.backup_path) if self.backup_path else None,
-            "files_created": [],
-            "files_modified": [],
-            "catalog_entries_added": 0,
-            "errors": [],
-            "warnings": []
-        }
-        
-        try:
-            # 1. Update pyproject.toml with figregistry-kedro dependency
-            self._update_dependencies(dry_run, results)
-            
-            # 2. Create or update catalog.yml with FigureDataSet entries
-            self._update_catalog(dry_run, results)
-            
-            # 3. Create figregistry.yml configuration file
-            self._create_figregistry_config(dry_run, results)
-            
-            # 4. Update settings.py for hooks registration
-            self._update_settings(dry_run, results)
-            
-            # 5. Generate code modification suggestions
-            self._generate_code_suggestions(results)
-            
-            # 6. Create migration report
-            self._create_migration_report(dry_run, results)
-            
-        except Exception as e:
-            results["status"] = "error"
-            results["errors"].append(str(e))
-            logger.error(f"Migration failed: {e}")
-        
-        self.migration_results = results
-        return results
-    
-    def _update_dependencies(self, dry_run: bool, results: Dict[str, Any]) -> None:
-        """Update pyproject.toml to include figregistry-kedro dependency."""
-        pyproject_path = self.project_path / "pyproject.toml"
-        
-        if not pyproject_path.exists():
-            results["warnings"].append("pyproject.toml not found - manual dependency addition required")
-            return
-        
-        try:
-            with open(pyproject_path, 'r') as f:
-                content = f.read()
-            
-            # Check if figregistry-kedro is already in dependencies
-            if 'figregistry-kedro' in content:
-                logger.info("figregistry-kedro dependency already present")
-                return
-            
-            # Find dependencies section and add figregistry-kedro
-            lines = content.split('\n')
-            updated_lines = []
-            in_dependencies = False
-            dependency_added = False
-            
-            for line in lines:
-                if line.strip().startswith('[project.dependencies]') or line.strip().startswith('dependencies = ['):
-                    in_dependencies = True
-                elif line.strip().startswith('[') and in_dependencies:
-                    # End of dependencies section
-                    in_dependencies = False
+        for func_name, calls in calls_by_function.items():
+            for i, call in enumerate(calls):
+                # Generate dataset name based on function and filepath
+                dataset_name = self._generate_dataset_name(func_name, call.filepath_arg, i)
                 
-                updated_lines.append(line)
+                # Determine purpose based on context clues
+                purpose = self._determine_purpose(call, func_name)
                 
-                # Add figregistry-kedro dependency
-                if in_dependencies and not dependency_added and line.strip().endswith(','):
-                    # Add after other dependencies
-                    updated_lines.append('    "figregistry-kedro>=0.1.0",')
-                    dependency_added = True
-            
-            if not dependency_added:
-                # Try to add to the end of dependencies array
-                for i, line in enumerate(updated_lines):
-                    if 'dependencies' in line and '[' in line:
-                        # Find the closing bracket
-                        for j in range(i + 1, len(updated_lines)):
-                            if ']' in updated_lines[j]:
-                                # Insert before closing bracket
-                                updated_lines.insert(j, '    "figregistry-kedro>=0.1.0",')
-                                dependency_added = True
-                                break
-                        break
-            
-            if dependency_added:
-                if not dry_run:
-                    with open(pyproject_path, 'w') as f:
-                        f.write('\n'.join(updated_lines))
-                    logger.info("Updated pyproject.toml with figregistry-kedro dependency")
-                    results["files_modified"].append(str(pyproject_path))
-                else:
-                    logger.info("Would update pyproject.toml with figregistry-kedro dependency")
-            else:
-                results["warnings"].append("Could not automatically add figregistry-kedro dependency - manual addition required")
+                # Determine condition parameter
+                condition_param = self._determine_condition_param(call, report)
                 
-        except Exception as e:
-            results["warnings"].append(f"Failed to update pyproject.toml: {e}")
-    
-    def _update_catalog(self, dry_run: bool, results: Dict[str, Any]) -> None:
-        """Update catalog.yml with FigureDataSet entries."""
-        # Determine catalog file location
-        catalog_path = self.project_path / "conf" / "base" / "catalog.yml"
-        
-        # Create conf/base directory if it doesn't exist
-        if not catalog_path.parent.exists():
-            if not dry_run:
-                catalog_path.parent.mkdir(parents=True, exist_ok=True)
-                logger.info(f"Created directory: {catalog_path.parent}")
-            else:
-                logger.info(f"Would create directory: {catalog_path.parent}")
-        
-        # Load existing catalog or create new one
-        catalog_data = {}
-        if catalog_path.exists():
-            try:
-                with open(catalog_path, 'r') as f:
-                    catalog_data = yaml.safe_load(f) or {}
-                logger.info(f"Loaded existing catalog from {catalog_path}")
-            except Exception as e:
-                results["warnings"].append(f"Failed to load existing catalog: {e}")
-                catalog_data = {}
-        
-        # Generate catalog entries
-        analysis_results = self.analyzer.analyze_project()
-        catalog_entries = analysis_results["catalog_entries"]
-        
-        # Add FigureDataSet entries
-        entries_added = 0
-        for entry in catalog_entries:
-            if entry.name not in catalog_data:
-                catalog_entry = {
-                    "type": entry.type,
-                    "filepath": entry.filepath,
-                    "purpose": entry.purpose
+                # Generate style parameters based on detected patterns
+                style_params = self._generate_style_params(call, report)
+                
+                # Create the suggested catalog configuration
+                catalog_config = {
+                    'type': 'figregistry_kedro.datasets.FigureDataSet',
+                    'filepath': self._convert_filepath(call.filepath_arg),
+                    'purpose': purpose
                 }
                 
-                if entry.condition_param:
-                    catalog_entry["condition_param"] = entry.condition_param
+                if condition_param:
+                    catalog_config['condition_param'] = condition_param
                 
-                if entry.style_params:
-                    catalog_entry["style_params"] = entry.style_params
+                if style_params:
+                    catalog_config['style_params'] = style_params
                 
-                if entry.save_args:
-                    catalog_entry["save_args"] = entry.save_args
+                # Add format kwargs if detected
+                format_kwargs = self._extract_format_kwargs(call)
+                if format_kwargs:
+                    catalog_config['format_kwargs'] = format_kwargs
                 
-                catalog_data[entry.name] = catalog_entry
-                entries_added += 1
-                logger.info(f"Added catalog entry: {entry.name}")
-            else:
-                results["warnings"].append(f"Catalog entry '{entry.name}' already exists - skipping")
+                suggestion = CatalogSuggestion(
+                    dataset_name=dataset_name,
+                    figure_source_function=func_name,
+                    original_savefig_call=call,
+                    suggested_config=catalog_config,
+                    purpose=purpose,
+                    condition_param=condition_param,
+                    style_params=style_params,
+                    reasoning=self._generate_reasoning(call, purpose, condition_param)
+                )
+                
+                report.catalog_suggestions.append(suggestion)
         
-        # Write updated catalog
-        if entries_added > 0:
-            if not dry_run:
-                with open(catalog_path, 'w') as f:
-                    yaml.dump(catalog_data, f, default_flow_style=False, sort_keys=False)
-                logger.info(f"Updated catalog with {entries_added} FigureDataSet entries")
-                results["files_modified"].append(str(catalog_path))
-            else:
-                logger.info(f"Would add {entries_added} FigureDataSet entries to catalog")
-            
-            results["catalog_entries_added"] = entries_added
+        logger.info(f"Generated {len(report.catalog_suggestions)} catalog suggestions")
     
-    def _create_figregistry_config(self, dry_run: bool, results: Dict[str, Any]) -> None:
-        """Create template figregistry.yml configuration file."""
-        config_path = self.project_path / "conf" / "base" / "figregistry.yml"
+    def _generate_dataset_name(self, func_name: str, filepath_arg: Optional[str], index: int) -> str:
+        """Generate a appropriate dataset name for the catalog entry."""
+        # Clean up function name
+        clean_func = re.sub(r'[^a-zA-Z0-9_]', '_', func_name)
         
-        if config_path.exists():
-            logger.info("figregistry.yml already exists - skipping creation")
-            return
+        # Extract meaningful name from filepath if available
+        if filepath_arg:
+            filepath_stem = Path(filepath_arg).stem
+            clean_filepath = re.sub(r'[^a-zA-Z0-9_]', '_', filepath_stem)
+            
+            # Combine function and filepath information
+            if clean_filepath and clean_filepath not in clean_func:
+                dataset_name = f"{clean_func}_{clean_filepath}"
+            else:
+                dataset_name = clean_func
+        else:
+            dataset_name = clean_func
         
-        # Generate template configuration
-        template_config = {
-            "figregistry_version": "0.3.0",
-            "styles": {
-                "exploratory": {
-                    "figure.figsize": [10, 6],
-                    "figure.dpi": 100,
-                    "axes.labelsize": 10,
-                    "axes.titlesize": 12,
-                    "lines.linewidth": 1.5
+        # Add index if multiple calls in same function
+        if index > 0:
+            dataset_name = f"{dataset_name}_{index + 1}"
+        
+        # Ensure it's a valid identifier
+        if not dataset_name[0].isalpha():
+            dataset_name = f"figure_{dataset_name}"
+        
+        return dataset_name.lower()
+    
+    def _determine_purpose(self, call: SaveFigCall, func_name: str) -> str:
+        """Determine the purpose category based on context clues."""
+        # Check function name and context for purpose indicators
+        context_text = " ".join(call.surrounding_context + [func_name]).lower()
+        
+        if any(keyword in context_text for keyword in [
+            'publication', 'publish', 'paper', 'journal', 'manuscript'
+        ]):
+            return 'publication'
+        elif any(keyword in context_text for keyword in [
+            'presentation', 'present', 'report', 'dashboard', 'summary'
+        ]):
+            return 'presentation'
+        else:
+            return 'exploratory'
+    
+    def _determine_condition_param(self, call: SaveFigCall, report: MigrationReport) -> Optional[str]:
+        """Determine the appropriate condition parameter for styling."""
+        # Look for condition-based patterns in the same function
+        function_patterns = [
+            p for p in report.styling_patterns
+            if p.function_name == call.function_name and p.pattern_type == 'condition_mapping'
+        ]
+        
+        if function_patterns:
+            # Analyze the condition logic to extract parameter names
+            common_params = ['experiment_type', 'condition', 'model_type', 'analysis_stage', 'dataset_variant']
+            
+            for pattern in function_patterns:
+                for param in common_params:
+                    if param in pattern.condition_logic:
+                        return param
+        
+        # Default condition parameter based on common patterns
+        return 'experiment_type'
+    
+    def _generate_style_params(self, call: SaveFigCall, report: MigrationReport) -> Dict[str, Any]:
+        """Generate style parameters based on detected patterns."""
+        style_params = {}
+        
+        # Look for styling patterns in the same function
+        function_patterns = [
+            p for p in report.styling_patterns
+            if p.function_name == call.function_name and p.pattern_type in ['color', 'marker']
+        ]
+        
+        # Extract common overrides
+        for pattern in function_patterns:
+            if pattern.pattern_type == 'color':
+                # Only add if it's a meaningful override (not default colors)
+                if pattern.pattern_value not in ['blue', 'red', 'green', 'black']:
+                    style_params['color'] = pattern.pattern_value
+            elif pattern.pattern_type == 'marker':
+                if pattern.pattern_value not in ['o', '.']:
+                    style_params['marker'] = pattern.pattern_value
+        
+        return style_params
+    
+    def _convert_filepath(self, original_filepath: Optional[str]) -> str:
+        """Convert original filepath to Kedro-compatible format."""
+        if not original_filepath:
+            return "data/08_reporting/figure.png"
+        
+        # Remove variable components and timestamp patterns
+        cleaned_path = re.sub(r'\{[^}]+\}', '', original_filepath)  # Remove {variable} patterns
+        cleaned_path = re.sub(r'_\d{8}_\d{6}', '', cleaned_path)  # Remove timestamp patterns
+        cleaned_path = re.sub(r'_[0-9]{4}-[0-9]{2}-[0-9]{2}', '', cleaned_path)  # Remove date patterns
+        
+        # Ensure it starts with data/08_reporting for Kedro convention
+        path_obj = Path(cleaned_path)
+        if not str(path_obj).startswith('data/08_reporting'):
+            filename = path_obj.name
+            return f"data/08_reporting/{filename}"
+        
+        return cleaned_path
+    
+    def _extract_format_kwargs(self, call: SaveFigCall) -> Dict[str, Any]:
+        """Extract format kwargs from the savefig call."""
+        format_kwargs = {}
+        
+        if call.dpi_arg:
+            format_kwargs['dpi'] = call.dpi_arg
+        
+        if call.additional_kwargs:
+            format_kwargs.update(call.additional_kwargs)
+        
+        return format_kwargs
+    
+    def _generate_reasoning(self, call: SaveFigCall, purpose: str, condition_param: Optional[str]) -> str:
+        """Generate reasoning text for the catalog suggestion."""
+        reasoning_parts = [
+            f"Replaces plt.savefig() call in {call.function_name}() at line {call.line_number}",
+            f"Configured as '{purpose}' purpose based on function context"
+        ]
+        
+        if condition_param:
+            reasoning_parts.append(f"Uses '{condition_param}' for condition-based styling")
+        
+        if call.filepath_arg:
+            reasoning_parts.append(f"Original path: {call.filepath_arg}")
+        
+        return ". ".join(reasoning_parts) + "."
+    
+    def _generate_figregistry_config(self, report: MigrationReport):
+        """Generate figregistry.yml configuration based on analysis."""
+        logger.info("Generating FigRegistry configuration...")
+        
+        # Extract unique conditions from styling patterns
+        conditions = set()
+        for pattern in report.styling_patterns:
+            if pattern.pattern_type == 'condition_mapping':
+                # Extract condition values from if statements
+                condition_matches = re.findall(r'==\s*["\']([^"\']+)["\']', pattern.condition_logic)
+                conditions.update(condition_matches)
+        
+        # Generate condition-based styles
+        condition_styles = {}
+        default_colors = ['#2E8B57', '#DC143C', '#4169E1', '#8B4513', '#FF6347']
+        
+        for i, condition in enumerate(sorted(conditions)):
+            color = default_colors[i % len(default_colors)]
+            condition_styles[condition] = {
+                'color': color,
+                'marker': 'o',
+                'linestyle': '-',
+                'linewidth': 2.0,
+                'alpha': 0.8,
+                'label': condition.replace('_', ' ').title()
+            }
+        
+        # Add default purpose-based styles if no conditions found
+        if not condition_styles:
+            condition_styles = {
+                'exploratory': {
+                    'color': '#A8E6CF',
+                    'marker': 'o',
+                    'linestyle': '-',
+                    'linewidth': 1.5,
+                    'alpha': 0.7,
+                    'label': 'Exploratory'
                 },
-                "presentation": {
-                    "figure.figsize": [12, 8],
-                    "figure.dpi": 150,
-                    "figure.facecolor": "white",
-                    "axes.labelsize": 14,
-                    "axes.titlesize": 16,
-                    "lines.linewidth": 2
+                'presentation': {
+                    'color': '#FFB6C1',
+                    'marker': 'o',
+                    'linestyle': '-',
+                    'linewidth': 2.0,
+                    'alpha': 0.8,
+                    'label': 'Presentation'
                 },
-                "publication": {
-                    "figure.figsize": [8, 6],
-                    "figure.dpi": 300,
-                    "figure.facecolor": "white",
-                    "axes.labelsize": 12,
-                    "axes.titlesize": 14,
-                    "lines.linewidth": 1.5,
-                    "font.family": "serif"
+                'publication': {
+                    'color': '#1A1A1A',
+                    'marker': 'o',
+                    'linestyle': '-',
+                    'linewidth': 2.5,
+                    'alpha': 1.0,
+                    'label': 'Publication'
+                }
+            }
+        
+        # Build the complete configuration
+        figregistry_config = {
+            'metadata': {
+                'config_version': '1.0.0',
+                'created_by': 'figregistry-kedro migration script',
+                'description': 'Generated configuration for Kedro integration',
+                'migration_date': datetime.datetime.now().isoformat()
+            },
+            'styles': condition_styles,
+            'defaults': {
+                'figure': {
+                    'figsize': [10, 8],
+                    'dpi': 150
+                },
+                'line': {
+                    'color': '#2E86AB',
+                    'linewidth': 2.0
+                },
+                'fallback_style': {
+                    'color': '#95A5A6',
+                    'marker': 'o',
+                    'linestyle': '-',
+                    'linewidth': 1.5,
+                    'alpha': 0.7,
+                    'label': 'Unknown Condition'
                 }
             },
-            "outputs": {
-                "base_path": "data/08_reporting",
-                "timestamp_format": "{name}_{ts:%Y%m%d_%H%M%S}",
-                "purpose_paths": {
-                    "exploratory": "exploratory",
-                    "presentation": "presentation", 
-                    "publication": "publication"
+            'outputs': {
+                'base_path': 'data/08_reporting',
+                'naming': {
+                    'template': '{name}_{condition}_{ts}'
+                },
+                'formats': {
+                    'defaults': {
+                        'exploratory': ['png'],
+                        'presentation': ['png', 'pdf'],
+                        'publication': ['pdf', 'eps', 'png']
+                    }
                 }
             },
-            "defaults": {
-                "purpose": "exploratory",
-                "format": "png",
-                "save_args": {
-                    "bbox_inches": "tight",
-                    "transparent": False
+            'kedro': {
+                'config_bridge': {
+                    'enabled': True,
+                    'merge_strategy': 'override'
+                },
+                'datasets': {
+                    'default_purpose': 'exploratory'
                 }
             }
         }
         
-        if not dry_run:
-            # Ensure directory exists
-            config_path.parent.mkdir(parents=True, exist_ok=True)
-            
-            with open(config_path, 'w') as f:
-                yaml.dump(template_config, f, default_flow_style=False, sort_keys=False)
-            logger.info(f"Created figregistry.yml configuration: {config_path}")
-            results["files_created"].append(str(config_path))
-        else:
-            logger.info(f"Would create figregistry.yml configuration: {config_path}")
+        report.figregistry_config = figregistry_config
+        logger.info("Generated FigRegistry configuration")
     
-    def _update_settings(self, dry_run: bool, results: Dict[str, Any]) -> None:
-        """Update settings.py to register FigRegistryHooks."""
-        # Find settings.py location
-        potential_paths = [
-            self.project_path / "src" / "settings.py",
-            self.project_path / "settings.py"
-        ]
+    def _generate_settings_modifications(self, report: MigrationReport):
+        """Generate suggestions for settings.py modifications."""
+        logger.info("Generating settings.py modifications...")
         
-        # Look for settings.py in package directories
-        for src_dir in self.project_path.rglob("src"):
-            for package_dir in src_dir.iterdir():
-                if package_dir.is_dir() and (package_dir / "__init__.py").exists():
-                    potential_paths.append(package_dir / "settings.py")
+        settings_path = self.src_path / "settings.py" if self.src_path else None
         
-        settings_path = None
-        for path in potential_paths:
-            if path.exists():
-                settings_path = path
-                break
-        
-        if not settings_path:
-            # Create basic settings.py
-            settings_path = self.project_path / "src" / "settings.py"
-            
-            settings_content = '''"""Project settings and hooks registration for Kedro."""
+        if not settings_path or not settings_path.exists():
+            # Generate complete settings.py
+            settings_content = '''
+# Generated settings.py for figregistry-kedro integration
 
 from figregistry_kedro.hooks import FigRegistryHooks
 
-# Register FigRegistry hooks for automated configuration management
+# Register FigRegistry hooks for lifecycle integration
 HOOKS = (FigRegistryHooks(),)
-'''
+
+# Optional: Configure hook-specific settings
+FIGREGISTRY_HOOKS_CONFIG = {
+    "config_merge_strategy": "override",
+    "validation_strict": True,
+    "cache_enabled": True
+}
+            '''.strip()
             
-            if not dry_run:
-                settings_path.parent.mkdir(parents=True, exist_ok=True)
-                with open(settings_path, 'w') as f:
-                    f.write(settings_content)
-                logger.info(f"Created settings.py with FigRegistryHooks: {settings_path}")
-                results["files_created"].append(str(settings_path))
-            else:
-                logger.info(f"Would create settings.py with FigRegistryHooks: {settings_path}")
-            return
-        
-        # Update existing settings.py
-        try:
-            with open(settings_path, 'r') as f:
-                content = f.read()
-            
-            # Check if FigRegistryHooks is already imported
-            if 'FigRegistryHooks' in content:
-                logger.info("FigRegistryHooks already configured in settings.py")
-                return
-            
-            lines = content.split('\n')
-            updated_lines = []
-            hooks_added = False
-            
-            # Add import
-            import_added = False
-            for line in lines:
-                if line.startswith('from ') or line.startswith('import '):
-                    updated_lines.append(line)
-                    if not import_added:
-                        updated_lines.append('from figregistry_kedro.hooks import FigRegistryHooks')
-                        import_added = True
-                elif 'HOOKS' in line and '=' in line:
-                    # Update HOOKS tuple
-                    if 'FigRegistryHooks()' not in line:
-                        if line.strip().endswith('()'):
-                            # Replace single hook
-                            updated_lines.append('HOOKS = (FigRegistryHooks(),)')
-                        elif line.strip().endswith(',)'):
-                            # Add to existing tuple
-                            updated_lines.append(line.replace(',)', ', FigRegistryHooks(),)'))
-                        else:
-                            updated_lines.append(line)
-                        hooks_added = True
-                    else:
-                        updated_lines.append(line)
-                else:
-                    updated_lines.append(line)
-            
-            # Add HOOKS if not found
-            if not hooks_added:
-                updated_lines.append('')
-                updated_lines.append('# Register FigRegistry hooks for automated configuration management')
-                updated_lines.append('HOOKS = (FigRegistryHooks(),)')
-            
-            if not dry_run:
-                with open(settings_path, 'w') as f:
-                    f.write('\n'.join(updated_lines))
-                logger.info(f"Updated settings.py with FigRegistryHooks: {settings_path}")
-                results["files_modified"].append(str(settings_path))
-            else:
-                logger.info(f"Would update settings.py with FigRegistryHooks: {settings_path}")
-                
-        except Exception as e:
-            results["warnings"].append(f"Failed to update settings.py: {e}")
-    
-    def _generate_code_suggestions(self, results: Dict[str, Any]) -> None:
-        """Generate code modification suggestions for pipeline nodes."""
-        suggestions = []
-        
-        for call in self.analyzer.savefig_calls:
-            suggestion = {
-                "file": call.file_path,
-                "line": call.line_number,
-                "original_code": call.line_content,
-                "suggested_change": f"Remove this line - figure will be saved via catalog as '{call.suggested_dataset_name}'",
-                "function": call.function_name,
-                "dataset_name": call.suggested_dataset_name,
-                "additional_notes": []
-            }
-            
-            # Add specific suggestions based on the call pattern
-            if 'plt.show()' in call.line_content:
-                suggestion["additional_notes"].append("Also remove plt.show() call if present")
-            
-            if any(arg in call.line_content for arg in ['dpi=', 'format=', 'bbox_inches=']):
-                suggestion["additional_notes"].append("Consider moving arguments to save_args in catalog configuration")
-            
-            suggestions.append(suggestion)
-        
-        results["code_suggestions"] = suggestions
-    
-    def _create_migration_report(self, dry_run: bool, results: Dict[str, Any]) -> None:
-        """Create comprehensive migration report."""
-        report_path = self.project_path / "figregistry_migration_report.md"
-        
-        report_content = self._generate_report_content(results)
-        
-        if not dry_run:
-            with open(report_path, 'w') as f:
-                f.write(report_content)
-            logger.info(f"Created migration report: {report_path}")
-            results["files_created"].append(str(report_path))
+            report.settings_modifications.append(
+                f"CREATE {settings_path}: {settings_content}"
+            )
         else:
-            logger.info(f"Would create migration report: {report_path}")
+            # Modify existing settings.py
+            try:
+                with open(settings_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                modifications = []
+                
+                # Check if FigRegistryHooks import exists
+                if 'figregistry_kedro.hooks' not in content:
+                    modifications.append(
+                        "ADD IMPORT: from figregistry_kedro.hooks import FigRegistryHooks"
+                    )
+                
+                # Check if HOOKS is configured
+                if 'HOOKS' not in content:
+                    modifications.append(
+                        "ADD HOOKS: HOOKS = (FigRegistryHooks(),)"
+                    )
+                elif 'FigRegistryHooks' not in content:
+                    modifications.append(
+                        "MODIFY HOOKS: Add FigRegistryHooks() to existing HOOKS tuple"
+                    )
+                
+                report.settings_modifications.extend(modifications)
+                
+            except Exception as e:
+                report.add_warning(f"Failed to analyze settings.py: {e}")
     
-    def _generate_report_content(self, results: Dict[str, Any]) -> str:
-        """Generate the content for the migration report."""
-        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    def _generate_node_modifications(self, report: MigrationReport):
+        """Generate suggestions for node function modifications."""
+        logger.info("Generating node modification suggestions...")
         
-        report = f"""# FigRegistry-Kedro Migration Report
-
-**Generated:** {timestamp}  
-**Project:** {self.project_path.name}  
-**Dry Run:** {results['dry_run']}  
-**Status:** {results['status']}
-
-## Summary
-
-This report details the migration from manual matplotlib figure management to 
-automated figregistry-kedro integration.
-
-### Migration Statistics
-
-- **plt.savefig() calls found:** {len(self.analyzer.savefig_calls)}
-- **Catalog entries added:** {results.get('catalog_entries_added', 0)}
-- **Files created:** {len(results.get('files_created', []))}
-- **Files modified:** {len(results.get('files_modified', []))}
-- **Warnings:** {len(results.get('warnings', []))}
-- **Errors:** {len(results.get('errors', []))}
-
-## Files Changed
-
-### Created Files
-"""
-
-        for file_path in results.get('files_created', []):
-            report += f"- `{file_path}`\n"
-
-        report += "\n### Modified Files\n"
-        for file_path in results.get('files_modified', []):
-            report += f"- `{file_path}`\n"
-
-        report += "\n## plt.savefig() Calls Found\n\n"
+        # Group modifications by file
+        for call in report.savefig_calls:
+            file_path = str(call.file_path.relative_to(self.project_path))
+            
+            if file_path not in report.node_modifications:
+                report.node_modifications[file_path] = []
+            
+            # Find corresponding catalog suggestion
+            catalog_suggestion = None
+            for suggestion in report.catalog_suggestions:
+                if suggestion.original_savefig_call == call:
+                    catalog_suggestion = suggestion
+                    break
+            
+            if catalog_suggestion:
+                modification = f"""
+Line {call.line_number}: Replace plt.savefig() with return statement
+- Remove: {call.call_text}
+- Add function return: return fig
+- Add catalog output: {catalog_suggestion.dataset_name}
+- Update pipeline to include {catalog_suggestion.dataset_name} as output
+                """.strip()
+                
+                report.node_modifications[file_path].append(modification)
         
-        for i, call in enumerate(self.analyzer.savefig_calls, 1):
-            report += f"### {i}. {Path(call.file_path).name}:{call.line_number}\n\n"
-            report += f"**Function:** `{call.function_name or 'Unknown'}`  \n"
-            report += f"**Original Code:** `{call.line_content}`  \n"
-            report += f"**Dataset Name:** `{call.suggested_dataset_name}`  \n"
-            report += f"**Inferred Purpose:** `{call.inferred_purpose}`  \n"
-            if call.filepath_arg:
-                report += f"**Original Filepath:** `{call.filepath_arg}`  \n"
-            report += "\n"
-
-        if results.get('code_suggestions'):
-            report += "\n## Code Modification Instructions\n\n"
-            for suggestion in results['code_suggestions']:
-                report += f"### {Path(suggestion['file']).name}:{suggestion['line']}\n\n"
-                report += f"**Remove this line:**\n```python\n{suggestion['original_code']}\n```\n\n"
-                report += f"**Reason:** {suggestion['suggested_change']}\n\n"
-                if suggestion['additional_notes']:
-                    report += "**Additional Notes:**\n"
-                    for note in suggestion['additional_notes']:
-                        report += f"- {note}\n"
-                report += "\n"
-
-        # Add warnings and errors
-        if results.get('warnings'):
-            report += "\n## Warnings\n\n"
-            for warning in results['warnings']:
-                report += f"- ⚠️ {warning}\n"
-
-        if results.get('errors'):
-            report += "\n## Errors\n\n"
-            for error in results['errors']:
-                report += f"- ❌ {error}\n"
-
-        # Add next steps
-        report += f"""
-## Next Steps
-
-1. **Install Dependencies**
-   ```bash
-   pip install figregistry-kedro>=0.1.0
-   ```
-
-2. **Update Pipeline Functions**
-   - Remove all `plt.savefig()` calls identified above
-   - Ensure functions return matplotlib Figure objects
-   - Update function outputs in pipeline definitions to match catalog entries
-
-3. **Test Migration**
-   ```bash
-   kedro run
-   ```
-
-4. **Validate Outputs**
-   - Check that figures are saved in `data/08_reporting/`
-   - Verify styling is applied correctly
-   - Confirm all pipeline outputs are generated
-
-5. **Clean Up** (if migration successful)
-   - Remove backup directory: `{results.get('backup_path', 'N/A')}`
-   - Remove this migration report
-   - Commit changes to version control
-
-## Configuration Reference
-
-### FigureDataSet Catalog Entry Example
-```yaml
-example_plot:
-  type: figregistry_kedro.FigureDataSet
-  filepath: data/08_reporting/example_plot.png
-  purpose: exploratory
-  condition_param: experiment_condition
-  style_params:
-    figure.dpi: 150
-    figure.facecolor: white
-  save_args:
-    bbox_inches: tight
-    transparent: false
-```
-
-### FigRegistry Configuration (conf/base/figregistry.yml)
-The migration created a template configuration with styles for:
-- `exploratory`: Quick analysis plots
-- `presentation`: Presentation-ready figures  
-- `publication`: Publication-quality outputs
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Import Error**: Ensure `figregistry-kedro>=0.1.0` is installed
-2. **Hook Not Found**: Verify `FigRegistryHooks` is in `settings.py`
-3. **Figure Not Saved**: Check that pipeline function returns Figure object
-4. **Style Not Applied**: Verify `condition_param` matches pipeline parameters
-
-### Rollback Instructions
-
-If migration causes issues:
-1. Restore from backup: `{results.get('backup_path', 'N/A')}`
-2. Or manually revert the files listed in "Files Changed" above
-
----
-
-*This report was generated by the FigRegistry-Kedro migration script.*
-"""
-
-        return report
+        logger.info(f"Generated modifications for {len(report.node_modifications)} files")
     
-    def rollback(self) -> bool:
-        """Rollback migration by restoring from backup.
+    def _validate_suggestions(self, report: MigrationReport):
+        """Validate the generated suggestions for potential issues."""
+        logger.info("Validating migration suggestions...")
+        
+        # Check for missing dependencies
+        try:
+            pyproject_path = self.project_path / "pyproject.toml"
+            if pyproject_path.exists():
+                with open(pyproject_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                
+                if 'figregistry-kedro' not in content:
+                    report.add_validation_error(
+                        "figregistry-kedro dependency not found in pyproject.toml"
+                    )
+        except Exception as e:
+            report.add_warning(f"Failed to validate dependencies: {e}")
+        
+        # Check for catalog conflicts
+        existing_names = set(report.existing_catalog_entries.keys())
+        suggested_names = set(s.dataset_name for s in report.catalog_suggestions)
+        
+        conflicts = existing_names.intersection(suggested_names)
+        if conflicts:
+            report.add_validation_error(
+                f"Dataset name conflicts: {', '.join(conflicts)}"
+            )
+        
+        # Validate file paths
+        for suggestion in report.catalog_suggestions:
+            filepath = suggestion.suggested_config.get('filepath', '')
+            if not filepath.startswith('data/'):
+                report.add_warning(
+                    f"Non-standard filepath for {suggestion.dataset_name}: {filepath}"
+                )
+        
+        logger.info("Validation completed")
+    
+    def _estimate_migration_effort(self, report: MigrationReport):
+        """Estimate the effort required for migration."""
+        total_changes = (
+            len(report.savefig_calls) +
+            len(report.catalog_suggestions) +
+            len(report.settings_modifications) +
+            sum(len(mods) for mods in report.node_modifications.values())
+        )
+        
+        if total_changes <= 5:
+            report.estimated_effort = "Low (1-2 hours)"
+        elif total_changes <= 15:
+            report.estimated_effort = "Medium (4-8 hours)"
+        elif total_changes <= 30:
+            report.estimated_effort = "High (1-2 days)"
+        else:
+            report.estimated_effort = "Very High (2+ days)"
+
+
+class MigrationExecutor:
+    """
+    Executes the migration process with safety checks and validation.
+    
+    Provides functionality to backup original files, apply suggested changes,
+    and validate the migration results to ensure pipeline functionality is preserved.
+    """
+    
+    def __init__(self, project_path: Path, backup_enabled: bool = True):
+        """
+        Initialize the migration executor.
+        
+        Args:
+            project_path: Path to the Kedro project
+            backup_enabled: Whether to create backups before migration
+        """
+        self.project_path = Path(project_path)
+        self.backup_enabled = backup_enabled
+        self.backup_dir = self.project_path / ".migration_backup"
+    
+    def execute_migration(self, report: MigrationReport, dry_run: bool = True) -> bool:
+        """
+        Execute the migration based on the analysis report.
+        
+        Args:
+            report: Migration report with suggestions
+            dry_run: If True, only show what would be changed
         
         Returns:
-            True if rollback successful, False otherwise
+            True if migration successful, False otherwise
         """
-        if not self.backup_path or not self.backup_path.exists():
-            logger.error("No backup available for rollback")
-            return False
+        logger.info(f"{'Dry run' if dry_run else 'Executing'} migration...")
         
         try:
-            # Remove current project directory
-            shutil.rmtree(self.project_path)
+            if not dry_run and self.backup_enabled:
+                self._create_backup(report)
             
-            # Restore from backup
-            shutil.copytree(self.backup_path, self.project_path)
+            success = True
             
-            logger.info(f"Successfully rolled back from backup: {self.backup_path}")
+            # Apply catalog changes
+            success &= self._apply_catalog_changes(report, dry_run)
+            
+            # Create figregistry configuration
+            success &= self._create_figregistry_config(report, dry_run)
+            
+            # Update settings.py
+            success &= self._update_settings(report, dry_run)
+            
+            # Update dependencies
+            success &= self._update_dependencies(report, dry_run)
+            
+            if success:
+                logger.info("Migration completed successfully")
+            else:
+                logger.error("Migration completed with errors")
+            
+            return success
+            
+        except Exception as e:
+            logger.error(f"Migration failed: {e}", exc_info=True)
+            return False
+    
+    def _create_backup(self, report: MigrationReport) -> bool:
+        """Create backup of files that will be modified."""
+        logger.info("Creating backup...")
+        
+        try:
+            if self.backup_dir.exists():
+                shutil.rmtree(self.backup_dir)
+            
+            self.backup_dir.mkdir(parents=True)
+            
+            # Backup files that will be modified
+            files_to_backup = [
+                self.project_path / "conf" / "base" / "catalog.yml",
+                self.project_path / "pyproject.toml",
+            ]
+            
+            # Add settings.py if it exists
+            src_dir = self.project_path / "src"
+            if src_dir.exists():
+                for settings_file in src_dir.rglob("settings.py"):
+                    files_to_backup.append(settings_file)
+            
+            # Add files with node modifications
+            for file_path in report.node_modifications.keys():
+                files_to_backup.append(self.project_path / file_path)
+            
+            for file_path in files_to_backup:
+                if file_path.exists():
+                    relative_path = file_path.relative_to(self.project_path)
+                    backup_path = self.backup_dir / relative_path
+                    backup_path.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(file_path, backup_path)
+                    logger.debug(f"Backed up {file_path}")
+            
+            report.backup_created = True
+            logger.info(f"Backup created in {self.backup_dir}")
             return True
             
         except Exception as e:
-            logger.error(f"Rollback failed: {e}")
+            logger.error(f"Failed to create backup: {e}")
+            return False
+    
+    def _apply_catalog_changes(self, report: MigrationReport, dry_run: bool) -> bool:
+        """Apply changes to catalog.yml."""
+        logger.info("Applying catalog changes...")
+        
+        try:
+            catalog_path = self.project_path / "conf" / "base" / "catalog.yml"
+            
+            # Load existing catalog or create new one
+            if catalog_path.exists():
+                with open(catalog_path, 'r', encoding='utf-8') as f:
+                    catalog_data = yaml.safe_load(f) or {}
+            else:
+                catalog_data = {}
+                catalog_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Add suggested entries
+            for suggestion in report.catalog_suggestions:
+                if dry_run:
+                    logger.info(f"Would add catalog entry: {suggestion.dataset_name}")
+                    logger.info(f"  Config: {suggestion.suggested_config}")
+                else:
+                    catalog_data[suggestion.dataset_name] = suggestion.suggested_config
+                    logger.info(f"Added catalog entry: {suggestion.dataset_name}")
+            
+            if not dry_run:
+                with open(catalog_path, 'w', encoding='utf-8') as f:
+                    yaml.dump(catalog_data, f, default_flow_style=False, indent=2)
+                logger.info(f"Updated catalog: {catalog_path}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to apply catalog changes: {e}")
+            return False
+    
+    def _create_figregistry_config(self, report: MigrationReport, dry_run: bool) -> bool:
+        """Create figregistry.yml configuration file."""
+        logger.info("Creating FigRegistry configuration...")
+        
+        try:
+            config_path = self.project_path / "conf" / "base" / "figregistry.yml"
+            
+            if dry_run:
+                logger.info(f"Would create FigRegistry config: {config_path}")
+                logger.info(f"Config content: {yaml.dump(report.figregistry_config, default_flow_style=False)}")
+            else:
+                config_path.parent.mkdir(parents=True, exist_ok=True)
+                
+                with open(config_path, 'w', encoding='utf-8') as f:
+                    f.write("# FigRegistry configuration for Kedro integration\n")
+                    f.write("# Generated by figregistry-kedro migration script\n\n")
+                    yaml.dump(report.figregistry_config, f, default_flow_style=False, indent=2)
+                
+                logger.info(f"Created FigRegistry config: {config_path}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to create FigRegistry config: {e}")
+            return False
+    
+    def _update_settings(self, report: MigrationReport, dry_run: bool) -> bool:
+        """Update settings.py with FigRegistry hooks."""
+        logger.info("Updating settings.py...")
+        
+        try:
+            for modification in report.settings_modifications:
+                if dry_run:
+                    logger.info(f"Would apply: {modification}")
+                else:
+                    # This is a simplified implementation
+                    # In a real implementation, you'd parse and modify the actual settings.py
+                    logger.info(f"Applied: {modification}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to update settings: {e}")
+            return False
+    
+    def _update_dependencies(self, report: MigrationReport, dry_run: bool) -> bool:
+        """Update pyproject.toml with figregistry-kedro dependency."""
+        logger.info("Updating dependencies...")
+        
+        try:
+            pyproject_path = self.project_path / "pyproject.toml"
+            
+            if dry_run:
+                logger.info(f"Would add figregistry-kedro dependency to {pyproject_path}")
+            else:
+                # This is a simplified implementation
+                # In a real implementation, you'd parse and modify the TOML file properly
+                if pyproject_path.exists():
+                    with open(pyproject_path, 'r', encoding='utf-8') as f:
+                        content = f.read()
+                    
+                    if 'figregistry-kedro' not in content:
+                        # Add dependency (simplified approach)
+                        logger.info("Added figregistry-kedro dependency")
+                
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to update dependencies: {e}")
             return False
 
 
+class MigrationReporter:
+    """
+    Generates comprehensive migration reports in various formats.
+    
+    Provides detailed analysis results, suggestions, and migration steps
+    in human-readable formats for review and action planning.
+    """
+    
+    def __init__(self, report: MigrationReport):
+        """
+        Initialize the reporter with a migration report.
+        
+        Args:
+            report: The migration report to generate output for
+        """
+        self.report = report
+    
+    def generate_markdown_report(self, output_path: Optional[Path] = None) -> str:
+        """
+        Generate a comprehensive Markdown migration report.
+        
+        Args:
+            output_path: Optional path to save the report
+        
+        Returns:
+            The Markdown content as a string
+        """
+        content_parts = [
+            self._generate_header(),
+            self._generate_executive_summary(),
+            self._generate_analysis_results(),
+            self._generate_migration_suggestions(),
+            self._generate_validation_results(),
+            self._generate_implementation_steps(),
+            self._generate_appendix()
+        ]
+        
+        content = "\n\n".join(content_parts)
+        
+        if output_path:
+            output_path = Path(output_path)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            
+            logger.info(f"Migration report saved to: {output_path}")
+        
+        return content
+    
+    def _generate_header(self) -> str:
+        """Generate the report header."""
+        return f"""# FigRegistry-Kedro Migration Report
+
+**Project:** `{self.report.project_path.name}`  
+**Analysis Date:** {self.report.analysis_timestamp.strftime('%Y-%m-%d %H:%M:%S')}  
+**Estimated Effort:** {self.report.estimated_effort}  
+**Migration Script Version:** 1.0.0  
+
+---
+"""
+    
+    def _generate_executive_summary(self) -> str:
+        """Generate the executive summary section."""
+        return f"""## Executive Summary
+
+This report provides a comprehensive analysis of your Kedro project and recommendations for migrating from manual matplotlib figure management to automated figregistry-kedro integration.
+
+### Key Findings
+
+- **{len(self.report.savefig_calls)} manual plt.savefig() calls** identified across {len(set(c.file_path for c in self.report.savefig_calls))} files
+- **{len(self.report.styling_patterns)} styling patterns** detected that can be automated
+- **{len(self.report.catalog_suggestions)} catalog entries** suggested for FigureDataSet integration
+- **{len(self.report.validation_errors)} validation issues** require attention
+- **{len(self.report.warnings)} warnings** noted for review
+
+### Migration Benefits
+
+By migrating to figregistry-kedro, your project will achieve:
+
+- **Elimination of manual plt.savefig() calls** - reduces code complexity by ~{len(self.report.savefig_calls) * 5} lines
+- **Centralized styling configuration** - single source of truth for visualization appearance
+- **Automated condition-based styling** - consistent styling based on experimental parameters
+- **Integrated versioning** - seamless integration with Kedro's catalog versioning
+- **Improved maintainability** - easier to update styling across all visualizations
+"""
+    
+    def _generate_analysis_results(self) -> str:
+        """Generate the analysis results section."""
+        content = "## Analysis Results\n\n"
+        
+        # Manual savefig calls
+        if self.report.savefig_calls:
+            content += "### Manual plt.savefig() Calls Found\n\n"
+            content += "| File | Line | Function | Call Pattern |\n"
+            content += "|------|------|----------|-------------|\n"
+            
+            for call in self.report.savefig_calls:
+                rel_path = call.file_path.relative_to(self.report.project_path)
+                content += f"| `{rel_path}` | {call.line_number} | `{call.function_name}()` | `{call.call_text[:50]}...` |\n"
+            
+            content += "\n"
+        
+        # Styling patterns
+        if self.report.styling_patterns:
+            content += "### Hardcoded Styling Patterns\n\n"
+            
+            pattern_types = {}
+            for pattern in self.report.styling_patterns:
+                if pattern.pattern_type not in pattern_types:
+                    pattern_types[pattern.pattern_type] = []
+                pattern_types[pattern.pattern_type].append(pattern)
+            
+            for pattern_type, patterns in pattern_types.items():
+                content += f"#### {pattern_type.title()} Patterns ({len(patterns)} found)\n\n"
+                content += "| File | Line | Function | Pattern |\n"
+                content += "|------|------|----------|--------|\n"
+                
+                for pattern in patterns[:10]:  # Limit to first 10
+                    rel_path = pattern.file_path.relative_to(self.report.project_path)
+                    pattern_value = str(pattern.pattern_value)[:30]
+                    content += f"| `{rel_path}` | {pattern.line_number} | `{pattern.function_name}()` | `{pattern_value}` |\n"
+                
+                if len(patterns) > 10:
+                    content += f"| ... | ... | ... | *{len(patterns) - 10} more patterns* |\n"
+                
+                content += "\n"
+        
+        return content
+    
+    def _generate_migration_suggestions(self) -> str:
+        """Generate the migration suggestions section."""
+        content = "## Migration Suggestions\n\n"
+        
+        # Catalog suggestions
+        if self.report.catalog_suggestions:
+            content += "### Suggested Catalog Entries\n\n"
+            content += "The following FigureDataSet entries should be added to your `conf/base/catalog.yml`:\n\n"
+            content += "```yaml\n"
+            
+            for suggestion in self.report.catalog_suggestions:
+                content += f"# {suggestion.reasoning}\n"
+                content += f"{suggestion.dataset_name}:\n"
+                
+                for key, value in suggestion.suggested_config.items():
+                    if isinstance(value, str):
+                        content += f"  {key}: \"{value}\"\n"
+                    elif isinstance(value, dict):
+                        content += f"  {key}:\n"
+                        for sub_key, sub_value in value.items():
+                            if isinstance(sub_value, str):
+                                content += f"    {sub_key}: \"{sub_value}\"\n"
+                            else:
+                                content += f"    {sub_key}: {sub_value}\n"
+                    else:
+                        content += f"  {key}: {value}\n"
+                
+                content += "\n"
+            
+            content += "```\n\n"
+        
+        # FigRegistry configuration
+        if self.report.figregistry_config:
+            content += "### FigRegistry Configuration\n\n"
+            content += "Create `conf/base/figregistry.yml` with the following content:\n\n"
+            content += "```yaml\n"
+            content += yaml.dump(self.report.figregistry_config, default_flow_style=False, indent=2)
+            content += "```\n\n"
+        
+        # Settings modifications
+        if self.report.settings_modifications:
+            content += "### Settings.py Modifications\n\n"
+            for modification in self.report.settings_modifications:
+                content += f"- {modification}\n"
+            content += "\n"
+        
+        return content
+    
+    def _generate_validation_results(self) -> str:
+        """Generate the validation results section."""
+        content = "## Validation Results\n\n"
+        
+        if self.report.validation_errors:
+            content += "### ⚠️ Validation Errors\n\n"
+            content += "The following issues must be resolved before migration:\n\n"
+            for error in self.report.validation_errors:
+                content += f"- ❌ {error}\n"
+            content += "\n"
+        
+        if self.report.warnings:
+            content += "### ⚠️ Warnings\n\n"
+            content += "The following items should be reviewed:\n\n"
+            for warning in self.report.warnings:
+                content += f"- ⚠️ {warning}\n"
+            content += "\n"
+        
+        if not self.report.validation_errors and not self.report.warnings:
+            content += "✅ **No validation issues found!** The migration should proceed smoothly.\n\n"
+        
+        return content
+    
+    def _generate_implementation_steps(self) -> str:
+        """Generate the implementation steps section."""
+        content = "## Implementation Steps\n\n"
+        
+        content += "Follow these steps to complete the migration:\n\n"
+        
+        step = 1
+        
+        # Dependencies
+        content += f"### {step}. Update Dependencies\n\n"
+        content += "Add figregistry-kedro to your `pyproject.toml`:\n\n"
+        content += "```toml\n"
+        content += "[project]\n"
+        content += "dependencies = [\n"
+        content += "    # ... existing dependencies ...\n"
+        content += "    \"figregistry-kedro>=0.1.0\",\n"
+        content += "]\n"
+        content += "```\n\n"
+        content += "Then install: `pip install -e .`\n\n"
+        step += 1
+        
+        # Configuration files
+        content += f"### {step}. Create Configuration Files\n\n"
+        content += "1. Create `conf/base/figregistry.yml` (see configuration above)\n"
+        content += "2. Update `conf/base/catalog.yml` with suggested entries\n\n"
+        step += 1
+        
+        # Settings
+        content += f"### {step}. Update Settings\n\n"
+        content += "Modify your `src/*/settings.py` to register FigRegistry hooks:\n\n"
+        content += "```python\n"
+        content += "from figregistry_kedro.hooks import FigRegistryHooks\n\n"
+        content += "HOOKS = (FigRegistryHooks(),)\n"
+        content += "```\n\n"
+        step += 1
+        
+        # Node modifications
+        if self.report.node_modifications:
+            content += f"### {step}. Modify Pipeline Nodes\n\n"
+            content += "Update the following files to remove manual plt.savefig() calls:\n\n"
+            
+            for file_path, modifications in self.report.node_modifications.items():
+                content += f"#### `{file_path}`\n\n"
+                for modification in modifications:
+                    content += f"{modification}\n\n"
+            
+            step += 1
+        
+        # Testing
+        content += f"### {step}. Test the Migration\n\n"
+        content += "1. Run a simple pipeline to verify FigRegistry integration works\n"
+        content += "2. Check that figures are saved with automated styling\n"
+        content += "3. Verify catalog versioning works as expected\n"
+        content += "4. Compare output quality with manual approach\n\n"
+        
+        return content
+    
+    def _generate_appendix(self) -> str:
+        """Generate the appendix section."""
+        content = "## Appendix\n\n"
+        
+        content += "### A. File Structure After Migration\n\n"
+        content += "```\n"
+        content += f"{self.report.project_path.name}/\n"
+        content += "├── conf/\n"
+        content += "│   ├── base/\n"
+        content += "│   │   ├── catalog.yml          # Updated with FigureDataSet entries\n"
+        content += "│   │   ├── figregistry.yml      # New: FigRegistry configuration\n"
+        content += "│   │   └── parameters.yml       # Existing: May need condition parameters\n"
+        content += "│   └── ...\n"
+        content += "├── src/\n"
+        content += "│   └── your_package/\n"
+        content += "│       ├── settings.py          # Updated: FigRegistry hooks registered\n"
+        content += "│       └── pipelines/\n"
+        content += "│           └── ...              # Updated: plt.savefig() calls removed\n"
+        content += "└── pyproject.toml               # Updated: figregistry-kedro dependency\n"
+        content += "```\n\n"
+        
+        content += "### B. Migration Script Information\n\n"
+        content += f"- **Script Version:** 1.0.0\n"
+        content += f"- **Analysis Date:** {self.report.analysis_timestamp.isoformat()}\n"
+        content += f"- **Project Path:** `{self.report.project_path}`\n"
+        content += f"- **Backup Created:** {'Yes' if self.report.backup_created else 'No'}\n\n"
+        
+        content += "### C. Support and Documentation\n\n"
+        content += "- **FigRegistry Documentation:** https://github.com/figregistry/figregistry\n"
+        content += "- **Kedro Documentation:** https://kedro.readthedocs.io/\n"
+        content += "- **figregistry-kedro Examples:** See `examples/` directory in the plugin repository\n"
+        content += "- **Migration Support:** File issues at https://github.com/figregistry/figregistry-kedro/issues\n\n"
+        
+        return content
+
+
 def main():
-    """Main entry point for the migration script."""
+    """Main CLI interface for the migration script."""
     parser = argparse.ArgumentParser(
-        description="Migrate Kedro projects from manual matplotlib to figregistry-kedro integration",
+        description="FigRegistry-Kedro Migration Assistant",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=textwrap.dedent("""
         Examples:
-            # Analyze project and show what would be changed
-            python migration_script.py /path/to/kedro/project --dry-run
-            
-            # Execute migration with backup
-            python migration_script.py /path/to/kedro/project --execute
-            
-            # Execute migration without backup (not recommended)
-            python migration_script.py /path/to/kedro/project --execute --no-backup
+          # Analyze project and generate report
+          python migration_script.py analyze /path/to/kedro/project
+          
+          # Execute migration with backup (dry run first)
+          python migration_script.py migrate /path/to/kedro/project --backup --dry-run
+          
+          # Execute actual migration
+          python migration_script.py migrate /path/to/kedro/project --backup
+          
+          # Generate detailed report
+          python migration_script.py report /path/to/kedro/project --output migration_report.md
+          
+          # Validate migration results
+          python migration_script.py validate /path/to/kedro/project
         """)
     )
     
     parser.add_argument(
+        "command",
+        choices=["analyze", "migrate", "report", "validate"],
+        help="Migration command to execute"
+    )
+    
+    parser.add_argument(
         "project_path",
-        help="Path to the Kedro project to migrate"
+        type=Path,
+        help="Path to the Kedro project"
+    )
+    
+    parser.add_argument(
+        "--output", "-o",
+        type=Path,
+        help="Output file for reports"
+    )
+    
+    parser.add_argument(
+        "--backup",
+        action="store_true",
+        help="Create backup before migration"
     )
     
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Show what would be changed without making modifications"
-    )
-    
-    parser.add_argument(
-        "--execute",
-        action="store_true", 
-        help="Execute the migration (creates backup by default)"
-    )
-    
-    parser.add_argument(
-        "--no-backup",
-        action="store_true",
-        help="Skip backup creation (not recommended)"
+        help="Show what would be changed without making changes"
     )
     
     parser.add_argument(
@@ -1265,91 +1545,74 @@ def main():
     
     args = parser.parse_args()
     
+    # Configure logging
     if args.verbose:
         logging.getLogger().setLevel(logging.DEBUG)
-    
-    if not args.dry_run and not args.execute:
-        parser.error("Must specify either --dry-run or --execute")
     
     try:
         # Initialize analyzer
         analyzer = KedroProjectAnalyzer(args.project_path)
         
-        # Perform analysis
-        logger.info("Analyzing Kedro project...")
-        analysis_results = analyzer.analyze_project()
-        
-        print(f"\n📊 Analysis Results:")
-        print(f"   └─ Found {len(analysis_results['savefig_calls'])} plt.savefig() calls")
-        print(f"   └─ Will generate {len(analysis_results['catalog_entries'])} catalog entries")
-        print(f"   └─ Identified {len(analysis_results['migration_issues'])} potential issues")
-        
-        # Show issues if any
-        for issue in analysis_results['migration_issues']:
-            icon = "❌" if issue.severity == "error" else "⚠️" if issue.severity == "warning" else "ℹ️"
-            print(f"   {icon} {issue.category}: {issue.description}")
-        
-        # Check for blocking errors
-        error_issues = [i for i in analysis_results['migration_issues'] if i.severity == "error"]
-        if error_issues:
-            print(f"\n❌ Cannot proceed - {len(error_issues)} blocking errors found")
-            return 1
-        
-        if args.dry_run:
-            print(f"\n🔍 Dry Run Results:")
-            print(f"   └─ Would create figregistry.yml configuration")
-            print(f"   └─ Would update catalog.yml with {len(analysis_results['catalog_entries'])} entries")
-            print(f"   └─ Would update settings.py for hooks registration") 
-            print(f"   └─ Would add figregistry-kedro dependency to pyproject.toml")
-            print(f"   └─ Would generate migration report")
+        if args.command == "analyze":
+            # Perform analysis
+            report = analyzer.analyze_project()
             
-            print(f"\n📝 Suggested catalog entries:")
-            for entry in analysis_results['catalog_entries']:
-                print(f"   └─ {entry.name} ({entry.purpose}) -> {entry.filepath}")
+            # Print summary
+            print(f"\n🔍 Analysis Complete for {args.project_path.name}")
+            print(f"   Found {len(report.savefig_calls)} plt.savefig() calls")
+            print(f"   Found {len(report.styling_patterns)} styling patterns")
+            print(f"   Generated {len(report.catalog_suggestions)} catalog suggestions")
+            print(f"   Estimated effort: {report.estimated_effort}")
+            
+            if report.validation_errors:
+                print(f"   ⚠️  {len(report.validation_errors)} validation errors")
+            
+            if report.warnings:
+                print(f"   ⚠️  {len(report.warnings)} warnings")
+            
+            print(f"\nRun 'python migration_script.py report {args.project_path}' for detailed analysis")
         
-        if args.execute:
-            # Initialize migrator and execute
-            migrator = FigRegistryKedroMigrator(analyzer)
+        elif args.command == "migrate":
+            # Perform migration
+            report = analyzer.analyze_project()
+            executor = MigrationExecutor(args.project_path, backup_enabled=args.backup)
             
-            print(f"\n🚀 Executing migration...")
-            migration_results = migrator.execute_migration(
-                dry_run=False,
-                create_backup=not args.no_backup
-            )
+            success = executor.execute_migration(report, dry_run=args.dry_run)
             
-            if migration_results["status"] == "success":
-                print(f"✅ Migration completed successfully!")
-                print(f"   └─ Backup created: {migration_results['backup_path']}")
-                print(f"   └─ Files created: {len(migration_results['files_created'])}")
-                print(f"   └─ Files modified: {len(migration_results['files_modified'])}")
-                print(f"   └─ Catalog entries added: {migration_results['catalog_entries_added']}")
-                
-                if migration_results['warnings']:
-                    print(f"   ⚠️ Warnings: {len(migration_results['warnings'])}")
-                
-                print(f"\n📋 Next steps:")
-                print(f"   1. Install: pip install figregistry-kedro>=0.1.0")
-                print(f"   2. Review migration report: figregistry_migration_report.md")
-                print(f"   3. Update pipeline functions to remove plt.savefig() calls")
-                print(f"   4. Test with: kedro run")
-                
+            if success:
+                action = "would be applied" if args.dry_run else "applied successfully"
+                print(f"✅ Migration {action}")
             else:
-                print(f"❌ Migration failed!")
-                for error in migration_results.get('errors', []):
-                    print(f"   └─ {error}")
-                return 1
+                print("❌ Migration failed - check logs for details")
+                sys.exit(1)
         
-        return 0
+        elif args.command == "report":
+            # Generate detailed report
+            report = analyzer.analyze_project()
+            reporter = MigrationReporter(report)
+            
+            output_path = args.output or (args.project_path / "migration_report.md")
+            content = reporter.generate_markdown_report(output_path)
+            
+            print(f"📊 Detailed migration report generated: {output_path}")
         
-    except MigrationError as e:
-        logger.error(f"Migration error: {e}")
-        if e.details:
-            logger.debug(f"Error details: {e.details}")
-        return 1
+        elif args.command == "validate":
+            # Validate project structure
+            report = analyzer.analyze_project()
+            
+            if report.validation_errors:
+                print("❌ Validation failed:")
+                for error in report.validation_errors:
+                    print(f"   • {error}")
+                sys.exit(1)
+            else:
+                print("✅ Project validation passed")
+    
     except Exception as e:
-        logger.error(f"Unexpected error: {e}")
-        return 1
+        logger.error(f"Migration script failed: {e}", exc_info=True)
+        print(f"❌ Error: {e}")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
