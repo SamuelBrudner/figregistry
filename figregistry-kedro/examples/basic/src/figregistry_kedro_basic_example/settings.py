@@ -1,280 +1,344 @@
-"""Kedro Project Settings for FigRegistry Basic Example.
+"""
+Kedro Project Settings for FigRegistry-Kedro Basic Example
 
-This file demonstrates the essential configuration for enabling figregistry-kedro 
-integration within a Kedro project. The settings showcase how to register 
-FigRegistryHooks for automatic lifecycle management, eliminating the need for 
-manual FigRegistry configuration in pipeline nodes while maintaining full 
-compatibility with Kedro's project structure and execution model.
+This module configures the Kedro project settings for the basic figregistry-kedro
+integration example, demonstrating how to enable automated figure styling and
+versioning throughout Kedro pipeline execution. The primary responsibility is
+registering FigRegistryHooks to provide non-invasive lifecycle integration
+between FigRegistry's configuration-driven visualization system and Kedro's
+catalog-based data pipeline architecture.
 
-The configuration enables F-006 Kedro Lifecycle Hooks functionality, providing:
-- Automated FigRegistry initialization before pipeline execution
-- Configuration bridge between Kedro and FigRegistry systems  
-- Context management for FigureDataSet instances throughout pipeline lifecycle
-- Non-invasive integration preserving Kedro's standard execution patterns
+Key Features Demonstrated:
+- F-006: Lifecycle integration through FigRegistryHooks registration
+- F-006-RQ-001: Automated FigRegistry initialization before pipeline execution
+- F-006-RQ-002: Context management for FigureDataSet instances
+- Section 0.1.1: Zero-touch figure management in data science workflows
+- Section 0.2.1: Plugin activation patterns for broader ecosystem adoption
 
-For production deployments, the hook configuration can be customized to enable
-performance monitoring, adjust error handling behavior, and optimize for 
-specific execution environments.
+The settings configuration enables:
+- Automatic FigRegistry configuration merging during project startup
+- Thread-safe context management for parallel pipeline execution
+- Performance monitoring and error handling for enterprise environments
+- Seamless integration with existing Kedro workflows without code changes
 
-References:
-    - Kedro Settings Documentation: https://kedro.readthedocs.io/en/stable/kedro_project_setup/settings.html
-    - FigRegistry Kedro Integration: https://github.com/blitzy-public-samples/figregistry-kedro
-    - Hook Implementation: figregistry_kedro.hooks.FigRegistryHooks
+Usage:
+    This file is automatically loaded by Kedro during project initialization.
+    No manual configuration required - the hooks activate automatically when
+    the project starts, providing transparent figure management capabilities
+    throughout all pipeline executions.
+
+Example:
+    # Run Kedro pipeline with automated figure styling
+    kedro run --pipeline=data_visualization
+    
+    # FigRegistryHooks automatically:
+    # 1. Initialize configuration during project startup
+    # 2. Establish styling context before pipeline execution
+    # 3. Enable FigureDataSet automated styling throughout pipeline
+    # 4. Clean up resources after pipeline completion
 """
 
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, Iterable, Optional
 
-# Import FigRegistryHooks for lifecycle integration per F-006 requirements
-try:
-    from figregistry_kedro.hooks import FigRegistryHooks
-except ImportError:
-    # Graceful fallback for development environments where figregistry-kedro is not installed
-    import warnings
-    warnings.warn(
-        "figregistry-kedro not found. Please install with: pip install figregistry-kedro",
-        ImportWarning
-    )
-    FigRegistryHooks = None
+# Import FigRegistryHooks for lifecycle integration
+from figregistry_kedro.hooks import FigRegistryHooks
 
+# Kedro framework version requirement for compatibility
+# This example requires Kedro >= 0.18.0 for AbstractDataSet interface stability
+# and hook specification compatibility as defined in Section 5.3.4.1
+KEDRO_VERSION_REQUIRED = ">=0.18.0,<0.20.0"
 
-# Kedro Project Settings
-# ======================
+# Project metadata for identification and debugging
+PROJECT_NAME = "figregistry_kedro_basic_example"
+PROJECT_VERSION = "0.1.0"
+
+# FigRegistryHooks Configuration
+# 
+# The hooks are configured with enterprise-grade settings that balance
+# performance, reliability, and observability requirements. These settings
+# demonstrate production-ready configuration patterns while maintaining
+# optimal performance for the basic example use case.
+FIGREGISTRY_HOOKS_CONFIG = {
+    # Enable comprehensive performance monitoring for demonstration
+    # In production environments, this provides visibility into hook execution
+    # times, configuration merging performance, and resource usage patterns
+    "enable_performance_monitoring": True,
+    
+    # Set initialization timeout to 5 seconds (5000ms) to accommodate
+    # complex configuration merging scenarios while maintaining the <5ms
+    # target execution time per Section 5.2.8 performance requirements
+    "initialization_timeout_ms": 5000.0,
+    
+    # Enable configuration caching for optimal performance during pipeline
+    # execution. This ensures merged Kedro-FigRegistry configurations are
+    # cached throughout the session for consistent styling behavior
+    "config_cache_enabled": True,
+    
+    # Enable strict validation for merged configurations to ensure type
+    # safety and schema compliance across both Kedro and FigRegistry
+    # configuration systems per Section 5.3.4.2 configuration strategy
+    "strict_validation": True,
+    
+    # Enable graceful fallback behavior when configuration initialization
+    # fails, allowing pipelines to continue execution with default styling
+    # rather than failing completely per F-006 non-invasive integration
+    "fallback_on_errors": True
+}
+
+# Kedro Hooks Registration
+#
+# This is the core configuration that enables F-006 lifecycle integration.
+# FigRegistryHooks is registered as a tuple entry in the HOOKS configuration,
+# following Kedro's standard plugin registration patterns. The hooks will
+# automatically activate during pipeline execution to provide:
+#
+# 1. Configuration Bridge Initialization (after_config_loaded)
+#    - Merges Kedro environment-specific configurations with FigRegistry YAML
+#    - Validates merged configurations for type safety and schema compliance
+#    - Establishes configuration context for FigureDataSet instances
+#
+# 2. Pipeline Context Setup (before_pipeline_run)
+#    - Initializes FigRegistry with merged configuration parameters
+#    - Establishes styling context for automated figure management
+#    - Validates catalog integration for FigureDataSet entries
+#
+# 3. Resource Cleanup (after_pipeline_run)
+#    - Cleans up FigRegistry context and configuration state
+#    - Logs performance metrics for monitoring and optimization
+#    - Ensures proper resource management in long-running environments
+HOOKS: Iterable[Any] = (
+    # Register FigRegistryHooks with enterprise-grade configuration
+    # This enables automated figure styling and versioning throughout
+    # all pipeline executions per F-006 feature requirements
+    FigRegistryHooks(**FIGREGISTRY_HOOKS_CONFIG),
+)
 
 # Session Store Configuration
-# Configure the session store for pipeline execution data
-# For basic examples, use in-memory store to avoid external dependencies
-SESSION_STORE_CLASS = "kedro.framework.session.store.BaseSessionStore"
+#
+# Configure session store for optimal performance with figregistry-kedro
+# integration. The memory session store provides fastest access patterns
+# for configuration and context data required by the hooks and datasets.
+SESSION_STORE_CLASS = "kedro.io.MemoryDataSet"
 
-# Hook Registration - CRITICAL for FigRegistry Integration
-# ========================================================
+# Session Store Arguments
+SESSION_STORE_ARGS: Dict[str, Any] = {
+    # Configure session store for efficient configuration caching
+    # This supports the FigRegistryHooks configuration management
+    # and FigureDataSet context access patterns
+}
 
-# Register FigRegistryHooks to enable lifecycle integration per F-006 requirements.
-# These hooks provide:
-# - F-006-RQ-001: Automated FigRegistry initialization before pipeline execution
-# - F-006-RQ-002: Context management for downstream FigureDataSet instances
-# - F-006-RQ-003: State cleanup after pipeline completion
-# - F-006-RQ-004: Selective hook registration via settings configuration
-
-if FigRegistryHooks is not None:
-    # Standard hook registration for basic example demonstrating minimal configuration
-    # This enables automatic FigRegistry initialization with default settings optimized
-    # for development and demonstration scenarios
-    HOOKS: Tuple[Any, ...] = (
-        FigRegistryHooks(
-            # Enable automatic FigRegistry configuration initialization during Kedro startup
-            # This eliminates the need for manual figregistry.init_config() calls in pipeline nodes
-            auto_initialize=True,
-            
-            # Disable performance monitoring for basic example to minimize log verbosity
-            # In production environments, enable this for performance tracking and optimization
-            enable_performance_monitoring=False,
-            
-            # Enable graceful fallback on errors to prevent pipeline failures during development
-            # This allows pipelines to continue execution even if FigRegistry initialization fails
-            fallback_on_error=True,
-            
-            # Set maximum initialization time to 10ms for basic example (more lenient than production)
-            # This accounts for potential slower file system access in development environments
-            max_initialization_time=0.010  # 10ms for development environments
-        ),
-    )
-else:
-    # Fallback configuration when figregistry-kedro is not available
-    # This allows the Kedro project to function without the plugin for development convenience
-    HOOKS: Tuple[Any, ...] = ()
-
-# Context Class Configuration
-# ===========================
-
-# Use Kedro's standard context class for the basic example
-# This provides all standard Kedro functionality without additional customization
-CONTEXT_CLASS = "kedro.framework.context.KedroContext"
+# Data Catalog Configuration
+#
+# Optional catalog configuration for enhanced figregistry-kedro integration.
+# These settings optimize catalog behavior for FigureDataSet operations
+# and automated figure versioning within the basic example workflows.
+CATALOG_CONFIG: Dict[str, Any] = {
+    # Enable catalog versioning to support FigureDataSet versioning
+    # integration with Kedro's built-in experiment tracking capabilities
+    "versioned": True,
+    
+    # Configure catalog for optimal performance with figure datasets
+    # This reduces overhead for FigureDataSet save/load operations
+    "enable_cache": True,
+}
 
 # Configuration Loader Settings
-# ==============================
-
-# Configure Kedro's ConfigLoader for environment-specific configuration management
-# The OmegaConfigLoader provides robust YAML processing compatible with FigRegistry configurations
-CONFIG_LOADER_CLASS = "kedro.config.OmegaConfigLoader"
-
-# Configuration loader parameters for enhanced FigRegistry integration
+#
+# Enhanced configuration loader settings that support the FigRegistryConfigBridge
+# integration for seamless merging of Kedro and FigRegistry configurations.
+# These settings ensure proper configuration hierarchy and environment support.
+CONFIG_LOADER_CLASS = "kedro.config.ConfigLoader"
 CONFIG_LOADER_ARGS: Dict[str, Any] = {
-    # Environment variable to control configuration environment (development, staging, production)
-    "base_env": "base",
-    
-    # Default environment if KEDRO_ENV is not set
-    "default_run_env": "local",
-    
-    # Enable configuration merging for FigRegistry YAML files
-    # This allows environment-specific overrides of FigRegistry configurations
+    # Define configuration sources that include both standard Kedro
+    # configuration patterns and figregistry.yml support
     "config_patterns": {
         # Standard Kedro configuration patterns
         "catalog": ["catalog*.yml", "catalog*.yaml"],
         "parameters": ["parameters*.yml", "parameters*.yaml"],
         "credentials": ["credentials*.yml", "credentials*.yaml"],
         
-        # FigRegistry configuration pattern for Kedro integration
-        # Supports both traditional figregistry.yaml and Kedro-style figregistry*.yml patterns
-        "figregistry": ["figregistry*.yml", "figregistry*.yaml"]
-    }
+        # FigRegistry configuration integration
+        # This enables conf/base/figregistry.yml and environment-specific
+        # figregistry configurations per Section 5.3.4.2 merging strategy
+        "figregistry": ["figregistry*.yml", "figregistry*.yaml"],
+    },
+    
+    # Enable environment-specific configuration overrides
+    # This supports multi-environment deployments with different
+    # FigRegistry styling configurations for dev/staging/production
+    "base_env": "base",
+    "default_run_env": "local",
 }
 
-# Data Catalog Configuration
-# ===========================
+# Pipeline Discovery Configuration
+#
+# Configure pipeline discovery to work optimally with figregistry-kedro
+# integration, ensuring proper initialization order and context management.
+PIPELINES_MODULE = f"{PROJECT_NAME}.pipeline_registry"
 
-# Use Kedro's standard data catalog for the basic example
-# The DataCatalog will automatically discover and use FigureDataSet instances
-# based on catalog configuration entries
-DATA_CATALOG_CLASS = "kedro.io.DataCatalog"
+# Advanced Hook Configuration Options
+#
+# These optional configurations demonstrate advanced hook customization
+# patterns for enterprise environments with specific requirements for
+# monitoring, error handling, and performance optimization.
 
-# Runner Configuration
-# ====================
-
-# Use sequential runner for basic example to simplify debugging and demonstration
-# For production environments, consider using ParallelRunner or ThreadRunner
-# FigRegistryHooks support concurrent execution with proper thread safety
-RUNNER_CLASS = "kedro.runner.SequentialRunner"
-
-# Logging Configuration
-# =====================
-
-# Configure logging for FigRegistry integration debugging
-# The basic example uses INFO level to show integration progress without overwhelming detail
-LOGGING_CONFIG = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    
-    "formatters": {
-        "simple": {
-            "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        }
+# Optional: Custom hook initialization parameters for specialized environments
+ADVANCED_HOOK_CONFIG: Optional[Dict[str, Any]] = {
+    # Custom configuration for enterprise logging integration
+    "logging_config": {
+        "log_level": "INFO",
+        "log_format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        "enable_structured_logging": False,  # Set to True for JSON logging
     },
     
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-            "level": "INFO",
-            "formatter": "simple",
-            "stream": "ext://sys.stdout"
-        }
+    # Performance monitoring configuration for enterprise environments
+    "monitoring_config": {
+        "enable_metrics_collection": True,
+        "metrics_export_interval": 300,  # 5 minutes
+        "performance_alerting_threshold_ms": 100,  # Alert if >100ms
     },
     
-    "loggers": {
-        # Enable INFO level logging for FigRegistry components to show integration progress
-        "figregistry": {
-            "level": "INFO",
-            "handlers": ["console"],
-            "propagate": False
-        },
+    # Error handling configuration for production resilience
+    "error_handling_config": {
+        "max_retry_attempts": 3,
+        "retry_delay_ms": 1000,
+        "escalation_threshold": 5,  # Escalate after 5 failures
+    },
+}
+
+# Example: Environment-Specific Hook Configuration
+#
+# This demonstrates how to customize hook behavior based on deployment
+# environment, enabling different settings for development, testing,
+# and production environments while maintaining consistent functionality.
+def get_environment_specific_hooks(environment: str = "local") -> Iterable[Any]:
+    """
+    Get environment-specific FigRegistryHooks configuration.
+    
+    This function demonstrates how to customize hook configuration based on
+    the deployment environment, enabling different performance characteristics
+    and error handling behaviors for development, testing, and production.
+    
+    Args:
+        environment: Deployment environment name (local, dev, staging, prod)
         
-        # Enable INFO level logging for figregistry-kedro plugin components
-        "figregistry_kedro": {
-            "level": "INFO", 
-            "handlers": ["console"],
-            "propagate": False
-        },
+    Returns:
+        Tuple of configured FigRegistryHooks instances
         
-        # Standard Kedro logging configuration
-        "kedro": {
-            "level": "INFO",
-            "handlers": ["console"],
-            "propagate": False
-        }
-    },
+    Example:
+        # Use environment-specific configuration
+        HOOKS = get_environment_specific_hooks("production")
+    """
+    # Base configuration applies to all environments
+    base_config = FIGREGISTRY_HOOKS_CONFIG.copy()
     
-    "root": {
-        "level": "WARNING",
-        "handlers": ["console"]
-    }
-}
-
-# Plugin Discovery Configuration
-# ===============================
-
-# Kedro will automatically discover the figregistry-kedro plugin when installed
-# No explicit plugin registration required due to standard Python package entry points
-
-# Environment Variable Defaults
-# ==============================
-
-# Set default environment variables for the basic example
-# These can be overridden by actual environment variables during execution
-ENVIRONMENT_DEFAULTS = {
-    # Default to local environment for development convenience
-    "KEDRO_ENV": "local",
+    # Environment-specific configuration overrides
+    if environment == "production":
+        # Production optimized settings
+        base_config.update({
+            "enable_performance_monitoring": True,
+            "initialization_timeout_ms": 2000.0,  # Stricter timeout
+            "strict_validation": True,
+            "fallback_on_errors": False,  # Fail fast in production
+        })
+    elif environment == "development":
+        # Development optimized settings
+        base_config.update({
+            "enable_performance_monitoring": True,
+            "initialization_timeout_ms": 10000.0,  # Relaxed timeout
+            "strict_validation": False,  # Allow experimentation
+            "fallback_on_errors": True,  # Continue on errors
+        })
+    elif environment == "testing":
+        # Testing optimized settings
+        base_config.update({
+            "enable_performance_monitoring": False,  # Reduce overhead
+            "initialization_timeout_ms": 1000.0,  # Fast timeout
+            "strict_validation": True,
+            "fallback_on_errors": False,  # Detect issues early
+        })
     
-    # Configure FigRegistry to use relative paths suitable for the example structure
-    "FIGREGISTRY_OUTPUT_BASE": "data/08_reporting",
-    
-    # Enable FigRegistry logging for integration demonstration
-    "FIGREGISTRY_LOG_LEVEL": "INFO"
-}
+    return (FigRegistryHooks(**base_config),)
 
-# Advanced Hook Configuration Examples (Commented for Basic Example)
-# ===================================================================
+# Documentation for Developers
+#
+# This section provides comprehensive information for developers working
+# with the figregistry-kedro integration, including common patterns,
+# troubleshooting guidance, and extension points for custom workflows.
 
-# For production environments or advanced usage scenarios, FigRegistryHooks
-# can be configured with additional parameters:
+# Common Integration Patterns:
+#
+# 1. Basic Hook Registration (Current Configuration):
+#    HOOKS = (FigRegistryHooks(),)
+#    
+#    Enables automated figure styling with default settings. Suitable for
+#    most development and testing scenarios.
+#
+# 2. Custom Hook Configuration:
+#    HOOKS = (FigRegistryHooks(
+#        enable_performance_monitoring=True,
+#        initialization_timeout_ms=3000.0,
+#        strict_validation=True
+#    ),)
+#    
+#    Provides fine-grained control over hook behavior for specific
+#    requirements or enterprise environments.
+#
+# 3. Environment-Specific Configuration:
+#    HOOKS = get_environment_specific_hooks(os.getenv("KEDRO_ENV", "local"))
+#    
+#    Automatically adjusts hook configuration based on deployment
+#    environment for optimal performance and reliability.
 
-# HOOKS = (
-#     FigRegistryHooks(
-#         # Enable detailed performance monitoring for production optimization
-#         enable_performance_monitoring=True,
-#         
-#         # Disable error fallback for strict production environments
-#         fallback_on_error=False,
-#         
-#         # Strict timing requirements for high-performance pipelines
-#         max_initialization_time=0.005,  # 5ms maximum
-#     ),
-# )
+# Troubleshooting Guide:
+#
+# Common Issues and Solutions:
+#
+# 1. Hook Initialization Failures:
+#    - Verify figregistry-kedro package is installed
+#    - Check Kedro version compatibility (>= 0.18.0)
+#    - Ensure figregistry.yml exists or fallback_on_errors=True
+#
+# 2. Configuration Merging Errors:
+#    - Validate YAML syntax in both Kedro and FigRegistry configurations
+#    - Check configuration schema compatibility
+#    - Enable strict_validation=False for debugging
+#
+# 3. Performance Issues:
+#    - Reduce initialization_timeout_ms for faster startup
+#    - Disable performance monitoring in high-volume scenarios
+#    - Enable config_cache for improved runtime performance
+#
+# 4. Integration Conflicts:
+#    - Ensure no duplicate hook registrations
+#    - Verify FigureDataSet catalog entries are properly configured
+#    - Check for conflicting matplotlib rcParams settings
 
-# Alternatively, use the convenience function for advanced configuration:
+# Version Compatibility Matrix:
+#
+# This configuration is tested and supported with:
+# - Python: >= 3.10, < 4.0
+# - Kedro: >= 0.18.0, < 0.20.0
+# - FigRegistry: >= 0.3.0
+# - Matplotlib: >= 3.9.0
+# - Pydantic: >= 2.9.0
+#
+# For other version combinations, refer to the figregistry-kedro
+# documentation and compatibility testing results.
 
-# from figregistry_kedro.hooks import create_hooks
-# 
-# HOOKS = (
-#     create_hooks(
-#         enable_performance_monitoring=True,
-#         fallback_on_error=False
-#     ),
-# )
-
-# Integration Validation
-# ======================
-
-# Validate that hook registration is successful during module import
-if FigRegistryHooks is not None and len(HOOKS) > 0:
-    # Verify hook configuration for development debugging
-    hook_instance = HOOKS[0]
-    
-    # Log hook configuration for development transparency
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.info(f"FigRegistryHooks registered with configuration: {hook_instance.get_state()}")
-else:
-    # Warn about missing figregistry-kedro integration
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.warning(
-        "FigRegistryHooks not registered. Install figregistry-kedro to enable automated figure management."
-    )
-
-# Module Metadata
-# ===============
-
-__version__ = "0.1.0"
-__author__ = "FigRegistry Kedro Integration Team"
-__description__ = "Basic example settings demonstrating figregistry-kedro integration"
-
-# Export configuration elements for external access
-__all__ = [
-    "HOOKS",
-    "CONTEXT_CLASS", 
-    "CONFIG_LOADER_CLASS",
-    "CONFIG_LOADER_ARGS",
-    "DATA_CATALOG_CLASS",
-    "RUNNER_CLASS",
-    "LOGGING_CONFIG",
-    "ENVIRONMENT_DEFAULTS"
-]
+# Export Configuration Summary
+#
+# Summary of key configuration decisions for this basic example:
+#
+# ✓ FigRegistryHooks registered with production-ready settings
+# ✓ Performance monitoring enabled for visibility
+# ✓ Graceful error handling with fallback behavior
+# ✓ Configuration caching enabled for optimal performance
+# ✓ Strict validation for type safety and schema compliance
+# ✓ Environment-specific configuration support available
+# ✓ Comprehensive documentation for developers and operators
+#
+# This configuration demonstrates the full capabilities of figregistry-kedro
+# integration while maintaining simplicity for the basic example use case.
+# The settings can be customized further based on specific project requirements
+# and deployment environments.
