@@ -1,279 +1,485 @@
-# config_merge_baseline.yml
-# Expected YAML configuration baseline representing successful FigRegistryConfigBridge merging operations
-# This file demonstrates the expected result when FigRegistryConfigBridge merges Kedro's ConfigLoader
-# configuration (from conf/base/figregistry.yml and conf/local/figregistry.yml) with traditional
-# standalone figregistry.yaml configuration according to Section 5.2.5 requirements.
+# FigRegistry-Kedro Configuration Merge Baseline
+# Expected output from FigRegistryConfigBridge.merge_configurations() operations
 #
-# Configuration Precedence Rules (per F-007.2):
-# 1. Environment-specific Kedro configurations override base configurations  
-# 2. Kedro configurations override standalone figregistry.yaml settings
-# 3. Deep merging for nested dictionaries
-# 4. Performance requirement: <50ms merge operation time (Section 6.6.4.3)
+# This file represents the validated baseline result of merging Kedro's ConfigLoader
+# configurations with traditional FigRegistry YAML settings through the configuration
+# bridge. It demonstrates precedence rules, environment-specific overrides, and
+# Pydantic schema compliance requirements.
+#
+# Requirements Coverage:
+# - Section 5.2.5: FigRegistryConfigBridge merged configuration structure
+# - F-007.2: Configuration precedence rules with environment-specific overrides
+# - Section 6.6.4.3: Performance testing baseline for <50ms merge operations
+# - FigRegistryConfigSchema: Pydantic validation compliance for merged configurations
 
-# Core styling configuration - merged from both Kedro and standalone FigRegistry sources
+# =============================================================================
+# Core FigRegistry Configuration (Merged)
+# =============================================================================
+figregistry_version: ">=0.3.0"
+environment: "local"  # Overridden from base "base" by environment-specific config
+
+# =============================================================================
+# Merged Style Conditions (Kedro Precedence Applied)
+# =============================================================================
+# Demonstrates F-007.2 precedence rules where Kedro-specific parameters
+# take priority over base FigRegistry configurations
 styles:
-  # Base styling conditions from traditional figregistry.yaml
-  exploratory:
-    figure.figsize: [12, 8]
-    axes.titlesize: 14
-    axes.labelsize: 12
-    xtick.labelsize: 10
-    ytick.labelsize: 10
-    legend.fontsize: 11
-    lines.linewidth: 2.0
-    lines.markersize: 6
-    grid.alpha: 0.3
-    
-  presentation:
-    figure.figsize: [16, 9]
-    axes.titlesize: 16
-    axes.labelsize: 14
-    xtick.labelsize: 12
-    ytick.labelsize: 12
-    legend.fontsize: 12
-    lines.linewidth: 2.5
-    lines.markersize: 8
-    grid.alpha: 0.2
-    
-  publication:
-    figure.figsize: [10, 6]
-    figure.dpi: 300
-    axes.titlesize: 14
-    axes.labelsize: 12
-    xtick.labelsize: 10
-    ytick.labelsize: 10
-    legend.fontsize: 10
-    lines.linewidth: 1.5
-    lines.markersize: 4
-    grid.alpha: 0.15
-    savefig.bbox: tight
-    savefig.pad_inches: 0.1
-    
-  # Kedro environment-specific styling overrides (demonstrate precedence)
-  kedro_development:
-    figure.figsize: [10, 6]
-    axes.titlesize: 13
-    axes.labelsize: 11
-    xtick.labelsize: 9
-    ytick.labelsize: 9
-    legend.fontsize: 10
-    lines.linewidth: 1.8
-    grid.alpha: 0.25
-    # Environment override demonstrates precedence over base configuration
-    
-  kedro_production:
-    figure.figsize: [12, 8]
-    figure.dpi: 300
-    axes.titlesize: 15
-    axes.labelsize: 13
-    xtick.labelsize: 11
-    ytick.labelsize: 11
-    legend.fontsize: 11
-    lines.linewidth: 2.0
-    lines.markersize: 5
-    grid.alpha: 0.2
-    savefig.bbox: tight
-    savefig.format: pdf
-    # Production overrides demonstrating environment-specific precedence
-    
-  # Complex condition patterns for comprehensive testing
-  experiment_type_a:
-    figure.figsize: [14, 10]
-    axes.titlesize: 16
-    lines.linewidth: 3.0
-    lines.color: '#2E86AB'
-    
-  experiment_type_b:
-    figure.figsize: [8, 6]
-    axes.titlesize: 12
-    lines.linewidth: 2.0
-    lines.color: '#A23B72'
+  # Base conditions from FigRegistry with Kedro parameter enrichment
+  control:
+    color: "#1f77b4"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Control"
+    zorder: 1
+    # Kedro parameter injection example
+    _source: "figregistry_base"
+    _enhanced_by: "kedro_parameters"
 
-# Color palettes merged from both configuration sources
+  treatment_a:
+    color: "#ff7f0e"  # Overridden by Kedro environment-specific config
+    marker: "s"
+    linestyle: "--"
+    linewidth: 2.5
+    markersize: 7
+    alpha: 0.9
+    label: "Treatment A"
+    zorder: 2
+    _source: "kedro_override"
+
+  treatment_b:
+    color: "#2ca02c"
+    marker: "^"
+    linestyle: "-."
+    linewidth: 2.0
+    markersize: 8
+    alpha: 0.85
+    label: "Treatment B"
+    zorder: 2
+    _source: "figregistry_base"
+
+  baseline:
+    color: "#9467bd"
+    marker: "v"
+    linestyle: "-"
+    linewidth: 1.8
+    markersize: 6
+    alpha: 0.7
+    label: "Baseline"
+    zorder: 1
+    _source: "figregistry_base"
+
+  # Kedro-injected experimental conditions from pipeline parameters
+  local_experiment:
+    color: "#e74c3c"  # Injected by Kedro local environment
+    marker: "D"
+    linestyle: ":"
+    linewidth: 2.0
+    markersize: 5
+    alpha: 0.8
+    label: "Local Experiment"
+    zorder: 3
+    _source: "kedro_injection"
+    _experiment_phase: "development"
+
+  # Dynamic condition from Kedro runtime parameters
+  dynamic_condition:
+    color: "#f39c12"
+    marker: "p"
+    linestyle: "-"
+    linewidth: 1.5
+    markersize: 6
+    alpha: 0.7
+    label: "Dynamic Analysis"
+    zorder: 2
+    _source: "kedro_runtime"
+    _condition_param: "analysis_stage"
+
+  # Wildcard patterns enhanced by Kedro configuration
+  exploratory_dev:
+    color: "#d62728"
+    marker: "x"
+    linestyle: ":"
+    linewidth: 1.5
+    markersize: 5
+    alpha: 0.6
+    label: "Exploratory Dev"
+    zorder: 0
+    _source: "figregistry_pattern"
+    _matched_pattern: "exploratory_*"
+
+# =============================================================================
+# Merged Color Palettes (Combined Sources)
+# =============================================================================
 palettes:
-  # Base palette from standalone figregistry.yaml
-  default:
-    primary: '#1f77b4'
-    secondary: '#ff7f0e'
-    accent: '#2ca02c'
-    warning: '#d62728'
-    info: '#9467bd'
-    
-  # Kedro environment-specific palette overrides
-  scientific:
-    primary: '#2E86AB'
-    secondary: '#A23B72'
-    accent: '#F18F01'
-    background: '#C73E1D'
-    
-  # Production quality palette (demonstrates environment precedence)
-  publication_ready:
-    primary: '#000000'
-    secondary: '#404040'
-    accent: '#808080'
-    grid: '#C0C0C0'
-    background: '#FFFFFF'
+  # Base palettes from FigRegistry
+  default: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+  colorblind_safe: ["#0173b2", "#de8f05", "#029e73", "#d55e00", "#cc78bc", "#ca9161"]
+  
+  # Kedro environment-specific palette additions
+  local_development: ["#e74c3c", "#f39c12", "#9b59b6", "#1abc9c", "#34495e"]
+  
+  # Merged palette combining both sources
+  project_specific:
+    - "#1f77b4"  # From FigRegistry base
+    - "#e74c3c"  # From Kedro local override
+    - "#2ca02c"  # From FigRegistry base
+    - "#f39c12"  # From Kedro parameter injection
 
-# Output configuration - merged with Kedro path aliases and traditional settings
+# =============================================================================
+# Merged Output Configuration (Kedro Path Integration)
+# =============================================================================
 outputs:
-  # Base output paths from standalone figregistry.yaml
-  base_path: "figures"
-  timestamp_format: "%Y%m%d_%H%M%S"
+  # Base path resolution with Kedro environment override
+  base_path: "data/08_reporting/figures"  # From Kedro ConfigLoader
   
-  # Kedro data layer integration paths (demonstrate Kedro precedence)
-  data_layers:
-    exploratory: "data/08_reporting/exploratory"
-    presentation: "data/08_reporting/presentation" 
-    publication: "data/08_reporting/publication"
-    
-  # Kedro catalog path aliases (override traditional paths)
+  # Path aliases integrated with Kedro data layer structure
   path_aliases:
-    expl: "${base_path}/exploratory"
-    pres: "${base_path}/presentation"
-    pub: "${base_path}/publication"
-    
-  # File naming patterns enhanced with Kedro parameters
-  naming_patterns:
-    default: "{condition}_{timestamp}"
-    versioned: "{condition}_{timestamp}_{version}"
-    kedro_dataset: "{purpose}_{condition_param}_{timestamp}"
-    
-  # Output format specifications
-  formats:
-    default: "png"
-    publication: "pdf"
-    presentation: ["png", "svg"]
-    
-  # DPI settings with environment overrides
-  dpi:
-    exploratory: 100
-    presentation: 200
-    publication: 300
-    kedro_production: 600  # Environment override demonstrates precedence
+    expl: "01_raw/exploratory"
+    eda: "01_raw/exploratory"
+    inter: "02_intermediate/figures"
+    primary: "03_primary/figures"
+    report: "08_reporting/figures"
+    pres: "08_reporting/presentation"
+    pub: "08_reporting/publication"
+    # Kedro-specific aliases
+    debug: "debug/figures"
+    local: "local/figures"
+    temp: "temp/figures"
+  
+  # Naming configuration with Kedro parameter substitution
+  timestamp_format: "{name}_{ts:%Y%m%d_%H%M%S}"
+  slug_format: "{purpose}_{name}_{condition}"
+  
+  # Format configuration merged from both sources
+  default_format: "png"
+  formats: ["png", "pdf", "svg"]
+  
+  # Quality settings with Kedro environment overrides
+  dpi: 300  # Overridden by Kedro local environment (from base 150)
+  bbox_inches: "tight"
+  pad_inches: 0.1
+  facecolor: "white"
+  edgecolor: "none"
+  transparent: false
+  metadata: true
 
-# Default configuration values - merged from both sources  
+# =============================================================================
+# Merged Defaults (Combined rcParams)
+# =============================================================================
 defaults:
-  # Base defaults from standalone figregistry.yaml
-  condition: "exploratory"
-  palette: "default"
-  output_format: "png"
-  dpi: 100
+  # Figure configuration with Kedro parameter injection
+  figure:
+    figsize: [12, 8]  # Overridden by Kedro parameters from [10, 6]
+    dpi: 150
   
-  # Kedro-specific defaults (demonstrate integration)
-  purpose: "exploratory"
-  condition_param: "experiment_type"
-  style_params: {}
+  # Line defaults from FigRegistry base
+  line:
+    color: "#2E86AB"
+    linewidth: 2.0
   
-  # Performance defaults optimized for Kedro pipeline execution
-  enable_caching: true
-  cache_size: 1000
-  concurrent_access: true
+  # Fallback style with Kedro enhancements
+  fallback_style:
+    color: "#95A5A6"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Unknown Condition"
+    _fallback_source: "figregistry_base"
+  
+  # Font configuration merged from both sources
+  font_family: "sans-serif"
+  font_size: 12
+  title_size: 14
+  label_size: 12
+  tick_size: 10
+  
+  # Grid configuration with Kedro local override
+  grid: true  # Enabled by Kedro local environment
+  grid_alpha: 0.3
+  grid_linewidth: 0.8
+  
+  # Axis configuration from FigRegistry base
+  spine_visibility:
+    top: false
+    right: false
+    bottom: true
+    left: true
+  
+  # Save configuration merged
+  savefig_dpi: 300
+  savefig_bbox: "tight"
+  savefig_pad_inches: 0.1
+  savefig_format: "png"
+
+# =============================================================================
+# Kedro Integration Context (Bridge-Generated)
+# =============================================================================
+# This section is generated by FigRegistryConfigBridge to provide
+# Kedro-specific context and parameter resolution
+kedro:
+  # Configuration bridge metadata
+  config_bridge:
+    enabled: true
+    merge_strategy: "override"
+    merge_timestamp: "2024-01-15T10:30:45Z"
+    merge_duration_ms: 8.5  # Performance target <10ms achieved
+    cache_enabled: true
+    validation_passed: true
+  
+  # Dataset integration settings
+  datasets:
+    default_purpose: "exploratory"
+    auto_register: true
+    versioning_enabled: true
+  
+  # Pipeline execution settings from Kedro environment
+  execution:
+    parallel_enabled: true
+    max_workers: 4
+    debug_mode: true  # Local environment override
+    verbose_logging: true  # Local environment override
+  
+  # Performance settings
+  performance:
+    cache_styling: false  # Disabled in local environment for development
+    cache_ttl_seconds: 3600
+    enable_concurrent_access: true
+    monitoring_enabled: false  # Local environment setting
   
   # Validation settings
-  strict_validation: false
-  error_on_missing: false
-
-# Kedro-specific integration settings (added by configuration bridge)
-kedro:
-  # Plugin configuration settings
-  plugin_enabled: true
-  hook_registration: true
-  dataset_integration: true
+  validation:
+    enabled: true
+    strict_mode: false  # Relaxed for local development
+    fail_on_missing_styles: false
   
-  # Environment-specific overrides
-  environment_overrides:
-    local:
-      debug: true
-      verbose_logging: true
-      performance_monitoring: true
-    production:
-      debug: false
-      verbose_logging: false
-      performance_monitoring: false
-      strict_validation: true
-      
-  # Catalog integration parameters
-  catalog_config:
-    default_purpose: "exploratory"
-    auto_versioning: true
-    path_resolution: "kedro_style"
-    
-  # Data layer mappings for automatic purpose detection
-  purpose_mappings:
+  # Purpose mapping for automatic resolution
+  purpose_mapping:
     "01_raw": "exploratory"
-    "02_intermediate": "exploratory"
-    "03_primary": "presentation"
-    "04_feature": "presentation"
-    "05_model_input": "presentation"
-    "06_models": "publication"
-    "07_model_output": "publication"
+    "02_intermediate": "analysis"
+    "03_primary": "analysis"
     "08_reporting": "publication"
 
-# Performance configuration for <50ms merge operation requirement (Section 6.6.4.3)
-performance:
-  # Caching configuration optimized for bridge operations
-  config_cache:
+# =============================================================================
+# Kedro Runtime Context (Parameter Injection)
+# =============================================================================
+# Context section created by configuration bridge containing resolved
+# Kedro parameters for condition-based styling resolution
+_kedro_context:
+  # Merged Kedro parameters for condition resolution
+  parameters:
+    experiment_condition: "local_experiment"
+    experiment_phase: "development"
+    analysis_stage: "dynamic_condition"
+    model_type: "baseline"
+    # Plot-specific parameters
+    plot_settings:
+      figure_size: [12, 8]
+      dpi: 150
+      enable_grid: true
+    # Execution configuration
+    execution_config:
+      output_base_path: "data/08_reporting/figures"
+      figure_formats: ["png", "pdf"]
+      parallel_workers: 4
+  
+  # Configuration loader information
+  config_loader:
+    environment: "local"
+    config_source: "conf"
+    available_environments: ["base", "local", "staging", "production"]
+  
+  # Bridge processing metadata
+  bridge_metadata:
+    kedro_config_sections_loaded: ["parameters", "figregistry", "catalog"]
+    figregistry_config_files_found: ["conf/base/figregistry.yml", "conf/local/figregistry.yml"]
+    precedence_rules_applied:
+      - "kedro_parameters_override_base"
+      - "local_environment_overrides_base"
+      - "figregistry_base_provides_defaults"
+    merge_conflicts_resolved: 3
+    validation_warnings: 0
+
+# =============================================================================
+# Environment-Specific Overrides (F-007.2 Demonstration)
+# =============================================================================
+# Section demonstrating precedence rules where environment-specific
+# configurations override base settings
+environment_overrides:
+  # Applied overrides from local environment
+  applied_overrides:
+    environment: "local"  # base -> local
+    "outputs.dpi": 300     # 150 -> 300
+    "defaults.figure.figsize": [12, 8]  # [10, 6] -> [12, 8]
+    "defaults.grid": true   # Explicitly set for local
+    "kedro.execution.debug_mode": true  # false -> true
+    "kedro.execution.verbose_logging": true  # false -> true
+    "kedro.performance.cache_styling": false  # true -> false
+    "kedro.validation.strict_mode": false  # true -> false
+  
+  # Override sources for traceability
+  override_sources:
+    "conf/local/figregistry.yml":
+      - "environment"
+      - "outputs.dpi"
+      - "kedro.execution.debug_mode"
+      - "kedro.performance.cache_styling"
+    "kedro_parameters":
+      - "defaults.figure.figsize"
+      - "defaults.grid"
+    "runtime_injection":
+      - "styles.local_experiment"
+      - "styles.dynamic_condition"
+
+# =============================================================================
+# Performance Metrics (Section 6.6.4.3 Compliance)
+# =============================================================================
+# Performance tracking for configuration bridge operations to validate
+# <50ms merge operation target from Section 6.6.4.3
+performance_metrics:
+  # Merge operation timing
+  merge_operation:
+    total_duration_ms: 8.5  # Target: <50ms ✓
+    breakdown_ms:
+      kedro_config_load: 2.1
+      figregistry_config_load: 1.8
+      merge_processing: 3.2
+      validation: 1.2
+      cache_operations: 0.2
+  
+  # Configuration complexity metrics
+  complexity:
+    total_config_sections: 12
+    style_conditions_count: 7
+    palette_definitions: 4
+    override_rules_applied: 6
+    validation_rules_checked: 15
+  
+  # Memory usage tracking
+  memory:
+    config_object_size_kb: 24.3
+    cache_size_kb: 156.7
+    peak_memory_usage_kb: 312.4
+  
+  # Cache performance
+  cache:
     enabled: true
-    max_size: 100
+    hit_rate: 0.0  # First merge operation
+    cache_key: "ConfigLoader_local_None_figregistry"
+    cached_at: "2024-01-15T10:30:45Z"
     ttl_seconds: 3600
-    
-  # Merge operation optimization
-  merge_optimization:
-    deep_merge_threshold: 10
-    validation_caching: true
-    lazy_evaluation: true
-    parallel_validation: false  # Sequential for <50ms target
-    
-  # Monitoring settings for performance validation
-  monitoring:
-    track_merge_time: true
-    alert_threshold_ms: 50
-    performance_logging: true
 
-# Environment metadata (added by configuration bridge)
-environment: "base"
-
-# Configuration validation settings
-validation_enabled: true
-enable_concurrent_access: true
-
-# Configuration merge metadata (for testing validation)
-merge_metadata:
-  sources:
-    - "figregistry.yaml"
-    - "conf/base/figregistry.yml"
-    - "conf/local/figregistry.yml"
-  precedence_order:
-    - "environment_specific_kedro"
-    - "base_kedro"
-    - "standalone_figregistry"
-  merge_strategy: "deep_merge"
-  validation_schema: "FigRegistryKedroConfig"
+# =============================================================================
+# Schema Validation Results
+# =============================================================================
+# Pydantic validation results demonstrating compliance with
+# FigRegistryConfigSchema requirements per Section 5.2.5
+validation:
+  # Schema compliance
+  schema_validation:
+    model: "FigRegistryConfigSchema"
+    status: "passed"
+    validation_time_ms: 1.2
+    errors: []
+    warnings: []
   
-# Version information for compatibility tracking
-version_info:
-  figregistry_version: ">=0.3.0"
-  kedro_version: ">=0.18.0,<0.20.0"
-  plugin_version: "0.1.0"
-  schema_version: "1.0"
+  # Field validation results
+  field_validation:
+    figregistry_version: "valid"
+    metadata: "valid"
+    styles: "valid_with_enhancements"
+    palettes: "valid"
+    defaults: "valid_with_overrides"
+    outputs: "valid_with_kedro_integration"
+    kedro: "valid_extension"
   
-# Configuration completeness validation
-required_sections:
-  - styles
-  - outputs
-  - defaults
+  # Type safety verification
+  type_safety:
+    strict_typing: true
+    type_coercion_applied: false
+    custom_validators_passed: true
   
-optional_sections:
-  - palettes
-  - kedro
-  - performance
-  - validation_enabled
-  - enable_concurrent_access
+  # Configuration completeness
+  completeness:
+    required_sections_present: true
+    optional_sections_count: 8
+    extension_sections_count: 2  # _kedro_context, environment_overrides
+    total_configuration_depth: 5
 
-# Expected validation results for testing
-validation_results:
-  schema_compliance: true
-  type_safety: true
-  precedence_correctness: true
-  performance_target_met: true
-  merge_time_ms: 15  # Well under 50ms requirement
+# =============================================================================
+# Metadata and Documentation
+# =============================================================================
+metadata:
+  # Configuration source tracking
+  config_sources:
+    primary: "kedro_configloader"
+    secondary: "figregistry_yaml"
+    environment: "local"
+    merge_strategy: "kedro_precedence"
+  
+  # Merge operation metadata
+  merge_info:
+    bridge_version: "1.0.0"
+    merge_timestamp: "2024-01-15T10:30:45Z"
+    merge_duration_ms: 8.5
+    kedro_version: "0.18.14"
+    figregistry_version: "0.3.0"
+    python_version: "3.11.7"
+  
+  # Configuration validation
+  validation_info:
+    schema_version: "2.0"
+    pydantic_model: "FigRegistryConfigSchema"
+    validation_passed: true
+    validation_duration_ms: 1.2
+    strict_validation: false  # Local environment setting
+  
+  # Usage and testing metadata
+  usage:
+    config_type: "merged_baseline"
+    intended_use: "performance_testing"
+    test_scenarios: ["precedence_rules", "environment_overrides", "schema_compliance"]
+    compatible_environments: ["local", "staging", "production"]
+  
+  # Performance baseline documentation
+  performance_baseline:
+    target_merge_time_ms: 50  # Section 6.6.4.3 requirement
+    achieved_merge_time_ms: 8.5
+    performance_ratio: 0.17  # 83% better than target
+    baseline_established: "2024-01-15T10:30:45Z"
+    memory_efficiency: "high"
+    cache_effectiveness: "enabled"
+
+# =============================================================================
+# Test Validation Markers
+# =============================================================================
+# Markers used by test framework to validate configuration bridge functionality
+_test_validation:
+  # Expected outcomes for test verification
+  expected_merge_behavior:
+    precedence_kedro_over_figregistry: true
+    environment_overrides_base: true
+    parameter_injection_successful: true
+    schema_validation_passed: true
+    performance_target_met: true
+  
+  # Specific test assertions
+  test_assertions:
+    config_sections_count: 12
+    style_conditions_with_kedro_enhancements: 2
+    environment_overrides_applied_count: 6
+    performance_under_50ms: true
+    cache_enabled: true
+    validation_errors_count: 0
+  
+  # Configuration bridge behavior verification
+  bridge_behavior:
+    merge_strategy_applied: "override"
+    kedro_precedence_enforced: true
+    figregistry_defaults_preserved: true
+    runtime_parameter_injection: true
+    environment_specific_overrides: true
+    pydantic_validation_successful: true
