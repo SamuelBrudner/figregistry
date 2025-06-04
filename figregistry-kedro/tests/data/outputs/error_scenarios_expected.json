@@ -1,352 +1,722 @@
 {
   "metadata": {
-    "description": "Expected error messages, fallback behaviors, and graceful degradation patterns for FigRegistry-Kedro plugin failure scenarios",
-    "version": "1.0.0",
-    "created_for": "Security testing validation per Section 6.6.8.1-6.6.8.2 and comprehensive error handling per Section 4.1.3.3",
-    "test_categories": [
-      "configuration_security",
-      "filesystem_security", 
-      "hook_registration_failures",
-      "catalog_parameter_validation",
-      "f002_fallback_scenarios",
-      "plugin_integration_failures"
+    "file_description": "Comprehensive error scenarios documentation for figregistry-kedro plugin testing",
+    "version": "0.1.0",
+    "created_for": "FigRegistry-Kedro Plugin Testing Framework",
+    "compliance_sections": [
+      "Section 4.1.3.3 - Error Recovery Mechanisms",
+      "Section 6.6.8.1 - Configuration Security Testing", 
+      "Section 6.6.8.2 - File System Security Testing",
+      "Section 5.2.6 - FigureDataSet Component",
+      "Section 5.2.7 - FigRegistryHooks Component",
+      "Section F-002 - Fallback Requirements"
+    ],
+    "last_updated": "2024-12-19",
+    "test_scope": "Error handling validation, graceful degradation, security testing, fallback mechanisms"
+  },
+
+  "configuration_errors": {
+    "description": "Expected behaviors for configuration schema validation failures and malformed YAML files per Section 6.6.8.1",
+    
+    "malformed_yaml": {
+      "scenario": "YAML syntax errors in configuration files",
+      "test_files": ["invalid_schema.yml"],
+      "expected_behaviors": {
+        "missing_quotes": {
+          "error_type": "YAMLParseError",
+          "error_message": "Error parsing YAML configuration: missing closing quote on line {line_number}",
+          "fallback_behavior": "Skip malformed configuration, load defaults, issue warning",
+          "user_action": "Check YAML syntax and fix quoted strings",
+          "recovery_mechanism": "Continue with built-in defaults"
+        },
+        "invalid_indentation": {
+          "error_type": "YAMLIndentationError", 
+          "error_message": "YAML indentation error in {file_path} at line {line_number}: {details}",
+          "fallback_behavior": "Configuration loading failed, reverting to safe defaults",
+          "user_action": "Validate YAML indentation using YAML linter",
+          "recovery_mechanism": "Default configuration applied with warning logged"
+        },
+        "duplicate_keys": {
+          "error_type": "YAMLDuplicateKeyError",
+          "error_message": "Duplicate key '{key_name}' found in {section} section",
+          "fallback_behavior": "Use first occurrence of key, warn about duplicate",
+          "user_action": "Remove duplicate configuration keys",
+          "recovery_mechanism": "First key value retained, subsequent ignored"
+        }
+      }
+    },
+
+    "schema_validation_failures": {
+      "scenario": "Pydantic schema validation errors for configuration content",
+      "test_cases": [
+        {
+          "field": "figregistry_version",
+          "invalid_value": 123.45,
+          "expected_type": "string",
+          "error_message": "figregistry_version must be string type, received {type}: {value}",
+          "fallback_behavior": "Use default version constraint, continue loading",
+          "recovery_mechanism": "Apply version '0.3.0' as default"
+        },
+        {
+          "field": "styles.invalid_color",
+          "invalid_value": "not_a_valid_color",
+          "expected_type": "valid_color_string",
+          "error_message": "Invalid color specification '{value}' in style '{style_name}': must be hex color or named color",
+          "fallback_behavior": "Skip invalid style definition, use palette fallback",
+          "recovery_mechanism": "Remove invalid style from condition mapping"
+        },
+        {
+          "field": "styles.invalid_marker",
+          "invalid_value": "invalid_marker_type",
+          "expected_type": "valid_matplotlib_marker",
+          "error_message": "Invalid matplotlib marker '{value}' in style '{style_name}': {allowed_markers}",
+          "fallback_behavior": "Default to 'o' marker, log warning",
+          "recovery_mechanism": "Replace with standard marker, preserve other style properties"
+        },
+        {
+          "field": "outputs.dpi",
+          "invalid_value": "not_a_number",
+          "expected_type": "number",
+          "error_message": "DPI setting must be numeric, received '{value}' of type {type}",
+          "fallback_behavior": "Use default DPI of 150, continue processing",
+          "recovery_mechanism": "Apply standard DPI setting"
+        },
+        {
+          "field": "defaults.figure_size",
+          "invalid_value": "not_a_list",
+          "expected_type": "list_of_numbers",
+          "error_message": "figure_size must be list of two numbers [width, height], received: {value}",
+          "fallback_behavior": "Use default figure size [10, 6]",
+          "recovery_mechanism": "Apply matplotlib default figure dimensions"
+        }
+      ]
+    },
+
+    "security_violations": {
+      "scenario": "Configuration injection and path traversal prevention per Section 6.6.8.2",
+      "test_cases": [
+        {
+          "attack_type": "path_traversal",
+          "malicious_input": "../../sensitive_file",
+          "field": "outputs.base_path",
+          "error_message": "Security violation: path traversal detected in base_path: '{value}'",
+          "fallback_behavior": "Reject path, use safe default output directory",
+          "recovery_mechanism": "Apply project root/outputs as safe path",
+          "security_action": "Log security event, sanitize path"
+        },
+        {
+          "attack_type": "absolute_path_injection",
+          "malicious_input": "/etc/passwd",
+          "field": "outputs.path_aliases.malicious",
+          "error_message": "Security violation: absolute path not allowed in path alias: '{value}'",
+          "fallback_behavior": "Remove malicious alias, preserve valid aliases",
+          "recovery_mechanism": "Filter out dangerous paths, maintain safe configurations",
+          "security_action": "Block absolute paths outside project directory"
+        },
+        {
+          "attack_type": "command_injection",
+          "malicious_input": "$(rm -rf /)",
+          "field": "outputs.timestamp_format",
+          "error_message": "Security violation: potential command injection in timestamp_format: '{value}'",
+          "fallback_behavior": "Use default timestamp format '%Y%m%d_%H%M%S'",
+          "recovery_mechanism": "Apply safe timestamp pattern",
+          "security_action": "Sanitize format strings, prevent code execution"
+        }
+      ]
+    },
+
+    "missing_configuration_files": {
+      "scenario": "FigRegistry configuration missing or inaccessible per F-002 fallback requirements",
+      "missing_figregistry_yaml": {
+        "error_type": "ConfigurationNotFoundWarning",
+        "error_message": "figregistry.yaml not found in project directory. Using default configuration.",
+        "fallback_behavior": "Initialize with built-in defaults, continue operation",
+        "user_action": "Create figregistry.yaml or configure via Kedro conf/base/figregistry.yml",
+        "recovery_mechanism": "Full functionality with default styling available"
+      },
+      "missing_kedro_config": {
+        "error_type": "KedroConfigNotFoundWarning", 
+        "error_message": "conf/base/figregistry.yml not found. Plugin will use FigRegistry defaults only.",
+        "fallback_behavior": "Skip Kedro configuration merge, use FigRegistry standalone mode",
+        "user_action": "Create conf/base/figregistry.yml for Kedro-specific configuration",
+        "recovery_mechanism": "Operate in compatibility mode with reduced integration"
+      },
+      "inaccessible_config": {
+        "error_type": "ConfigurationAccessError",
+        "error_message": "Permission denied accessing configuration file: {file_path}",
+        "fallback_behavior": "Skip inaccessible file, attempt alternative configuration sources",
+        "user_action": "Check file permissions or provide alternative configuration",
+        "recovery_mechanism": "Try multiple configuration sources in order of precedence"
+      }
+    }
+  },
+
+  "dependency_errors": {
+    "description": "Expected behaviors when required dependencies are missing or incompatible",
+
+    "missing_kedro": {
+      "scenario": "Kedro framework not installed or wrong version",
+      "error_type": "ImportError",
+      "error_message": "kedro>=0.18.0,<0.20.0 required but not found. Install with: pip install 'kedro>=0.18.0,<0.20.0'",
+      "fallback_behavior": "Plugin initialization fails gracefully",
+      "user_action": "Install compatible Kedro version",
+      "recovery_mechanism": "Cannot function as Kedro plugin, suggest standalone FigRegistry"
+    },
+
+    "missing_figregistry": {
+      "scenario": "Core FigRegistry package not installed or incompatible version",
+      "error_type": "ImportError", 
+      "error_message": "figregistry>=0.3.0 required but not found. Install with: pip install 'figregistry>=0.3.0'",
+      "fallback_behavior": "Plugin cannot initialize, fail with clear instructions",
+      "user_action": "Install compatible FigRegistry version",
+      "recovery_mechanism": "No recovery possible, dependency is mandatory"
+    },
+
+    "incompatible_matplotlib": {
+      "scenario": "Matplotlib version incompatible with plugin requirements",
+      "error_type": "VersionCompatibilityError",
+      "error_message": "matplotlib>={required_version} required, found {current_version}. Upgrade with: pip install --upgrade matplotlib",
+      "fallback_behavior": "Warn about potential compatibility issues, attempt operation",
+      "user_action": "Upgrade matplotlib to compatible version", 
+      "recovery_mechanism": "Limited functionality mode with warnings"
+    },
+
+    "missing_pydantic": {
+      "scenario": "Pydantic not available for configuration validation",
+      "error_type": "ImportError",
+      "error_message": "pydantic>=2.9.0 required for configuration validation. Install with: pip install 'pydantic>=2.9.0'",
+      "fallback_behavior": "Skip strict validation, use basic type checking",
+      "user_action": "Install pydantic for full validation support",
+      "recovery_mechanism": "Basic validation mode with reduced error checking"
+    }
+  },
+
+  "filesystem_errors": {
+    "description": "Expected behaviors for filesystem access failures and security issues per Section 6.6.8.2",
+
+    "permission_denied": {
+      "scenario": "Insufficient permissions to write output files",
+      "error_type": "PermissionError",
+      "error_message": "Permission denied writing to {output_path}. Check directory permissions.",
+      "fallback_behavior": "Attempt to write to temporary directory, warn user",
+      "user_action": "Grant write permissions to output directory or change output path",
+      "recovery_mechanism": "Write to user temp directory with modified filename"
+    },
+
+    "disk_full": {
+      "scenario": "Insufficient disk space for figure output",
+      "error_type": "OSError",
+      "error_message": "Disk full: cannot write figure to {output_path}. Free disk space required.",
+      "fallback_behavior": "Abort save operation, preserve figure object in memory",
+      "user_action": "Free disk space or change output location",
+      "recovery_mechanism": "Return figure object without saving, allow manual save"
+    },
+
+    "invalid_path_characters": {
+      "scenario": "Invalid characters in output filename",
+      "error_type": "FilenameValidationError",
+      "error_message": "Invalid characters in filename '{filename}': {invalid_chars}. Using sanitized name: '{sanitized_name}'",
+      "fallback_behavior": "Replace invalid characters with safe alternatives",
+      "user_action": "Use valid filename characters in figure names",
+      "recovery_mechanism": "Auto-sanitize filenames while preserving readability"
+    },
+
+    "path_too_long": {
+      "scenario": "Output path exceeds filesystem limits",
+      "error_type": "PathTooLongError",
+      "error_message": "Output path too long ({length} chars, max {max_length}): {path}",
+      "fallback_behavior": "Truncate path components while preserving uniqueness",
+      "user_action": "Shorten output path or use path aliases",
+      "recovery_mechanism": "Generate abbreviated path with hash suffix for uniqueness"
+    },
+
+    "readonly_filesystem": {
+      "scenario": "Attempting to write to read-only filesystem",
+      "error_type": "ReadOnlyFilesystemError",
+      "error_message": "Cannot write to read-only filesystem at {path}",
+      "fallback_behavior": "Skip save operation, log error with suggested alternatives",
+      "user_action": "Change output directory to writable location",
+      "recovery_mechanism": "Provide list of alternative writable directories"
+    }
+  },
+
+  "catalog_parameter_errors": {
+    "description": "Expected behaviors for invalid catalog parameter specifications per Section 5.2.6",
+
+    "invalid_condition_param": {
+      "scenario": "Malformed condition_param in catalog configuration",
+      "test_cases": [
+        {
+          "invalid_value": 123,
+          "expected_type": "string",
+          "error_message": "condition_param must be string, received {type}: {value}",
+          "fallback_behavior": "Skip condition-based styling, use default style",
+          "recovery_mechanism": "Apply base styling without conditional logic"
+        },
+        {
+          "invalid_value": "",
+          "expected_type": "non_empty_string", 
+          "error_message": "condition_param cannot be empty string",
+          "fallback_behavior": "Use figure name as condition parameter",
+          "recovery_mechanism": "Derive condition from dataset name or figure title"
+        },
+        {
+          "invalid_value": "invalid.parameter.name",
+          "expected_type": "valid_identifier",
+          "error_message": "condition_param '{value}' must be valid Python identifier",
+          "fallback_behavior": "Sanitize parameter name, warn about changes",
+          "recovery_mechanism": "Convert to valid identifier: 'invalid_parameter_name'"
+        }
+      ]
+    },
+
+    "invalid_style_params": {
+      "scenario": "Malformed style_params override configuration",
+      "test_cases": [
+        {
+          "invalid_value": "not_a_dict",
+          "expected_type": "dictionary",
+          "error_message": "style_params must be dictionary, received {type}: {value}",
+          "fallback_behavior": "Ignore style_params, use standard style resolution",
+          "recovery_mechanism": "Apply condition-based styling without overrides"
+        },
+        {
+          "invalid_value": {"color": "invalid_color", "marker": "bad_marker"},
+          "expected_type": "valid_style_dict",
+          "error_message": "Invalid style parameters: {validation_errors}",
+          "fallback_behavior": "Filter out invalid parameters, keep valid ones",
+          "recovery_mechanism": "Partial style application with validation warnings"
+        }
+      ]
+    },
+
+    "invalid_purpose": {
+      "scenario": "Invalid purpose parameter in dataset configuration",
+      "test_cases": [
+        {
+          "invalid_value": "invalid_purpose",
+          "expected_type": "valid_purpose",
+          "allowed_values": ["exploratory", "presentation", "publication"],
+          "error_message": "purpose must be one of {allowed_values}, received: '{value}'",
+          "fallback_behavior": "Default to 'exploratory' purpose",
+          "recovery_mechanism": "Apply exploratory styling settings"
+        },
+        {
+          "invalid_value": 123,
+          "expected_type": "string",
+          "error_message": "purpose must be string, received {type}: {value}",
+          "fallback_behavior": "Use default purpose based on dataset location",
+          "recovery_mechanism": "Infer purpose from data catalog layer (01_raw -> exploratory, 08_reporting -> presentation)"
+        }
+      ]
+    },
+
+    "missing_required_params": {
+      "scenario": "Required dataset parameters not provided",
+      "missing_filepath": {
+        "error_message": "FigureDataSet requires filepath parameter",
+        "fallback_behavior": "Generate filepath from dataset name and default format",
+        "recovery_mechanism": "Create filepath: 'data/08_reporting/{dataset_name}.png'"
+      },
+      "missing_dataset_name": {
+        "error_message": "Dataset name required for figure identification",
+        "fallback_behavior": "Use timestamp-based filename",
+        "recovery_mechanism": "Generate name from timestamp: 'figure_{timestamp}'"
+      }
+    }
+  },
+
+  "hook_registration_errors": {
+    "description": "Expected behaviors for hook registration and lifecycle failures per Section 5.2.7",
+
+    "hook_registration_failure": {
+      "scenario": "FigRegistryHooks fails to register in Kedro project",
+      "error_type": "HookRegistrationError",
+      "error_message": "Failed to register FigRegistryHooks: {error_details}. Plugin will operate in standalone mode.",
+      "fallback_behavior": "Skip hook registration, disable lifecycle integration",
+      "user_action": "Check settings.py configuration and Kedro version compatibility",
+      "recovery_mechanism": "Manual configuration initialization required"
+    },
+
+    "hook_initialization_failure": {
+      "scenario": "Hook initialization fails during pipeline startup",
+      "error_type": "HookInitializationError",
+      "error_message": "FigRegistryHooks initialization failed in before_pipeline_run: {error_details}",
+      "fallback_behavior": "Continue pipeline execution without FigRegistry integration",
+      "user_action": "Check configuration files and fix initialization issues",
+      "recovery_mechanism": "Pipeline runs normally, figures require manual styling"
+    },
+
+    "config_bridge_failure": {
+      "scenario": "Configuration bridge fails to merge Kedro and FigRegistry configs",
+      "error_type": "ConfigurationBridgeError", 
+      "error_message": "Failed to merge configurations: {merge_error}. Using FigRegistry defaults only.",
+      "fallback_behavior": "Use standalone FigRegistry configuration, skip Kedro integration",
+      "user_action": "Validate conf/base/figregistry.yml syntax and schema compliance",
+      "recovery_mechanism": "Operate in compatibility mode with reduced functionality"
+    },
+
+    "hook_execution_timeout": {
+      "scenario": "Hook execution exceeds timeout threshold",
+      "error_type": "HookTimeoutError",
+      "error_message": "Hook execution timeout ({timeout}s exceeded). Continuing with default behavior.",
+      "fallback_behavior": "Skip remaining hook operations, use default configuration",
+      "user_action": "Optimize configuration loading or increase timeout settings",
+      "recovery_mechanism": "Async configuration loading in background"
+    },
+
+    "concurrent_access_conflict": {
+      "scenario": "Multiple pipeline runs cause hook conflicts",
+      "error_type": "ConcurrentAccessError",
+      "error_message": "Concurrent pipeline execution detected. Hook state may be inconsistent.",
+      "fallback_behavior": "Use per-session configuration isolation",
+      "user_action": "Enable parallel execution safety or run pipelines sequentially",
+      "recovery_mechanism": "Thread-local configuration storage"
+    }
+  },
+
+  "dataset_operation_errors": {
+    "description": "Expected behaviors for FigureDataSet save/load operation failures",
+
+    "figure_object_validation": {
+      "scenario": "Invalid matplotlib figure object provided",
+      "test_cases": [
+        {
+          "invalid_input": "not_a_figure",
+          "error_message": "Expected matplotlib.figure.Figure object, received {type}: {value}",
+          "fallback_behavior": "Raise TypeError with clear instructions",
+          "recovery_mechanism": "No recovery - invalid input must be corrected"
+        },
+        {
+          "invalid_input": "None",
+          "error_message": "Figure object cannot be None. Ensure pipeline node returns valid figure.",
+          "fallback_behavior": "Skip save operation, log error",
+          "recovery_mechanism": "Continue pipeline execution, mark dataset as failed"
+        },
+        {
+          "invalid_input": "empty_figure",
+          "error_message": "Figure contains no axes or plotted data. Saving empty figure to {path}",
+          "fallback_behavior": "Save empty figure with warning",
+          "recovery_mechanism": "Create minimal valid figure file"
+        }
+      ]
+    },
+
+    "style_application_failure": {
+      "scenario": "Error applying resolved style to figure",
+      "error_type": "StyleApplicationError",
+      "error_message": "Failed to apply style '{style_name}' to figure: {style_error}",
+      "fallback_behavior": "Save figure with current styling, skip failed style properties",
+      "user_action": "Validate style configuration and matplotlib compatibility",
+      "recovery_mechanism": "Partial style application with error logging"
+    },
+
+    "save_operation_failure": {
+      "scenario": "Figure save operation fails during catalog integration",
+      "error_type": "FigureSaveError",
+      "error_message": "Failed to save figure to {output_path}: {save_error}",
+      "fallback_behavior": "Retry with alternative format, fallback to PNG if specified format fails",
+      "user_action": "Check output path permissions and disk space",
+      "recovery_mechanism": "Multiple format fallback: SVG -> PNG -> temporary file"
+    },
+
+    "versioning_conflict": {
+      "scenario": "Conflict between Kedro versioning and FigRegistry versioning",
+      "error_type": "VersioningConflictWarning",
+      "error_message": "Both Kedro versioning and FigRegistry timestamping enabled. Using Kedro versioning for consistency.",
+      "fallback_behavior": "Disable FigRegistry timestamp suffix, use Kedro version path",
+      "user_action": "Choose single versioning strategy to avoid conflicts", 
+      "recovery_mechanism": "Kedro versioning takes precedence"
+    },
+
+    "load_operation_failure": {
+      "scenario": "Figure load operation fails (for datasets supporting load)",
+      "error_type": "FigureLoadError",
+      "error_message": "Cannot load figure from {input_path}: {load_error}",
+      "fallback_behavior": "Return None, log error details",
+      "user_action": "Verify figure file exists and is readable",
+      "recovery_mechanism": "Skip load operation, continue pipeline with missing data"
+    }
+  },
+
+  "security_error_handling": {
+    "description": "Expected behaviors for security-related error scenarios per Section 6.6.8.1-6.6.8.2",
+
+    "yaml_injection_prevention": {
+      "scenario": "YAML configuration injection attempts",
+      "test_cases": [
+        {
+          "attack_type": "code_injection",
+          "malicious_yaml": "!!python/object/apply:os.system ['rm -rf /']",
+          "error_message": "Security violation: unsafe YAML content detected. Using safe_load only.",
+          "fallback_behavior": "Reject unsafe YAML, use default configuration",
+          "security_action": "Log security event, continue with safe defaults"
+        },
+        {
+          "attack_type": "object_instantiation",
+          "malicious_yaml": "!!python/object:subprocess.Popen [['cat', '/etc/passwd']]",
+          "error_message": "Security violation: object instantiation blocked in YAML configuration",
+          "fallback_behavior": "Parse with safe_load, reject dangerous constructs",
+          "security_action": "Sanitize configuration, prevent code execution"
+        }
+      ]
+    },
+
+    "path_traversal_prevention": {
+      "scenario": "Path traversal attack prevention in configuration",
+      "test_cases": [
+        {
+          "attack_path": "../../../etc/passwd",
+          "field": "outputs.base_path",
+          "error_message": "Security violation: path traversal detected: '{path}'. Path confined to project directory.",
+          "fallback_behavior": "Sanitize path to project-relative safe location",
+          "security_action": "Block traversal, log security event"
+        },
+        {
+          "attack_path": "/etc/shadow",
+          "field": "outputs.path_aliases.malicious",
+          "error_message": "Security violation: absolute system path not allowed: '{path}'",
+          "fallback_behavior": "Remove dangerous path alias, preserve safe aliases",
+          "security_action": "Filter absolute paths outside project scope"
+        }
+      ]
+    },
+
+    "environment_injection_prevention": {
+      "scenario": "Environment variable injection in configuration",
+      "test_cases": [
+        {
+          "malicious_input": "${HOME}/.ssh/id_rsa",
+          "field": "outputs.base_path",
+          "error_message": "Security warning: environment variable expansion disabled for security",
+          "fallback_behavior": "Treat as literal string, disable variable expansion",
+          "security_action": "Prevent environment variable injection"
+        },
+        {
+          "malicious_input": "$PATH/malicious_script",
+          "field": "style_params.custom_path",
+          "error_message": "Environment variable expansion blocked in style parameters",
+          "fallback_behavior": "Use literal string value without expansion",
+          "security_action": "Sanitize input, prevent variable injection"
+        }
+      ]
+    }
+  },
+
+  "fallback_mechanisms": {
+    "description": "Comprehensive fallback behaviors per F-002 requirements when FigRegistry functionality is unavailable",
+
+    "configuration_fallbacks": {
+      "missing_config_file": {
+        "fallback_behavior": "Use built-in default configuration with standard matplotlib styling",
+        "functionality_preserved": [
+          "Basic figure saving with timestamp",
+          "Standard matplotlib rcParams", 
+          "Default color palette (tab10)",
+          "Basic output format support (PNG, PDF)"
+        ],
+        "functionality_limited": [
+          "No condition-based styling",
+          "No custom style mappings",
+          "No path aliases",
+          "No advanced output management"
+        ],
+        "user_guidance": "Create figregistry.yaml for full functionality"
+      },
+
+      "invalid_configuration": {
+        "fallback_behavior": "Load partial configuration with validation errors for invalid sections",
+        "functionality_preserved": [
+          "Valid configuration sections continue working",
+          "Safe defaults applied to invalid sections",
+          "Error logging for troubleshooting"
+        ],
+        "functionality_limited": [
+          "Invalid style definitions ignored", 
+          "Malformed output settings use defaults",
+          "Corrupted palettes fall back to matplotlib defaults"
+        ],
+        "user_guidance": "Fix configuration validation errors shown in logs"
+      }
+    },
+
+    "dependency_fallbacks": {
+      "missing_kedro": {
+        "fallback_behavior": "Plugin loading fails gracefully, suggest standalone FigRegistry",
+        "functionality_preserved": [],
+        "functionality_limited": ["All Kedro integration features disabled"],
+        "user_guidance": "Install kedro>=0.18.0 or use standalone figregistry package",
+        "alternative_approach": "Use figregistry directly without Kedro integration"
+      },
+
+      "incompatible_versions": {
+        "fallback_behavior": "Load with compatibility warnings, limited feature set",
+        "functionality_preserved": [
+          "Basic figure saving",
+          "Core configuration loading",
+          "Essential styling features"
+        ],
+        "functionality_limited": [
+          "Advanced Kedro features disabled",
+          "Newer API features unavailable",
+          "Performance optimizations disabled"
+        ],
+        "user_guidance": "Upgrade dependencies for full feature support"
+      }
+    },
+
+    "runtime_fallbacks": {
+      "hook_failure": {
+        "fallback_behavior": "Continue pipeline execution without automated FigRegistry integration",
+        "functionality_preserved": [
+          "Pipeline execution completes normally",
+          "Manual figure styling still possible",
+          "Basic output capabilities retained"
+        ],
+        "functionality_limited": [
+          "No automatic style application",
+          "No configuration bridge functionality",
+          "Manual configuration initialization required"
+        ],
+        "user_guidance": "Check hook registration and configuration files"
+      },
+
+      "style_resolution_failure": {
+        "fallback_behavior": "Use default matplotlib styling when condition-based styling fails",
+        "functionality_preserved": [
+          "Figure generation continues",
+          "File saving operates normally",
+          "Basic visualization output"
+        ],
+        "functionality_limited": [
+          "No condition-specific styling",
+          "Standard matplotlib appearance",
+          "No custom color schemes"
+        ],
+        "user_guidance": "Verify style configuration and condition mapping"
+      },
+
+      "file_operation_failure": {
+        "fallback_behavior": "Attempt alternative save methods and locations",
+        "functionality_preserved": [
+          "Figure object available for manual saving",
+          "Error details provided for troubleshooting",
+          "Alternative save formats attempted"
+        ],
+        "functionality_limited": [
+          "Original save location unavailable",
+          "May require manual intervention",
+          "Backup location used"
+        ],
+        "user_guidance": "Check permissions, disk space, and output path configuration"
+      }
+    }
+  },
+
+  "graceful_degradation_patterns": {
+    "description": "Systematic graceful degradation to ensure system stability under failure conditions",
+
+    "degradation_levels": {
+      "level_1_minimal_impact": {
+        "description": "Single feature failure with full recovery",
+        "scenarios": [
+          "Invalid style parameter - use default styling",
+          "Missing path alias - use full path",
+          "Invalid color value - use default color"
+        ],
+        "user_impact": "Minimal - feature works with defaults",
+        "recovery_action": "Automatic with warning logged"
+      },
+
+      "level_2_feature_disabled": {
+        "description": "Feature set disabled but core functionality preserved", 
+        "scenarios": [
+          "Invalid configuration section - skip section",
+          "Plugin hook failure - disable automation",
+          "Catalog parameter error - manual operation required"
+        ],
+        "user_impact": "Moderate - some automation lost",
+        "recovery_action": "Manual intervention for full functionality"
+      },
+
+      "level_3_compatibility_mode": {
+        "description": "Reduced functionality mode with core features only",
+        "scenarios": [
+          "Kedro integration failure - standalone mode",
+          "Configuration file missing - built-in defaults",
+          "Dependency version mismatch - basic features only"
+        ],
+        "user_impact": "Significant - advanced features unavailable",
+        "recovery_action": "Configuration or dependency fixes required"
+      },
+
+      "level_4_safe_failure": {
+        "description": "Complete feature failure with safe shutdown",
+        "scenarios": [
+          "Critical security violation - disable feature",
+          "Irrecoverable error - fail with clear message",
+          "Incompatible environment - prevent activation"
+        ],
+        "user_impact": "Complete - feature unavailable",
+        "recovery_action": "System reconfiguration required"
+      }
+    }
+  },
+
+  "error_reporting_formats": {
+    "description": "Standardized error message formats for consistent user experience",
+
+    "error_message_structure": {
+      "format": "{error_type}: {description} | Fallback: {fallback_action} | Action: {user_action}",
+      "components": {
+        "error_type": "Standardized error classification",
+        "description": "Clear description of what went wrong",
+        "fallback_action": "What the system will do to recover",
+        "user_action": "Recommended user action to fix"
+      }
+    },
+
+    "log_levels": {
+      "CRITICAL": "System-threatening errors requiring immediate attention",
+      "ERROR": "Feature failures that prevent normal operation",
+      "WARNING": "Issues that reduce functionality but allow continuation",
+      "INFO": "Fallback actions and recovery operations",
+      "DEBUG": "Detailed error context for troubleshooting"
+    },
+
+    "user_notification_methods": {
+      "console_warnings": "Immediate user feedback during operation",
+      "log_file_details": "Comprehensive error context for debugging",
+      "exception_messages": "Clear actionable guidance in exception text",
+      "documentation_references": "Links to relevant troubleshooting documentation"
+    }
+  },
+
+  "testing_validation_scenarios": {
+    "description": "Comprehensive test scenarios for validating error handling implementation",
+
+    "unit_test_scenarios": [
+      "Configuration schema validation with invalid_schema.yml",
+      "Security input sanitization with malicious input patterns",
+      "Fallback mechanism activation under controlled failure conditions",
+      "Error message format validation for consistency",
+      "Recovery mechanism effectiveness testing"
+    ],
+
+    "integration_test_scenarios": [
+      "End-to-end pipeline execution with configuration errors",
+      "Hook failure recovery in complete Kedro project context",
+      "Multi-level degradation cascading through error conditions",
+      "Cross-component error propagation and handling",
+      "User workflow preservation under various failure modes"
+    ],
+
+    "security_test_scenarios": [
+      "YAML injection prevention validation",
+      "Path traversal attack blocking",
+      "Configuration injection attempt handling",
+      "Environment variable expansion security",
+      "File system access boundary enforcement"
     ]
-  },
-  
-  "configuration_security_errors": {
-    "description": "Error scenarios for configuration security testing per Section 6.6.8.1",
-    "malformed_yaml_configs": {
-      "scenario": "Malformed YAML configuration files and schema validation failures",
-      "test_files": [
-        "tests/data/configs/invalid_schema.yml"
-      ],
-      "expected_errors": {
-        "yaml_syntax_error": {
-          "error_type": "YAMLError",
-          "message_pattern": "^Failed to parse YAML configuration.*: mapping values are not allowed here",
-          "fallback_behavior": "Use default FigRegistry configuration with warning message",
-          "recovery_action": "Continue plugin initialization with core styling disabled"
-        },
-        "schema_validation_error": {
-          "error_type": "ValidationError", 
-          "message_pattern": "^Configuration validation failed.*: field required",
-          "fallback_behavior": "Apply schema defaults for missing required fields",
-          "recovery_action": "Log validation errors and continue with partial configuration"
-        },
-        "unsafe_yaml_content": {
-          "error_type": "SecurityError",
-          "message_pattern": "^Unsafe YAML content detected.*: arbitrary code execution prevented",
-          "fallback_behavior": "Reject configuration and use empty styling rules",
-          "recovery_action": "Block plugin initialization and log security violation"
-        }
-      }
-    },
-    "figregistry_config_bridge_errors": {
-      "scenario": "FigRegistryConfigBridge security validation failures",
-      "expected_errors": {
-        "kedro_yaml_injection": {
-          "error_type": "SecurityError",
-          "message_pattern": "^Kedro configuration contains unsafe YAML.*: code injection prevented",
-          "fallback_behavior": "Use standalone figregistry.yaml configuration only",
-          "recovery_action": "Disable Kedro configuration merging and log security event"
-        },
-        "path_traversal_in_purpose": {
-          "error_type": "SecurityError", 
-          "message_pattern": "^Purpose parameter contains invalid path.*: directory traversal prevented",
-          "fallback_behavior": "Use default output directory with sanitized purpose name",
-          "recovery_action": "Replace malicious path components with safe defaults"
-        },
-        "condition_param_injection": {
-          "error_type": "ValidationError",
-          "message_pattern": "^Condition parameter validation failed.*: invalid characters detected",
-          "fallback_behavior": "Use empty condition mapping with warning",
-          "recovery_action": "Skip condition-based styling for affected parameters"
-        },
-        "config_merge_type_safety": {
-          "error_type": "TypeError",
-          "message_pattern": "^Configuration merge failed.*: incompatible types between Kedro and FigRegistry configs",
-          "fallback_behavior": "Prioritize FigRegistry configuration over conflicting Kedro settings",
-          "recovery_action": "Log type conflicts and apply type coercion where safe"
-        }
-      }
-    }
-  },
-
-  "filesystem_security_errors": {
-    "description": "Error scenarios for filesystem security testing per Section 6.6.8.2",
-    "catalog_parameter_validation": {
-      "scenario": "Malformed catalog parameters and path security validation",
-      "expected_errors": {
-        "filepath_traversal_attempt": {
-          "error_type": "SecurityError",
-          "message_pattern": "^Catalog filepath contains directory traversal.*: \\.\\./ sequences not allowed",
-          "fallback_behavior": "Use project-relative safe path with same filename",
-          "recovery_action": "Sanitize path and create file in designated output directory"
-        },
-        "absolute_path_override": {
-          "error_type": "SecurityError",
-          "message_pattern": "^Absolute path not allowed in catalog configuration.*: /.*",
-          "fallback_behavior": "Convert to relative path from project root",
-          "recovery_action": "Strip leading slash and treat as project-relative path"
-        },
-        "symbolic_link_exploitation": {
-          "error_type": "SecurityError",
-          "message_pattern": "^Symbolic link target outside project boundaries.*: unauthorized path access",
-          "fallback_behavior": "Resolve symlink and validate final target path",
-          "recovery_action": "Create new file if target is safe, otherwise use temp directory"
-        },
-        "invalid_save_args": {
-          "error_type": "ValidationError",
-          "message_pattern": "^Invalid save_args in catalog configuration.*: unsupported matplotlib parameters",
-          "fallback_behavior": "Use default matplotlib save parameters",
-          "recovery_action": "Filter invalid parameters and proceed with safe defaults"
-        }
-      }
-    },
-    "figuredataset_path_enforcement": {
-      "scenario": "FigureDataSet path validation and directory enforcement",
-      "expected_errors": {
-        "unauthorized_directory_creation": {
-          "error_type": "PermissionError",
-          "message_pattern": "^Directory creation failed.*: insufficient permissions for .*",
-          "fallback_behavior": "Use temporary directory with appropriate permissions",
-          "recovery_action": "Create figure in user-writable location with warning"
-        },
-        "catalog_parameter_bypass": {
-          "error_type": "SecurityError",
-          "message_pattern": "^Catalog parameter manipulation detected.*: security boundary violation",
-          "fallback_behavior": "Ignore manipulated parameters and use catalog defaults",
-          "recovery_action": "Reset to safe catalog configuration and log security event"
-        },
-        "directory_permissions_violation": {
-          "error_type": "OSError",
-          "message_pattern": "^Output directory permissions insufficient.*: cannot write to .*",
-          "fallback_behavior": "Create temporary output location with conservative permissions (755)",
-          "recovery_action": "Generate figure in fallback directory and notify user of location change"
-        }
-      }
-    }
-  },
-
-  "hook_registration_failures": {
-    "description": "Hook registration failure scenarios and recovery procedures per Section 5.2.7",
-    "figregistry_hooks_errors": {
-      "scenario": "FigRegistryHooks lifecycle integration failures",
-      "expected_errors": {
-        "hook_registration_failed": {
-          "error_type": "PluginError",
-          "message_pattern": "^FigRegistryHooks registration failed.*: hook manager unavailable",
-          "fallback_behavior": "Continue Kedro execution without FigRegistry automation",
-          "recovery_action": "Log hook failure and provide manual styling instructions"
-        },
-        "before_pipeline_run_failure": {
-          "error_type": "ConfigurationError",
-          "message_pattern": "^Hook initialization failed in before_pipeline_run.*: configuration bridge unavailable",
-          "fallback_behavior": "Skip FigRegistry initialization and use manual figure management",
-          "recovery_action": "Continue pipeline execution with warning about missing automation"
-        },
-        "environment_variable_protection": {
-          "error_type": "SecurityError",
-          "message_pattern": "^Hook attempted unauthorized environment modification.*: security violation",
-          "fallback_behavior": "Block environment changes and continue with current settings",
-          "recovery_action": "Disable problematic hook functionality and log security event"
-        },
-        "context_isolation_breach": {
-          "error_type": "SecurityError",
-          "message_pattern": "^Hook accessed unauthorized Kedro context.*: session boundary violation",
-          "fallback_behavior": "Restrict hook to authorized context scope only",
-          "recovery_action": "Reset hook permissions and continue with limited functionality"
-        },
-        "arbitrary_code_execution_attempt": {
-          "error_type": "SecurityError",
-          "message_pattern": "^Hook lifecycle method contains unsafe operations.*: code execution prevented",
-          "fallback_behavior": "Disable hook entirely and use manual configuration",
-          "recovery_action": "Block hook execution and alert about potential security threat"
-        }
-      }
-    }
-  },
-
-  "catalog_parameter_validation_failures": {
-    "description": "Catalog parameter validation errors per Section 5.2.6",
-    "figuredataset_parameter_errors": {
-      "scenario": "FigureDataSet catalog configuration validation failures", 
-      "expected_errors": {
-        "missing_required_parameters": {
-          "error_type": "ValidationError",
-          "message_pattern": "^Required catalog parameter missing.*: 'filepath' is required for FigureDataSet",
-          "fallback_behavior": "Generate default filepath using figure ID and timestamp",
-          "recovery_action": "Create figure with auto-generated filename in default output directory"
-        },
-        "malformed_condition_param": {
-          "error_type": "ValidationError",
-          "message_pattern": "^Invalid condition_param format.*: parameter name contains illegal characters",
-          "fallback_behavior": "Use empty condition mapping and default styling",
-          "recovery_action": "Skip condition-based styling and apply global default styles"
-        },
-        "invalid_style_params_type": {
-          "error_type": "TypeError",
-          "message_pattern": "^style_params must be dictionary.*: received .*",
-          "fallback_behavior": "Ignore style_params and use configuration-based styling only",
-          "recovery_action": "Apply styling from figregistry configuration without parameter overrides"
-        },
-        "purpose_parameter_validation": {
-          "error_type": "ValidationError", 
-          "message_pattern": "^Purpose parameter invalid.*: must be one of \\[exploratory, presentation, publication\\]",
-          "fallback_behavior": "Default to 'exploratory' purpose with standard styling",
-          "recovery_action": "Apply exploratory styling rules and log parameter correction"
-        },
-        "load_args_compatibility": {
-          "error_type": "NotImplementedError",
-          "message_pattern": "^FigureDataSet does not support load operations.*: figures are output-only datasets",
-          "fallback_behavior": "Skip load operation and return None",
-          "recovery_action": "Log unsupported operation and continue with save-only behavior"
-        }
-      }
-    }
-  },
-
-  "f002_fallback_scenarios": {
-    "description": "F-002 fallback requirements when FigRegistry functionality is unavailable",
-    "condition_based_styling_failures": {
-      "scenario": "Graceful degradation when condition-based styling fails",
-      "expected_errors": {
-        "figregistry_module_unavailable": {
-          "error_type": "ImportError",
-          "message_pattern": "^FigRegistry module not available.*: falling back to manual figure management",
-          "fallback_behavior": "Continue with standard matplotlib figure saving without styling automation",
-          "recovery_action": "Provide clear instructions for manual styling and configuration"
-        },
-        "style_resolution_failure": {
-          "error_type": "StyleResolutionError",
-          "message_pattern": "^Style resolution failed for condition.*: using default matplotlib styles",
-          "fallback_behavior": "Apply matplotlib default styling without condition-based modifications",
-          "recovery_action": "Save figure with standard matplotlib parameters and log style failure"
-        },
-        "condition_mapping_corruption": {
-          "error_type": "ConfigurationError",
-          "message_pattern": "^Condition mapping data corrupted.*: reverting to manual styling workflow",
-          "fallback_behavior": "Disable automated styling and require manual style specification",
-          "recovery_action": "Prompt user to check configuration and provide manual styling guidance"
-        },
-        "partial_configuration_load": {
-          "error_type": "PartialConfigurationError",
-          "message_pattern": "^Partial configuration loaded.*: some styling features unavailable",
-          "fallback_behavior": "Use available configuration sections and disable unavailable features",
-          "recovery_action": "Continue with reduced functionality and list disabled features"
-        }
-      }
-    }
-  },
-
-  "plugin_integration_failures": {
-    "description": "Comprehensive plugin integration failure scenarios",
-    "kedro_session_errors": {
-      "scenario": "Kedro session and context integration failures",
-      "expected_errors": {
-        "session_context_unavailable": {
-          "error_type": "SessionError",
-          "message_pattern": "^Kedro session context not available.*: plugin requires active Kedro session",
-          "fallback_behavior": "Function as standalone FigRegistry without Kedro integration",
-          "recovery_action": "Disable Kedro-specific features and use traditional FigRegistry workflow"
-        },
-        "catalog_unavailable": {
-          "error_type": "CatalogError",
-          "message_pattern": "^Kedro catalog not accessible.*: FigureDataSet cannot integrate with catalog",
-          "fallback_behavior": "Use direct file saving instead of catalog-managed persistence",
-          "recovery_action": "Save figures directly to filesystem and log catalog integration failure"
-        },
-        "configloader_failure": {
-          "error_type": "ConfigurationError",
-          "message_pattern": "^Kedro ConfigLoader initialization failed.*: configuration bridge unavailable",
-          "fallback_behavior": "Use standalone figregistry.yaml configuration only",
-          "recovery_action": "Skip Kedro configuration merging and continue with local configuration"
-        },
-        "plugin_discovery_failure": {
-          "error_type": "PluginError",
-          "message_pattern": "^Plugin discovery failed.*: figregistry-kedro not found in plugin registry",
-          "fallback_behavior": "Manual plugin initialization if user explicitly imports components",
-          "recovery_action": "Provide installation instructions and manual setup guidance"
-        }
-      }
-    },
-    "version_compatibility_errors": {
-      "scenario": "Version compatibility and dependency failures",
-      "expected_errors": {
-        "kedro_version_incompatible": {
-          "error_type": "VersionError",
-          "message_pattern": "^Kedro version .* not supported.*: requires kedro>=0.18.0,<0.20.0",
-          "fallback_behavior": "Disable plugin functionality and warn about version incompatibility",
-          "recovery_action": "Provide upgrade instructions and suggest compatible versions"
-        },
-        "figregistry_version_incompatible": {
-          "error_type": "VersionError", 
-          "message_pattern": "^FigRegistry version .* not supported.*: requires figregistry>=0.3.0",
-          "fallback_behavior": "Disable plugin and suggest standalone FigRegistry usage",
-          "recovery_action": "Provide upgrade path and compatibility information"
-        },
-        "abstractdataset_interface_change": {
-          "error_type": "InterfaceError",
-          "message_pattern": "^AbstractDataSet interface changed.*: FigureDataSet requires interface update",
-          "fallback_behavior": "Attempt graceful degradation to basic save functionality",
-          "recovery_action": "Log interface compatibility issue and suggest plugin update"
-        }
-      }
-    }
-  },
-
-  "performance_degradation_scenarios": {
-    "description": "Performance-related error scenarios and degradation patterns",
-    "timeout_and_resource_errors": {
-      "scenario": "Performance threshold violations and resource constraints",
-      "expected_errors": {
-        "configuration_load_timeout": {
-          "error_type": "TimeoutError",
-          "message_pattern": "^Configuration loading exceeded timeout.*: >100ms threshold violated",
-          "fallback_behavior": "Use cached configuration from previous session if available",
-          "recovery_action": "Continue with cached config and log performance degradation"
-        },
-        "style_resolution_timeout": {
-          "error_type": "TimeoutError",
-          "message_pattern": "^Style resolution exceeded timeout.*: >10ms threshold violated",
-          "fallback_behavior": "Apply default styling without condition resolution",
-          "recovery_action": "Use matplotlib defaults and log performance issue"
-        },
-        "figure_save_timeout": {
-          "error_type": "TimeoutError",
-          "message_pattern": "^Figure save operation exceeded timeout.*: >500ms threshold violated",
-          "fallback_behavior": "Attempt save with reduced quality settings",
-          "recovery_action": "Save with lower DPI and log performance warning"
-        },
-        "memory_threshold_exceeded": {
-          "error_type": "MemoryError",
-          "message_pattern": "^Plugin memory usage exceeded threshold.*: >10MB limit violated",
-          "fallback_behavior": "Clear internal caches and reduce memory footprint",
-          "recovery_action": "Continue with minimal memory usage and frequent garbage collection"
-        }
-      }
-    }
-  },
-
-  "test_validation_criteria": {
-    "description": "Validation criteria for error handling tests",
-    "error_message_validation": {
-      "regex_pattern_matching": "All error messages must match specified regex patterns exactly",
-      "message_informativeness": "Error messages must provide actionable information for troubleshooting",
-      "security_message_guidelines": "Security-related errors must not expose sensitive configuration details",
-      "consistency_requirements": "Error message format must be consistent across all plugin components"
-    },
-    "fallback_behavior_validation": {
-      "graceful_degradation": "All fallback behaviors must allow continued operation without data loss",
-      "user_notification": "Users must be clearly informed when fallback behaviors are activated",
-      "functionality_preservation": "Core functionality must remain available even when advanced features fail",
-      "recovery_completeness": "Recovery actions must restore as much functionality as possible"
-    },
-    "security_validation_requirements": {
-      "injection_prevention": "All input validation must prevent code injection and path traversal attacks",
-      "privilege_containment": "Error scenarios must not escalate privileges or expose unauthorized data",
-      "secure_fallback": "Fallback behaviors must maintain security boundaries and access controls",
-      "audit_logging": "Security-related errors must be logged for security monitoring and analysis"
-    }
   }
 }
