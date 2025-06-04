@@ -1,691 +1,1404 @@
-# FigRegistry-Kedro Migration Guide
+# FigRegistry-Kedro Migration Guide: From Manual to Automated Figure Management
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Prerequisites](#prerequisites)
+3. [Migration Benefits](#migration-benefits)
+4. [Step-by-Step Conversion Process](#step-by-step-conversion-process)
+5. [Before/After Code Examples](#beforeafter-code-examples)
+6. [Configuration Setup](#configuration-setup)
+7. [Validation and Testing](#validation-and-testing)
+8. [Troubleshooting](#troubleshooting)
+9. [Best Practices](#best-practices)
 
 ## Overview
 
-This comprehensive guide walks you through the process of migrating an existing Kedro project from manual matplotlib figure management to automated figregistry-kedro integration. The migration eliminates scattered `plt.savefig()` calls, centralizes styling configuration, and introduces automatic condition-based styling for consistent scientific visualization workflows.
+This guide provides comprehensive instructions for migrating existing Kedro projects from manual matplotlib figure management to automated figregistry-kedro integration. The migration transforms scattered `plt.savefig()` calls and hardcoded styling into a centralized, condition-based automation system that eliminates code duplication while ensuring consistent, publication-quality visualizations.
 
-### Migration Benefits
+### What This Migration Accomplishes
 
-- **Eliminate Manual Figure Management**: Remove all `plt.savefig()` calls from pipeline nodes
-- **Centralized Styling Configuration**: Move styling logic from code to configuration files
-- **Automatic Condition-Based Styling**: Apply different styles based on experimental conditions
-- **Improved Maintainability**: Reduce code duplication and improve separation of concerns
-- **Enhanced Versioning**: Integrate with Kedro's versioning system for reproducible experiments
+- **Eliminates manual `plt.savefig()` calls** throughout pipeline nodes (Target: 90% code reduction)
+- **Automates condition-based styling** through catalog configuration (F-005)
+- **Centralizes figure management** via FigRegistry's configuration system (F-007)
+- **Integrates seamlessly** with Kedro's versioning and experiment tracking (F-005-RQ-002)
+- **Maintains backward compatibility** with existing pipeline logic
+
+### Core Components Involved
+
+- **FigureDataSet**: Custom Kedro dataset for automated figure styling and persistence
+- **FigRegistryHooks**: Lifecycle hooks for automatic configuration initialization
+- **FigRegistryConfigBridge**: Configuration translation between Kedro and FigRegistry
+- **figregistry.yml**: Centralized styling and output configuration
 
 ## Prerequisites
 
-Before starting the migration, ensure you have:
-
-- An existing Kedro project (version 0.18.0 or higher)
-- Python 3.10 or higher
-- Matplotlib-based visualization nodes in your pipeline
-- Basic familiarity with Kedro's catalog and configuration system
-
-## Migration Steps
-
-### Step 1: Install figregistry-kedro
-
-Update your project's `pyproject.toml` to include the figregistry-kedro dependency:
-
-```toml
-# Before: Traditional dependencies
-[project]
-dependencies = [
-    "kedro>=0.18.0,<0.20.0",
-    "matplotlib>=3.9.0",
-    "pandas>=1.3.0",
-    "numpy>=1.20.0",
-    # ... other dependencies
-]
-
-# After: Add figregistry-kedro integration
-[project]
-dependencies = [
-    "kedro>=0.18.0,<0.20.0",
-    "figregistry-kedro>=0.1.0",  # <-- Add this dependency
-    "matplotlib>=3.9.0",
-    "pandas>=1.3.0",
-    "numpy>=1.20.0",
-    # ... other dependencies
-]
-```
-
-Install the updated dependencies:
+### Required Dependencies
 
 ```bash
-pip install -e .
-# or if using conda
-conda env update --file environment.yml
+# Install figregistry-kedro with all dependencies
+pip install figregistry-kedro
+
+# Verify installation
+python -c "import figregistry_kedro; print('✅ Installation successful')"
 ```
 
-### Step 2: Register FigRegistry Hooks
+### Kedro Version Compatibility
 
-Update your project's `src/<project_name>/settings.py` to register the FigRegistry lifecycle hooks:
+- **Kedro**: `>=0.18.0,<0.20.0`
+- **FigRegistry**: `>=0.3.0`
+- **Python**: `>=3.10`
 
+### Project Requirements
+
+- Existing Kedro project with visualization pipeline nodes
+- Pipeline nodes that currently use matplotlib for figure creation
+- Write access to project configuration directories (`conf/`)
+
+## Migration Benefits
+
+### Quantified Improvements
+
+| Metric | Before (Manual) | After (Automated) | Improvement |
+|--------|----------------|-------------------|-------------|
+| Lines of styling code | ~20-50 per figure | 0 per figure | 90%+ reduction |
+| Configuration management | Scattered across nodes | Centralized in catalog | Single source |
+| Style consistency | Manual, error-prone | Automatic, guaranteed | 100% consistent |
+| File organization | Manual path management | Automatic organization | Zero maintenance |
+| Experimental variations | Hardcoded conditions | Dynamic resolution | Infinite flexibility |
+
+### Workflow Benefits
+
+- **Zero manual intervention** for figure styling and persistence
+- **Automatic versioning** integration with Kedro experiments
+- **Environment-specific styling** through configuration hierarchy
+- **Publication-ready outputs** with consistent quality standards
+- **Reduced maintenance overhead** for visualization updates
+
+## Step-by-Step Conversion Process
+
+### Step 1: Install and Verify figregistry-kedro
+
+```bash
+# Install the integration package
+pip install figregistry-kedro
+
+# Verify all components are available
+python -c "
+from figregistry_kedro.datasets import FigureDataSet
+from figregistry_kedro.hooks import FigRegistryHooks
+from figregistry_kedro.config import FigRegistryConfigBridge
+print('✅ All components imported successfully')
+"
+```
+
+### Step 2: Register FigRegistryHooks in settings.py
+
+**Location**: `src/{project_name}/settings.py`
+
+**BEFORE (Manual Approach)**:
 ```python
-# Before: Standard Kedro settings
-"""Project settings."""
-from kedro.config import TemplatedConfigLoader
+# settings.py - Traditional configuration
+HOOKS = []  # No automated figure management
+```
 
-CONFIG_LOADER_CLASS = TemplatedConfigLoader
+**AFTER (Automated Approach)**:
+```python
+# settings.py - FigRegistry integration enabled
+from figregistry_kedro.hooks import FigRegistryHooks
 
-# After: Add FigRegistry hooks
-"""Project settings."""
-from kedro.config import TemplatedConfigLoader
-from figregistry_kedro.hooks import FigRegistryHooks  # <-- Import hooks
-
-CONFIG_LOADER_CLASS = TemplatedConfigLoader
-
-# Register FigRegistry hooks for lifecycle management
+# Register FigRegistryHooks for automated lifecycle management (F-006)
 HOOKS = (
     FigRegistryHooks(
-        auto_initialize=True,
-        enable_performance_monitoring=False,
-        fallback_on_error=True
+        enable_performance_monitoring=True,    # Track integration performance
+        fallback_on_errors=True,              # Graceful error handling
+        strict_validation=True,               # Validate merged configurations
+        config_cache_enabled=True            # Enable performance caching
     ),
 )
+
+# Enhanced configuration patterns for FigRegistry integration (F-007)
+CONFIG_LOADER_ARGS = {
+    "base_env": "base",
+    "default_run_env": "local",
+    "config_patterns": {
+        "catalog": ["catalog*.yml", "catalog*.yaml"],
+        "parameters": ["parameters*.yml", "parameters*.yaml"],
+        "credentials": ["credentials*.yml", "credentials*.yaml"],
+        # NEW: Enable FigRegistry configuration discovery
+        "figregistry": ["figregistry*.yml", "figregistry*.yaml"]
+    }
+}
 ```
 
 ### Step 3: Create FigRegistry Configuration
 
-Create a new configuration file `conf/base/figregistry.yml` with your styling definitions:
+**Location**: `conf/base/figregistry.yml`
+
+Create a comprehensive FigRegistry configuration that defines your styling rules:
 
 ```yaml
-# conf/base/figregistry.yml
-# Condition-based styling configuration
+# figregistry.yml - Centralized styling configuration
+figregistry_version: ">=0.3.0"
 
+metadata:
+  config_version: "1.0.0"
+  description: "Automated figure styling for Kedro pipeline"
+  environment: "development"
+
+# Condition-based style mappings (F-002)
 styles:
   # Exploratory analysis styling
   exploratory:
-    figure.figsize: [10, 6]
-    figure.dpi: 100
-    axes.grid: true
-    axes.labelsize: 12
-    axes.titlesize: 14
-    legend.fontsize: 10
-    
-  # Presentation-ready styling
+    color: "#2E86AB"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.8
+    label: "Exploratory Analysis"
+
+  # Presentation-quality styling
   presentation:
-    figure.figsize: [12, 8]
-    figure.dpi: 150
-    axes.grid: false
-    axes.labelsize: 14
-    axes.titlesize: 16
-    font.weight: bold
-    legend.fontsize: 12
-    
-  # Publication-quality styling
+    color: "#E74C3C"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.9
+    label: "Presentation"
+
+  # Publication-ready styling
   publication:
-    figure.figsize: [8, 6]
-    figure.dpi: 300
-    axes.grid: false
-    axes.labelsize: 11
-    axes.titlesize: 12
-    font.family: serif
-    legend.fontsize: 9
+    color: "#2C3E50"
+    marker: "D"
+    linestyle: "-"
+    linewidth: 2.8
+    alpha: 1.0
+    label: "Publication"
 
-palettes:
-  default:
-    primary: "#2E86AB"
-    secondary: "#A23B72"
-    accent: "#F18F01"
+  # Model-specific styling
+  random_forest:
+    color: "#27AE60"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.3
+    alpha: 0.85
+    label: "Random Forest"
 
+  linear_model:
+    color: "#8E44AD"
+    marker: "v"
+    linestyle: "--"
+    linewidth: 2.1
+    alpha: 0.8
+    label: "Linear Model"
+
+# Default styling fallbacks
+defaults:
+  figure:
+    figsize: [10, 8]
+    dpi: 150
+  line:
+    color: "#34495E"
+    linewidth: 2.0
+  fallback_style:
+    color: "#95A5A6"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Default"
+
+# Output management configuration (F-004)
 outputs:
   base_path: "data/08_reporting"
-  naming_convention: "{purpose}_{condition}_{timestamp}"
-  
-defaults:
-  purpose: exploratory
-  format: png
-  bbox_inches: tight
+  naming:
+    template: "{name}_{condition}_{ts}"
+  directories:
+    exploratory: "exploratory"
+    presentation: "presentation"
+    publication: "publication"
 ```
 
-### Step 4: Update Data Catalog
+### Step 4: Update Data Catalog Configuration
 
-Modify your `conf/base/catalog.yml` to use FigureDataSet instead of standard file outputs:
+**Location**: `conf/base/catalog.yml`
 
+Transform your catalog to use FigureDataSet for all matplotlib outputs:
+
+**BEFORE (Manual Dataset Entries)**:
 ```yaml
-# Before: Manual figure management (remove these entries)
-# training_plot:
-#   type: matplotlib.MatplotlibWriter
-#   filepath: data/08_reporting/training_plot.png
+# Traditional approach - no automated figure management
+training_data:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/training_data.csv
 
-# validation_metrics:
-#   type: matplotlib.MatplotlibWriter  
-#   filepath: data/08_reporting/validation_metrics.png
-
-# After: FigRegistry automated figure management
-training_plot:
-  type: figregistry_kedro.FigureDataSet
-  filepath: data/08_reporting/training_plot.png
-  purpose: exploratory
-  condition_param: experiment_condition
-  style_params:
-    figure.facecolor: white
-    axes.spines.top: false
-    axes.spines.right: false
-  save_args:
-    bbox_inches: tight
-    transparent: false
-
-validation_metrics:
-  type: figregistry_kedro.FigureDataSet
-  filepath: data/08_reporting/validation_metrics.png
-  purpose: presentation
-  condition_param: model_type
-  style_params:
-    figure.dpi: 200
-  save_args:
-    bbox_inches: tight
-    format: png
-
-# For publication-ready figures
-publication_results:
-  type: figregistry_kedro.FigureDataSet
-  filepath: data/08_reporting/publication_results.pdf
-  purpose: publication
-  condition_param: analysis_type
-  save_args:
-    bbox_inches: tight
-    format: pdf
-    transparent: true
+# No figure datasets - manual plt.savefig() calls in nodes
 ```
 
-### Step 5: Update Pipeline Parameters
-
-Add condition parameters to your `conf/base/parameters.yml` for dynamic styling:
-
+**AFTER (Automated FigureDataSet Entries)**:
 ```yaml
-# Add these parameters for condition-based styling
-experiment_condition: "baseline_model"
-model_type: "random_forest"
-analysis_type: "performance_comparison"
+# Data pipeline remains unchanged
+training_data:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/training_data.csv
 
-# Your existing parameters remain unchanged
-model_options:
-  n_estimators: 100
-  max_depth: 10
-  random_state: 42
+# NEW: Automated figure management through FigureDataSet (F-005)
+model_performance_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/model_performance_${params:experiment_type}.png
+  purpose: presentation                        # Maps to styling purpose
+  condition_param: model_type                  # Resolves from parameters.yml
+  style_params:                               # Dataset-specific overrides
+    figure.figsize: [12, 8]
+    figure.dpi: 300
+  save_args:
+    bbox_inches: tight
+    facecolor: white
+  versioned: true                             # Kedro versioning integration
 
-# ... other existing parameters
+feature_importance_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/feature_importance_${params:model_type}.png
+  purpose: exploratory
+  condition_param: analysis_phase
+  style_params:
+    figure.figsize: [10, 12]                  # Vertical layout for feature names
+  versioned: true
+
+validation_results_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/validation_results.pdf
+  purpose: publication                        # Publication-quality output
+  condition_param: validation_method
+  style_params:
+    figure.dpi: 300                          # High DPI for publication
+  save_args:
+    format: pdf                              # Vector format
+    bbox_inches: tight
+  versioned: true
 ```
 
-### Step 6: Refactor Pipeline Nodes
+### Step 5: Update Pipeline Nodes
 
-Update your pipeline nodes to remove manual figure management and return matplotlib figure objects:
+Transform your pipeline nodes from manual figure management to automated processing:
 
-#### Before: Manual Figure Management
-
+**BEFORE (Manual Approach)**:
 ```python
-# src/<project_name>/pipelines/data_science/nodes.py
+# nodes.py - Manual matplotlib management with problems
 import matplotlib.pyplot as plt
-import seaborn as sns
+import os
+from datetime import datetime
 
-def create_training_plot(training_data: pd.DataFrame) -> None:
-    """Create training visualization with manual styling."""
-    # Manual styling configuration
-    plt.style.use('seaborn-v0_8')
-    plt.figure(figsize=(10, 6), dpi=100)
-    plt.rcParams.update({
-        'axes.grid': True,
-        'axes.labelsize': 12,
-        'axes.titlesize': 14,
-        'legend.fontsize': 10
-    })
+def create_model_performance_plot(model_metrics: Dict[str, Any], 
+                                 parameters: Dict[str, Any]) -> None:
+    """PROBLEMATIC: Manual figure management with hardcoded styling."""
     
-    # Create plot
-    plt.plot(training_data['epoch'], training_data['loss'], label='Training Loss')
-    plt.plot(training_data['epoch'], training_data['val_loss'], label='Validation Loss')
-    plt.title('Model Training Progress')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
-    plt.legend()
-    plt.grid(True)
+    # PROBLEM: Hardcoded styling parameters
+    if parameters.get("model_type") == "random_forest":
+        color = "#27AE60"
+        marker = "s"
+        linewidth = 2.5
+    elif parameters.get("model_type") == "linear_model":
+        color = "#8E44AD"
+        marker = "^"
+        linewidth = 2.0
+    else:
+        color = "gray"  # PROBLEM: Inconsistent fallback
+        marker = "o"
+        linewidth = 1.5
     
-    # Manual save with hardcoded path
-    plt.savefig('data/08_reporting/training_plot.png', 
-                bbox_inches='tight', dpi=100)
-    plt.close()
-
-def create_validation_metrics(results: pd.DataFrame) -> None:
-    """Create validation metrics with manual styling."""
-    # Duplicate styling configuration
-    plt.figure(figsize=(12, 8), dpi=150)
-    plt.rcParams.update({
-        'axes.grid': False,
-        'axes.labelsize': 14,
-        'axes.titlesize': 16,
-        'font.weight': 'bold'
-    })
+    # PROBLEM: Manual figure creation with styling
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 8))
     
-    # Create plot
-    sns.barplot(data=results, x='metric', y='value')
-    plt.title('Model Performance Metrics')
-    plt.xticks(rotation=45)
+    # PROBLEM: Manual styling application
+    ax1.plot(model_metrics['train_scores'], color=color, 
+            marker=marker, linewidth=linewidth, alpha=0.8)
+    ax1.set_title("Training Performance", fontsize=14, color=color)
+    ax1.set_xlabel("Epoch")
+    ax1.set_ylabel("Score")
+    ax1.grid(True, alpha=0.3)
     
-    # Manual save with hardcoded path
-    plt.savefig('data/08_reporting/validation_metrics.png',
-                bbox_inches='tight', dpi=150)
-    plt.close()
-```
-
-#### After: Automated Figure Management
-
-```python
-# src/<project_name>/pipelines/data_science/nodes.py
-import matplotlib.pyplot as plt
-import seaborn as sns
-from matplotlib.figure import Figure
-
-def create_training_plot(training_data: pd.DataFrame) -> Figure:
-    """Create training visualization with automated styling."""
-    # Create figure without manual styling - FigRegistry handles this
-    fig, ax = plt.subplots()
-    
-    # Focus on data visualization logic only
-    ax.plot(training_data['epoch'], training_data['loss'], label='Training Loss')
-    ax.plot(training_data['epoch'], training_data['val_loss'], label='Validation Loss')
-    ax.set_title('Model Training Progress')
-    ax.set_xlabel('Epoch')
-    ax.set_ylabel('Loss')
-    ax.legend()
-    
-    # Return figure object - no manual save required
-    return fig
-
-def create_validation_metrics(results: pd.DataFrame) -> Figure:
-    """Create validation metrics with automated styling."""
-    # Create figure without manual styling
-    fig, ax = plt.subplots()
-    
-    # Focus on data visualization logic only
-    sns.barplot(data=results, x='metric', y='value', ax=ax)
-    ax.set_title('Model Performance Metrics')
-    ax.tick_params(axis='x', rotation=45)
-    
-    # Return figure object - no manual save required
-    return fig
-
-def create_publication_results(analysis_data: pd.DataFrame) -> Figure:
-    """Create publication-ready results visualization."""
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-    
-    # Left subplot: Performance comparison
-    analysis_data.plot(kind='bar', ax=ax1)
-    ax1.set_title('Performance Comparison')
-    ax1.set_ylabel('Accuracy Score')
-    
-    # Right subplot: Feature importance
-    feature_importance = analysis_data.groupby('feature')['importance'].mean()
-    feature_importance.plot(kind='barh', ax=ax2)
-    ax2.set_title('Feature Importance')
-    ax2.set_xlabel('Importance Score')
+    ax2.plot(model_metrics['val_scores'], color=color,
+            marker=marker, linewidth=linewidth, alpha=0.8)
+    ax2.set_title("Validation Performance", fontsize=14, color=color)
+    ax2.set_xlabel("Epoch")
+    ax2.set_ylabel("Score")
+    ax2.grid(True, alpha=0.3)
     
     plt.tight_layout()
+    
+    # PROBLEM: Manual file path construction
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    model_type = parameters.get("model_type", "unknown")
+    output_dir = "data/08_reporting/presentation"
+    
+    # PROBLEM: Manual directory creation
+    os.makedirs(output_dir, exist_ok=True)
+    filename = f"model_performance_{model_type}_{timestamp}.png"
+    full_path = os.path.join(output_dir, filename)
+    
+    # PROBLEM: Manual plt.savefig() call with hardcoded parameters
+    plt.savefig(full_path, dpi=300, bbox_inches='tight', 
+                facecolor='white', edgecolor='none')
+    plt.close()
+    
+    print(f"Saved plot to: {full_path}")
+    return None  # Returns nothing - figure handled manually
+```
+
+**AFTER (Automated Approach)**:
+```python
+# nodes.py - Automated figure management (clean and simple)
+import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
+from typing import Dict, Any
+
+def create_model_performance_plot(model_metrics: Dict[str, Any], 
+                                 parameters: Dict[str, Any]) -> Figure:
+    """SOLUTION: Clean node focused on visualization logic only."""
+    
+    # Clean figure creation - no manual styling needed
+    fig, (ax1, ax2) = plt.subplots(1, 2)
+    
+    # Pure visualization logic - styling handled by FigureDataSet
+    ax1.plot(model_metrics['train_scores'])
+    ax1.set_title("Training Performance")
+    ax1.set_xlabel("Epoch")
+    ax1.set_ylabel("Score")
+    ax1.grid(True)
+    
+    ax2.plot(model_metrics['val_scores'])
+    ax2.set_title("Validation Performance")
+    ax2.set_xlabel("Epoch")
+    ax2.set_ylabel("Score")
+    ax2.grid(True)
+    
+    plt.tight_layout()
+    
+    # Return figure object - FigureDataSet handles everything else
+    return fig  # ✅ FigureDataSet applies styling and saves automatically
+```
+
+### Step 6: Update Parameters Configuration
+
+**Location**: `conf/base/parameters.yml`
+
+Ensure your parameters support condition-based styling:
+
+```yaml
+# parameters.yml - Enable condition resolution for automated styling
+
+# Model configuration for condition_param resolution
+model_configuration:
+  model_type: "random_forest"              # Used by condition_param: model_type
+  training_variant: "optimized"            # Used for training-specific styling
+  complexity_level: "moderate"             # Used for complexity-based styling
+
+# Analysis configuration
+analysis_configuration:
+  analysis_phase: "validation"             # Used for phase-specific styling
+  output_target: "stakeholder"             # Used for audience-specific styling
+
+# Dataset configuration
+dataset_configuration:
+  dataset_variant: "real_world"            # Used for data-specific styling
+  data_quality: "high_quality"             # Used for quality-based styling
+  sample_size_category: "medium_sample"    # Used for sample-dependent styling
+
+# Execution context
+execution_environment:
+  environment_type: "production"           # Used for environment-specific styling
+  resource_level: "standard"               # Used for resource-aware styling
+
+# Visualization context
+visualization_context:
+  audience_type: "technical"               # Used for audience-specific outputs
+  presentation_medium: "screen"            # Used for medium-specific optimization
+  accessibility_level: "colorblind_safe"   # Used for accessibility requirements
+  quality_requirement: "review"            # Used for quality-specific styling
+
+# Experiment tracking
+experiment_tracking:
+  experiment_id: "exp_001"                 # Used for experiment-specific outputs
+  experiment_condition: "baseline"         # Primary condition identifier
+```
+
+## Before/After Code Examples
+
+### Example 1: Training Metrics Visualization
+
+**BEFORE - Manual Approach (Problematic)**:
+```python
+def visualize_training_metrics(metrics: Dict, params: Dict) -> None:
+    """Problems: Manual styling, hardcoded paths, code duplication."""
+    
+    # Manual styling logic (repeated across functions)
+    if params.get("experiment_type") == "baseline":
+        colors = ["#3498DB", "#E74C3C"]
+        linewidth = 2.0
+    elif params.get("experiment_type") == "optimized":
+        colors = ["#27AE60", "#8E44AD"]
+        linewidth = 2.5
+    else:
+        colors = ["gray", "lightgray"]
+        linewidth = 1.5
+    
+    # Manual figure creation and styling
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(metrics['epochs'], metrics['train_loss'], 
+           color=colors[0], linewidth=linewidth, label='Training Loss')
+    ax.plot(metrics['epochs'], metrics['val_loss'],
+           color=colors[1], linewidth=linewidth, label='Validation Loss')
+    
+    # Manual styling application
+    ax.set_xlabel('Epoch', fontsize=12)
+    ax.set_ylabel('Loss', fontsize=12)
+    ax.set_title('Training Progress', fontsize=14, fontweight='bold')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    
+    # Manual file management
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_path = f"data/08_reporting/training_metrics_{timestamp}.png"
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    
+    # Manual save with hardcoded parameters
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
+```
+
+**AFTER - Automated Approach (Clean)**:
+```python
+def visualize_training_metrics(metrics: Dict, params: Dict) -> Figure:
+    """Solution: Clean visualization logic, automated management."""
+    
+    # Simple figure creation - no styling needed
+    fig, ax = plt.subplots()  # Size handled by FigureDataSet
+    
+    # Pure visualization logic
+    ax.plot(metrics['epochs'], metrics['train_loss'], label='Training Loss')
+    ax.plot(metrics['epochs'], metrics['val_loss'], label='Validation Loss')
+    
+    # Basic labeling - styling applied automatically
+    ax.set_xlabel('Epoch')
+    ax.set_ylabel('Loss')
+    ax.set_title('Training Progress')
+    ax.legend()
+    ax.grid(True)
+    
+    # Return figure - FigureDataSet handles styling and saving
     return fig
 ```
 
-### Step 7: Update Pipeline Definition
+**Catalog Configuration**:
+```yaml
+training_metrics_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/training_metrics.png
+  purpose: validation
+  condition_param: experiment_type  # Automatically resolves styling
+  versioned: true
+```
 
-Update your pipeline to use the new node signatures:
+### Example 2: Feature Importance Analysis
 
+**BEFORE - Manual Approach**:
 ```python
-# src/<project_name>/pipelines/data_science/pipeline.py
-from kedro.pipeline import Pipeline, node
-from .nodes import create_training_plot, create_validation_metrics, create_publication_results
-
-def create_pipeline(**kwargs) -> Pipeline:
-    return Pipeline([
-        node(
-            func=create_training_plot,
-            inputs="training_data",
-            outputs="training_plot",  # Now outputs to FigureDataSet
-            name="create_training_plot_node",
-        ),
-        node(
-            func=create_validation_metrics,
-            inputs="model_results",
-            outputs="validation_metrics",  # Now outputs to FigureDataSet
-            name="create_validation_metrics_node",
-        ),
-        node(
-            func=create_publication_results,
-            inputs="analysis_data",
-            outputs="publication_results",  # Now outputs to FigureDataSet
-            name="create_publication_results_node",
-        ),
-    ])
+def create_feature_importance_plot(importance_scores: pd.DataFrame,
+                                  parameters: Dict[str, Any]) -> None:
+    """Manual feature importance with repetitive styling code."""
+    
+    # Manual color scheme selection
+    model_type = parameters.get("model_type", "unknown")
+    if model_type == "random_forest":
+        bar_color = "#2ECC71"
+        title_color = "#27AE60"
+    elif model_type == "gradient_boosting":
+        bar_color = "#3498DB"
+        title_color = "#2980B9"
+    else:
+        bar_color = "#95A5A6"
+        title_color = "#7F8C8D"
+    
+    # Manual figure configuration
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    # Manual plotting with styling
+    bars = ax.barh(importance_scores['feature'], 
+                   importance_scores['importance'],
+                   color=bar_color, alpha=0.8, edgecolor='black')
+    
+    # Manual formatting
+    ax.set_xlabel('Feature Importance', fontsize=12)
+    ax.set_title(f'Feature Importance - {model_type.title()}', 
+                fontsize=14, color=title_color, fontweight='bold')
+    ax.grid(True, alpha=0.3, axis='x')
+    
+    # Manual file handling
+    purpose = parameters.get("purpose", "analysis")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"feature_importance_{model_type}_{purpose}_{timestamp}.png"
+    
+    output_dir = "data/08_reporting/analysis"
+    os.makedirs(output_dir, exist_ok=True)
+    output_path = os.path.join(output_dir, filename)
+    
+    plt.savefig(output_path, dpi=300, bbox_inches='tight')
+    plt.close()
 ```
 
-## Validation Steps
-
-### Step 1: Verify Installation
-
-Check that figregistry-kedro is properly installed:
-
-```bash
-python -c "import figregistry_kedro; print('✓ FigRegistry-Kedro installed successfully')"
-```
-
-### Step 2: Validate Configuration
-
-Test configuration loading:
-
+**AFTER - Automated Approach**:
 ```python
-# Run this in a Python shell within your project directory
-from figregistry_kedro.config import init_config
-from kedro.config import ConfigLoader
-
-config_loader = ConfigLoader("conf")
-config = init_config(config_loader, "base")
-if config:
-    print("✓ Configuration loaded successfully")
-else:
-    print("✗ Configuration loading failed")
+def create_feature_importance_plot(importance_scores: pd.DataFrame,
+                                  parameters: Dict[str, Any]) -> Figure:
+    """Clean feature importance focused on analysis logic."""
+    
+    # Simple figure creation
+    fig, ax = plt.subplots()
+    
+    # Core visualization logic only
+    ax.barh(importance_scores['feature'], 
+            importance_scores['importance'])
+    
+    # Basic labeling
+    ax.set_xlabel('Feature Importance')
+    ax.set_title('Feature Importance Analysis')
+    ax.grid(True, axis='x')
+    
+    # Return for automated processing
+    return fig
 ```
 
-### Step 3: Test Pipeline Execution
-
-Run your pipeline to ensure figures are generated correctly:
-
-```bash
-kedro run --pipeline=data_science
+**Catalog Configuration**:
+```yaml
+feature_importance_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/feature_importance_${params:model_type}.png
+  purpose: exploratory
+  condition_param: model_type  # Automatic model-specific styling
+  style_params:
+    figure.figsize: [10, 8]    # Vertical layout for feature names
+  versioned: true
 ```
 
-Check that figures are created in the expected locations with proper styling applied.
+## Configuration Setup
 
-### Step 4: Verify Hook Registration
+### Complete Configuration Examples
 
-Confirm hooks are registered by checking the logs for initialization messages:
-
-```bash
-kedro run --pipeline=data_science --log-level=DEBUG
-```
-
-Look for log messages like:
-- `"Initializing FigRegistry configuration for environment: base"`
-- `"FigRegistry initialization completed successfully"`
-
-## Migration Best Practices
-
-### 1. Gradual Migration Strategy
-
-Migrate one pipeline at a time rather than all at once:
-
-```python
-# Migrate high-impact visualizations first
-priority_pipelines = [
-    "data_science",      # Core analysis figures
-    "reporting",         # Customer-facing reports
-    "model_evaluation"   # Performance metrics
-]
-
-# Keep existing manual figures during transition
-legacy_pipelines = [
-    "exploratory_analysis",  # Migrate later
-    "data_quality_checks"    # Migrate last
-]
-```
-
-### 2. Condition Parameter Strategy
-
-Design meaningful condition parameters that reflect your experimental structure:
+#### 1. Enhanced figregistry.yml
 
 ```yaml
-# Good: Semantic condition parameters
-parameters:
-  experiment_condition: "baseline_vs_treatment"
-  model_architecture: "transformer_large"
-  dataset_version: "v2.1_cleaned"
+# Complete figregistry.yml for production use
+figregistry_version: ">=0.3.0"
 
-# Avoid: Generic or unclear conditions
-parameters:
-  condition: "test1"
-  type: "A"
-```
+metadata:
+  config_version: "1.0.0"
+  description: "Production figure styling configuration"
+  environment: "production"
+  last_updated: "2024-01-01"
 
-### 3. Style Organization
-
-Organize styles by output purpose rather than individual plots:
-
-```yaml
-# Good: Purpose-based organization
+# Comprehensive style definitions
 styles:
-  exploratory:     # For quick analysis
-    figure.dpi: 100
-    figure.figsize: [10, 6]
+  # Purpose-based styling
+  exploratory:
+    color: "#2E86AB"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.8
+    markersize: 8
+
+  presentation:
+    color: "#E74C3C"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.9
+    markersize: 9
+
+  publication:
+    color: "#2C3E50"
+    marker: "D"
+    linestyle: "-"
+    linewidth: 3.0
+    alpha: 1.0
+    markersize: 10
+
+  # Model-specific styling
+  random_forest:
+    color: "#27AE60"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.3
+    alpha: 0.85
+    label: "Random Forest"
+
+  linear_model:
+    color: "#8E44AD"
+    marker: "v"
+    linestyle: "--"
+    linewidth: 2.1
+    alpha: 0.8
+    label: "Linear Model"
+
+  neural_network:
+    color: "#F39C12"
+    marker: "*"
+    linestyle: "-"
+    linewidth: 2.4
+    alpha: 0.9
+    label: "Neural Network"
+
+  # Quality-based styling
+  high_quality:
+    color: "#1ABC9C"
+    marker: "P"
+    linestyle: "-"
+    linewidth: 2.2
+    alpha: 0.9
+    label: "High Quality"
+
+  medium_quality:
+    color: "#F1C40F"
+    marker: "X"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.8
+    label: "Medium Quality"
+
+# Advanced defaults
+defaults:
+  figure:
+    figsize: [10, 8]
+    dpi: 150
+    facecolor: "white"
   
-  presentation:    # For stakeholder meetings
-    figure.dpi: 150
-    figure.figsize: [12, 8]
-    font.size: 14
+  axes:
+    grid: true
+    grid_alpha: 0.3
+    titlesize: 14
+    labelsize: 12
   
-  publication:     # For papers/reports
+  line:
+    color: "#34495E"
+    linewidth: 2.0
+    alpha: 0.8
+  
+  legend:
+    loc: "best"
+    fontsize: 11
+    framealpha: 0.9
+  
+  text:
+    fontsize: 11
+    color: "#2C3E50"
+
+# Output configuration
+outputs:
+  base_path: "data/08_reporting"
+  naming:
+    template: "{name}_{condition}_{ts}"
+    timestamp_format: "%Y%m%d_%H%M%S"
+  
+  directories:
+    exploratory: "exploratory"
+    presentation: "presentation"
+    publication: "publication"
+    validation: "validation"
+    analysis: "analysis"
+
+# Performance optimization
+performance:
+  cache_enabled: true
+  max_cache_size: 1000
+  style_resolution_timeout_ms: 10
+```
+
+#### 2. Advanced Catalog Configuration
+
+```yaml
+# Complete catalog.yml with multiple FigureDataSet examples
+
+# Training and validation visualizations
+training_loss_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/training/loss_curves_${params:experiment_id}.png
+  purpose: validation
+  condition_param: model_configuration.model_type
+  style_params:
+    figure.figsize: [12, 6]
+    line.linewidth: 2.5
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+
+model_comparison_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/comparison/model_comparison.pdf
+  purpose: publication
+  condition_param: analysis_configuration.comparison_type
+  style_params:
+    figure.figsize: [14, 10]
     figure.dpi: 300
-    figure.figsize: [8, 6]
-    font.family: serif
+  save_args:
+    format: pdf
+    bbox_inches: tight
+  versioned: true
 
-# Avoid: Plot-specific styles
-styles:
-  training_plot_style:
-    # Too specific
-  validation_chart_format:
-    # Hard to reuse
+# Feature analysis
+feature_correlation_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/features/correlation_matrix.png
+  purpose: exploratory
+  condition_param: dataset_configuration.data_quality
+  style_params:
+    figure.figsize: [12, 12]
+  versioned: true
+
+feature_importance_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/features/importance_${params:model_type}.png
+  purpose: presentation
+  condition_param: model_configuration.model_type
+  style_params:
+    figure.figsize: [10, 12]  # Vertical for feature names
+  versioned: true
+
+# Performance evaluation
+confusion_matrix_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/evaluation/confusion_matrix.png
+  purpose: validation
+  condition_param: dataset_configuration.data_quality
+  style_params:
+    figure.figsize: [8, 8]
+  versioned: true
+
+roc_curve_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/evaluation/roc_curves.png
+  purpose: publication
+  condition_param: model_configuration.model_type
+  style_params:
+    figure.figsize: [10, 8]
+    figure.dpi: 300
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+
+# Diagnostic plots
+residual_analysis_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/diagnostics/residuals.png
+  purpose: exploratory
+  condition_param: dataset_configuration.sample_size_category
+  style_params:
+    figure.figsize: [12, 8]
+    scatter.alpha: 0.6
+  versioned: true
+
+learning_curve_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/diagnostics/learning_curves.png
+  purpose: validation
+  condition_param: model_configuration.training_variant
+  style_params:
+    figure.figsize: [14, 6]
+    line.linewidth: 2.5
+  versioned: true
 ```
 
-### 4. Error Handling
+## Validation and Testing
 
-Configure appropriate fallback behavior for production systems:
+### Step 1: Test Hook Registration
+
+Create a validation script to verify hook registration:
 
 ```python
-# In settings.py
-HOOKS = (
-    FigRegistryHooks(
-        auto_initialize=True,
-        fallback_on_error=True,  # Continue if FigRegistry fails
-        enable_performance_monitoring=False  # Disable in production
-    ),
-)
+# test_migration.py - Migration validation script
+import sys
+from pathlib import Path
+
+# Add project to path
+project_root = Path(__file__).parent
+sys.path.append(str(project_root / "src"))
+
+def test_hook_registration():
+    """Test that FigRegistryHooks are properly registered."""
+    try:
+        from {project_name}.settings import HOOKS
+        
+        if not HOOKS:
+            print("❌ No hooks registered")
+            return False
+        
+        # Check for FigRegistryHooks
+        hook_types = [type(hook).__name__ for hook in HOOKS]
+        if "FigRegistryHooks" not in hook_types:
+            print(f"❌ FigRegistryHooks not found. Found: {hook_types}")
+            return False
+        
+        print("✅ FigRegistryHooks registered successfully")
+        return True
+        
+    except ImportError as e:
+        print(f"❌ Import error: {e}")
+        return False
+
+def test_figregistry_config():
+    """Test that figregistry.yml is valid and loadable."""
+    try:
+        config_path = project_root / "conf" / "base" / "figregistry.yml"
+        
+        if not config_path.exists():
+            print(f"❌ figregistry.yml not found at {config_path}")
+            return False
+        
+        import yaml
+        with open(config_path) as f:
+            config = yaml.safe_load(f)
+        
+        # Validate required sections
+        required_sections = ["styles", "defaults", "outputs"]
+        missing_sections = [s for s in required_sections if s not in config]
+        
+        if missing_sections:
+            print(f"❌ Missing required sections: {missing_sections}")
+            return False
+        
+        print("✅ figregistry.yml configuration valid")
+        print(f"   Styles defined: {len(config['styles'])}")
+        return True
+        
+    except Exception as e:
+        print(f"❌ Configuration error: {e}")
+        return False
+
+def test_figuredataset_catalog():
+    """Test that catalog contains FigureDataSet entries."""
+    try:
+        catalog_path = project_root / "conf" / "base" / "catalog.yml"
+        
+        if not catalog_path.exists():
+            print(f"❌ catalog.yml not found at {catalog_path}")
+            return False
+        
+        import yaml
+        with open(catalog_path) as f:
+            catalog = yaml.safe_load(f)
+        
+        # Find FigureDataSet entries
+        figuredatasets = []
+        for name, config in catalog.items():
+            if isinstance(config, dict) and "figregistry_kedro.FigureDataSet" in str(config.get("type", "")):
+                figuredatasets.append(name)
+        
+        if not figuredatasets:
+            print("❌ No FigureDataSet entries found in catalog")
+            return False
+        
+        print(f"✅ Found {len(figuredatasets)} FigureDataSet entries:")
+        for ds in figuredatasets[:5]:  # Show first 5
+            print(f"   - {ds}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Catalog validation error: {e}")
+        return False
+
+def run_migration_validation():
+    """Run complete migration validation."""
+    print("🔍 Validating figregistry-kedro migration...")
+    print("=" * 50)
+    
+    tests = [
+        ("Hook Registration", test_hook_registration),
+        ("FigRegistry Configuration", test_figregistry_config),
+        ("Catalog Integration", test_figuredataset_catalog)
+    ]
+    
+    results = []
+    for test_name, test_func in tests:
+        print(f"\n{test_name}:")
+        result = test_func()
+        results.append(result)
+    
+    print("\n" + "=" * 50)
+    
+    if all(results):
+        print("🎉 MIGRATION VALIDATION PASSED!")
+        print("Your project is ready for automated figure management.")
+        return True
+    else:
+        print("⚠️  MIGRATION VALIDATION FAILED")
+        print("Please address the issues above before proceeding.")
+        return False
+
+if __name__ == "__main__":
+    success = run_migration_validation()
+    sys.exit(0 if success else 1)
+```
+
+### Step 2: Test Pipeline Execution
+
+Run a test pipeline to verify the integration:
+
+```bash
+# Test the pipeline with figregistry-kedro integration
+kedro run --pipeline=data_visualization
+
+# Check that figures were created automatically
+ls -la data/08_reporting/
+
+# Verify automated styling was applied
+kedro run --pipeline=data_visualization --params="model_type:linear_model"
+```
+
+### Step 3: Performance Validation
+
+Create a performance test to ensure minimal overhead:
+
+```python
+# performance_test.py - Measure integration overhead
+import time
+import matplotlib.pyplot as plt
+import numpy as np
+from figregistry_kedro.datasets import FigureDataSet
+
+def test_save_performance():
+    """Test FigureDataSet save performance vs manual saves."""
+    
+    # Create test figure
+    fig, ax = plt.subplots()
+    x = np.linspace(0, 10, 1000)
+    ax.plot(x, np.sin(x))
+    
+    # Test manual matplotlib save
+    start_time = time.time()
+    fig.savefig("test_manual.png", dpi=300, bbox_inches='tight')
+    manual_time = (time.time() - start_time) * 1000
+    
+    # Test FigureDataSet save
+    dataset = FigureDataSet(
+        filepath="test_figregistry.png",
+        purpose="exploratory",
+        condition_param="test_condition"
+    )
+    
+    start_time = time.time()
+    dataset._save(fig)
+    figregistry_time = (time.time() - start_time) * 1000
+    
+    # Calculate overhead
+    overhead_percent = ((figregistry_time - manual_time) / manual_time) * 100
+    
+    print(f"Manual save time: {manual_time:.2f}ms")
+    print(f"FigureDataSet save time: {figregistry_time:.2f}ms")
+    print(f"Overhead: {overhead_percent:.1f}%")
+    
+    # Validate overhead is within acceptable range (<5%)
+    if overhead_percent < 5.0:
+        print("✅ Performance overhead within acceptable range")
+        return True
+    else:
+        print("❌ Performance overhead exceeds 5% target")
+        return False
+
+if __name__ == "__main__":
+    test_save_performance()
 ```
 
 ## Troubleshooting
 
 ### Common Issues and Solutions
 
-#### Issue: "FigRegistry not initialized" Error
+#### 1. Hook Registration Issues
 
-**Symptoms**: Pipeline fails with configuration not found errors
+**Problem**: `FigRegistryHooks not found` error
 
-**Solution**: Verify hook registration and configuration file paths
-
+**Solution**:
 ```python
-# Check hook registration in settings.py
+# Verify installation
+pip list | grep figregistry-kedro
+
+# If not installed:
+pip install figregistry-kedro
+
+# Check import in settings.py
 from figregistry_kedro.hooks import FigRegistryHooks
-print("✓ Hooks imported successfully")
-
-# Verify configuration file exists
-from pathlib import Path
-config_path = Path("conf/base/figregistry.yml")
-if config_path.exists():
-    print("✓ Configuration file found")
-else:
-    print("✗ Configuration file missing")
+print("✅ Import successful")
 ```
 
-#### Issue: Styling Not Applied
+#### 2. Configuration Loading Errors
 
-**Symptoms**: Figures generated but don't show expected styling
+**Problem**: `figregistry.yml not found` or loading errors
 
-**Solution**: Check condition parameter resolution
+**Solution**:
+```bash
+# Verify file location
+ls -la conf/base/figregistry.yml
 
-```python
-# Add debug logging to verify condition resolution
-import logging
-logging.getLogger("figregistry_kedro").setLevel(logging.DEBUG)
-
-# Run pipeline and check logs for:
-# "Resolved condition 'experiment_condition' = 'baseline_model'"
+# Validate YAML syntax
+python -c "
+import yaml
+with open('conf/base/figregistry.yml') as f:
+    config = yaml.safe_load(f)
+print('✅ YAML syntax valid')
+"
 ```
 
-#### Issue: Performance Degradation
+#### 3. Condition Resolution Issues
 
-**Symptoms**: Pipeline runs significantly slower after migration
+**Problem**: Styles not applied correctly
 
-**Solution**: Enable performance monitoring and optimize configuration
+**Solutions**:
 
+**Check parameter availability**:
+```yaml
+# In parameters.yml - ensure condition parameters exist
+model_configuration:
+  model_type: "random_forest"  # Must match condition_param usage
+```
+
+**Verify condition_param configuration**:
+```yaml
+# In catalog.yml - check condition_param path
+my_plot:
+  type: figregistry_kedro.FigureDataSet
+  condition_param: model_configuration.model_type  # Nested parameter path
+```
+
+**Add fallback styling**:
+```yaml
+# In figregistry.yml - always include fallback
+defaults:
+  fallback_style:
+    color: "#95A5A6"
+    marker: "o"
+    linestyle: "-"
+```
+
+#### 4. Versioning Integration Issues
+
+**Problem**: Kedro versioning not working with FigureDataSet
+
+**Solution**:
+```yaml
+# Ensure versioned: true in catalog entry
+my_versioned_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/plot.png
+  versioned: true  # ← Critical for Kedro versioning
+  purpose: validation
+```
+
+#### 5. Performance Issues
+
+**Problem**: Slow figure saves or style resolution
+
+**Solutions**:
+
+**Enable caching**:
 ```python
-# Enable performance monitoring
+# In settings.py
 HOOKS = (
     FigRegistryHooks(
-        enable_performance_monitoring=True,
-        max_initialization_time=0.005  # 5ms limit
+        config_cache_enabled=True,  # Enable configuration caching
+        cache_size=1000            # Increase cache size
     ),
 )
-
-# Check cache statistics
-from figregistry_kedro.datasets import FigureDataSet
-stats = FigureDataSet.get_performance_stats()
-print(f"Average save time: {stats['avg_save_time']*1000:.2f}ms")
 ```
 
-#### Issue: Import Errors
-
-**Symptoms**: Cannot import figregistry_kedro components
-
-**Solution**: Verify installation and dependencies
-
-```bash
-# Reinstall with verbose output
-pip install --upgrade --force-reinstall figregistry-kedro
-
-# Check dependency versions
-pip show figregistry-kedro
-pip show kedro
-pip show figregistry
-```
-
-### Environment-Specific Configuration
-
-For multi-environment projects, create environment-specific overrides:
-
+**Optimize style configuration**:
 ```yaml
-# conf/local/figregistry.yml (for development)
+# In figregistry.yml - avoid complex nested configurations
+styles:
+  simple_style:  # Keep styles simple and focused
+    color: "#2E86AB"
+    linewidth: 2.0
+```
+
+### Debugging Tools
+
+#### Enable Debug Logging
+
+```python
+# Add to pipeline nodes for debugging
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# FigRegistry-specific logging
+logger = logging.getLogger("figregistry_kedro")
+logger.setLevel(logging.DEBUG)
+```
+
+#### Configuration Inspection
+
+```python
+# Inspect merged configuration
+from figregistry_kedro.config import get_merged_config
+
+config = get_merged_config(environment="local")
+print("Available styles:", list(config.get("styles", {}).keys()))
+print("Output configuration:", config.get("outputs", {}))
+```
+
+#### Hook State Monitoring
+
+```python
+# Check hook state
+from figregistry_kedro.hooks import get_global_hook_state
+
+state = get_global_hook_state()
+print("Hook state:", state)
+```
+
+## Best Practices
+
+### 1. Configuration Organization
+
+#### Structured Style Definitions
+```yaml
+# Organize styles by category for maintainability
+styles:
+  # Purpose-based styles
+  exploratory:
+    color: "#2E86AB"
+    # ... other properties
+    
+  # Model-specific styles
+  random_forest:
+    color: "#27AE60"
+    # ... other properties
+    
+  # Quality-based styles
+  high_quality:
+    color: "#1ABC9C"
+    # ... other properties
+```
+
+#### Environment-Specific Overrides
+```yaml
+# conf/local/figregistry.yml - Development overrides
 styles:
   exploratory:
-    figure.dpi: 72  # Lower resolution for faster development
+    figure:
+      dpi: 150  # Lower DPI for faster development iteration
 
-# conf/production/figregistry.yml (for production)
+# conf/production/figregistry.yml - Production overrides  
 styles:
-  presentation:
-    figure.dpi: 300  # High resolution for production outputs
   publication:
-    figure.dpi: 600  # Ultra-high resolution for publications
+    figure:
+      dpi: 300  # High DPI for production quality
 ```
 
-## Advanced Migration Scenarios
+### 2. Parameter Design
 
-### Migrating Complex Subplots
-
-For complex matplotlib figures with subplots:
-
-```python
-# Before: Manual subplot management
-def create_complex_dashboard():
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 10))
-    # ... complex plotting logic ...
-    plt.savefig('dashboard.png', dpi=150, bbox_inches='tight')
-    plt.close()
-
-# After: Return figure for automated management
-def create_complex_dashboard() -> Figure:
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
-    # ... same plotting logic ...
-    return fig  # FigRegistry handles sizing and saving
-```
-
-### Migrating Animation or Interactive Plots
-
-For animated or interactive visualizations:
-
+#### Clear Parameter Hierarchy
 ```yaml
-# Catalog configuration for animations
-animated_results:
-  type: figregistry_kedro.FigureDataSet
-  filepath: data/08_reporting/animated_results.gif
-  purpose: presentation
-  save_args:
-    format: gif
-    writer: pillow
-    fps: 2
+# parameters.yml - Structured for condition resolution
+model_configuration:
+  model_type: "random_forest"
+  training_variant: "optimized"
+  
+analysis_configuration:
+  analysis_phase: "validation"
+  output_target: "stakeholder"
+  
+execution_environment:
+  environment_type: "production"
+  resource_level: "standard"
 ```
 
-### Integrating with Existing Tools
+#### Consistent Naming Conventions
+```yaml
+# Use consistent naming patterns for condition parameters
+dataset_configuration:
+  dataset_variant: "real_world"        # Use descriptive variants
+  data_quality: "high_quality"         # Use quality indicators
+  sample_size_category: "large_sample" # Use category classifications
+```
 
-For projects using other visualization libraries:
+### 3. Catalog Design
 
+#### Logical Output Organization
+```yaml
+# Group related visualizations
+training_metrics_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/training/metrics.png
+  
+validation_results_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/validation/results.png
+  
+final_presentation_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/presentation/summary.png
+```
+
+#### Template-Based Naming
+```yaml
+# Use parameter substitution for dynamic naming
+model_comparison_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/comparison/${params:model_type}_vs_baseline.png
+  condition_param: model_configuration.model_type
+```
+
+### 4. Node Implementation
+
+#### Clean Separation of Concerns
 ```python
-# Plotly integration example
-import plotly.graph_objects as go
-from plotly.io import to_image
-import matplotlib.pyplot as plt
-
-def create_plotly_figure() -> Figure:
-    """Convert Plotly figure to matplotlib for FigRegistry."""
-    # Create Plotly figure
-    plotly_fig = go.Figure()
-    plotly_fig.add_trace(go.Scatter(x=[1, 2, 3], y=[4, 5, 6]))
+def create_visualization(data: pd.DataFrame, parameters: Dict) -> Figure:
+    """Keep nodes focused on visualization logic only."""
     
-    # Convert to matplotlib via image
-    img_bytes = to_image(plotly_fig, format="png")
-    
-    # Create matplotlib figure with image
+    # ✅ Good: Focus on data visualization
     fig, ax = plt.subplots()
-    ax.imshow(plt.imread(io.BytesIO(img_bytes)))
-    ax.axis('off')
+    ax.plot(data['x'], data['y'])
+    ax.set_title("Analysis Results")
     
+    # ✅ Good: Return figure for automated processing
+    return fig
+    
+    # ❌ Avoid: Manual styling, saving, or path management
+    # plt.savefig("output.png")  # Don't do this
+```
+
+#### Parameterized Visualization Logic
+```python
+def create_model_comparison(results: Dict, parameters: Dict) -> Figure:
+    """Use parameters for visualization logic, not styling."""
+    
+    fig, ax = plt.subplots()
+    
+    # ✅ Good: Use parameters for data selection and layout
+    models_to_compare = parameters.get("models_to_compare", ["model_a", "model_b"])
+    
+    for model in models_to_compare:
+        if model in results:
+            ax.plot(results[model]['metrics'], label=model)
+    
+    ax.legend()
     return fig
 ```
 
-## Migration Checklist
+### 5. Testing Strategy
 
-Use this checklist to ensure complete migration:
+#### Unit Testing for Nodes
+```python
+# test_nodes.py
+import pytest
+from matplotlib.figure import Figure
 
-### Pre-Migration
-- [ ] Backup existing project
-- [ ] Document current figure output locations
-- [ ] Identify all nodes with `plt.savefig()` calls
-- [ ] Review existing styling patterns
-- [ ] Test current pipeline functionality
+def test_create_visualization():
+    """Test that node returns a valid Figure object."""
+    # Arrange
+    test_data = pd.DataFrame({"x": [1, 2, 3], "y": [1, 4, 9]})
+    test_params = {"analysis_type": "exploration"}
+    
+    # Act
+    result = create_visualization(test_data, test_params)
+    
+    # Assert
+    assert isinstance(result, Figure)
+    assert len(result.get_axes()) > 0
+```
 
-### Migration Implementation
-- [ ] Install figregistry-kedro dependency
-- [ ] Register FigRegistryHooks in settings.py
-- [ ] Create conf/base/figregistry.yml configuration
-- [ ] Update catalog.yml with FigureDataSet entries
-- [ ] Add condition parameters to parameters.yml
-- [ ] Refactor pipeline nodes to return Figure objects
-- [ ] Remove manual plt.savefig() calls
-- [ ] Update pipeline definitions
+#### Integration Testing
+```python
+# test_integration.py
+def test_figuredataset_integration():
+    """Test that FigureDataSet processes figures correctly."""
+    # Create test dataset
+    dataset = FigureDataSet(
+        filepath="test_output.png",
+        purpose="validation",
+        condition_param="test_condition"
+    )
+    
+    # Create test figure
+    fig, ax = plt.subplots()
+    ax.plot([1, 2, 3], [1, 4, 9])
+    
+    # Test save operation
+    dataset._save(fig)
+    
+    # Verify output exists
+    assert Path("test_output.png").exists()
+```
 
-### Post-Migration Validation
-- [ ] Verify all tests pass
-- [ ] Check figure output quality and styling
-- [ ] Validate performance impact (<5% overhead)
-- [ ] Test multi-environment configuration
-- [ ] Verify version control integration
-- [ ] Update documentation
-- [ ] Train team on new workflow
+### 6. Performance Optimization
 
-## Conclusion
+#### Efficient Style Caching
+```python
+# Enable caching for better performance
+HOOKS = (
+    FigRegistryHooks(
+        config_cache_enabled=True,
+        max_cache_size=1000,
+        performance_target_ms=10.0
+    ),
+)
+```
 
-The migration to figregistry-kedro transforms your Kedro project from manual figure management to an automated, configuration-driven approach. This results in:
+#### Lazy Loading Patterns
+```yaml
+# Use versioning strategically
+development_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/dev_plot.png
+  versioned: false  # Disable versioning for development speed
 
-- **50-80% reduction** in visualization-related code
-- **Centralized styling** management across all pipelines
-- **Automatic consistency** across experimental conditions
-- **Improved maintainability** through separation of concerns
-- **Enhanced reproducibility** with version-controlled styling
+production_plot:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/prod_plot.png
+  versioned: true   # Enable versioning for production tracking
+```
 
-The migration process typically takes 1-2 days for small projects and up to a week for large, complex pipelines. The long-term benefits in maintainability and consistency make this investment worthwhile for any data science project with significant visualization requirements.
+### 7. Documentation and Maintenance
 
-For additional support and advanced use cases, refer to the [figregistry-kedro documentation](https://figregistry-kedro.readthedocs.io) or the project's [GitHub repository](https://github.com/blitzy-public-samples/figregistry-kedro).
+#### Configuration Documentation
+```yaml
+# Document your styling choices
+styles:
+  publication:
+    # Publication-quality styling for peer review
+    # - High DPI for crisp text
+    # - Conservative colors for accessibility
+    # - Larger fonts for readability
+    color: "#2C3E50"
+    marker: "D"
+    linewidth: 3.0
+```
+
+#### Migration Tracking
+```python
+# Keep migration notes in settings.py
+"""
+Migration Notes:
+- Converted 15 manual plt.savefig() calls to FigureDataSet automation
+- Eliminated ~500 lines of repetitive styling code
+- Added condition-based styling for 8 experimental conditions
+- Performance overhead: <2% compared to manual approach
+"""
+```
+
+---
+
+## Summary
+
+This migration guide provides a comprehensive approach to transforming Kedro projects from manual matplotlib figure management to automated figregistry-kedro integration. The key transformation involves:
+
+1. **Installing figregistry-kedro** and registering FigRegistryHooks
+2. **Creating centralized configuration** in figregistry.yml  
+3. **Updating the data catalog** to use FigureDataSet entries
+4. **Modifying pipeline nodes** to return Figure objects instead of manual saves
+5. **Validating the migration** through comprehensive testing
+
+The result is a significant reduction in visualization-related code (target: 90%), consistent styling across all experimental conditions, and seamless integration with Kedro's versioning and experiment tracking capabilities.
+
+For additional support and advanced configuration options, refer to the comprehensive examples in the `figregistry-kedro/examples/` directory.
