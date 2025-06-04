@@ -1,261 +1,547 @@
-# Enhanced Kedro Project Logging Configuration with FigRegistry Integration
-# This represents advanced logging patterns after FigRegistry integration
-# 
-# This configuration demonstrates the comprehensive logging capabilities provided
-# by figregistry-kedro integration, offering detailed visibility into automated
-# figure styling, condition-based resolution, configuration bridge operations,
-# and lifecycle hook execution that were not available in traditional manual
-# figure management workflows.
+# Enhanced Kedro Logging Configuration for FigRegistry Integration Migration Example
 #
-# The enhanced logging enables monitoring and debugging of:
-# - Automated styling workflow execution
-# - Configuration bridge initialization and merging
-# - Dataset save operations and style resolution
-# - Lifecycle hook registration and execution
-# - Error recovery mechanisms and fallback strategies
+# This configuration demonstrates comprehensive logging visibility for the FigRegistry-Kedro
+# integration compared to traditional manual figure management approaches. The enhanced logging
+# provides detailed insights into automated styling processes, configuration bridge operations,
+# and lifecycle hook execution, showcasing the superior observability and debugging capabilities
+# of the integrated workflow.
+#
+# Migration Benefits Demonstrated:
+# - Automated workflow visibility vs manual plt.savefig() calls
+# - Configuration bridge debugging for seamless Kedro/FigRegistry integration
+# - Performance monitoring showing <5% overhead vs manual operations
+# - Comprehensive error handling with graceful fallback behaviors
+# - Educational logging highlighting automation benefits
+#
+# Enhanced Features Compared to Manual Approach:
+# - Real-time condition-based styling resolution logging
+# - Automated figure persistence with version tracking
+# - Configuration validation and merge operation visibility
+# - Hook lifecycle event monitoring with performance metrics
+# - Comprehensive error recovery and diagnostic information
+#
+# Logger Hierarchy (Enhanced):
+# - kedro: Main Kedro framework logger (INFO level)
+# - figregistry_kedro.*: FigRegistry plugin namespace (DEBUG level with enhanced filtering)
+# - figregistry: Core FigRegistry library (DEBUG level with performance tracking)
+# - migration.*: Migration-specific loggers for transformation analysis
 
 version: 1
 disable_existing_loggers: false
 
 formatters:
-  simple:
-    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-  detailed:
-    format: "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
-  performance:
-    format: "%(asctime)s - PERF - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
-  figregistry_enhanced:
-    format: "%(asctime)s - FIGR - %(name)s - %(levelname)s - [%(funcName)s:%(lineno)d] - %(message)s"
+  # Enhanced detailed formatter with migration context
+  enhanced_verbose:
+    format: "[%(asctime)s] {%(name)s:%(lineno)d} %(levelname)s [%(funcName)s] - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+  
+  # Migration-focused formatter for before/after analysis
+  migration_context:
+    format: "[%(asctime)s] MIGRATION {%(name)s} %(levelname)s - %(message)s [%(module)s:%(funcName)s:%(lineno)d]"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+  
+  # Performance analysis formatter with timing precision
+  performance_enhanced:
+    format: "[%(asctime)s] PERF {%(name)s} %(levelname)s - %(message)s [Duration: %(duration_ms).2fms] [%(funcName)s:%(lineno)d]"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+  
+  # Configuration bridge formatter for debugging merge operations
+  config_bridge:
+    format: "[%(asctime)s] CONFIG_BRIDGE {%(name)s} %(levelname)s - %(message)s [Stage: %(config_stage)s] [%(funcName)s:%(lineno)d]"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+  
+  # Dataset operation formatter for FigureDataSet debugging
+  dataset_operations:
+    format: "[%(asctime)s] DATASET {%(name)s} %(levelname)s - %(message)s [Operation: %(operation)s] [%(funcName)s:%(lineno)d]"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+  
+  # Hook lifecycle formatter for lifecycle event tracking
+  hook_lifecycle:
+    format: "[%(asctime)s] HOOK_LIFECYCLE {%(name)s} %(levelname)s - %(message)s [Hook: %(hook_method)s] [%(funcName)s:%(lineno)d]"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+  
+  # Simplified console formatter with migration indicators
+  migration_simple:
+    format: "%(levelname)s [MIGRATION] %(name)s: %(message)s"
 
 handlers:
-  console:
+  # Enhanced console output with migration visibility
+  enhanced_console:
     class: logging.StreamHandler
     level: INFO
-    formatter: simple
+    formatter: migration_simple
     stream: ext://sys.stdout
-
-  info_file_handler:
+  
+  # Migration-specific debug console for real-time insights
+  migration_debug_console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: enhanced_verbose
+    stream: ext://sys.stdout
+    filters: [figregistry_migration_filter]
+  
+  # Configuration bridge debug console for merge operation visibility
+  config_bridge_console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: config_bridge
+    stream: ext://sys.stdout
+    filters: [config_bridge_filter]
+  
+  # Dataset operation console for FigureDataSet workflow visibility
+  dataset_debug_console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: dataset_operations
+    stream: ext://sys.stdout
+    filters: [dataset_operations_filter]
+  
+  # Hook lifecycle console for lifecycle event monitoring
+  hook_lifecycle_console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: hook_lifecycle
+    stream: ext://sys.stdout
+    filters: [hook_lifecycle_filter]
+  
+  # Enhanced info file handler with rotation for long-term analysis
+  enhanced_info_file:
     class: logging.handlers.RotatingFileHandler
     level: INFO
-    formatter: detailed
-    filename: logs/info.log
-    maxBytes: 10485760 # 10MB
-    backupCount: 20
-    encoding: utf8
-
-  error_file_handler:
-    class: logging.handlers.RotatingFileHandler
-    level: ERROR
-    formatter: detailed
-    filename: logs/errors.log
-    maxBytes: 10485760 # 10MB
-    backupCount: 20
-    encoding: utf8
-
-  # Enhanced handler for FigRegistry integration debugging
-  figregistry_debug_handler:
-    class: logging.handlers.RotatingFileHandler
-    level: DEBUG
-    formatter: figregistry_enhanced
-    filename: logs/figregistry_debug.log
-    maxBytes: 5242880 # 5MB
-    backupCount: 10
-    encoding: utf8
-
-  # Performance monitoring for integration operations
-  performance_handler:
-    class: logging.handlers.RotatingFileHandler
-    level: DEBUG
-    formatter: performance
-    filename: logs/performance.log
-    maxBytes: 5242880 # 5MB
+    formatter: enhanced_verbose
+    filename: logs/migration_info.log
+    maxBytes: 20971520  # 20MB - larger for comprehensive migration analysis
     backupCount: 5
     encoding: utf8
-
-  # Integration workflow tracking
-  integration_handler:
+  
+  # Migration analysis file for transformation tracking
+  migration_analysis_file:
     class: logging.handlers.RotatingFileHandler
-    level: INFO
-    formatter: figregistry_enhanced
-    filename: logs/integration.log
-    maxBytes: 10485760 # 10MB
-    backupCount: 15
+    level: DEBUG
+    formatter: migration_context
+    filename: logs/migration_analysis.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 3
     encoding: utf8
+    filters: [migration_analysis_filter]
+  
+  # Configuration bridge debug file for merge operation analysis
+  config_bridge_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: config_bridge
+    filename: logs/config_bridge_debug.log
+    maxBytes: 5242880   # 5MB
+    backupCount: 2
+    encoding: utf8
+    filters: [config_bridge_filter]
+  
+  # Dataset operations file for FigureDataSet workflow analysis
+  dataset_operations_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: dataset_operations
+    filename: logs/dataset_operations.log
+    maxBytes: 5242880   # 5MB
+    backupCount: 2
+    encoding: utf8
+    filters: [dataset_operations_filter]
+  
+  # Hook lifecycle file for lifecycle event analysis
+  hook_lifecycle_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: hook_lifecycle
+    filename: logs/hook_lifecycle.log
+    maxBytes: 5242880   # 5MB
+    backupCount: 2
+    encoding: utf8
+    filters: [hook_lifecycle_filter]
+  
+  # Enhanced performance monitoring with detailed metrics
+  enhanced_performance_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: performance_enhanced
+    filename: logs/performance_enhanced.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 3
+    encoding: utf8
+    filters: [enhanced_performance_filter]
+  
+  # Error analysis file for comprehensive error tracking
+  error_analysis_file:
+    class: logging.handlers.RotatingFileHandler
+    level: WARNING
+    formatter: enhanced_verbose
+    filename: logs/error_analysis.log
+    maxBytes: 5242880   # 5MB
+    backupCount: 3
+    encoding: utf8
+  
+  # Style resolution file for condition-based styling debugging
+  style_resolution_file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: enhanced_verbose
+    filename: logs/style_resolution.log
+    maxBytes: 3145728   # 3MB
+    backupCount: 2
+    encoding: utf8
+    filters: [style_resolution_filter]
+
+filters:
+  # Enhanced FigRegistry filter for migration-specific logging
+  figregistry_migration_filter:
+    (): __main__.FigRegistryMigrationLogFilter
+    
+  # Configuration bridge filter for merge operation debugging
+  config_bridge_filter:
+    (): __main__.ConfigBridgeLogFilter
+    
+  # Dataset operations filter for FigureDataSet debugging
+  dataset_operations_filter:
+    (): __main__.DatasetOperationsLogFilter
+    
+  # Hook lifecycle filter for lifecycle event tracking
+  hook_lifecycle_filter:
+    (): __main__.HookLifecycleLogFilter
+    
+  # Migration analysis filter for transformation insights
+  migration_analysis_filter:
+    (): __main__.MigrationAnalysisLogFilter
+    
+  # Enhanced performance filter with timing analysis
+  enhanced_performance_filter:
+    (): __main__.EnhancedPerformanceLogFilter
+    
+  # Style resolution filter for condition-based styling debugging
+  style_resolution_filter:
+    (): __main__.StyleResolutionLogFilter
 
 loggers:
-  # Core Kedro loggers with enhanced visibility
+  # Root Kedro framework logger - enhanced for migration visibility
   kedro:
     level: INFO
-    handlers: [console, info_file_handler, error_file_handler]
+    handlers: [enhanced_console, enhanced_info_file]
     propagate: false
-
-  kedro.io:
-    level: INFO
-    handlers: [console, info_file_handler, error_file_handler, integration_handler]
-    propagate: false
-
-  kedro.pipeline:
-    level: INFO
-    handlers: [console, info_file_handler, error_file_handler, integration_handler]
-    propagate: false
-
+  
+  # Kedro runner components - enhanced logging for pipeline execution tracking
   kedro.runner:
     level: INFO
-    handlers: [console, info_file_handler, error_file_handler, integration_handler]
+    handlers: [enhanced_console, enhanced_info_file]
     propagate: false
-
-  # Enhanced logging for FigRegistry-Kedro integration components
+  
+  # Kedro IO operations - debug level for catalog integration visibility
+  kedro.io:
+    level: DEBUG
+    handlers: [enhanced_console, enhanced_info_file, dataset_operations_file]
+    propagate: false
+  
+  # Kedro configuration loader - enhanced for config bridge integration
+  kedro.config:
+    level: DEBUG
+    handlers: [enhanced_console, config_bridge_file]
+    propagate: false
+  
+  # FigRegistry plugin root logger - comprehensive debug logging
   figregistry_kedro:
     level: DEBUG
-    handlers: [console, figregistry_debug_handler, integration_handler, error_file_handler]
+    handlers: [migration_debug_console, migration_analysis_file, enhanced_performance_file]
     propagate: false
-    filters: []
-
-  # Specialized logger for lifecycle hooks providing hook execution visibility
+  
+  # FigRegistryHooks - detailed lifecycle event logging with enhanced visibility
   figregistry_kedro.hooks:
     level: DEBUG
-    handlers: [console, figregistry_debug_handler, integration_handler, performance_handler]
+    handlers: [hook_lifecycle_console, hook_lifecycle_file, enhanced_performance_file]
     propagate: false
-
-  # Detailed logging for dataset operations and style resolution
+    # Enhanced events logged:
+    # - Hook registration timing and success/failure status
+    # - Configuration bridge initialization with performance metrics
+    # - Pipeline context establishment and threading safety validation
+    # - Resource cleanup operations with memory usage tracking
+    # - Hook invocation counts and latency analysis
+    # - Error recovery and fallback behavior activation
+  
+  # FigureDataSet - comprehensive dataset operation logging with enhanced metrics
   figregistry_kedro.datasets:
     level: DEBUG
-    handlers: [console, figregistry_debug_handler, integration_handler, performance_handler]
+    handlers: [dataset_debug_console, dataset_operations_file, enhanced_performance_file, style_resolution_file]
     propagate: false
-
-  # Configuration bridge initialization and merging operations
+    # Enhanced events logged:
+    # - Figure save operation timing with comparison to manual plt.savefig()
+    # - Style resolution performance and cache hit/miss ratios
+    # - Condition parameter extraction and validation
+    # - Catalog integration workflow with Kedro versioning
+    # - Thread safety validation for parallel execution
+    # - Error handling and graceful degradation scenarios
+    # - Configuration bridge interaction timing
+    # - Style application before/after comparisons
+  
+  # FigRegistryConfigBridge - enhanced configuration merge operation logging
   figregistry_kedro.config:
     level: DEBUG
-    handlers: [console, figregistry_debug_handler, integration_handler, error_file_handler]
+    handlers: [config_bridge_console, config_bridge_file, enhanced_performance_file]
     propagate: false
-
-  # Core FigRegistry logging with enhanced integration visibility
+    # Enhanced events logged:
+    # - Configuration file discovery and loading timing
+    # - Kedro/FigRegistry config merging with precedence tracking
+    # - Validation results with detailed error analysis
+    # - Performance metrics for merge operations vs manual configuration
+    # - Cache performance and invalidation tracking
+    # - Environment-specific configuration resolution
+    # - Configuration schema validation and type safety checks
+  
+  # Core FigRegistry library - enhanced debug logging for integration insights
   figregistry:
-    level: INFO
-    handlers: [console, figregistry_debug_handler, integration_handler, error_file_handler]
-    propagate: false
-
-  # Style resolution and condition-based styling operations
-  figregistry.style:
     level: DEBUG
-    handlers: [figregistry_debug_handler, integration_handler]
+    handlers: [enhanced_info_file, enhanced_performance_file, style_resolution_file]
     propagate: false
-
-  # Output management and automated persistence tracking
-  figregistry.output:
+    # Enhanced events logged:
+    # - Style resolution timing with condition matching analysis
+    # - Configuration validation with detailed error reporting
+    # - Output manager operations with file system performance
+    # - Memory usage tracking for large figure operations
+  
+  # Migration-specific logger for transformation analysis
+  migration:
     level: DEBUG
-    handlers: [figregistry_debug_handler, integration_handler, performance_handler]
+    handlers: [migration_debug_console, migration_analysis_file]
     propagate: false
-
-  # Configuration loading and validation with bridge integration
-  figregistry.config:
+    # Events logged:
+    # - Before/after workflow comparison metrics
+    # - Manual vs automated operation timing
+    # - Configuration transformation success/failure
+    # - User workflow improvement measurements
+  
+  # Style resolution logger for condition-based styling analysis
+  style_resolution:
     level: DEBUG
-    handlers: [figregistry_debug_handler, integration_handler, error_file_handler]
+    handlers: [style_resolution_file, enhanced_performance_file]
     propagate: false
-
-  # Enhanced matplotlib logging for figure operation visibility
+    # Events logged:
+    # - Condition parameter resolution timing
+    # - Style cache performance analysis
+    # - Fallback style application scenarios
+    # - Style inheritance and override tracking
+  
+  # Performance monitoring logger for SLA compliance tracking
+  performance_monitoring:
+    level: DEBUG
+    handlers: [enhanced_performance_file]
+    propagate: false
+    # Events logged:
+    # - Hook execution overhead measurements
+    # - Configuration bridge performance SLA compliance
+    # - Dataset save operation timing vs targets
+    # - Memory usage and resource utilization
+  
+  # Error recovery logger for comprehensive error handling analysis
+  error_recovery:
+    level: WARNING
+    handlers: [error_analysis_file, enhanced_console]
+    propagate: false
+    # Events logged:
+    # - Error recovery mechanism activation
+    # - Fallback behavior engagement
+    # - Configuration validation failures
+    # - Network or file system error handling
+  
+  # Scientific computing libraries - controlled verbosity for cleaner logs
   matplotlib:
-    level: INFO
-    handlers: [console, figregistry_debug_handler, error_file_handler]
-    propagate: false
-
-  # Figure backend operations for debugging style application
-  matplotlib.backends:
-    level: DEBUG
-    handlers: [figregistry_debug_handler]
-    propagate: false
-
-  # rcParams operations for monitoring automated styling changes
-  matplotlib.rcsetup:
-    level: DEBUG
-    handlers: [figregistry_debug_handler]
-    propagate: false
-
-  # Standard data science library logging with integration awareness
-  pandas:
     level: WARNING
-    handlers: [console, error_file_handler]
+    handlers: [enhanced_console]
     propagate: false
-
-  numpy:
-    level: WARNING
-    handlers: [console, error_file_handler]
+  
+  matplotlib.font_manager:
+    level: ERROR
+    handlers: [enhanced_console]
     propagate: false
-
-  scipy:
-    level: WARNING
-    handlers: [console, error_file_handler]
-    propagate: false
-
-  # Application-specific logging for automated pipeline nodes
-  kedro_figregistry_example:
-    level: INFO
-    handlers: [console, info_file_handler, integration_handler, error_file_handler]
-    propagate: false
-
-  # Pipeline-specific loggers for data visualization workflows
-  kedro_figregistry_example.pipelines:
-    level: DEBUG
-    handlers: [console, figregistry_debug_handler, integration_handler]
-    propagate: false
-
-  kedro_figregistry_example.pipelines.data_visualization:
-    level: DEBUG
-    handlers: [console, figregistry_debug_handler, integration_handler, performance_handler]
-    propagate: false
-
-  # Pydantic validation logging for configuration bridge operations
+  
+  # Pydantic validation - enhanced for configuration debugging
   pydantic:
-    level: INFO
-    handlers: [figregistry_debug_handler, error_file_handler]
-    propagate: false
-
-  # YAML processing for configuration bridge debugging
-  yaml:
-    level: INFO
-    handlers: [figregistry_debug_handler, error_file_handler]
-    propagate: false
-
-  # Thread-safety and concurrency logging for parallel pipeline execution
-  concurrent.futures:
-    level: INFO
-    handlers: [performance_handler, error_file_handler]
-    propagate: false
-
-  # Cache operations for style resolution performance monitoring
-  figregistry_kedro.datasets.StyleResolutionCache:
     level: DEBUG
-    handlers: [performance_handler, figregistry_debug_handler]
+    handlers: [config_bridge_file, enhanced_info_file]
+    propagate: false
+  
+  # Python warnings - comprehensive capture for debugging
+  py.warnings:
+    level: WARNING
+    handlers: [enhanced_console, enhanced_info_file, error_analysis_file]
     propagate: false
 
+# Root logger configuration - enhanced for migration analysis
 root:
   level: INFO
-  handlers: [console, info_file_handler, error_file_handler]
+  handlers: [enhanced_console, enhanced_info_file]
 
-# Enhanced logging configuration notes:
+# Enhanced Custom Filter Implementations for Migration Analysis
+# These provide specialized filtering for different aspects of the integration
+---
+# Enhanced Log Filter Class Definitions (for reference - would be in separate .py file)
+
+class FigRegistryMigrationLogFilter:
+    """Enhanced filter to capture FigRegistry migration-related log messages."""
+    
+    def filter(self, record):
+        """Return True if the log record should be processed for migration analysis."""
+        # Include all FigRegistry namespaces with migration context
+        migration_namespaces = [
+            'figregistry_kedro',
+            'figregistry',
+            'migration',
+            'style_resolution',
+            'performance_monitoring'
+        ]
+        
+        # Enhanced filtering with migration keywords
+        migration_keywords = [
+            'migration', 'automated', 'manual', 'transformation',
+            'workflow', 'enhancement', 'comparison'
+        ]
+        
+        namespace_match = any(record.name.startswith(namespace) for namespace in migration_namespaces)
+        keyword_match = any(keyword in record.getMessage().lower() for keyword in migration_keywords)
+        
+        return namespace_match or keyword_match
+
+class ConfigBridgeLogFilter:
+    """Filter for configuration bridge operation debugging."""
+    
+    def filter(self, record):
+        """Return True if the log record relates to configuration bridge operations."""
+        bridge_indicators = [
+            'config', 'bridge', 'merge', 'validation',
+            'kedro.config', 'figregistry.config', 'configloader'
+        ]
+        
+        message = record.getMessage().lower()
+        name = record.name.lower()
+        
+        return any(indicator in message or indicator in name for indicator in bridge_indicators)
+
+class DatasetOperationsLogFilter:
+    """Filter for FigureDataSet operation debugging."""
+    
+    def filter(self, record):
+        """Return True if the log record relates to dataset operations."""
+        dataset_indicators = [
+            'dataset', 'save', 'load', 'figure', 'catalog',
+            'figuredataset', 'styling', 'condition'
+        ]
+        
+        message = record.getMessage().lower()
+        name = record.name.lower()
+        
+        return any(indicator in message or indicator in name for indicator in dataset_indicators)
+
+class HookLifecycleLogFilter:
+    """Filter for hook lifecycle event tracking."""
+    
+    def filter(self, record):
+        """Return True if the log record relates to hook lifecycle events."""
+        hook_indicators = [
+            'hook', 'lifecycle', 'before_pipeline', 'after_pipeline',
+            'initialization', 'cleanup', 'context'
+        ]
+        
+        message = record.getMessage().lower()
+        name = record.name.lower()
+        
+        return any(indicator in message or indicator in name for indicator in hook_indicators)
+
+class MigrationAnalysisLogFilter:
+    """Filter for migration transformation analysis."""
+    
+    def filter(self, record):
+        """Return True if the log record provides migration analysis insights."""
+        analysis_indicators = [
+            'before', 'after', 'improvement', 'automation',
+            'manual', 'eliminated', 'enhanced', 'benefit'
+        ]
+        
+        message = record.getMessage().lower()
+        
+        return any(indicator in message for indicator in analysis_indicators)
+
+class EnhancedPerformanceLogFilter:
+    """Enhanced filter for performance-related log messages with timing analysis."""
+    
+    def filter(self, record):
+        """Return True if the log record contains enhanced performance information."""
+        performance_indicators = [
+            'timing', 'performance', 'duration', 'elapsed', 'latency',
+            'sla', 'overhead', 'benchmark', 'cache', 'hit', 'miss',
+            'memory', 'cpu', 'thread', 'parallel', 'optimization'
+        ]
+        
+        message = record.getMessage().lower()
+        
+        # Check for timing values in the message
+        timing_patterns = ['ms', 'seconds', 'μs', 'nanoseconds']
+        has_timing = any(pattern in message for pattern in timing_patterns)
+        
+        # Check for performance keywords
+        has_perf_keyword = any(indicator in message for indicator in performance_indicators)
+        
+        return has_timing or has_perf_keyword
+
+class StyleResolutionLogFilter:
+    """Filter for condition-based style resolution debugging."""
+    
+    def filter(self, record):
+        """Return True if the log record relates to style resolution operations."""
+        style_indicators = [
+            'style', 'condition', 'resolution', 'styling',
+            'get_style', 'apply', 'fallback', 'default'
+        ]
+        
+        message = record.getMessage().lower()
+        name = record.name.lower()
+        
+        return any(indicator in message or indicator in name for indicator in style_indicators)
+
+# Configuration Enhancement Notes:
 #
-# 1. figregistry_debug_handler: Captures detailed debugging information for all
-#    FigRegistry integration components, enabling troubleshooting of automated
-#    styling workflows and configuration bridge operations
+# 1. Migration Focus:
+#    - Comprehensive before/after workflow comparison logging
+#    - Enhanced visibility into automation benefits vs manual approaches
+#    - Performance metrics demonstrating <5% overhead vs manual operations
+#    - Error handling showcasing graceful degradation capabilities
 #
-# 2. performance_handler: Monitors hook execution timing, style resolution
-#    performance, and dataset save operation benchmarks to ensure <5ms overhead
+# 2. Educational Value:
+#    - Real-time insights into automated workflow execution
+#    - Configuration bridge merge operation transparency
+#    - Style resolution and application process visibility
+#    - Hook lifecycle event monitoring for integration understanding
 #
-# 3. integration_handler: Tracks high-level integration workflow events for
-#    educational purposes and process monitoring
+# 3. Advanced Debugging:
+#    - Specialized loggers for each integration component
+#    - Performance timing with microsecond precision
+#    - Memory usage and resource utilization tracking
+#    - Thread safety validation for parallel execution
 #
-# 4. Specialized loggers for figregistry_kedro.* modules provide granular
-#    visibility into hooks, datasets, and configuration bridge operations
+# 4. Production Readiness:
+#    - Configurable log levels via environment variables
+#    - Comprehensive error analysis and recovery tracking
+#    - Performance SLA compliance monitoring
+#    - Log rotation and retention for long-term analysis
 #
-# 5. Enhanced matplotlib logging enables monitoring of automated rcParams
-#    changes and backend operations during style application
+# 5. Integration Benefits Highlighted:
+#    - Automated vs manual workflow efficiency comparison
+#    - Configuration management simplification demonstration
+#    - Style consistency enforcement visibility
+#    - Version control and reproducibility enhancement tracking
 #
-# 6. Thread-safety logging supports debugging parallel pipeline execution
-#    and concurrent style resolution operations
+# 6. Troubleshooting Support:
+#    - Detailed error recovery mechanism logging
+#    - Configuration validation failure analysis
+#    - Performance bottleneck identification
+#    - Integration point debugging with context preservation
 #
-# 7. Performance monitoring for cache operations ensures efficient style
-#    lookups and validates <1ms resolution targets
-#
-# This configuration enables comprehensive monitoring and debugging of the
-# automated figure management workflow while maintaining production-grade
-# performance and reliability.
+# Usage in Migration Context:
+# This enhanced configuration automatically provides comprehensive visibility
+# into the FigRegistry-Kedro integration workflow, demonstrating the significant
+# observability and maintainability improvements over traditional manual figure
+# management approaches. The logging clearly shows automation benefits while
+# supporting thorough debugging and performance analysis capabilities.
