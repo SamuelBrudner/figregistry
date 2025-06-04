@@ -1,121 +1,123 @@
-sample_id,treatment,measurement_type,value,mean,std_dev,n_samples,measurement_unit,experimental_phase,analysis_stage,timestamp
-S001,control,biomarker_alpha,23.45,23.12,2.34,15,mg/mL,training,exploratory,2024-01-15T09:00:00Z
-S002,control,biomarker_alpha,21.78,23.12,2.34,15,mg/mL,training,exploratory,2024-01-15T09:15:00Z
-S003,control,biomarker_alpha,25.12,23.12,2.34,15,mg/mL,training,exploratory,2024-01-15T09:30:00Z
-S004,control,biomarker_alpha,22.89,23.12,2.34,15,mg/mL,training,exploratory,2024-01-15T09:45:00Z
-S005,control,biomarker_alpha,24.56,23.12,2.34,15,mg/mL,training,exploratory,2024-01-15T10:00:00Z
-S006,treatment_A,biomarker_alpha,31.23,30.87,3.12,15,mg/mL,training,exploratory,2024-01-15T10:15:00Z
-S007,treatment_A,biomarker_alpha,29.45,30.87,3.12,15,mg/mL,training,exploratory,2024-01-15T10:30:00Z
-S008,treatment_A,biomarker_alpha,32.78,30.87,3.12,15,mg/mL,training,exploratory,2024-01-15T10:45:00Z
-S009,treatment_A,biomarker_alpha,28.91,30.87,3.12,15,mg/mL,training,exploratory,2024-01-15T11:00:00Z
-S010,treatment_A,biomarker_alpha,33.12,30.87,3.12,15,mg/mL,training,exploratory,2024-01-15T11:15:00Z
-S011,treatment_B,biomarker_alpha,41.67,42.15,4.23,15,mg/mL,training,exploratory,2024-01-15T11:30:00Z
-S012,treatment_B,biomarker_alpha,43.89,42.15,4.23,15,mg/mL,training,exploratory,2024-01-15T11:45:00Z
-S013,treatment_B,biomarker_alpha,39.78,42.15,4.23,15,mg/mL,training,exploratory,2024-01-15T12:00:00Z
-S014,treatment_B,biomarker_alpha,44.23,42.15,4.23,15,mg/mL,training,exploratory,2024-01-15T12:15:00Z
-S015,treatment_B,biomarker_alpha,40.91,42.15,4.23,15,mg/mL,training,exploratory,2024-01-15T12:30:00Z
-S016,control,biomarker_beta,18.34,18.67,1.89,15,µg/L,training,exploratory,2024-01-15T13:00:00Z
-S017,control,biomarker_beta,17.89,18.67,1.89,15,µg/L,training,exploratory,2024-01-15T13:15:00Z
-S018,control,biomarker_beta,19.45,18.67,1.89,15,µg/L,training,exploratory,2024-01-15T13:30:00Z
-S019,control,biomarker_beta,18.12,18.67,1.89,15,µg/L,training,exploratory,2024-01-15T13:45:00Z
-S020,control,biomarker_beta,19.78,18.67,1.89,15,µg/L,training,exploratory,2024-01-15T14:00:00Z
-S021,treatment_A,biomarker_beta,25.67,25.43,2.67,15,µg/L,training,exploratory,2024-01-15T14:15:00Z
-S022,treatment_A,biomarker_beta,24.89,25.43,2.67,15,µg/L,training,exploratory,2024-01-15T14:30:00Z
-S023,treatment_A,biomarker_beta,26.78,25.43,2.67,15,µg/L,training,exploratory,2024-01-15T14:45:00Z
-S024,treatment_A,biomarker_beta,23.91,25.43,2.67,15,µg/L,training,exploratory,2024-01-15T15:00:00Z
-S025,treatment_A,biomarker_beta,27.12,25.43,2.67,15,µg/L,training,exploratory,2024-01-15T15:15:00Z
-S026,treatment_B,biomarker_beta,32.45,33.78,3.45,15,µg/L,training,exploratory,2024-01-15T15:30:00Z
-S027,treatment_B,biomarker_beta,35.67,33.78,3.45,15,µg/L,training,exploratory,2024-01-15T15:45:00Z
-S028,treatment_B,biomarker_beta,31.23,33.78,3.45,15,µg/L,training,exploratory,2024-01-15T16:00:00Z
-S029,treatment_B,biomarker_beta,36.12,33.78,3.45,15,µg/L,training,exploratory,2024-01-15T16:15:00Z
-S030,treatment_B,biomarker_beta,30.89,33.78,3.45,15,µg/L,training,exploratory,2024-01-15T16:30:00Z
-S031,control,efficacy_score,72.3,71.8,5.2,20,score,validation,presentation,2024-01-16T09:00:00Z
-S032,control,efficacy_score,69.7,71.8,5.2,20,score,validation,presentation,2024-01-16T09:15:00Z
-S033,control,efficacy_score,74.1,71.8,5.2,20,score,validation,presentation,2024-01-16T09:30:00Z
-S034,control,efficacy_score,70.5,71.8,5.2,20,score,validation,presentation,2024-01-16T09:45:00Z
-S035,control,efficacy_score,73.9,71.8,5.2,20,score,validation,presentation,2024-01-16T10:00:00Z
-S036,treatment_A,efficacy_score,84.2,83.6,4.8,20,score,validation,presentation,2024-01-16T10:15:00Z
-S037,treatment_A,efficacy_score,82.1,83.6,4.8,20,score,validation,presentation,2024-01-16T10:30:00Z
-S038,treatment_A,efficacy_score,85.7,83.6,4.8,20,score,validation,presentation,2024-01-16T10:45:00Z
-S039,treatment_A,efficacy_score,81.9,83.6,4.8,20,score,validation,presentation,2024-01-16T11:00:00Z
-S040,treatment_A,efficacy_score,86.4,83.6,4.8,20,score,validation,presentation,2024-01-16T11:15:00Z
-S041,treatment_B,efficacy_score,91.8,92.4,3.6,20,score,validation,presentation,2024-01-16T11:30:00Z
-S042,treatment_B,efficacy_score,94.2,92.4,3.6,20,score,validation,presentation,2024-01-16T11:45:00Z
-S043,treatment_B,efficacy_score,89.6,92.4,3.6,20,score,validation,presentation,2024-01-16T12:00:00Z
-S044,treatment_B,efficacy_score,93.7,92.4,3.6,20,score,validation,presentation,2024-01-16T12:15:00Z
-S045,treatment_B,efficacy_score,90.1,92.4,3.6,20,score,validation,presentation,2024-01-16T12:30:00Z
-S046,control,response_time,156.7,152.3,12.4,25,ms,validation,presentation,2024-01-16T13:00:00Z
-S047,control,response_time,148.9,152.3,12.4,25,ms,validation,presentation,2024-01-16T13:15:00Z
-S048,control,response_time,159.1,152.3,12.4,25,ms,validation,presentation,2024-01-16T13:30:00Z
-S049,control,response_time,145.6,152.3,12.4,25,ms,validation,presentation,2024-01-16T13:45:00Z
-S050,control,response_time,161.2,152.3,12.4,25,ms,validation,presentation,2024-01-16T14:00:00Z
-S051,treatment_A,response_time,134.5,132.8,10.7,25,ms,validation,presentation,2024-01-16T14:15:00Z
-S052,treatment_A,response_time,128.2,132.8,10.7,25,ms,validation,presentation,2024-01-16T14:30:00Z
-S053,treatment_A,response_time,137.9,132.8,10.7,25,ms,validation,presentation,2024-01-16T14:45:00Z
-S054,treatment_A,response_time,125.7,132.8,10.7,25,ms,validation,presentation,2024-01-16T15:00:00Z
-S055,treatment_A,response_time,140.3,132.8,10.7,25,ms,validation,presentation,2024-01-16T15:15:00Z
-S056,treatment_B,response_time,118.4,116.9,8.9,25,ms,validation,presentation,2024-01-16T15:30:00Z
-S057,treatment_B,response_time,112.8,116.9,8.9,25,ms,validation,presentation,2024-01-16T15:45:00Z
-S058,treatment_B,response_time,121.7,116.9,8.9,25,ms,validation,presentation,2024-01-16T16:00:00Z
-S059,treatment_B,response_time,109.3,116.9,8.9,25,ms,validation,presentation,2024-01-16T16:15:00Z
-S060,treatment_B,response_time,124.1,116.9,8.9,25,ms,validation,presentation,2024-01-16T16:30:00Z
-S061,control,accuracy_metric,0.823,0.817,0.034,30,proportion,testing,publication,2024-01-17T09:00:00Z
-S062,control,accuracy_metric,0.805,0.817,0.034,30,proportion,testing,publication,2024-01-17T09:15:00Z
-S063,control,accuracy_metric,0.841,0.817,0.034,30,proportion,testing,publication,2024-01-17T09:30:00Z
-S064,control,accuracy_metric,0.798,0.817,0.034,30,proportion,testing,publication,2024-01-17T09:45:00Z
-S065,control,accuracy_metric,0.856,0.817,0.034,30,proportion,testing,publication,2024-01-17T10:00:00Z
-S066,treatment_A,accuracy_metric,0.887,0.891,0.028,30,proportion,testing,publication,2024-01-17T10:15:00Z
-S067,treatment_A,accuracy_metric,0.903,0.891,0.028,30,proportion,testing,publication,2024-01-17T10:30:00Z
-S068,treatment_A,accuracy_metric,0.874,0.891,0.028,30,proportion,testing,publication,2024-01-17T10:45:00Z
-S069,treatment_A,accuracy_metric,0.912,0.891,0.028,30,proportion,testing,publication,2024-01-17T11:00:00Z
-S070,treatment_A,accuracy_metric,0.869,0.891,0.028,30,proportion,testing,publication,2024-01-17T11:15:00Z
-S071,treatment_B,accuracy_metric,0.934,0.942,0.021,30,proportion,testing,publication,2024-01-17T11:30:00Z
-S072,treatment_B,accuracy_metric,0.957,0.942,0.021,30,proportion,testing,publication,2024-01-17T11:45:00Z
-S073,treatment_B,accuracy_metric,0.928,0.942,0.021,30,proportion,testing,publication,2024-01-17T12:00:00Z
-S074,treatment_B,accuracy_metric,0.961,0.942,0.021,30,proportion,testing,publication,2024-01-17T12:15:00Z
-S075,treatment_B,accuracy_metric,0.919,0.942,0.021,30,proportion,testing,publication,2024-01-17T12:30:00Z
-S076,control,throughput_rate,847.3,852.1,38.7,18,ops/sec,testing,publication,2024-01-17T13:00:00Z
-S077,control,throughput_rate,863.5,852.1,38.7,18,ops/sec,testing,publication,2024-01-17T13:15:00Z
-S078,control,throughput_rate,839.2,852.1,38.7,18,ops/sec,testing,publication,2024-01-17T13:30:00Z
-S079,control,throughput_rate,871.7,852.1,38.7,18,ops/sec,testing,publication,2024-01-17T13:45:00Z
-S080,control,throughput_rate,825.4,852.1,38.7,18,ops/sec,testing,publication,2024-01-17T14:00:00Z
-S081,treatment_A,throughput_rate,967.8,973.2,42.3,18,ops/sec,testing,publication,2024-01-17T14:15:00Z
-S082,treatment_A,throughput_rate,984.6,973.2,42.3,18,ops/sec,testing,publication,2024-01-17T14:30:00Z
-S083,treatment_A,throughput_rate,951.7,973.2,42.3,18,ops/sec,testing,publication,2024-01-17T14:45:00Z
-S084,treatment_A,throughput_rate,997.1,973.2,42.3,18,ops/sec,testing,publication,2024-01-17T15:00:00Z
-S085,treatment_A,throughput_rate,935.9,973.2,42.3,18,ops/sec,testing,publication,2024-01-17T15:15:00Z
-S086,treatment_B,throughput_rate,1123.4,1134.7,51.2,18,ops/sec,testing,publication,2024-01-17T15:30:00Z
-S087,treatment_B,throughput_rate,1156.8,1134.7,51.2,18,ops/sec,testing,publication,2024-01-17T15:45:00Z
-S088,treatment_B,throughput_rate,1098.3,1134.7,51.2,18,ops/sec,testing,publication,2024-01-17T16:00:00Z
-S089,treatment_B,throughput_rate,1167.2,1134.7,51.2,18,ops/sec,testing,publication,2024-01-17T16:15:00Z
-S090,treatment_B,throughput_rate,1076.9,1134.7,51.2,18,ops/sec,testing,publication,2024-01-17T16:30:00Z
-S091,control,error_rate,0.0847,0.0823,0.0156,22,proportion,final,publication,2024-01-18T09:00:00Z
-S092,control,error_rate,0.0765,0.0823,0.0156,22,proportion,final,publication,2024-01-18T09:15:00Z
-S093,control,error_rate,0.0891,0.0823,0.0156,22,proportion,final,publication,2024-01-18T09:30:00Z
-S094,control,error_rate,0.0734,0.0823,0.0156,22,proportion,final,publication,2024-01-18T09:45:00Z
-S095,control,error_rate,0.0923,0.0823,0.0156,22,proportion,final,publication,2024-01-18T10:00:00Z
-S096,treatment_A,error_rate,0.0567,0.0543,0.0124,22,proportion,final,publication,2024-01-18T10:15:00Z
-S097,treatment_A,error_rate,0.0498,0.0543,0.0124,22,proportion,final,publication,2024-01-18T10:30:00Z
-S098,treatment_A,error_rate,0.0612,0.0543,0.0124,22,proportion,final,publication,2024-01-18T10:45:00Z
-S099,treatment_A,error_rate,0.0471,0.0543,0.0124,22,proportion,final,publication,2024-01-18T11:00:00Z
-S100,treatment_A,error_rate,0.0634,0.0543,0.0124,22,proportion,final,publication,2024-01-18T11:15:00Z
-S101,treatment_B,error_rate,0.0289,0.0312,0.0089,22,proportion,final,publication,2024-01-18T11:30:00Z
-S102,treatment_B,error_rate,0.0356,0.0312,0.0089,22,proportion,final,publication,2024-01-18T11:45:00Z
-S103,treatment_B,error_rate,0.0267,0.0312,0.0089,22,proportion,final,publication,2024-01-18T12:00:00Z
-S104,treatment_B,error_rate,0.0378,0.0312,0.0089,22,proportion,final,publication,2024-01-18T12:15:00Z
-S105,treatment_B,error_rate,0.0234,0.0312,0.0089,22,proportion,final,publication,2024-01-18T12:30:00Z
-S106,control,memory_usage,2847.3,2834.6,187.4,16,MB,final,publication,2024-01-18T13:00:00Z
-S107,control,memory_usage,2789.2,2834.6,187.4,16,MB,final,publication,2024-01-18T13:15:00Z
-S108,control,memory_usage,2901.7,2834.6,187.4,16,MB,final,publication,2024-01-18T13:30:00Z
-S109,control,memory_usage,2756.8,2834.6,187.4,16,MB,final,publication,2024-01-18T13:45:00Z
-S110,control,memory_usage,2967.4,2834.6,187.4,16,MB,final,publication,2024-01-18T14:00:00Z
-S111,treatment_A,memory_usage,2456.8,2478.3,164.2,16,MB,final,publication,2024-01-18T14:15:00Z
-S112,treatment_A,memory_usage,2534.7,2478.3,164.2,16,MB,final,publication,2024-01-18T14:30:00Z
-S113,treatment_A,memory_usage,2389.5,2478.3,164.2,16,MB,final,publication,2024-01-18T14:45:00Z
-S114,treatment_A,memory_usage,2567.9,2478.3,164.2,16,MB,final,publication,2024-01-18T15:00:00Z
-S115,treatment_A,memory_usage,2342.1,2478.3,164.2,16,MB,final,publication,2024-01-18T15:15:00Z
-S116,treatment_B,memory_usage,2123.4,2089.7,142.6,16,MB,final,publication,2024-01-18T15:30:00Z
-S117,treatment_B,memory_usage,2067.8,2089.7,142.6,16,MB,final,publication,2024-01-18T15:45:00Z
-S118,treatment_B,memory_usage,2156.3,2089.7,142.6,16,MB,final,publication,2024-01-18T16:00:00Z
-S119,treatment_B,memory_usage,2023.9,2089.7,142.6,16,MB,final,publication,2024-01-18T16:15:00Z
-S120,treatment_B,memory_usage,2189.4,2089.7,142.6,16,MB,final,publication,2024-01-18T16:30:00Z
+sample_id,experiment_id,treatment,measurement_type,value,std_dev,n_samples,measurement_unit,time_point,researcher,notes
+SMPL001,EXP001,treatment_group_a,efficacy,0.82,0.12,25,percentage,baseline,Dr. Sarah Chen,Initial dose-response measurement compound X-47
+SMPL002,EXP001,treatment_group_a,efficacy,0.85,0.08,25,percentage,week_2,Dr. Sarah Chen,Follow-up efficacy assessment
+SMPL003,EXP001,treatment_group_a,efficacy,0.89,0.09,25,percentage,week_4,Dr. Sarah Chen,Peak efficacy measurement
+SMPL004,EXP001,treatment_group_a,toxicity,0.15,0.04,25,severity_score,baseline,Dr. Sarah Chen,Safety profile assessment
+SMPL005,EXP001,treatment_group_a,toxicity,0.18,0.05,25,severity_score,week_2,Dr. Sarah Chen,Toxicity monitoring
+SMPL006,EXP001,treatment_group_a,toxicity,0.22,0.06,25,severity_score,week_4,Dr. Sarah Chen,Extended safety evaluation
+SMPL007,EXP001,treatment_group_a,biomarker_level,2.4,0.3,25,ng_ml,baseline,Dr. Sarah Chen,Biomarker expression baseline
+SMPL008,EXP001,treatment_group_a,biomarker_level,3.1,0.4,25,ng_ml,week_2,Dr. Sarah Chen,Biomarker response measurement
+SMPL009,EXP001,treatment_group_a,biomarker_level,3.8,0.5,25,ng_ml,week_4,Dr. Sarah Chen,Peak biomarker expression
+SMPL010,EXP002,treatment_group_b,efficacy,0.76,0.14,25,percentage,baseline,Dr. Sarah Chen,Secondary compound Y-23 baseline
+SMPL011,EXP002,treatment_group_b,efficacy,0.78,0.11,25,percentage,week_2,Dr. Sarah Chen,Y-23 efficacy progression
+SMPL012,EXP002,treatment_group_b,efficacy,0.81,0.13,25,percentage,week_4,Dr. Sarah Chen,Y-23 peak efficacy
+SMPL013,EXP002,treatment_group_b,toxicity,0.12,0.03,25,severity_score,baseline,Dr. Sarah Chen,Y-23 safety baseline
+SMPL014,EXP002,treatment_group_b,toxicity,0.14,0.04,25,severity_score,week_2,Dr. Sarah Chen,Y-23 toxicity monitoring
+SMPL015,EXP002,treatment_group_b,toxicity,0.17,0.05,25,severity_score,week_4,Dr. Sarah Chen,Y-23 safety assessment
+SMPL016,EXP002,treatment_group_b,biomarker_level,1.8,0.2,25,ng_ml,baseline,Dr. Sarah Chen,Y-23 biomarker baseline
+SMPL017,EXP002,treatment_group_b,biomarker_level,2.3,0.3,25,ng_ml,week_2,Dr. Sarah Chen,Y-23 biomarker response
+SMPL018,EXP002,treatment_group_b,biomarker_level,2.7,0.4,25,ng_ml,week_4,Dr. Sarah Chen,Y-23 biomarker peak
+SMPL019,EXP003,control_group,efficacy,0.12,0.06,25,percentage,baseline,Dr. Sarah Chen,Placebo control baseline
+SMPL020,EXP003,control_group,efficacy,0.13,0.07,25,percentage,week_2,Dr. Sarah Chen,Control efficacy monitoring
+SMPL021,EXP003,control_group,efficacy,0.15,0.08,25,percentage,week_4,Dr. Sarah Chen,Control final assessment
+SMPL022,EXP003,control_group,toxicity,0.08,0.02,25,severity_score,baseline,Dr. Sarah Chen,Control safety baseline
+SMPL023,EXP003,control_group,toxicity,0.09,0.03,25,severity_score,week_2,Dr. Sarah Chen,Control toxicity monitoring
+SMPL024,EXP003,control_group,toxicity,0.10,0.03,25,severity_score,week_4,Dr. Sarah Chen,Control safety final
+SMPL025,EXP003,control_group,biomarker_level,0.8,0.1,25,ng_ml,baseline,Dr. Sarah Chen,Control biomarker baseline
+SMPL026,EXP003,control_group,biomarker_level,0.9,0.1,25,ng_ml,week_2,Dr. Sarah Chen,Control biomarker monitoring
+SMPL027,EXP003,control_group,biomarker_level,1.0,0.1,25,ng_ml,week_4,Dr. Sarah Chen,Control biomarker final
+SMPL028,EXP004,treatment_group_a,efficacy,0.86,0.10,50,percentage,baseline,Dr. Michael Rodriguez,Validation phase X-47 increased sample
+SMPL029,EXP004,treatment_group_a,efficacy,0.87,0.09,50,percentage,week_2,Dr. Michael Rodriguez,X-47 validation efficacy
+SMPL030,EXP004,treatment_group_a,efficacy,0.90,0.08,50,percentage,week_4,Dr. Michael Rodriguez,X-47 validation peak
+SMPL031,EXP004,treatment_group_a,toxicity,0.16,0.04,50,severity_score,baseline,Dr. Michael Rodriguez,X-47 validation safety
+SMPL032,EXP004,treatment_group_a,toxicity,0.19,0.05,50,severity_score,week_2,Dr. Michael Rodriguez,X-47 validation toxicity
+SMPL033,EXP004,treatment_group_a,toxicity,0.21,0.05,50,severity_score,week_4,Dr. Michael Rodriguez,X-47 validation final safety
+SMPL034,EXP005,treatment_group_b,efficacy,0.79,0.12,50,percentage,baseline,Dr. Michael Rodriguez,Y-23 validation baseline
+SMPL035,EXP005,treatment_group_b,efficacy,0.81,0.10,50,percentage,week_2,Dr. Michael Rodriguez,Y-23 validation efficacy
+SMPL036,EXP005,treatment_group_b,efficacy,0.84,0.11,50,percentage,week_4,Dr. Michael Rodriguez,Y-23 validation peak
+SMPL037,EXP005,treatment_group_b,toxicity,0.13,0.03,50,severity_score,baseline,Dr. Michael Rodriguez,Y-23 validation safety
+SMPL038,EXP005,treatment_group_b,toxicity,0.15,0.04,50,severity_score,week_2,Dr. Michael Rodriguez,Y-23 validation toxicity
+SMPL039,EXP005,treatment_group_b,toxicity,0.16,0.04,50,severity_score,week_4,Dr. Michael Rodriguez,Y-23 validation final safety
+SMPL040,EXP006,control_group,efficacy,0.14,0.07,50,percentage,baseline,Dr. Michael Rodriguez,Control validation baseline
+SMPL041,EXP006,control_group,efficacy,0.15,0.08,50,percentage,week_2,Dr. Michael Rodriguez,Control validation monitoring
+SMPL042,EXP006,control_group,efficacy,0.16,0.07,50,percentage,week_4,Dr. Michael Rodriguez,Control validation final
+SMPL043,EXP006,control_group,toxicity,0.09,0.02,50,severity_score,baseline,Dr. Michael Rodriguez,Control validation safety
+SMPL044,EXP006,control_group,toxicity,0.10,0.03,50,severity_score,week_2,Dr. Michael Rodriguez,Control validation toxicity
+SMPL045,EXP006,control_group,toxicity,0.11,0.03,50,severity_score,week_4,Dr. Michael Rodriguez,Control validation final safety
+SMPL046,EXP007,combined_groups,efficacy,0.84,0.15,100,percentage,baseline,Dr. Emily Watson,Combined analysis baseline
+SMPL047,EXP007,combined_groups,efficacy,0.85,0.14,100,percentage,week_2,Dr. Emily Watson,Combined analysis progression
+SMPL048,EXP007,combined_groups,efficacy,0.87,0.13,100,percentage,week_4,Dr. Emily Watson,Combined analysis final
+SMPL049,EXP007,combined_groups,toxicity,0.16,0.08,100,severity_score,baseline,Dr. Emily Watson,Combined toxicity baseline
+SMPL050,EXP007,combined_groups,toxicity,0.18,0.09,100,severity_score,week_2,Dr. Emily Watson,Combined toxicity monitoring
+SMPL051,EXP007,combined_groups,toxicity,0.19,0.09,100,severity_score,week_4,Dr. Emily Watson,Combined toxicity final
+SMPL052,EXP008,treatment_group_a,biomarker_level,2.6,0.4,15,ng_ml,baseline,Dr. James Kim,Biomarker discovery cohort 1
+SMPL053,EXP008,treatment_group_a,biomarker_level,3.2,0.5,15,ng_ml,week_2,Dr. James Kim,Biomarker discovery response
+SMPL054,EXP008,treatment_group_a,biomarker_level,3.9,0.6,15,ng_ml,week_4,Dr. James Kim,Biomarker discovery peak
+SMPL055,EXP008,treatment_group_a,genetic_marker,0.73,0.11,15,expression_ratio,baseline,Dr. James Kim,Genetic marker baseline
+SMPL056,EXP008,treatment_group_a,genetic_marker,0.78,0.12,15,expression_ratio,week_2,Dr. James Kim,Genetic marker response
+SMPL057,EXP008,treatment_group_a,genetic_marker,0.82,0.13,15,expression_ratio,week_4,Dr. James Kim,Genetic marker peak
+SMPL058,EXP009,treatment_group_b,biomarker_level,1.9,0.3,15,ng_ml,baseline,Dr. James Kim,Biomarker discovery cohort 2
+SMPL059,EXP009,treatment_group_b,biomarker_level,2.4,0.4,15,ng_ml,week_2,Dr. James Kim,Cohort 2 biomarker response
+SMPL060,EXP009,treatment_group_b,biomarker_level,2.8,0.5,15,ng_ml,week_4,Dr. James Kim,Cohort 2 biomarker peak
+SMPL061,EXP009,treatment_group_b,genetic_marker,0.69,0.10,15,expression_ratio,baseline,Dr. James Kim,Cohort 2 genetic baseline
+SMPL062,EXP009,treatment_group_b,genetic_marker,0.71,0.11,15,expression_ratio,week_2,Dr. James Kim,Cohort 2 genetic response
+SMPL063,EXP009,treatment_group_b,genetic_marker,0.74,0.12,15,expression_ratio,week_4,Dr. James Kim,Cohort 2 genetic peak
+SMPL064,EXP010,control_group,biomarker_level,0.9,0.1,15,ng_ml,baseline,Dr. James Kim,Control biomarker discovery
+SMPL065,EXP010,control_group,biomarker_level,1.0,0.1,15,ng_ml,week_2,Dr. James Kim,Control biomarker monitoring
+SMPL066,EXP010,control_group,biomarker_level,1.1,0.2,15,ng_ml,week_4,Dr. James Kim,Control biomarker final
+SMPL067,EXP010,control_group,genetic_marker,0.08,0.02,15,expression_ratio,baseline,Dr. James Kim,Control genetic baseline
+SMPL068,EXP010,control_group,genetic_marker,0.09,0.02,15,expression_ratio,week_2,Dr. James Kim,Control genetic monitoring
+SMPL069,EXP010,control_group,genetic_marker,0.10,0.03,15,expression_ratio,week_4,Dr. James Kim,Control genetic final
+SMPL070,EXP014,treatment_group_a,efficacy,0.45,0.09,20,percentage,baseline,Dr. Robert Taylor,Low dose efficacy baseline
+SMPL071,EXP014,treatment_group_a,efficacy,0.47,0.08,20,percentage,week_1,Dr. Robert Taylor,Low dose short-term response
+SMPL072,EXP014,treatment_group_a,efficacy,0.48,0.09,20,percentage,week_2,Dr. Robert Taylor,Low dose final assessment
+SMPL073,EXP014,treatment_group_a,toxicity,0.08,0.02,20,severity_score,baseline,Dr. Robert Taylor,Low dose safety baseline
+SMPL074,EXP014,treatment_group_a,toxicity,0.09,0.02,20,severity_score,week_1,Dr. Robert Taylor,Low dose safety monitoring
+SMPL075,EXP014,treatment_group_a,toxicity,0.10,0.03,20,severity_score,week_2,Dr. Robert Taylor,Low dose safety final
+SMPL076,EXP015,treatment_group_b,efficacy,0.91,0.06,20,percentage,baseline,Dr. Robert Taylor,High dose efficacy baseline
+SMPL077,EXP015,treatment_group_b,efficacy,0.92,0.05,20,percentage,week_1,Dr. Robert Taylor,High dose short-term response
+SMPL078,EXP015,treatment_group_b,efficacy,0.93,0.06,20,percentage,week_2,Dr. Robert Taylor,High dose final assessment
+SMPL079,EXP015,treatment_group_b,toxicity,0.28,0.08,20,severity_score,baseline,Dr. Robert Taylor,High dose safety baseline
+SMPL080,EXP015,treatment_group_b,toxicity,0.31,0.09,20,severity_score,week_1,Dr. Robert Taylor,High dose safety monitoring
+SMPL081,EXP015,treatment_group_b,toxicity,0.34,0.10,20,severity_score,week_2,Dr. Robert Taylor,High dose safety final
+SMPL082,EXP016,control_group,efficacy,0.09,0.04,20,percentage,baseline,Dr. Robert Taylor,Dose study control baseline
+SMPL083,EXP016,control_group,efficacy,0.10,0.05,20,percentage,week_1,Dr. Robert Taylor,Dose study control monitoring
+SMPL084,EXP016,control_group,efficacy,0.11,0.05,20,percentage,week_2,Dr. Robert Taylor,Dose study control final
+SMPL085,EXP020,treatment_group_a,efficacy,0.62,0.10,10,percentage,week_1,Dr. David Chang,Longitudinal study week 1
+SMPL086,EXP020,treatment_group_a,biomarker_level,2.1,0.3,10,ng_ml,week_1,Dr. David Chang,Longitudinal biomarker week 1
+SMPL087,EXP021,treatment_group_a,efficacy,0.79,0.09,10,percentage,week_4,Dr. David Chang,Longitudinal study week 4
+SMPL088,EXP021,treatment_group_a,biomarker_level,3.4,0.4,10,ng_ml,week_4,Dr. David Chang,Longitudinal biomarker week 4
+SMPL089,EXP022,treatment_group_a,efficacy,0.84,0.08,10,percentage,week_8,Dr. David Chang,Longitudinal study week 8
+SMPL090,EXP022,treatment_group_a,biomarker_level,4.1,0.5,10,ng_ml,week_8,Dr. David Chang,Longitudinal biomarker week 8
+SMPL091,EXP023,treatment_group_a,efficacy,0.81,0.09,10,percentage,week_12,Dr. David Chang,Longitudinal study week 12
+SMPL092,EXP023,treatment_group_a,biomarker_level,3.8,0.5,10,ng_ml,week_12,Dr. David Chang,Longitudinal biomarker week 12
+SMPL093,EXP024,treatment_group_a,safety_score,0.93,0.04,7,safety_index,month_1,Dr. Maria Gonzalez,Safety profile month 1
+SMPL094,EXP024,treatment_group_a,safety_score,0.91,0.05,7,safety_index,month_3,Dr. Maria Gonzalez,Safety profile month 3
+SMPL095,EXP024,treatment_group_a,safety_score,0.90,0.06,7,safety_index,month_6,Dr. Maria Gonzalez,Safety profile month 6
+SMPL096,EXP025,treatment_group_b,safety_score,0.89,0.05,7,safety_index,month_1,Dr. Maria Gonzalez,Alternative treatment safety month 1
+SMPL097,EXP025,treatment_group_b,safety_score,0.87,0.06,7,safety_index,month_3,Dr. Maria Gonzalez,Alternative treatment safety month 3
+SMPL098,EXP025,treatment_group_b,safety_score,0.86,0.07,7,safety_index,month_6,Dr. Maria Gonzalez,Alternative treatment safety month 6
+SMPL099,EXP026,control_group,safety_score,0.97,0.02,7,safety_index,month_1,Dr. Maria Gonzalez,Control safety month 1
+SMPL100,EXP026,control_group,safety_score,0.96,0.03,7,safety_index,month_3,Dr. Maria Gonzalez,Control safety month 3
+SMPL101,EXP026,control_group,safety_score,0.95,0.03,7,safety_index,month_6,Dr. Maria Gonzalez,Control safety month 6
+SMPL102,EXP027,combined_groups,safety_score,0.91,0.08,21,safety_index,month_1,Dr. Maria Gonzalez,Combined safety analysis month 1
+SMPL103,EXP027,combined_groups,safety_score,0.89,0.09,21,safety_index,month_3,Dr. Maria Gonzalez,Combined safety analysis month 3
+SMPL104,EXP027,combined_groups,safety_score,0.88,0.10,21,safety_index,month_6,Dr. Maria Gonzalez,Combined safety analysis month 6
+SMPL105,EXP032,treatment_group_a,efficacy,0.68,0.11,30,percentage,month_1,Dr. Rachel Adams,Standard care comparison
+SMPL106,EXP032,treatment_group_a,efficacy,0.70,0.10,30,percentage,month_3,Dr. Rachel Adams,Standard care progression
+SMPL107,EXP032,treatment_group_a,efficacy,0.72,0.12,30,percentage,month_6,Dr. Rachel Adams,Standard care final
+SMPL108,EXP033,treatment_group_b,efficacy,0.81,0.09,30,percentage,month_1,Dr. Rachel Adams,Experimental treatment comparison
+SMPL109,EXP033,treatment_group_b,efficacy,0.83,0.08,30,percentage,month_3,Dr. Rachel Adams,Experimental treatment progression
+SMPL110,EXP033,treatment_group_b,efficacy,0.85,0.10,30,percentage,month_6,Dr. Rachel Adams,Experimental treatment final
+SMPL111,EXP034,combined_groups,efficacy,0.76,0.13,60,percentage,month_1,Dr. Rachel Adams,Head-to-head comparison month 1
+SMPL112,EXP034,combined_groups,efficacy,0.78,0.12,60,percentage,month_3,Dr. Rachel Adams,Head-to-head comparison month 3
+SMPL113,EXP034,combined_groups,efficacy,0.79,0.14,60,percentage,month_6,Dr. Rachel Adams,Head-to-head comparison final
+SMPL114,EXP035,treatment_group_a,efficacy,0.72,0.13,5,percentage,week_2,Dr. Thomas Wilson,Pilot study early assessment
+SMPL115,EXP035,treatment_group_a,efficacy,0.74,0.12,5,percentage,week_4,Dr. Thomas Wilson,Pilot study final
+SMPL116,EXP036,control_group,efficacy,0.11,0.05,5,percentage,week_2,Dr. Thomas Wilson,Pilot control early
+SMPL117,EXP036,control_group,efficacy,0.12,0.06,5,percentage,week_4,Dr. Thomas Wilson,Pilot control final
+SMPL118,EXP037,combined_groups,efficacy,0.61,0.18,10,percentage,week_2,Dr. Thomas Wilson,Pilot combined early
+SMPL119,EXP037,combined_groups,efficacy,0.63,0.17,10,percentage,week_4,Dr. Thomas Wilson,Pilot combined final
+SMPL120,EXP038,treatment_group_a,efficacy,0.75,0.16,120,percentage,historical,Dr. Sophia Martinez,Historical treatment A analysis
+SMPL121,EXP039,treatment_group_b,efficacy,0.71,0.17,120,percentage,historical,Dr. Sophia Martinez,Historical treatment B analysis
+SMPL122,EXP040,combined_groups,efficacy,0.73,0.19,240,percentage,historical,Dr. Sophia Martinez,Meta-analysis combined historical
