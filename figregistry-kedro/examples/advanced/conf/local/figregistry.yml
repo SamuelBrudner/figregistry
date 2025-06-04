@@ -1,633 +1,669 @@
 # =============================================================================
-# FigRegistry Local Development Configuration - Advanced Example
+# Local Development FigRegistry Configuration - Advanced Example
 # =============================================================================
-# This configuration file provides development-optimized FigRegistry settings
-# designed for rapid iteration, enhanced debugging visibility, and efficient
-# plugin development workflows. This local configuration extends and overrides
-# the sophisticated base configuration with simplified patterns optimized for
-# development speed while maintaining compatibility with the FigRegistryConfigBridge
-# and advanced example structure.
+# 
+# Development-optimized FigRegistry configuration providing debug-friendly
+# styling patterns, simplified condition mappings, and rapid iteration
+# capabilities for local development workflows. This configuration extends
+# the sophisticated base configuration structure while optimizing for
+# development speed, debugging efficiency, and plugin testing scenarios.
 #
-# Key Development Optimizations:
+# Key Development Features:
+# - Debug-optimized styling with high-visibility colors and clear labels
 # - Simplified condition mappings for rapid testing (F-002-RQ-002)
-# - Enhanced debugging features for configuration bridge (F-007-RQ-002)
-# - Local development paths and naming conventions (F-004)
-# - Debug-friendly styling with clear visual distinction
-# - Hot-reload support and enhanced validation feedback
-# - Streamlined metadata for plugin testing scenarios
+# - Enhanced debugging capabilities for configuration bridge testing (F-007-RQ-002)
+# - Development-specific output paths for organized debugging
+# - Hot-reload compatibility for rapid iteration workflows (Section 2.4.1.4)
+# - Performance monitoring and detailed logging for plugin development
+# - Condition-based styling optimized for FigureDataSet testing (F-005-RQ-004)
+#
+# This configuration works seamlessly with the FigRegistryConfigBridge to
+# enable efficient debugging of configuration merging, style resolution,
+# and Kedro integration patterns while maintaining compatibility with the
+# advanced example's sophisticated architecture.
 # =============================================================================
 
-# -----------------------------------------------------------------------------
-# FigRegistry Version and Local Development Metadata
-# -----------------------------------------------------------------------------
-# Optimized version requirements and local development tracking
+# Version compatibility maintained for development consistency
 figregistry_version: ">=0.3.0"
 
-# Enhanced metadata for development tracking and debugging
-metadata:
-  config_version: "1.0.0-dev"
-  created_by: "figregistry-kedro advanced example (local development)"
-  description: "Local development configuration optimized for debugging and rapid iteration"
-  environment: "local"
-  last_updated: "2024-01-01"
-  
-  # Development-specific metadata for debugging
-  development:
-    debug_mode: true
-    rapid_iteration: true
-    enhanced_logging: true
-    simplified_patterns: true
-    hot_reload_enabled: true
-    validation_verbose: true
-    
-  # Plugin development tracking
-  plugin_testing:
-    config_bridge_debug: true
-    dataset_operation_debug: true
-    hook_lifecycle_debug: true
-    condition_resolution_debug: true
-    style_application_debug: true
-
-# -----------------------------------------------------------------------------
-# Simplified Condition-Based Style Mappings for Development (F-002)
-# -----------------------------------------------------------------------------
-# Streamlined styles with clear debugging labels and simplified patterns
-# Designed for rapid testing and visual debugging of condition resolution
-
-styles:
-  # Primary development test conditions with clear visual distinction
-  dev_test_basic:
-    color: "#FF0000"              # Bright red for easy identification
-    marker: "o"                   # Standard circle
-    linestyle: "-"                # Solid line
-    linewidth: 3.0                # Thick for visibility
-    alpha: 1.0                    # Full opacity for debugging
-    label: "[DEV] Basic Test"     # Clear debug label
-    markersize: 10                # Large for easy spotting
-    
-  dev_test_advanced:
-    color: "#00FF00"              # Bright green for contrast
-    marker: "s"                   # Square markers
-    linestyle: "--"               # Dashed for distinction
-    linewidth: 3.0                # Thick for visibility
-    alpha: 1.0                    # Full opacity
-    label: "[DEV] Advanced Test"  # Clear debug label
-    markersize: 10                # Large markers
-    
-  dev_test_debug:
-    color: "#0000FF"              # Bright blue for debugging
-    marker: "^"                   # Triangle markers
-    linestyle: ":"                # Dotted line
-    linewidth: 3.0                # Thick for visibility
-    alpha: 1.0                    # Full opacity
-    label: "[DEV] Debug Mode"     # Clear debug label
-    markersize: 10                # Large markers
-  
-  # Simplified experimental conditions for quick iteration
-  quick_treatment_a:
-    color: "#FF6666"              # Light red
-    marker: "o"                   # Circle
-    linestyle: "-"                # Solid
-    linewidth: 2.5                # Medium thick
-    alpha: 0.9                    # High visibility
-    label: "Treatment A (Dev)"    # Development label
-    markersize: 8                 # Standard size
-    
-  quick_treatment_b:
-    color: "#66FF66"              # Light green
-    marker: "s"                   # Square
-    linestyle: "-"                # Solid
-    linewidth: 2.5                # Medium thick
-    alpha: 0.9                    # High visibility
-    label: "Treatment B (Dev)"    # Development label
-    markersize: 8                 # Standard size
-    
-  quick_control:
-    color: "#6666FF"              # Light blue
-    marker: "^"                   # Triangle
-    linestyle: "--"               # Dashed
-    linewidth: 2.0                # Standard
-    alpha: 0.8                    # Good visibility
-    label: "Control (Dev)"        # Development label
-    markersize: 7                 # Standard size
-    
-  # Phase-based conditions optimized for development
-  dev_training:
-    color: "#FFD700"              # Gold for training
-    marker: "x"                   # X marker
-    linestyle: ":"                # Dotted
-    linewidth: 2.0                # Standard
-    alpha: 0.8                    # Good visibility
-    label: "Training (Dev)"       # Development label
-    markersize: 8                 # Standard size
-    
-  dev_validation:
-    color: "#FF69B4"              # Hot pink for validation
-    marker: "+"                   # Plus marker
-    linestyle: "-."               # Dash-dot
-    linewidth: 2.0                # Standard
-    alpha: 0.8                    # Good visibility
-    label: "Validation (Dev)"     # Development label
-    markersize: 8                 # Standard size
-    
-  dev_testing:
-    color: "#FF8C00"              # Dark orange for testing
-    marker: "*"                   # Star marker
-    linestyle: "-"                # Solid
-    linewidth: 2.2                # Slightly thick
-    alpha: 0.8                    # Good visibility
-    label: "Testing (Dev)"        # Development label
-    markersize: 9                 # Slightly larger
-    
-  # Model type conditions for quick algorithm testing
-  dev_linear:
-    color: "#87CEEB"              # Sky blue
-    marker: "o"                   # Circle
-    linestyle: "-"                # Solid
-    linewidth: 2.0                # Standard
-    alpha: 0.8                    # Good visibility
-    label: "Linear (Dev)"         # Development label
-    markersize: 7                 # Standard size
-    
-  dev_forest:
-    color: "#32CD32"              # Lime green
-    marker: "s"                   # Square
-    linestyle: "-"                # Solid
-    linewidth: 2.0                # Standard
-    alpha: 0.8                    # Good visibility
-    label: "Forest (Dev)"         # Development label
-    markersize: 7                 # Standard size
-    
-  dev_ensemble:
-    color: "#9370DB"              # Medium purple
-    marker: "D"                   # Diamond
-    linestyle: "-"                # Solid
-    linewidth: 2.2                # Slightly thick
-    alpha: 0.8                    # Good visibility
-    label: "Ensemble (Dev)"       # Development label
-    markersize: 8                 # Standard size
-    
-  # Output purpose conditions for development workflow
-  dev_exploratory:
-    color: "#98FB98"              # Pale green
-    marker: "."                   # Point
-    linestyle: "-"                # Solid
-    linewidth: 1.5                # Thin
-    alpha: 0.7                    # Moderate visibility
-    label: "Explore (Dev)"        # Development label
-    markersize: 6                 # Small
-    
-  dev_presentation:
-    color: "#FFB6C1"              # Light pink
-    marker: "o"                   # Circle
-    linestyle: "-"                # Solid
-    linewidth: 2.0                # Standard
-    alpha: 0.8                    # Good visibility
-    label: "Present (Dev)"        # Development label
-    markersize: 8                 # Standard size
-    
-  dev_publication:
-    color: "#2F4F4F"              # Dark slate gray
-    marker: "o"                   # Circle
-    linestyle: "-"                # Solid
-    linewidth: 2.5                # Thick
-    alpha: 1.0                    # Full opacity
-    label: "Publish (Dev)"        # Development label
-    markersize: 8                 # Standard size
-
-# -----------------------------------------------------------------------------
-# Simplified Color Palettes for Development
-# -----------------------------------------------------------------------------
-# Streamlined palettes with high contrast for debugging
-
-palettes:
-  # High contrast primary palette for debugging
-  development_primary:
-    - "#FF0000"  # Bright red
-    - "#00FF00"  # Bright green
-    - "#0000FF"  # Bright blue
-    - "#FFFF00"  # Bright yellow
-    - "#FF00FF"  # Bright magenta
-    - "#00FFFF"  # Bright cyan
-    - "#FFA500"  # Orange
-    - "#800080"  # Purple
-    
-  # Quick testing palette with distinct colors
-  quick_test:
-    basic: "#FF0000"
-    advanced: "#00FF00" 
-    debug: "#0000FF"
-    fallback: "#FFFF00"
-    
-  # Development phases with clear distinction
-  dev_phases:
-    training: "#FFD700"
-    validation: "#FF69B4"
-    testing: "#FF8C00"
-    debug: "#00FFFF"
-    
-  # Simplified grayscale for development
-  dev_grayscale:
-    - "#000000"  # Black
-    - "#666666"  # Dark gray
-    - "#999999"  # Medium gray
-    - "#CCCCCC"  # Light gray
-
-# -----------------------------------------------------------------------------
-# Development-Optimized Defaults
-# -----------------------------------------------------------------------------
-# Settings optimized for rapid iteration and debugging visibility
-
-defaults:
-  # Figure settings optimized for development speed
-  figure:
-    figsize: [8, 6]               # Smaller for faster rendering
-    dpi: 100                      # Lower DPI for speed
-    facecolor: "white"            # Clean background
-    edgecolor: "black"            # Visible border for debugging
-    
-  # Enhanced line visibility for debugging
-  line:
-    color: "#FF0000"              # Bright red default
-    linewidth: 3.0                # Thick for visibility
-    linestyle: "-"                # Solid lines
-    alpha: 1.0                    # Full opacity for debugging
-    
-  # Large markers for easy identification
-  marker:
-    marker: "o"                   # Circle markers
-    markersize: 10                # Large for debugging
-    markerfacecolor: "auto"       # Match line color
-    markeredgecolor: "black"      # Black edge for contrast
-    markeredgewidth: 1.0          # Thick edge
-    
-  # Enhanced text for debugging
-  text:
-    fontsize: 14                  # Larger for readability
-    fontweight: "bold"            # Bold for visibility
-    fontfamily: "sans-serif"      # Clean font
-    color: "#000000"              # Black text
-    
-  # Prominent legend for debugging
-  legend:
-    loc: "upper right"            # Fixed location
-    fontsize: 12                  # Large font
-    frameon: true                 # Show frame
-    fancybox: false               # Simple box
-    shadow: true                  # Shadow for visibility
-    framealpha: 1.0               # Solid background
-    edgecolor: "black"            # Black border
-    
-  # Visible grid for debugging
-  grid:
-    visible: true                 # Show grid
-    alpha: 0.5                    # More visible
-    linestyle: "--"               # Dashed
-    linewidth: 1.0                # Thicker grid
-    color: "#CCCCCC"              # Light gray
-    
-  # Enhanced axes for debugging
-  axes:
-    labelsize: 14                 # Large labels
-    titlesize: 16                 # Large title
-    linewidth: 2.0                # Thick axis lines
-    edgecolor: "#000000"          # Black axes
-    facecolor: "white"            # White background
-    
-  # Debug fallback style with high visibility
-  fallback_style:
-    color: "#FF00FF"              # Bright magenta
-    marker: "o"                   # Circle
-    linestyle: "-"                # Solid
-    linewidth: 4.0                # Very thick
-    alpha: 1.0                    # Full opacity
-    label: "[DEBUG] Unknown"      # Clear debug label
-    markersize: 12                # Very large
-
-# -----------------------------------------------------------------------------
-# Local Development Output Configuration (F-004)
-# -----------------------------------------------------------------------------
-# Optimized for debugging and rapid iteration
-
-outputs:
-  # Local development base path
-  base_path: "data/08_reporting/local_dev"
-  
-  # Simplified aliases for development workflow
-  aliases:
-    dev: "data/08_reporting/local_dev"              # Main development
-    debug: "data/08_reporting/local_dev/debug"      # Debug outputs
-    test: "data/08_reporting/local_dev/test"        # Testing outputs
-    temp: "data/08_reporting/local_dev/temp"        # Temporary outputs
-    quick: "data/08_reporting/local_dev/quick"      # Quick iteration
-    
-  # Development-optimized naming convention
-  naming:
-    # Template with debugging info
-    template: "DEV_{name}_{condition}_{ts}_DEBUG"
-    
-    # More detailed timestamp for development
-    timestamp_format: "%Y%m%d_%H%M%S_%f"
-    
-    # Development purpose suffixes
-    purpose_suffixes:
-      dev_exploratory: "_dev_explore"
-      dev_presentation: "_dev_present"
-      dev_publication: "_dev_pub"
-      debug: "_DEBUG"
-      test: "_TEST"
-      
-    # Development condition suffixes
-    condition_suffixes:
-      dev_test_basic: "_BASIC"
-      dev_test_advanced: "_ADVANCED"
-      dev_test_debug: "_DEBUG_MODE"
-      quick_treatment_a: "_TRT_A_DEV"
-      quick_treatment_b: "_TRT_B_DEV"
-      quick_control: "_CTRL_DEV"
-      
-  # Fast formats for development
-  formats:
-    # PNG only for speed during development
-    defaults:
-      dev_exploratory: ["png"]
-      dev_presentation: ["png"]
-      dev_publication: ["png"]
-      debug: ["png"]
-      test: ["png"]
-      
-    # Low-resolution PNG for speed
-    png:
-      dpi: 150                    # Medium resolution
-      bbox_inches: "tight"        # Tight bounding
-      pad_inches: 0.1             # Small padding
-      
-  # Aggressive directory management for development
-  directories:
-    create_missing: true          # Auto-create
-    permissions: 0o755            # Standard permissions
-    
-    # Simple structure for development
-    structure:
-      by_date: false              # No date organization
-      by_condition: true          # Organize by condition
-      by_purpose: false           # No purpose organization
-      
-  # Enhanced versioning for development
-  versioning:
-    enabled: true                 # Enable versioning
-    strategy: "timestamp"         # Timestamp versioning
-    keep_versions: 50             # Keep many versions for debugging
-
-# -----------------------------------------------------------------------------
-# Enhanced Kedro Integration for Development (F-007)
-# -----------------------------------------------------------------------------
-# Configuration bridge settings optimized for debugging
+# =============================================================================
+# DEVELOPMENT-SPECIFIC KEDRO INTEGRATION SETTINGS
+# =============================================================================
 
 kedro:
-  # Enhanced config bridge for development debugging
-  config_bridge:
-    enabled: true                 # Enable bridge
-    merge_strategy: "override"    # Kedro overrides
-    validation_strict: false      # Relaxed validation for development
-    cache_enabled: false          # Disable caching for hot reload
-    performance_target_ms: 25     # Relaxed performance for debugging
-    
-    # Development-specific bridge settings
-    development:
-      verbose_merging: true       # Detailed merge logging
-      validation_warnings: true   # Show validation warnings
-      fallback_logging: true      # Log fallback operations
-      merge_trace: true           # Trace merge operations
-      
-  # Dataset settings optimized for development
-  datasets:
-    # Development-friendly defaults
-    default_purpose: "dev_exploratory"
-    default_condition_param: "dev_condition"
-    enable_versioning: true       # Keep versions for debugging
-    auto_create_dirs: true        # Auto-create directories
-    
-    # Enhanced style resolution for debugging
-    style_resolution:
-      fallback_enabled: true      # Enable fallbacks
-      parameter_sources:
-        - "params:dev_condition"              # Primary dev condition
-        - "params:experiment_condition"       # Standard condition
-        - "params:debug_condition"            # Debug condition
-        - "params:test_condition"             # Test condition
-        
-    # Relaxed performance for debugging
-    performance:
-      save_overhead_target: 10    # 10% overhead acceptable in dev
-      style_lookup_cache: false   # Disable cache for hot reload
-      
-  # Development hooks configuration
-  hooks:
-    enabled: true                 # Enable hooks
-    
-    # Enhanced execution for development
-    execution:
-      before_pipeline_run: true   # Initialize
-      after_pipeline_run: true    # Cleanup
-      before_node_run: false      # No node hooks
-      after_node_run: false       # No node hooks
-      
-    # Development context settings
-    context:
-      share_config: true          # Share config
-      thread_safe: false          # Single-threaded for debugging
-      cleanup_on_exit: true       # Clean up
-      verbose_context: true       # Verbose context logging
-      
-    # Relaxed performance for development
-    performance:
-      hook_overhead_ms: 100       # 100ms acceptable in dev
-      initialization_timeout: 10000  # 10 second timeout
-      
-  # Development environment overrides
-  development:
-    # Enhanced debugging features
-    debug:
-      condition_resolution: true   # Debug condition resolution
-      style_application: true      # Debug style application
-      config_merging: true         # Debug config merging
-      figure_saving: true          # Debug figure saving
-      validation_details: true     # Debug validation
-      
-    # Performance relaxation for development
-    performance:
-      style_cache_disabled: true   # No style caching
-      config_cache_disabled: true  # No config caching
-      hot_reload_enabled: true     # Enable hot reload
-      
-    # Enhanced logging for development
-    logging:
-      level: "DEBUG"               # Debug level logging
-      verbose_operations: true     # Verbose operation logging
-      timing_logs: true            # Log operation timing
-      error_details: true          # Detailed error logging
-
-# -----------------------------------------------------------------------------
-# Debugging and Validation Configuration
-# -----------------------------------------------------------------------------
-# Enhanced settings for plugin development and debugging
-
-debugging:
-  # Condition resolution debugging
-  condition_resolution:
-    enabled: true                 # Enable debugging
-    log_attempts: true            # Log resolution attempts
-    log_fallbacks: true           # Log fallback usage
-    log_parameter_sources: true   # Log parameter sources
-    
-  # Style application debugging
-  style_application:
-    enabled: true                 # Enable debugging
-    log_style_lookup: true        # Log style lookups
-    log_style_application: true   # Log style application
-    log_fallback_styles: true     # Log fallback styles
-    
-  # Configuration merging debugging
-  config_merging:
-    enabled: true                 # Enable debugging
-    log_merge_operations: true    # Log merge operations
-    log_override_conflicts: true  # Log conflicts
-    log_validation_results: true  # Log validation
-    
-  # Figure saving debugging  
-  figure_saving:
-    enabled: true                 # Enable debugging
-    log_save_operations: true     # Log save operations
-    log_path_resolution: true     # Log path resolution
-    log_format_selection: true    # Log format selection
-
-# Enhanced validation for development
-validation:
-  # Relaxed validation for development
-  schema_version: "1.0.0-dev"
-  strict_mode: false              # Relaxed validation
+  # Enhanced configuration bridge settings for development debugging
+  enable_config_bridge: true
   
-  # Required sections (minimal for development)
-  required_sections:
-    - "styles"
-    - "outputs"
+  # Development-specific environment overrides with debugging
+  environment_overrides: true
+  debug_config_merging: true      # Enable detailed merge logging
+  log_config_resolution: true     # Log configuration source resolution
+  
+  # Enhanced dataset integration for plugin development
+  dataset_integration:
+    enable_context_injection: true
+    enable_parameter_resolution: true
+    enable_run_metadata_styling: true
+    debug_style_resolution: true     # Enable detailed style resolution logging
+    log_condition_mapping: true      # Log condition-to-style mappings
+    validate_style_applications: true # Enhanced validation for development
+  
+  # Development-optimized performance settings
+  performance:
+    enable_caching: false           # Disable caching for hot reload
+    cache_ttl_seconds: 0           # No cache TTL for development
+    enable_concurrent_access: false # Single-threaded for easier debugging
+    log_performance_metrics: true   # Enhanced performance logging
     
-  # Enhanced validation rules for development
-  rules:
-    styles:
-      required_fields: ["color"]  # Only color required
-      warn_missing_optional: true # Warn about missing optional
-      
-    outputs:
-      required_fields: ["base_path"]
-      auto_create_missing: true   # Auto-create missing
-
-# -----------------------------------------------------------------------------
-# Performance Monitoring for Development
-# -----------------------------------------------------------------------------
-# Track performance during development for optimization
-
-performance:
-  # Enhanced monitoring for development
-  monitoring:
-    enabled: true                 # Enable monitoring
-    log_slow_operations: true     # Log slow operations
-    collect_detailed_metrics: true # Detailed metrics
-    timing_threshold_ms: 10       # 10ms threshold for logging
-    
-  # Development optimization settings
-  optimization:
-    style_cache_size: 100         # Small cache for development
-    config_cache_ttl: 60          # 1 minute TTL
-    lazy_loading: false           # Eager loading for debugging
-    hot_reload_check_interval: 1  # 1 second hot reload check
-    
-  # Relaxed performance targets for development
-  targets:
-    config_load_ms: 200           # 200ms acceptable for dev
-    style_lookup_ms: 5            # 5ms acceptable for dev
-    save_overhead_percent: 10     # 10% overhead acceptable
-    hook_overhead_ms: 100         # 100ms acceptable for dev
-    merge_time_ms: 25             # 25ms acceptable for dev
-
-# -----------------------------------------------------------------------------
-# Development Testing and Examples
-# -----------------------------------------------------------------------------
-# Built-in testing scenarios for development validation
-
-development_testing:
-  # Quick test scenarios
-  quick_tests:
-    basic_condition_test:
-      condition: "dev_test_basic"
-      expected_color: "#FF0000"
-      expected_marker: "o"
-      
-    advanced_condition_test:
-      condition: "dev_test_advanced"
-      expected_color: "#00FF00"
-      expected_marker: "s"
-      
-    debug_condition_test:
-      condition: "dev_test_debug"
-      expected_color: "#0000FF"
-      expected_marker: "^"
-      
-  # Fallback testing
-  fallback_tests:
-    missing_condition:
-      condition: "nonexistent_condition"
-      expected_fallback: true
-      expected_color: "#FF00FF"
-      
-  # Parameter resolution testing
-  parameter_tests:
-    basic_resolution:
-      parameter_name: "dev_condition"
-      expected_resolution: true
-      
-    nested_resolution:
-      parameter_path: "nested.dev.condition"
-      expected_resolution: false
+  # Development debugging features
+  debugging:
+    verbose_logging: true
+    detailed_error_messages: true
+    style_resolution_tracing: true
+    configuration_validation_details: true
 
 # =============================================================================
-# Development Usage Instructions
+# DEVELOPMENT-OPTIMIZED PALETTE DEFINITIONS  
+# =============================================================================
+
+palettes:
+  # Development palette with high-visibility colors for debugging
+  development:
+    primary: "#FF0000"        # Bright red for high visibility
+    secondary: "#00FF00"      # Bright green for contrast
+    accent: "#0000FF"         # Bright blue for debugging
+    success: "#FF8000"        # Orange for status indication
+    neutral: "#808080"        # Gray for neutral elements
+    background: "#FFFFFF"     # Clean white background
+    debug: "#FF00FF"          # Magenta for debug scenarios
+    warning: "#FFFF00"        # Yellow for warnings
+    
+  # Simplified exploration palette for rapid testing
+  exploration_simple:
+    primary: "#A8E6CF"        # Light green for exploration
+    secondary: "#FFB6C1"      # Light pink for variations
+    accent: "#87CEEB"         # Sky blue for accents
+    success: "#98FB98"        # Pale green for success
+    neutral: "#D3D3D3"        # Light gray for neutral
+    background: "#FAFAFA"     # Very light gray background
+    
+  # Debug palette for plugin testing scenarios
+  debug_testing:
+    test_basic: "#FF4444"     # Bright red for basic tests
+    test_advanced: "#44FF44"  # Bright green for advanced tests
+    test_debug: "#4444FF"     # Bright blue for debug tests
+    treatment_a: "#FF8888"    # Light red for treatment A
+    treatment_b: "#88FF88"    # Light green for treatment B
+    control: "#8888FF"        # Light blue for control
+    baseline: "#FFAA00"       # Orange for baseline
+    experimental: "#AA00FF"   # Purple for experimental
+
+# =============================================================================
+# DEVELOPMENT-SPECIFIC CONDITION-BASED STYLING
+# =============================================================================
+
+styles:
+  # === DEVELOPMENT TESTING CONDITIONS ===
+  # High-visibility styling patterns for rapid development testing
+  
+  # Basic development test condition - bright red markers
+  "dev_test_basic":
+    color: "palettes.development.primary"  # Bright red
+    marker: "o"
+    linestyle: "-"
+    linewidth: 3.0
+    markersize: 10
+    alpha: 1.0
+    label: "DEV: Basic Test (Red)"
+    markeredgewidth: 2.0
+    markeredgecolor: "black"
+    
+  # Advanced development test condition - bright green squares
+  "dev_test_advanced":
+    color: "palettes.development.secondary"  # Bright green
+    marker: "s"
+    linestyle: "-"
+    linewidth: 3.5
+    markersize: 12
+    alpha: 1.0
+    label: "DEV: Advanced Test (Green)"
+    markeredgewidth: 2.0
+    markeredgecolor: "black"
+    
+  # Debug test condition - bright blue triangles
+  "dev_test_debug":
+    color: "palettes.development.accent"  # Bright blue
+    marker: "^"
+    linestyle: "-"
+    linewidth: 4.0
+    markersize: 14
+    alpha: 1.0
+    label: "DEV: Debug Test (Blue)"
+    markeredgewidth: 2.0
+    markeredgecolor: "black"
+    
+  # === QUICK EXPERIMENTAL CONDITIONS ===
+  # Simplified experimental conditions for rapid A/B testing
+  
+  "quick_treatment_a":
+    color: "palettes.debug_testing.treatment_a"  # Light red
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 0.9
+    label: "Quick Treatment A"
+    
+  "quick_treatment_b":
+    color: "palettes.debug_testing.treatment_b"  # Light green
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 0.9
+    label: "Quick Treatment B"
+    
+  "quick_control":
+    color: "palettes.debug_testing.control"  # Light blue
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 0.9
+    label: "Quick Control"
+    
+  # === DEVELOPMENT PIPELINE CONDITIONS ===
+  # Pipeline-specific conditions for development workflows
+  
+  "dev_training":
+    color: "palettes.exploration_simple.primary"
+    marker: "D"
+    linestyle: "--"
+    linewidth: 2.0
+    markersize: 7
+    alpha: 0.8
+    label: "Dev Training"
+    
+  "dev_validation":
+    color: "palettes.exploration_simple.secondary"
+    marker: "h"
+    linestyle: ":"
+    linewidth: 2.0
+    markersize: 7
+    alpha: 0.8
+    label: "Dev Validation"
+    
+  "dev_testing":
+    color: "palettes.exploration_simple.accent"
+    marker: "*"
+    linestyle: "-."
+    linewidth: 2.0
+    markersize: 9
+    alpha: 0.8
+    label: "Dev Testing"
+    
+  "dev_exploratory":
+    color: "palettes.exploration_simple.success"
+    marker: "+"
+    linestyle: "-"
+    linewidth: 1.5
+    markersize: 8
+    alpha: 0.7
+    label: "Dev Exploratory"
+    
+  "dev_presentation":
+    color: "palettes.development.success"  # Orange
+    marker: "x"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 8
+    alpha: 0.8
+    label: "Dev Presentation"
+    
+  "dev_publication":
+    color: "palettes.development.debug"  # Magenta
+    marker: "v"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 0.9
+    label: "Dev Publication"
+    
+  # === DEBUGGING WILDCARD PATTERNS ===
+  # Simplified wildcard patterns for development testing
+  
+  "dev_*":
+    # Base styling for all development conditions
+    linewidth: 2.0
+    alpha: 0.8
+    markeredgewidth: 1.0
+    markeredgecolor: "black"
+    
+  "dev_test_*":
+    # High-visibility styling for all test conditions
+    linewidth: 3.0
+    alpha: 1.0
+    markeredgewidth: 2.0
+    markersize: 10
+    
+  "quick_*":
+    # Consistent styling for quick experimental conditions
+    linewidth: 2.5
+    alpha: 0.9
+    markeredgewidth: 1.0
+    markersize: 8
+    
+  # === FALLBACK CONDITIONS FOR DEBUGGING ===
+  # Debug-friendly fallback styles
+  
+  "debug_fallback":
+    color: "palettes.development.warning"  # Yellow
+    marker: "?"
+    linestyle: ":"
+    linewidth: 1.0
+    markersize: 6
+    alpha: 0.6
+    label: "Debug Fallback Style"
+
+# =============================================================================
+# DEVELOPMENT-OPTIMIZED OUTPUT CONFIGURATIONS
+# =============================================================================
+
+outputs:
+  # Development-specific base path for organized debugging
+  base_path: "data/08_reporting/figures/development"
+  
+  # Enhanced timestamp formatting for development tracking
+  timestamp_format: "{name}_dev_{ts:%Y%m%d_%H%M%S}"
+  
+  # Development-specific path aliases
+  aliases:
+    # Development aliases with clear debug labeling
+    dev_debug: "data/08_reporting/figures/development/debug"
+    dev_test: "data/08_reporting/figures/development/testing"
+    dev_iteration: "data/08_reporting/figures/development/iteration"
+    dev_validation: "data/08_reporting/figures/development/validation"
+    
+    # Quick aliases for rapid development
+    debug: "data/08_reporting/figures/development/debug"
+    test: "data/08_reporting/figures/development/testing"
+    quick: "data/08_reporting/figures/development/quick"
+    
+    # Override common aliases for development
+    expl: "data/08_reporting/figures/development/exploration"
+    exploration: "data/08_reporting/figures/development/exploration"
+    pres: "data/08_reporting/figures/development/presentation"
+    presentation: "data/08_reporting/figures/development/presentation"
+    pub: "data/08_reporting/figures/development/publication"
+    publication: "data/08_reporting/figures/development/publication"
+    
+    # Plugin testing aliases
+    plugin_test: "data/08_reporting/figures/development/plugin_testing"
+    config_test: "data/08_reporting/figures/development/config_testing"
+    bridge_test: "data/08_reporting/figures/development/bridge_testing"
+    
+  # Development-optimized format specifications
+  formats:
+    # Fast PNG for development iteration
+    png:
+      dpi: 150                    # Reduced from production 300
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      transparent: false
+      
+    # Simple PDF for quick review
+    pdf:
+      dpi: 150                    # Reduced from production 300
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      backend: "pdf"
+      
+  # Development directory management
+  create_directories: true
+  directory_permissions: 0o755
+  
+  # Enhanced metadata for development debugging
+  include_metadata: true
+  metadata_format: "yaml"
+  
+  # Development-specific versioning
+  versioning:
+    enable: true
+    strategy: "timestamp"
+    keep_versions: 20             # Keep more versions for development
+    include_dev_metadata: true    # Include development-specific metadata
+    
+  # Optimized for development speed
+  compression:
+    enable: false                 # Disabled for speed
+    level: 1                      # Minimal compression when enabled
+    
+  # Enhanced validation for debugging
+  validation:
+    enable: true
+    check_file_size: true
+    max_file_size_mb: 100         # Larger limit for development
+    validate_paths: true          # Extra path validation for debugging
+    log_validation_details: true  # Detailed validation logging
+
+# =============================================================================
+# DEVELOPMENT-OPTIMIZED DEFAULT CONFIGURATIONS
+# =============================================================================
+
+defaults:
+  # Development matplotlib style defaults
+  style:
+    # Figure configuration optimized for development
+    figure.figsize: [10, 8]       # Larger for development visibility
+    figure.dpi: 100               # Standard DPI for development
+    figure.facecolor: "white"
+    figure.edgecolor: "none"
+    figure.autolayout: true
+    
+    # Font configuration for clear development visibility
+    font.family: ["DejaVu Sans", "Arial", "Helvetica", "sans-serif"]
+    font.size: 14                 # Larger font for development
+    font.weight: "normal"
+    
+    # Axes configuration for development debugging
+    axes.linewidth: 1.5           # Thicker lines for visibility
+    axes.edgecolor: "#000000"     # Black edges for clarity
+    axes.facecolor: "white"
+    axes.grid: true
+    axes.axisbelow: true
+    axes.labelsize: 14            # Larger labels for development
+    axes.titlesize: 16            # Larger titles for development
+    axes.titleweight: "bold"
+    axes.spines.top: false
+    axes.spines.right: false
+    
+    # Enhanced grid for development
+    grid.color: "#CCCCCC"         # More visible grid
+    grid.linewidth: 1.0           # Thicker grid lines
+    grid.alpha: 0.8               # More visible grid
+    
+    # Legend configuration for development debugging
+    legend.frameon: true
+    legend.fancybox: true
+    legend.shadow: true           # Enable shadow for visibility
+    legend.framealpha: 0.9
+    legend.edgecolor: "#000000"   # Black edge for visibility
+    legend.facecolor: "white"
+    legend.fontsize: 12           # Larger legend font
+    
+    # Line configuration for development visibility
+    lines.linewidth: 2.5          # Thicker lines for development
+    lines.markersize: 8           # Larger markers for development
+    lines.markeredgewidth: 1.5    # Thicker marker edges
+    
+    # Tick configuration for development
+    xtick.labelsize: 12           # Larger tick labels
+    ytick.labelsize: 12
+    xtick.direction: "out"
+    ytick.direction: "out"
+    xtick.major.size: 6           # Larger ticks for visibility
+    ytick.major.size: 6
+    xtick.minor.size: 4
+    ytick.minor.size: 4
+    
+  # Development condition styling fallback
+  condition_fallback:
+    color: "palettes.development.warning"  # Yellow for high visibility
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 8
+    alpha: 0.8
+    label: "Development Undefined Condition"
+    
+  # Development palette selection priority
+  palette_priority:
+    - "development"         # Development palette first
+    - "debug_testing"       # Debug palette second
+    - "exploration_simple"  # Simplified exploration third
+    - "publication"         # Base publication fallback
+    
+  # Development performance settings
+  performance:
+    enable_caching: false        # Disabled for hot reload
+    cache_style_lookups: false   # Disabled for development
+    optimize_rendering: false    # Disabled for debugging clarity
+    log_performance_warnings: true # Enhanced performance logging
+    
+  # Enhanced development quality settings
+  quality:
+    enable_validation: true
+    validate_colors: true
+    validate_markers: true
+    validate_fonts: true
+    log_validation_warnings: true # Enhanced validation logging
+    strict_validation: false      # Relaxed for development
+
+# =============================================================================
+# DEVELOPMENT METADATA AND CONFIGURATION
+# =============================================================================
+
+metadata:
+  # Development configuration metadata
+  version: "1.0.0-dev"
+  created: "2024-12-19"
+  author: "FigRegistry-Kedro Advanced Example - Local Development"
+  description: >
+    Local development FigRegistry configuration providing debug-optimized
+    styling patterns, simplified condition mappings, and enhanced debugging
+    capabilities for rapid iteration workflows. Designed for efficient
+    plugin development, configuration bridge testing, and development
+    debugging scenarios.
+    
+  purpose: "local_development"
+  environment: "development"
+  
+  # Development feature flags
+  features:
+    enable_debug_logging: true
+    enable_verbose_output: true
+    enable_hot_reload: true
+    enable_development_colors: true
+    enable_enhanced_validation: true
+    enable_performance_monitoring: true
+    enable_detailed_error_messages: true
+    
+  # Development compatibility settings
+  compatibility:
+    kedro_versions: [">=0.18.0", "<0.20.0"]
+    figregistry_versions: [">=0.3.0"]
+    python_versions: [">=3.10"]
+    optimization_level: "development"
+    
+  # Development documentation and debugging
+  documentation:
+    debug_guide: "docs/development/debugging.md"
+    configuration_reference: "docs/development/config.md"
+    troubleshooting: "docs/development/troubleshooting.md"
+    
+  # Development quality assurance settings
+  quality_assurance:
+    validation_enabled: true
+    performance_monitoring: true
+    debug_logging: true
+    enhanced_error_reporting: true
+
+# =============================================================================
+# DEVELOPMENT-SPECIFIC KEDRO INTEGRATION OVERRIDES
+# =============================================================================
+
+kedro_integration:
+  # Development dataset configuration mapping
+  dataset_mappings:
+    # Development figure datasets with enhanced debugging
+    dev_training_figures:
+      purpose: "dev_exploratory"
+      condition_param: "dev_condition"
+      style_params:
+        default_condition: "dev_training"
+        debug_condition: "dev_test_basic"
+        log_style_resolution: true
+        
+    dev_validation_figures:
+      purpose: "dev_presentation"
+      condition_param: "experiment_condition"
+      style_params:
+        default_condition: "dev_validation"
+        debug_condition: "dev_test_advanced"
+        log_style_resolution: true
+        
+    dev_testing_figures:
+      purpose: "dev_publication"
+      condition_param: "debug_condition"
+      style_params:
+        default_condition: "dev_testing"
+        debug_condition: "dev_test_debug"
+        log_style_resolution: true
+        
+  # Development environment-specific overrides
+  environment_overrides:
+    local:
+      # Optimized settings for local development
+      defaults.style.figure.dpi: 100
+      outputs.formats.png.dpi: 150
+      defaults.performance.optimize_rendering: false
+      kedro.debugging.verbose_logging: true
+      kedro.debugging.style_resolution_tracing: true
+      
+  # Development parameter resolution patterns
+  parameter_resolution:
+    # Enhanced condition resolution for development
+    condition_templates:
+      dev_test: "dev_test_{test_type}"
+      quick_experiment: "quick_{experiment_type}"
+      development_stage: "dev_{stage_name}"
+      debug_scenario: "debug_{scenario_name}"
+      
+    # Development parameter validation rules
+    validation_rules:
+      test_type: ["basic", "advanced", "debug"]
+      experiment_type: ["treatment_a", "treatment_b", "control"]
+      stage_name: ["training", "validation", "testing", "exploratory", "presentation", "publication"]
+      scenario_name: ["fallback", "config_test", "bridge_test", "plugin_test"]
+      
+  # Enhanced development performance monitoring
+  performance_monitoring:
+    enable_timing: true
+    enable_memory_tracking: true
+    enable_cache_metrics: true
+    log_slow_operations: true
+    
+    # Development performance targets
+    targets:
+      style_lookup_ms: 5.0          # Relaxed for development
+      config_merge_ms: 50.0         # Relaxed for development
+      figure_save_overhead_percent: 10.0 # Relaxed for development
+      
+  # Enhanced development error handling
+  error_handling:
+    fallback_to_defaults: true
+    log_configuration_errors: true
+    enable_graceful_degradation: true
+    detailed_error_messages: true
+    debug_error_context: true
+    
+    # Development error recovery strategies
+    recovery_strategies:
+      invalid_condition: "use_debug_fallback"
+      missing_palette: "use_development_palette"
+      invalid_output_path: "use_dev_path"
+      configuration_merge_error: "log_and_continue"
+
+# =============================================================================
+# DEVELOPMENT DEBUGGING AND MONITORING CONFIGURATION
+# =============================================================================
+
+development:
+  # Configuration bridge debugging
+  config_bridge:
+    enable_merge_logging: true
+    log_precedence_decisions: true
+    validate_merge_results: true
+    trace_configuration_sources: true
+    
+  # Style resolution debugging
+  style_resolution:
+    enable_resolution_logging: true
+    log_condition_matching: true
+    trace_wildcard_expansion: true
+    validate_style_applications: true
+    
+  # FigureDataSet debugging
+  dataset_debugging:
+    log_save_operations: true
+    validate_figure_objects: true
+    trace_parameter_resolution: true
+    monitor_performance: true
+    
+  # Enhanced development logging
+  logging:
+    level: "DEBUG"
+    detailed_messages: true
+    include_timestamps: true
+    include_source_locations: true
+    log_configuration_details: true
+    log_style_applications: true
+    
+  # Development performance tracking
+  performance:
+    track_operation_times: true
+    log_slow_operations: true
+    memory_usage_monitoring: false  # Disabled for development speed
+    enable_profiling: false          # Disabled unless specifically needed
+    
+  # Development validation settings
+  validation:
+    strict_type_checking: false     # Relaxed for development
+    comprehensive_error_messages: true
+    validate_all_operations: true
+    log_validation_details: true
+
+# =============================================================================
+# DEVELOPMENT USAGE INSTRUCTIONS AND EXAMPLES
 # =============================================================================
 #
-# 1. Hot Reload Testing:
-#    - Modify condition styles and see immediate effects
-#    - Cache disabled for real-time configuration changes
-#    - Enhanced logging shows configuration merge operations
+# Quick Start for Development:
+# 1. Use condition parameters from local/parameters.yml:
+#    - dev_condition: "dev_test_basic" -> Bright red circles
+#    - experiment_condition: "dev_test_advanced" -> Bright green squares  
+#    - debug_condition: "dev_test_debug" -> Bright blue triangles
 #
-# 2. Condition Resolution Debugging:
-#    - Use dev_test_* conditions for clear visual identification
-#    - Bright colors and large markers for easy spotting
-#    - Debug labels clearly indicate development mode
+# 2. Rapid A/B Testing:
+#    - "quick_treatment_a" -> Light red markers
+#    - "quick_treatment_b" -> Light green markers
+#    - "quick_control" -> Light blue markers
 #
-# 3. Performance Monitoring:
-#    - Enhanced timing logs show operation performance
-#    - Relaxed performance targets accommodate debugging overhead
-#    - Detailed metrics collection for optimization
+# 3. Pipeline Development:
+#    - "dev_training", "dev_validation", "dev_testing" for pipeline stages
+#    - "dev_exploratory", "dev_presentation", "dev_publication" for purposes
 #
-# 4. Configuration Bridge Testing:
-#    - Verbose merging shows how local config overrides base
-#    - Validation warnings help identify configuration issues
-#    - Merge trace shows precedence resolution
+# 4. Debug Output Locations:
+#    - debug: data/08_reporting/figures/development/debug/
+#    - test: data/08_reporting/figures/development/testing/
+#    - quick: data/08_reporting/figures/development/quick/
 #
-# 5. Rapid Iteration Workflow:
-#    - PNG-only output for speed
-#    - Smaller figure sizes for faster rendering
-#    - Aggressive versioning keeps debugging history
+# 5. Configuration Bridge Testing:
+#    - Enhanced logging enabled for merge operations
+#    - Detailed validation messages for debugging
+#    - Performance monitoring for optimization
 #
-# 6. Integration Testing:
-#    - Built-in test scenarios validate basic functionality
-#    - Fallback tests ensure robust error handling
-#    - Parameter resolution tests verify condition lookup
+# 6. FigureDataSet Development:
+#    - condition_param resolution logging enabled
+#    - Style application tracing for debugging
+#    - Parameter validation with detailed error messages
 #
-# 7. Debug Features:
-#    - High contrast colors for easy visual identification
-#    - Large markers and thick lines for debugging visibility
-#    - Clear debug labels distinguish development outputs
+# 7. Hot Reload Development:
+#    - Caching disabled for immediate configuration changes
+#    - Enhanced validation for configuration updates
+#    - Detailed logging for configuration source tracking
 #
 # =============================================================================
