@@ -1,31 +1,56 @@
-qc_analysis_id,experiment_id,qc_category,instrument_id,measurement_type,quality_score,pass_fail_status,threshold_upper,threshold_lower,qc_threshold_type,deviation_from_target,measurement_count,operator_id,analysis_timestamp,quality_flag,severity_level,requires_action,compliance_level,instrument_drift,measurement_variance,control_limits_status,trending_direction
-QC001,EXP_2024_001,calibration_check,INST_001,pH_measurement,0.95,PASS,7.5,6.5,pH_range,0.02,25,OPR_001,2024-03-15 09:30:00,GREEN,LOW,NO,HIGH,0.001,0.004,WITHIN,STABLE
-QC002,EXP_2024_001,calibration_check,INST_002,temperature_calibration,0.88,PASS,25.2,24.8,temperature_tolerance,0.05,30,OPR_001,2024-03-15 09:35:00,GREEN,LOW,NO,HIGH,-0.002,0.008,WITHIN,STABLE
-QC003,EXP_2024_001,instrument_validation,INST_001,linearity_check,0.92,PASS,0.995,0.985,correlation_coefficient,0.001,50,OPR_002,2024-03-15 10:00:00,GREEN,LOW,NO,HIGH,0.000,0.002,WITHIN,IMPROVING
-QC004,EXP_2024_001,instrument_validation,INST_003,precision_test,0.78,WARN,0.05,0.00,rsd_percentage,0.032,20,OPR_002,2024-03-15 10:15:00,YELLOW,MEDIUM,YES,MEDIUM,0.005,0.015,NEAR_LIMIT,DEGRADING
-QC005,EXP_2024_001,control_sample,INST_001,recovery_test,0.89,PASS,105.0,95.0,recovery_percentage,1.2,15,OPR_001,2024-03-15 10:30:00,GREEN,LOW,NO,HIGH,0.003,0.012,WITHIN,STABLE
-QC006,EXP_2024_002,calibration_check,INST_002,flow_rate_check,0.65,FAIL,10.2,9.8,flow_ml_per_min,0.45,18,OPR_003,2024-03-15 11:00:00,RED,HIGH,YES,LOW,0.008,0.025,EXCEED,DEGRADING
-QC007,EXP_2024_002,calibration_check,INST_004,wavelength_calibration,0.94,PASS,590.5,589.5,wavelength_nm,0.15,35,OPR_001,2024-03-15 11:15:00,GREEN,LOW,NO,HIGH,-0.001,0.003,WITHIN,STABLE
-QC008,EXP_2024_002,instrument_validation,INST_002,detector_response,0.73,WARN,1.05,0.95,response_ratio,0.08,22,OPR_002,2024-03-15 11:30:00,YELLOW,MEDIUM,YES,MEDIUM,0.012,0.018,NEAR_LIMIT,DEGRADING
-QC009,EXP_2024_002,instrument_validation,INST_005,baseline_stability,0.86,PASS,0.02,0.00,noise_level,0.005,40,OPR_003,2024-03-15 11:45:00,GREEN,LOW,NO,HIGH,0.002,0.008,WITHIN,STABLE
-QC010,EXP_2024_002,control_sample,INST_003,blank_contamination,0.92,PASS,0.1,0.0,contaminant_ppm,0.02,12,OPR_001,2024-03-15 12:00:00,GREEN,LOW,NO,HIGH,0.001,0.005,WITHIN,STABLE
-QC011,EXP_2024_003,calibration_check,INST_001,concentration_check,0.58,FAIL,102.0,98.0,concentration_percentage,8.5,28,OPR_002,2024-03-15 12:15:00,RED,HIGH,YES,LOW,0.015,0.035,EXCEED,DEGRADING
-QC012,EXP_2024_003,calibration_check,INST_006,pressure_calibration,0.91,PASS,15.2,14.8,pressure_psi,0.08,25,OPR_003,2024-03-15 12:30:00,GREEN,LOW,NO,HIGH,0.003,0.006,WITHIN,STABLE
-QC013,EXP_2024_003,instrument_validation,INST_004,sensitivity_test,0.79,WARN,1.5,0.5,detection_limit,0.35,30,OPR_001,2024-03-15 12:45:00,YELLOW,MEDIUM,YES,MEDIUM,0.008,0.020,NEAR_LIMIT,STABLE
-QC014,EXP_2024_003,instrument_validation,INST_007,reproducibility,0.87,PASS,5.0,0.0,cv_percentage,1.8,45,OPR_002,2024-03-15 13:00:00,GREEN,LOW,NO,HIGH,0.004,0.010,WITHIN,IMPROVING
-QC015,EXP_2024_003,control_sample,INST_005,matrix_effect,0.83,PASS,110.0,90.0,matrix_recovery,3.2,20,OPR_003,2024-03-15 13:15:00,GREEN,LOW,NO,HIGH,0.006,0.014,WITHIN,STABLE
-QC016,EXP_2024_004,calibration_check,INST_002,volume_accuracy,0.69,WARN,1.02,0.98,volume_ratio,0.055,32,OPR_001,2024-03-15 13:30:00,YELLOW,MEDIUM,YES,MEDIUM,0.010,0.022,NEAR_LIMIT,DEGRADING
-QC017,EXP_2024_004,calibration_check,INST_008,time_accuracy,0.95,PASS,60.5,59.5,time_seconds,0.12,20,OPR_002,2024-03-15 13:45:00,GREEN,LOW,NO,HIGH,0.001,0.007,WITHIN,STABLE
-QC018,EXP_2024_004,instrument_validation,INST_001,carryover_test,0.88,PASS,1.0,0.0,carryover_percentage,0.25,15,OPR_003,2024-03-15 14:00:00,GREEN,LOW,NO,HIGH,0.003,0.009,WITHIN,STABLE
-QC019,EXP_2024_004,instrument_validation,INST_006,interference_check,0.72,WARN,5.0,0.0,interference_level,2.8,25,OPR_001,2024-03-15 14:15:00,YELLOW,MEDIUM,YES,MEDIUM,0.009,0.019,NEAR_LIMIT,STABLE
-QC020,EXP_2024_004,control_sample,INST_007,stability_test,0.90,PASS,8.0,0.0,degradation_percentage,1.5,35,OPR_002,2024-03-15 14:30:00,GREEN,LOW,NO,HIGH,0.002,0.011,WITHIN,STABLE
-QC021,EXP_2024_005,calibration_check,INST_003,response_linearity,0.62,FAIL,0.998,0.990,r_squared,0.025,50,OPR_003,2024-03-15 14:45:00,RED,HIGH,YES,LOW,0.018,0.032,EXCEED,DEGRADING
-QC022,EXP_2024_005,calibration_check,INST_009,zero_drift,0.93,PASS,0.5,0.0,drift_units,0.08,40,OPR_001,2024-03-15 15:00:00,GREEN,LOW,NO,HIGH,0.002,0.005,WITHIN,STABLE
-QC023,EXP_2024_005,instrument_validation,INST_002,span_check,0.81,PASS,102.0,98.0,span_percentage,1.2,30,OPR_002,2024-03-15 15:15:00,GREEN,LOW,NO,HIGH,0.005,0.013,WITHIN,IMPROVING
-QC024,EXP_2024_005,instrument_validation,INST_008,signal_noise_ratio,0.76,WARN,50.0,30.0,snr_db,8.5,28,OPR_003,2024-03-15 15:30:00,YELLOW,MEDIUM,YES,MEDIUM,0.011,0.021,NEAR_LIMIT,DEGRADING
-QC025,EXP_2024_005,control_sample,INST_004,cross_contamination,0.89,PASS,0.5,0.0,contamination_ppm,0.12,18,OPR_001,2024-03-15 15:45:00,GREEN,LOW,NO,HIGH,0.004,0.008,WITHIN,STABLE
-QC026,EXP_2024_006,calibration_check,INST_005,optical_alignment,0.67,WARN,98.0,95.0,alignment_percentage,4.8,22,OPR_002,2024-03-15 16:00:00,YELLOW,MEDIUM,YES,MEDIUM,0.013,0.027,NEAR_LIMIT,DEGRADING
-QC027,EXP_2024_006,calibration_check,INST_010,pump_calibration,0.94,PASS,5.05,4.95,pump_ml_per_min,0.02,35,OPR_003,2024-03-15 16:15:00,GREEN,LOW,NO,HIGH,0.001,0.004,WITHIN,STABLE
-QC028,EXP_2024_006,instrument_validation,INST_003,method_precision,0.85,PASS,3.0,0.0,rsd_inter_day,0.8,45,OPR_001,2024-03-15 16:30:00,GREEN,LOW,NO,HIGH,0.006,0.015,WITHIN,STABLE
-QC029,EXP_2024_006,instrument_validation,INST_009,accuracy_check,0.74,WARN,102.0,98.0,recovery_bias,5.2,25,OPR_002,2024-03-15 16:45:00,YELLOW,MEDIUM,YES,MEDIUM,0.010,0.023,NEAR_LIMIT,STABLE
-QC030,EXP_2024_006,control_sample,INST_006,system_suitability,0.91,PASS,1.5,0.5,system_score,0.15,30,OPR_003,2024-03-15 17:00:00,GREEN,LOW,NO,HIGH,0.003,0.009,WITHIN,IMPROVING
+analysis_id,instrument_id,qc_category,analysis_date,pass_fail_status,quality_score,threshold_indicator,deviation_percent,risk_level,manual_styling_required,color_code_needed,symbol_type_needed,analysis_notes
+QCA_001,HPLC_001,calibration_check,2024-01-15,PASS,97.85,ABOVE_THRESHOLD,2.85,LOW,TRUE,GREEN,CIRCLE,"Manual green circle styling needed for passing calibration. Traditional approach requires hardcoded color='green', marker='o'"
+QCA_002,HPLC_002,calibration_check,2024-01-15,FAIL,94.80,BELOW_THRESHOLD,-0.20,HIGH,TRUE,RED,X_MARK,"Manual red X styling required for failed calibration. Traditional matplotlib requires manual color='red', marker='X', s=100"
+QCA_003,LC_MS_001,calibration_check,2024-01-15,PASS,99.10,ABOVE_THRESHOLD,4.10,LOW,TRUE,GREEN,CIRCLE,"Manual green circle needed. Traditional workflow: plt.scatter(x, y, c='green', marker='o', label='Pass')"
+QCA_004,LC_MS_002,calibration_check,2024-01-15,PASS,96.70,ABOVE_THRESHOLD,1.70,LOW,TRUE,GREEN,CIRCLE,"Manual styling for passing result. Conventional approach: if status=='PASS': plt.plot(data, 'go-')"
+QCA_005,HPLC_001,instrument_validation,2024-01-15,PASS,0.025,BELOW_THRESHOLD,-50.00,LOW,TRUE,BLUE,DIAMOND,"Manual blue diamond for validation pass. Traditional: marker='D', color='blue', markersize=8"
+QCA_006,HPLC_002,instrument_validation,2024-01-15,FAIL,0.070,ABOVE_THRESHOLD,40.00,HIGH,TRUE,RED,TRIANGLE_DOWN,"Manual red down-triangle for validation fail. Conventional: marker='v', color='red', alpha=0.8"
+QCA_007,LC_MS_001,instrument_validation,2024-01-15,PASS,0.010,BELOW_THRESHOLD,-80.00,LOW,TRUE,BLUE,DIAMOND,"Manual blue diamond styling needed. Traditional matplotlib: plt.scatter(x, y, marker='D', c='blue')"
+QCA_008,LC_MS_002,instrument_validation,2024-01-15,PASS,0.040,BELOW_THRESHOLD,-20.00,LOW,TRUE,BLUE,DIAMOND,"Manual styling required for validation pass. Hardcoded approach: color='blue', marker='D'"
+QCA_009,HPLC_001,control_sample,2024-01-15,PASS,102.05,WITHIN_LIMITS,-2.95,LOW,TRUE,PURPLE,SQUARE,"Manual purple square for control sample pass. Traditional: marker='s', color='purple', edgecolor='black'"
+QCA_010,HPLC_002,control_sample,2024-01-15,FAIL,107.20,ABOVE_THRESHOLD,2.20,MEDIUM,TRUE,ORANGE,TRIANGLE_UP,"Manual orange up-triangle for control fail. Conventional styling: marker='^', color='orange'"
+QCA_011,LC_MS_001,control_sample,2024-01-15,PASS,98.90,WITHIN_LIMITS,-6.10,LOW,TRUE,PURPLE,SQUARE,"Manual purple square needed. Traditional matplotlib: plt.plot(x, y, 'ps', markersize=10)"
+QCA_012,LC_MS_002,control_sample,2024-01-15,PASS,103.50,WITHIN_LIMITS,-1.50,LOW,TRUE,PURPLE,SQUARE,"Manual styling for control pass. Hardcoded: if category=='control': color='purple'"
+QCA_013,HPLC_001,drift_monitoring,2024-01-15,PASS,5.135,WITHIN_LIMITS,-1.25,LOW,TRUE,CYAN,PLUS,"Manual cyan plus for drift monitoring pass. Traditional: marker='+', color='cyan', markersize=12"
+QCA_014,HPLC_002,drift_monitoring,2024-01-15,FAIL,5.230,ABOVE_THRESHOLD,0.58,MEDIUM,TRUE,YELLOW,ASTERISK,"Manual yellow asterisk for drift fail. Conventional: marker='*', color='yellow', alpha=0.9"
+QCA_015,LC_MS_001,drift_monitoring,2024-01-15,PASS,4.980,WITHIN_LIMITS,-4.23,LOW,TRUE,CYAN,PLUS,"Manual cyan plus styling needed. Traditional approach: plt.scatter(x, y, marker='+', c='cyan')"
+QCA_016,LC_MS_002,drift_monitoring,2024-01-15,PASS,5.050,WITHIN_LIMITS,-2.88,LOW,TRUE,CYAN,PLUS,"Manual styling required for drift pass. Hardcoded matplotlib: color='cyan', marker='+'"
+QCA_017,GC_MS_001,calibration_check,2024-01-16,PASS,97.05,ABOVE_THRESHOLD,2.05,LOW,TRUE,GREEN,CIRCLE,"Manual green circle for GC-MS calibration pass. Traditional styling decisions needed"
+QCA_018,GC_MS_001,instrument_validation,2024-01-16,PASS,0.030,BELOW_THRESHOLD,-40.00,LOW,TRUE,BLUE,DIAMOND,"Manual blue diamond for GC-MS validation. Requires hardcoded marker and color selection"
+QCA_019,GC_MS_001,control_sample,2024-01-16,PASS,99.70,WITHIN_LIMITS,-5.30,LOW,TRUE,PURPLE,SQUARE,"Manual purple square for GC-MS control. Traditional approach needs explicit styling"
+QCA_020,GC_MS_001,drift_monitoring,2024-01-16,PASS,8.450,WITHIN_LIMITS,-0.59,LOW,TRUE,CYAN,PLUS,"Manual cyan plus for GC-MS drift monitoring. Conventional matplotlib styling required"
+QCA_021,UV_VIS_001,calibration_check,2024-01-16,PASS,98.90,ABOVE_THRESHOLD,3.90,LOW,TRUE,GREEN,CIRCLE,"Manual green circle for UV-Vis calibration. Traditional workflow requires manual color coding"
+QCA_022,UV_VIS_002,calibration_check,2024-01-16,FAIL,93.20,BELOW_THRESHOLD,-1.80,HIGH,TRUE,RED,X_MARK,"Manual red X for UV-Vis calibration fail. Hardcoded styling: marker='X', color='red'"
+QCA_023,UV_VIS_001,instrument_validation,2024-01-16,PASS,0.020,BELOW_THRESHOLD,-60.00,LOW,TRUE,BLUE,DIAMOND,"Manual blue diamond for UV-Vis validation pass. Traditional matplotlib customization needed"
+QCA_024,UV_VIS_002,instrument_validation,2024-01-16,FAIL,0.080,ABOVE_THRESHOLD,60.00,HIGH,TRUE,RED,TRIANGLE_DOWN,"Manual red down-triangle for validation fail. Conventional approach: manual symbol selection"
+QCA_025,UV_VIS_001,control_sample,2024-01-16,PASS,101.20,WITHIN_LIMITS,-3.80,LOW,TRUE,PURPLE,SQUARE,"Manual purple square for UV-Vis control. Traditional styling decisions required"
+QCA_026,UV_VIS_002,control_sample,2024-01-16,FAIL,109.80,ABOVE_THRESHOLD,4.80,MEDIUM,TRUE,ORANGE,TRIANGLE_UP,"Manual orange up-triangle for control fail. Hardcoded matplotlib parameters needed"
+QCA_027,UV_VIS_001,drift_monitoring,2024-01-16,PASS,550.20,WITHIN_LIMITS,-0.33,LOW,TRUE,CYAN,PLUS,"Manual cyan plus for UV-Vis drift pass. Traditional approach requires explicit styling"
+QCA_028,UV_VIS_002,drift_monitoring,2024-01-16,FAIL,553.10,ABOVE_THRESHOLD,0.20,MEDIUM,TRUE,YELLOW,ASTERISK,"Manual yellow asterisk for drift fail. Conventional matplotlib: manual marker and color"
+QCA_029,ICP_MS_001,calibration_check,2024-01-17,PASS,99.40,ABOVE_THRESHOLD,4.40,LOW,TRUE,GREEN,CIRCLE,"Manual green circle for ICP-MS calibration. Traditional workflow needs hardcoded styling"
+QCA_030,ICP_MS_001,instrument_validation,2024-01-17,PASS,0.015,BELOW_THRESHOLD,-70.00,LOW,TRUE,BLUE,DIAMOND,"Manual blue diamond for ICP-MS validation. Traditional approach: explicit marker styling"
+QCA_031,ICP_MS_001,control_sample,2024-01-17,PASS,98.10,WITHIN_LIMITS,-6.90,LOW,TRUE,PURPLE,SQUARE,"Manual purple square for ICP-MS control. Conventional matplotlib requires manual styling"
+QCA_032,ICP_MS_001,drift_monitoring,2024-01-17,PASS,7.230,WITHIN_LIMITS,-0.96,LOW,TRUE,CYAN,PLUS,"Manual cyan plus for ICP-MS drift monitoring. Traditional styling decisions needed"
+QCA_033,FTIR_001,calibration_check,2024-01-17,MIXED,95.70,THRESHOLD_BORDERLINE,0.70,MEDIUM,TRUE,YELLOW,DIAMOND,"Manual yellow diamond for borderline calibration. Traditional: requires threshold-based color logic"
+QCA_034,FTIR_001,instrument_validation,2024-01-17,PASS,0.040,BELOW_THRESHOLD,-20.00,LOW,TRUE,BLUE,DIAMOND,"Manual blue diamond for FTIR validation. Hardcoded matplotlib styling required"
+QCA_035,FTIR_001,control_sample,2024-01-17,PASS,103.80,WITHIN_LIMITS,-1.20,LOW,TRUE,PURPLE,SQUARE,"Manual purple square for FTIR control sample. Traditional approach needs explicit colors"
+QCA_036,FTIR_001,drift_monitoring,2024-01-17,PASS,1652.80,WITHIN_LIMITS,-0.13,LOW,TRUE,CYAN,PLUS,"Manual cyan plus for FTIR drift monitoring. Conventional styling: manual marker selection"
+QCA_037,XRF_001,calibration_check,2024-01-18,PASS,96.80,ABOVE_THRESHOLD,1.80,LOW,TRUE,GREEN,CIRCLE,"Manual green circle for XRF calibration. Traditional matplotlib: hardcoded color and marker"
+QCA_038,XRF_001,instrument_validation,2024-01-18,PASS,0.035,BELOW_THRESHOLD,-30.00,LOW,TRUE,BLUE,DIAMOND,"Manual blue diamond for XRF validation. Traditional workflow requires manual styling"
+QCA_039,XRF_001,control_sample,2024-01-18,PASS,102.70,WITHIN_LIMITS,-2.30,LOW,TRUE,PURPLE,SQUARE,"Manual purple square for XRF control. Conventional approach: explicit symbol styling"
+QCA_040,XRF_001,drift_monitoring,2024-01-18,PASS,45.20,WITHIN_LIMITS,-1.74,LOW,TRUE,CYAN,PLUS,"Manual cyan plus for XRF drift monitoring. Traditional matplotlib customization needed"
+QCA_041,NMR_400_001,calibration_check,2024-01-18,PASS,98.30,ABOVE_THRESHOLD,3.30,LOW,TRUE,GREEN,CIRCLE,"Manual green circle for NMR calibration. Traditional styling: hardcoded color decisions"
+QCA_042,NMR_400_001,instrument_validation,2024-01-18,PASS,0.025,BELOW_THRESHOLD,-50.00,LOW,TRUE,BLUE,DIAMOND,"Manual blue diamond for NMR validation. Conventional matplotlib: manual marker styling"
+QCA_043,NMR_400_001,control_sample,2024-01-18,PASS,99.80,WITHIN_LIMITS,-5.20,LOW,TRUE,PURPLE,SQUARE,"Manual purple square for NMR control sample. Traditional approach requires explicit styling"
+QCA_044,NMR_400_001,drift_monitoring,2024-01-18,PASS,399.89,WITHIN_LIMITS,-0.03,LOW,TRUE,CYAN,PLUS,"Manual cyan plus for NMR drift monitoring. Traditional workflow needs hardcoded parameters"
+QCA_045,HPLC_001,overall_performance,2024-01-15,PASS,88.5,COMPOSITE_SCORE,88.50,LOW,TRUE,LIGHT_GREEN,CIRCLE_FILLED,"Manual light green filled circle for overall HPLC performance. Traditional: complex conditional styling"
+QCA_046,HPLC_002,overall_performance,2024-01-15,FAIL,72.3,COMPOSITE_SCORE,72.30,HIGH,TRUE,DARK_RED,X_LARGE,"Manual dark red large X for poor overall performance. Hardcoded: multiple styling parameters"
+QCA_047,LC_MS_001,overall_performance,2024-01-15,PASS,92.8,COMPOSITE_SCORE,92.80,LOW,TRUE,DARK_GREEN,CIRCLE_FILLED,"Manual dark green filled circle for excellent LC-MS performance. Traditional threshold styling"
+QCA_048,LC_MS_002,overall_performance,2024-01-15,PASS,86.2,COMPOSITE_SCORE,86.20,LOW,TRUE,LIGHT_GREEN,CIRCLE_FILLED,"Manual light green filled circle for good LC-MS performance. Conventional matplotlib styling"
+QCA_049,GC_MS_001,overall_performance,2024-01-16,PASS,89.7,COMPOSITE_SCORE,89.70,LOW,TRUE,LIGHT_GREEN,CIRCLE_FILLED,"Manual light green filled circle for GC-MS overall performance. Traditional styling approach"
+QCA_050,UV_VIS_001,overall_performance,2024-01-16,PASS,85.1,COMPOSITE_SCORE,85.10,MEDIUM,TRUE,YELLOW_GREEN,CIRCLE_FILLED,"Manual yellow-green filled circle for marginal UV-Vis performance. Threshold-based styling needed"
+QCA_051,UV_VIS_002,overall_performance,2024-01-16,FAIL,69.8,COMPOSITE_SCORE,69.80,HIGH,TRUE,DARK_RED,X_LARGE,"Manual dark red large X for failed UV-Vis overall performance. Complex traditional styling"
+QCA_052,ICP_MS_001,overall_performance,2024-01-17,PASS,94.1,COMPOSITE_SCORE,94.10,LOW,TRUE,DARK_GREEN,CIRCLE_FILLED,"Manual dark green filled circle for excellent ICP-MS performance. Hardcoded matplotlib parameters"
+QCA_053,FTIR_001,overall_performance,2024-01-17,PASS,83.4,COMPOSITE_SCORE,83.40,MEDIUM,TRUE,YELLOW_GREEN,CIRCLE_FILLED,"Manual yellow-green filled circle for acceptable FTIR performance. Traditional threshold styling"
+QCA_054,XRF_001,overall_performance,2024-01-18,PASS,87.9,COMPOSITE_SCORE,87.90,LOW,TRUE,LIGHT_GREEN,CIRCLE_FILLED,"Manual light green filled circle for good XRF performance. Conventional styling decisions"
+QCA_055,NMR_400_001,overall_performance,2024-01-18,PASS,95.3,COMPOSITE_SCORE,95.30,LOW,TRUE,DARK_GREEN,CIRCLE_FILLED,"Manual dark green filled circle for outstanding NMR performance. Traditional matplotlib customization"
