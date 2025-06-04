@@ -1,185 +1,86 @@
 """Traditional Kedro Project Example - Manual Figure Management.
 
-This package demonstrates a conventional Kedro machine learning pipeline project
-that relies on manual matplotlib figure management approaches. This example serves
-as the "before" state in migration documentation, showing the scattered plt.savefig()
-calls, hardcoded styling, and manual file management that figregistry-kedro eliminates.
+This package demonstrates traditional Kedro project structure and workflows before
+figregistry-kedro integration. The project showcases manual matplotlib figure 
+management patterns including scattered plt.savefig() calls, hardcoded styling,
+manual file path management, and code duplication issues that automated figure
+styling solutions address.
 
-Traditional Manual Patterns Demonstrated:
-    - Manual plt.savefig() calls scattered throughout pipeline nodes
-    - Hardcoded styling parameters within individual functions
-    - Manual file path construction and naming conventions
-    - Code duplication for styling across different visualization functions
-    - Inconsistent experimental condition handling without systematic management
-    - Manual configuration management without automated initialization
+Traditional Workflow Characteristics:
+- Manual plt.savefig() calls scattered throughout pipeline nodes
+- Hardcoded styling parameters duplicated across multiple functions
+- Inconsistent file naming and path management approaches
+- Manual configuration of colors, markers, and layout parameters
+- Repetitive figure styling code without systematic management
+- No automated versioning or condition-based styling capabilities
 
-Project Structure (Traditional):
-    - pipeline_registry.py: Standard pipeline definitions without lifecycle hooks
-    - nodes.py: Pipeline node functions with manual figure saving and styling
-    - settings.py: Basic Kedro project settings without FigRegistryHooks
+Problem Areas Demonstrated:
+This example highlights the maintenance overhead and code quality issues
+associated with manual figure management in data science pipelines,
+providing clear motivation for automated styling and versioning solutions.
 
-Pain Points Highlighted:
-    - Maintenance overhead from scattered styling code
-    - Configuration drift across different visualizations
-    - Manual version management and file organization
-    - Inconsistent styling across experimental conditions
-    - Code duplication and reduced maintainability
+Project Structure:
+- nodes.py: Pipeline functions with manual figure management
+- pipeline_registry.py: Standard Kedro pipeline registration
+- settings.py: Traditional project configuration without lifecycle hooks
 
-This traditional approach requires developers to manually manage every aspect
-of figure creation, styling, and persistence within their pipeline node functions,
-leading to the maintenance challenges that automated solutions address.
-
-Usage Example (Traditional Manual Approach):
-    # Execute pipeline with manual figure management
-    kedro run --pipeline=data_visualization
-    
-    # Each node function contains manual plt.savefig() calls
-    # Styling must be manually configured in each function
-    # File paths and naming require manual management
-
-For comparison with the automated approach, see the figregistry-kedro examples.
+Educational Purpose:
+This package serves as the baseline state in migration documentation,
+demonstrating the problematic patterns that automated figure management
+systems like figregistry-kedro are designed to eliminate.
 """
 
-# Basic package metadata for traditional Kedro project
-__version__ = "1.0.0"
-__author__ = "Data Science Team"
-__description__ = "Traditional Kedro project with manual figure management"
+__version__ = "0.1.0"
 
-# Import core components following standard Kedro patterns
-# No figregistry-kedro integration - purely traditional approach
+# Standard package metadata for traditional Kedro project
+__author__ = "Example Project Contributors"
+__email__ = "example@kedro.org"
 
-try:
-    # Standard Kedro pipeline registry import
-    from .pipeline_registry import create_pipeline
-    
-    # Traditional node functions with manual figure management
-    from .nodes import (
-        create_exploratory_plot,
-        generate_summary_visualization,
-        create_analysis_chart
-    )
-    
-    # Mark successful imports for basic validation
-    _IMPORTS_SUCCESS = True
-    
-except ImportError as e:
-    # Basic error handling for missing components
-    import warnings
-    warnings.warn(
-        f"Could not import pipeline components: {e}. "
-        "Check that all files are present in the package.",
-        ImportWarning
-    )
-    _IMPORTS_SUCCESS = False
-
-
-# Standard exports for Kedro project discovery
-# Traditional approach - no automation or advanced integration
+# Public API following standard Python package conventions
 __all__ = [
-    # Package metadata
     "__version__",
-    "__author__",
-    "__description__",
-    
-    # Core pipeline function (required for Kedro)
-    "create_pipeline",
-    
-    # Node functions for manual figure management
-    "create_exploratory_plot",
-    "generate_summary_visualization", 
-    "create_analysis_chart",
-    
-    # Status indicator
-    "_IMPORTS_SUCCESS"
 ]
 
+# Project identification constants for standard Kedro framework usage
+PROJECT_NAME = "kedro-manual-example"
+PROJECT_VERSION = __version__
+PACKAGE_NAME = "kedro_manual_example"
 
-def get_project_info() -> dict:
-    """Get basic project information for traditional Kedro project.
-    
-    Returns:
-        Dictionary containing standard project metadata and status,
-        without advanced integration features or automation capabilities.
-        
-    Example:
-        >>> from kedro_manual_example import get_project_info
-        >>> info = get_project_info()
-        >>> print(f"Traditional Project: {info['name']} v{info['version']}")
-    """
-    return {
-        "name": "kedro-manual-example",
-        "version": __version__,
-        "description": __description__,
-        "author": __author__,
-        "imports_success": _IMPORTS_SUCCESS,
-        "kedro_compatible": True,
-        "automation_features": False,
-        "manual_management_required": True,
-        "pain_points": [
-            "Manual plt.savefig() calls in every node",
-            "Hardcoded styling parameters throughout code",
-            "Manual file path and naming management",
-            "Code duplication across visualization functions",
-            "Inconsistent experimental condition handling",
-            "No systematic configuration management"
-        ]
-    }
+# Standard Kedro project requirements
+KEDRO_VERSION_REQUIREMENT = ">=0.18.0,<0.20.0"
+PYTHON_VERSION_REQUIREMENT = ">=3.10"
 
+# Traditional project metadata highlighting manual approach characteristics
+PROJECT_CHARACTERISTICS = [
+    "Manual figure management with plt.savefig() calls",
+    "Hardcoded styling parameters throughout codebase",
+    "Inconsistent file naming and organization",
+    "Code duplication in figure styling logic",
+    "No automated versioning capabilities",
+    "Manual configuration of visualization parameters",
+]
 
-def check_dependencies() -> bool:
-    """Check if basic dependencies are available for traditional workflow.
-    
-    Validates that standard scientific computing packages are installed
-    for manual figure management workflow. No automated styling or
-    configuration management dependencies required.
-    
-    Returns:
-        True if basic dependencies are available, False otherwise.
-        
-    Example:
-        >>> from kedro_manual_example import check_dependencies
-        >>> if check_dependencies():
-        ...     print("Ready for manual figure management workflow")
-        ... else:
-        ...     print("Missing basic dependencies")
-    """
-    try:
-        # Check standard scientific computing dependencies
-        import kedro
-        import matplotlib
-        import pandas
-        import numpy
-        
-        # Validate project structure is importable
-        if not _IMPORTS_SUCCESS:
-            return False
-            
-        return True
-        
-    except ImportError:
-        return False
-
-
-# Project configuration for traditional manual approach
-TRADITIONAL_CONFIG = {
-    "approach": "manual",
-    "automation_level": "none",
-    "required_kedro_version": ">=0.18.0",
-    "figure_management": "manual_plt_savefig",
-    "styling_approach": "hardcoded_in_functions",
-    "configuration_management": "manual",
-    "maintenance_requirements": [
-        "Update styling code in multiple functions",
-        "Manually manage file paths and naming",
-        "Coordinate experimental condition handling",
-        "Maintain consistent styling across pipeline",
-        "Handle version management manually"
-    ],
-    "migration_benefits": [
-        "Eliminate scattered plt.savefig() calls",
-        "Centralize styling configuration",
-        "Automate file management",
-        "Reduce code duplication",
-        "Enable systematic condition handling"
+# Classification metadata for migration example documentation
+EXAMPLE_METADATA = {
+    "purpose": "migration_baseline_demonstration",
+    "workflow_type": "traditional_manual_management", 
+    "complexity_level": "basic",
+    "target_audience": "figregistry_kedro_evaluation",
+    "problem_areas": [
+        "scattered_figure_saving_logic",
+        "hardcoded_styling_parameters",
+        "manual_file_management",
+        "code_duplication_patterns",
+        "inconsistent_naming_conventions",
+        "maintenance_overhead",
     ]
+}
+
+# Traditional Kedro project structure demonstration
+TRADITIONAL_COMPONENTS = {
+    "pipeline_organization": "standard_kedro_patterns",
+    "figure_management": "manual_matplotlib_operations",
+    "configuration": "scattered_hardcoded_parameters",
+    "versioning": "manual_timestamp_approaches",
+    "styling": "duplicated_styling_code_blocks",
 }
