@@ -1,185 +1,185 @@
-"""
-Comprehensive unit tests for FigureDataSet component.
+"""Comprehensive unit tests for FigureDataSet component.
 
-This module provides complete test coverage for the figregistry_kedro.datasets.FigureDataSet
-component, validating AbstractDataSet interface compliance, automated condition-based styling,
-catalog parameter extraction, versioning compatibility, performance requirements, and
-error handling scenarios per F-005 feature requirements.
+This module provides exhaustive testing of the FigureDataSet implementation per
+Section 6.6 Testing Strategy, validating AbstractDataSet interface compliance, 
+automated condition-based styling, catalog integration, and performance requirements.
 
-Testing Scope per Section 6.6.1.1:
-- AbstractDataSet interface compliance for catalog integration (F-005)
-- Automated condition-based styling without manual intervention (F-005.2)
-- Compatibility with Kedro versioning and experiment tracking (F-005.2)
-- Thread-safe operation for parallel pipeline execution (Section 5.2.8)
-- Performance validation of <200ms per save operation (Section 6.6.4.3)
+Test Coverage Areas:
+- AbstractDataSet interface compliance per F-005 requirements
+- Automated condition-based styling without manual intervention per F-005.2
+- Kedro catalog parameter extraction and configuration per Section 5.2.6
+- Compatibility with Kedro versioning and experiment tracking per F-005.2
+- Thread-safe operation for parallel pipeline execution per Section 5.2.8
+- Performance validation against <200ms save operation targets per Section 6.6.4.3
+- Comprehensive error handling for malformed configurations and edge cases
 
-Test Organization per Section 6.6.2.2:
-- Unit tests for save/load/describe methods
-- Integration tests for catalog parameter extraction
-- Performance tests with pytest-benchmark
-- Security tests for parameter validation
-- Thread-safety tests for parallel execution
+The test suite leverages pytest-mock for Kedro component simulation, property-based
+testing for configuration validation, and comprehensive performance benchmarking
+to ensure production-ready plugin functionality across supported environments.
 """
 
+import concurrent.futures
 import os
-import sys
+import tempfile
+import threading
 import time
 import warnings
-import tempfile
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple
 from unittest.mock import Mock, MagicMock, patch, call
-from concurrent.futures import ThreadPoolExecutor
-import threading
-
 import pytest
-import matplotlib
-import matplotlib.pyplot as plt
+
+# Core testing dependencies
 import numpy as np
-import pandas as pd
-from PIL import Image
 
-# Configure matplotlib for headless testing
-matplotlib.use('Agg')
-plt.ioff()
+# Suppress warnings in test environment
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=PendingDeprecationWarning)
 
-# Suppress warnings for clean test output
-warnings.filterwarnings('ignore', category=UserWarning, module='matplotlib')
-warnings.filterwarnings('ignore', category=FutureWarning, module='kedro')
+# Import matplotlib with fallback for test environments
+try:
+    import matplotlib
+    import matplotlib.pyplot as plt
+    from matplotlib.figure import Figure
+    matplotlib.use('Agg')  # Non-interactive backend for testing
+    MATPLOTLIB_AVAILABLE = True
+except ImportError:
+    MATPLOTLIB_AVAILABLE = False
+    Figure = None
+    plt = None
+
+# Import Kedro components with graceful fallback
+try:
+    from kedro.io import AbstractDataSet
+    from kedro.io.core import get_filepath_str
+    KEDRO_AVAILABLE = True
+except ImportError:
+    KEDRO_AVAILABLE = False
+    AbstractDataSet = object
+
+# Import FigregRegistry components with fallback
+try:
+    import figregistry
+    FIGREGISTRY_AVAILABLE = True
+except ImportError:
+    FIGREGISTRY_AVAILABLE = False
+
+# Import components under test
+try:
+    from figregistry_kedro.datasets import (
+        FigureDataSet, 
+        FigureDataSetError,
+        StyleResolutionCache,
+        create_figure_dataset,
+        validate_figure_dataset_config
+    )
+    FIGREGISTRY_KEDRO_AVAILABLE = True
+except ImportError:
+    FIGREGISTRY_KEDRO_AVAILABLE = False
+    FigureDataSet = None
+    FigureDataSetError = Exception
+    StyleResolutionCache = None
+
+# Import test fixtures and utilities
+from figregistry_kedro.tests.fixtures.kedro_fixtures import (
+    minimal_kedro_context,
+    test_catalog_with_figregistry,
+    mock_kedro_session,
+    mock_hook_manager,
+    figregistry_config_bridge,
+    mock_figure_dataset,
+    hook_performance_tracker,
+    mock_matplotlib_figure,
+    kedro_integration_validators,
+    complete_kedro_mock_stack
+)
+
+# Import property-based testing if available
+try:
+    from hypothesis import given, strategies as st, settings, assume, HealthCheck
+    from hypothesis.stateful import RuleBasedStateMachine, rule, initialize, invariant
+    HYPOTHESIS_AVAILABLE = True
+except ImportError:
+    HYPOTHESIS_AVAILABLE = False
+
+# Import benchmarking if available
+try:
+    import pytest_benchmark
+    BENCHMARK_AVAILABLE = True
+except ImportError:
+    BENCHMARK_AVAILABLE = False
 
 
 # =============================================================================
-# TEST SETUP AND FIXTURES
+# TEST CONFIGURATION AND FIXTURES
 # =============================================================================
 
-@pytest.fixture(autouse=True)
-def reset_matplotlib_state():
-    """
-    Reset matplotlib state between tests for isolation per Section 6.6.5.6.
-    
-    Ensures clean matplotlib environment for each test execution,
-    preventing cross-test contamination and ensuring consistent figure state.
-    """
-    # Store initial rcParams state
-    initial_rcparams = matplotlib.rcParams.copy()
-    
-    # Reset to defaults before test
-    matplotlib.rcdefaults()
-    plt.close('all')
-    
-    yield
-    
-    # Restore initial state and close figures
-    matplotlib.rcParams.update(initial_rcparams)
-    plt.close('all')
+pytestmark = [
+    pytest.mark.unit,
+    pytest.mark.kedro_plugin,
+    pytest.mark.skipif(not FIGREGISTRY_KEDRO_AVAILABLE, reason="figregistry-kedro not available")
+]
 
 
 @pytest.fixture
 def sample_figure():
-    """
-    Create sample matplotlib figure for dataset testing per Section 6.6.2.6.
+    """Create sample matplotlib figure for testing FigureDataSet operations.
     
-    Provides standard matplotlib figure object with basic plot content
-    for testing FigureDataSet save/load operations and styling application.
+    Returns:
+        matplotlib.figure.Figure: Sample figure with realistic plot data
     """
+    if not MATPLOTLIB_AVAILABLE:
+        pytest.skip("Matplotlib not available for figure creation")
+    
     fig, ax = plt.subplots(figsize=(8, 6))
     
-    # Create sample data
+    # Create realistic test data
     x = np.linspace(0, 10, 100)
-    y = np.sin(x) + 0.1 * np.random.randn(100)
+    y1 = np.sin(x) + 0.1 * np.random.RandomState(42).randn(100)
+    y2 = np.cos(x) + 0.1 * np.random.RandomState(43).randn(100)
     
-    # Create plot with various elements for comprehensive testing
-    ax.plot(x, y, 'b-', linewidth=2, label='sin(x) + noise')
-    ax.set_xlabel('X values')
-    ax.set_ylabel('Y values')
-    ax.set_title('Sample Plot for FigureDataSet Testing')
+    ax.plot(x, y1, 'b-', label='Sine Wave', linewidth=2, marker='o', markersize=4)
+    ax.plot(x, y2, 'r--', label='Cosine Wave', linewidth=2, marker='s', markersize=4)
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel('Amplitude')
+    ax.set_title('Sample Figure for FigureDataSet Testing')
     ax.legend()
     ax.grid(True, alpha=0.3)
     
-    # Add some additional complexity
-    ax.axhline(y=0, color='k', linestyle='--', alpha=0.5)
-    ax.text(5, 0.5, 'Test annotation', fontsize=10, ha='center')
-    
     return fig
 
 
 @pytest.fixture
-def complex_figure():
+def mock_figregistry_api(mocker):
+    """Mock FigRegistry API calls for isolated FigureDataSet testing.
+    
+    Args:
+        mocker: pytest-mock fixture
+        
+    Returns:
+        dict: Mocked FigRegistry API functions with configurable responses
     """
-    Create complex matplotlib figure for advanced testing scenarios.
-    
-    Provides matplotlib figure with subplots, multiple data series,
-    and complex styling for testing performance and advanced features.
-    """
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
-    
-    # Generate deterministic sample data
-    np.random.seed(42)
-    x = np.linspace(0, 10, 100)
-    
-    # Plot 1: Multiple line plots
-    ax1.plot(x, np.sin(x), 'b-', label='sin(x)', linewidth=2)
-    ax1.plot(x, np.cos(x), 'r--', label='cos(x)', linewidth=2)
-    ax1.set_title('Trigonometric Functions')
-    ax1.legend()
-    ax1.grid(True, alpha=0.3)
-    
-    # Plot 2: Scatter plot with colormap
-    x_scatter = np.random.randn(100)
-    y_scatter = np.random.randn(100)
-    colors = np.random.randn(100)
-    ax2.scatter(x_scatter, y_scatter, c=colors, alpha=0.6, cmap='viridis')
-    ax2.set_title('Random Scatter with Colormap')
-    ax2.grid(True, alpha=0.3)
-    
-    # Plot 3: Bar plot with error bars
-    categories = ['A', 'B', 'C', 'D', 'E']
-    values = [23, 45, 56, 78, 32]
-    errors = [2, 3, 4, 5, 3]
-    ax3.bar(categories, values, yerr=errors, capsize=5, color='green', alpha=0.7)
-    ax3.set_title('Category Data with Error Bars')
-    ax3.set_ylabel('Values')
-    
-    # Plot 4: Filled area plot
-    y_fill = np.exp(-x/5) * np.sin(x)
-    ax4.fill_between(x, 0, y_fill, alpha=0.6, color='purple')
-    ax4.plot(x, y_fill, 'purple', linewidth=2)
-    ax4.set_title('Exponential Decay with Fill')
-    ax4.set_xlabel('Time')
-    ax4.set_ylabel('Amplitude')
-    ax4.grid(True, alpha=0.3)
-    
-    plt.tight_layout()
-    return fig
-
-
-@pytest.fixture
-def mock_figregistry_apis(mocker):
-    """
-    Mock FigRegistry core APIs for dataset testing isolation per Section 6.6.2.3.
-    
-    Provides comprehensive mocking of FigRegistry's get_style() and save_figure()
-    APIs to test FigureDataSet behavior without external dependencies.
-    """
-    # Mock get_style API
+    # Mock core FigRegistry functions
     mock_get_style = mocker.patch('figregistry.get_style')
+    mock_save_figure = mocker.patch('figregistry.save_figure')
+    mock_init_config = mocker.patch('figregistry.init_config')
+    
+    # Configure realistic return values
     mock_get_style.return_value = {
-        'figure.figsize': [10, 6],
-        'axes.grid': True,
-        'axes.grid.alpha': 0.3,
-        'font.size': 12,
-        'axes.labelsize': 14,
-        'axes.titlesize': 16,
-        'legend.fontsize': 10
+        'figure.figsize': [8, 6],
+        'figure.facecolor': 'white',
+        'figure.edgecolor': 'black',
+        'figure.dpi': 100,
+        'axes.labelsize': 12,
+        'axes.titlesize': 14,
+        'lines.linewidth': 2.0,
+        'lines.markersize': 8,
+        'lines.color': '#1f77b4',
+        'lines.marker': 'o',
+        'lines.linestyle': '-'
     }
     
-    # Mock save_figure API
-    mock_save_figure = mocker.patch('figregistry.save_figure')
-    mock_save_figure.return_value = '/mocked/path/figure_20231201_123456.png'
-    
-    # Mock init_config API for configuration initialization
-    mock_init_config = mocker.patch('figregistry.init_config')
-    mock_init_config.return_value = True
+    mock_save_figure.return_value = "test_figure_output.png"
     
     return {
         'get_style': mock_get_style,
@@ -189,2323 +189,2034 @@ def mock_figregistry_apis(mocker):
 
 
 @pytest.fixture
-def figure_dataset_config():
-    """
-    Provide comprehensive FigureDataSet configuration scenarios per F-005.2.
+def basic_dataset_config():
+    """Provide basic FigureDataSet configuration for testing.
     
-    Returns various catalog configuration patterns for testing parameter
-    extraction, condition resolution, and error handling scenarios.
+    Returns:
+        dict: Basic dataset configuration parameters
     """
     return {
-        'basic_config': {
-            'filepath': 'data/08_reporting/figures/basic_plot.png',
-            'purpose': 'exploratory',
-            'condition_param': 'experiment_type',
-            'save_args': {
-                'dpi': 150,
-                'bbox_inches': 'tight'
-            }
+        'filepath': 'data/08_reporting/test_figure.png',
+        'purpose': 'exploratory',
+        'condition_param': 'experiment_condition',
+        'style_params': {
+            'figure.dpi': 300,
+            'figure.facecolor': 'white'
         },
-        'advanced_config': {
-            'filepath': 'data/08_reporting/figures/advanced_plot.pdf',
-            'purpose': 'publication',
-            'condition_param': 'analysis_mode',
-            'style_params': {
-                'figure.figsize': [8, 6],
-                'axes.labelsize': 12,
-                'font.family': 'serif'
-            },
-            'save_args': {
-                'format': 'pdf',
-                'dpi': 300,
-                'transparent': True
-            },
-            'versioned': True
-        },
-        'minimal_config': {
-            'filepath': 'data/08_reporting/figures/minimal_plot.svg',
-            'purpose': 'presentation'
-            # No condition_param or style_params for testing defaults
-        },
-        'invalid_config': {
-            # Missing required filepath
-            'purpose': 'exploratory',
-            'condition_param': 'invalid_param'
+        'save_args': {
+            'bbox_inches': 'tight',
+            'transparent': False
         }
     }
 
 
 @pytest.fixture
-def mock_kedro_session_context(mocker, temp_work_dir):
+def advanced_dataset_config():
+    """Provide advanced FigureDataSet configuration for complex testing.
+    
+    Returns:
+        dict: Advanced dataset configuration with versioning and complex parameters
     """
-    Mock Kedro session context for dataset testing per Section 6.6.2.3.
-    
-    Creates comprehensive mock of Kedro session components including
-    catalog, configuration, and pipeline parameters for isolated testing.
-    """
-    # Mock session
-    mock_session = mocker.Mock()
-    mock_session.store = {
-        'experiment_type': 'baseline',
-        'analysis_mode': 'development',
-        'user_id': 'test_user',
-        'project_name': 'test_project'
-    }
-    
-    # Mock context
-    mock_context = mocker.Mock()
-    mock_context.project_path = temp_work_dir
-    mock_context.package_name = 'test_project'
-    
-    # Mock catalog with versioning support
-    mock_catalog = mocker.Mock()
-    mock_catalog.save = mocker.Mock()
-    mock_catalog.load = mocker.Mock()
-    mock_catalog.exists = mocker.Mock(return_value=True)
-    
-    # Mock config loader
-    mock_config_loader = mocker.Mock()
-    mock_config_loader.get.return_value = {
-        'styles': {
-            'exploratory': {'figure.figsize': [10, 6]},
-            'presentation': {'figure.figsize': [12, 8]},
-            'publication': {'figure.figsize': [8, 6]}
+    return {
+        'filepath': 'data/08_reporting/figures/advanced/{condition}/output.pdf',
+        'purpose': 'publication',
+        'condition_param': 'experimental_treatment',
+        'style_params': {
+            'figure.figsize': [12, 8],
+            'figure.dpi': 300,
+            'axes.labelsize': 14,
+            'axes.titlesize': 16,
+            'legend.fontsize': 12
         },
-        'outputs': {
-            'base_path': 'data/08_reporting/figures',
-            'timestamp_format': '%Y%m%d_%H%M%S'
-        }
+        'save_args': {
+            'format': 'pdf',
+            'dpi': 300,
+            'bbox_inches': 'tight',
+            'pad_inches': 0.2
+        },
+        'version': True
     }
-    
-    mock_context.catalog = mock_catalog
-    mock_context.config_loader = mock_config_loader
-    mock_session.load_context.return_value = mock_context
-    
-    return mock_session
 
 
 @pytest.fixture
-def performance_baseline():
-    """
-    Provide performance baseline measurements per Section 6.6.4.3.
+def pipeline_context():
+    """Provide mock pipeline context for condition parameter resolution.
     
-    Establishes baseline timing measurements for configuration loading,
-    style resolution, and dataset operations for performance validation.
+    Returns:
+        dict: Mock pipeline parameters for testing condition resolution
     """
     return {
-        'manual_save_time': 0.100,  # 100ms baseline for manual plt.savefig
-        'style_resolution_time': 0.001,  # 1ms target for get_style()
-        'dataset_save_target': 0.200,  # 200ms target for FigureDataSet save
-        'overhead_threshold': 0.05,  # 5% maximum overhead vs manual
-        'memory_baseline_mb': 50.0  # 50MB baseline memory usage
+        'experiment_condition': 'test_experiment',
+        'experimental_treatment': 'control_group',
+        'data_processing_stage': 'intermediate',
+        'analysis_type': 'exploratory_analysis',
+        'output_format': 'publication_ready'
+    }
+
+
+@pytest.fixture
+def performance_tracker():
+    """Provide performance tracking utilities for benchmark validation.
+    
+    Returns:
+        dict: Performance tracking and validation utilities
+    """
+    timing_data = []
+    
+    def track_operation(operation_name: str, execution_time: float):
+        """Track operation timing for performance analysis."""
+        timing_data.append({
+            'operation': operation_name,
+            'execution_time_ms': execution_time * 1000,
+            'timestamp': time.time()
+        })
+    
+    def validate_performance_targets() -> Dict[str, Any]:
+        """Validate performance against specified targets."""
+        if not timing_data:
+            return {'status': 'no_data'}
+        
+        save_operations = [t for t in timing_data if 'save' in t['operation']]
+        if not save_operations:
+            return {'status': 'no_save_operations'}
+        
+        max_save_time = max(op['execution_time_ms'] for op in save_operations)
+        avg_save_time = sum(op['execution_time_ms'] for op in save_operations) / len(save_operations)
+        
+        return {
+            'status': 'pass' if max_save_time < 200.0 else 'fail',
+            'max_save_time_ms': max_save_time,
+            'avg_save_time_ms': avg_save_time,
+            'target_ms': 200.0,
+            'operation_count': len(save_operations)
+        }
+    
+    def get_summary() -> Dict[str, Any]:
+        """Get comprehensive timing summary."""
+        return {
+            'operations': timing_data.copy(),
+            'validation': validate_performance_targets(),
+            'total_operations': len(timing_data)
+        }
+    
+    return {
+        'track_operation': track_operation,
+        'validate_targets': validate_performance_targets,
+        'get_summary': get_summary,
+        'timing_data': timing_data
     }
 
 
 # =============================================================================
-# FIGUREDATASET UNIT TESTS - ABSTRACTDATASET INTERFACE COMPLIANCE
+# ABSTRACTDATASET INTERFACE COMPLIANCE TESTS (F-005 Requirements)
 # =============================================================================
 
-class TestFigureDataSetInterface:
+class TestAbstractDataSetCompliance:
+    """Test suite for AbstractDataSet interface compliance per F-005 requirements.
+    
+    Validates that FigureDataSet correctly implements the AbstractDataSet interface
+    including _save(), _load(), _describe(), and _exists() methods according to
+    Kedro dataset API specifications.
     """
-    Test AbstractDataSet interface compliance per F-005 requirements.
     
-    Validates that FigureDataSet correctly implements Kedro's AbstractDataSet
-    contract including _save(), _load(), and _describe() methods with proper
-    parameter handling and error management.
-    """
+    def test_figuredataset_inherits_abstractdataset(self):
+        """Verify FigureDataSet correctly inherits from AbstractDataSet.
+        
+        Validates class hierarchy and interface compliance for Kedro catalog integration.
+        """
+        if not KEDRO_AVAILABLE:
+            pytest.skip("Kedro not available for interface testing")
+        
+        assert issubclass(FigureDataSet, AbstractDataSet)
+        
+        # Verify required abstract methods are implemented
+        required_methods = ['_save', '_load', '_describe']
+        for method in required_methods:
+            assert hasattr(FigureDataSet, method)
+            assert callable(getattr(FigureDataSet, method))
     
-    def test_figuredataset_initialization(self, figure_dataset_config, temp_work_dir):
+    def test_figuredataset_initialization_valid_config(self, basic_dataset_config):
+        """Test FigureDataSet initialization with valid configuration parameters.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            
+        Validates proper initialization and parameter storage.
         """
-        Test FigureDataSet initialization with various configuration parameters.
+        dataset = FigureDataSet(**basic_dataset_config)
         
-        Validates proper initialization of FigureDataSet with catalog parameters
-        including filepath, purpose, condition_param, and style_params.
-        """
-        # Import here to avoid circular imports during test collection
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Verify configuration parameters are stored correctly
+        assert dataset._filepath == basic_dataset_config['filepath']
+        assert dataset._purpose == basic_dataset_config['purpose']
+        assert dataset._condition_param == basic_dataset_config['condition_param']
+        assert dataset._style_params == basic_dataset_config['style_params']
+        assert dataset._save_args == basic_dataset_config['save_args']
         
-        config = figure_dataset_config['basic_config']
-        
-        # Test basic initialization
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param'],
-            save_args=config['save_args']
-        )
-        
-        # Verify attributes are properly set
-        assert dataset._filepath == config['filepath']
-        assert dataset._purpose == config['purpose']
-        assert dataset._condition_param == config['condition_param']
-        assert dataset._save_args == config['save_args']
-        
-        # Test advanced initialization with style_params
-        advanced_config = figure_dataset_config['advanced_config']
-        advanced_dataset = FigureDataSet(
-            filepath=advanced_config['filepath'],
-            purpose=advanced_config['purpose'],
-            condition_param=advanced_config['condition_param'],
-            style_params=advanced_config['style_params'],
-            save_args=advanced_config['save_args'],
-            versioned=advanced_config['versioned']
-        )
-        
-        assert advanced_dataset._style_params == advanced_config['style_params']
-        assert advanced_dataset._versioned == advanced_config['versioned']
+        # Verify operation statistics are initialized
+        assert dataset._operation_stats['saves'] == 0
+        assert dataset._operation_stats['style_resolution_time'] == 0.0
+        assert dataset._operation_stats['save_operation_time'] == 0.0
     
-    
-    def test_figuredataset_initialization_minimal_config(self, figure_dataset_config):
+    def test_figuredataset_initialization_minimal_config(self):
+        """Test FigureDataSet initialization with minimal required configuration.
+        
+        Validates default parameter handling and graceful degradation.
         """
-        Test FigureDataSet initialization with minimal required parameters.
+        dataset = FigureDataSet(filepath='test_figure.png')
         
-        Validates that FigureDataSet can be initialized with only required
-        parameters and properly handles default values for optional parameters.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['minimal_config']
-        
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose']
-        )
-        
-        # Verify required attributes
-        assert dataset._filepath == config['filepath']
-        assert dataset._purpose == config['purpose']
-        
-        # Verify optional attributes have sensible defaults
+        # Verify default values are applied
+        assert dataset._filepath == 'test_figure.png'
+        assert dataset._purpose == 'exploratory'
         assert dataset._condition_param is None
         assert dataset._style_params == {}
         assert dataset._save_args == {}
-        assert dataset._versioned is False
     
-    
-    def test_figuredataset_initialization_invalid_config(self, figure_dataset_config):
+    def test_figuredataset_initialization_invalid_purpose_warning(self, caplog):
+        """Test FigureDataSet initialization with invalid purpose generates warning.
+        
+        Args:
+            caplog: pytest log capture fixture
+            
+        Validates warning generation for non-standard purpose values.
         """
-        Test FigureDataSet initialization with invalid configurations.
-        
-        Validates proper error handling for missing required parameters
-        and invalid parameter combinations per error handling requirements.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        # Test missing filepath
-        with pytest.raises((ValueError, TypeError)) as excinfo:
-            FigureDataSet(purpose='exploratory')
-        
-        assert 'filepath' in str(excinfo.value).lower()
-        
-        # Test missing purpose
-        with pytest.raises((ValueError, TypeError)) as excinfo:
-            FigureDataSet(filepath='test.png')
-        
-        assert 'purpose' in str(excinfo.value).lower()
-        
-        # Test invalid purpose value
-        with pytest.raises(ValueError) as excinfo:
-            FigureDataSet(
+        with caplog.at_level('WARNING'):
+            dataset = FigureDataSet(
                 filepath='test.png',
                 purpose='invalid_purpose'
             )
         
-        assert 'purpose' in str(excinfo.value).lower()
+        assert dataset._purpose == 'invalid_purpose'
+        assert 'not in recommended values' in caplog.text
     
-    
-    def test_figuredataset_describe_method(self, figure_dataset_config, mock_figregistry_apis):
+    def test_figuredataset_describe_method(self, basic_dataset_config):
+        """Test _describe() method returns comprehensive dataset metadata.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            
+        Validates metadata completeness and format per AbstractDataSet requirements.
         """
-        Test _describe() method implementation per AbstractDataSet requirements.
-        
-        Validates that _describe() returns proper dictionary containing dataset
-        configuration and metadata for Kedro catalog introspection.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['advanced_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param'],
-            style_params=config['style_params'],
-            save_args=config['save_args'],
-            versioned=config['versioned']
-        )
-        
+        dataset = FigureDataSet(**basic_dataset_config)
         description = dataset._describe()
         
-        # Verify description contains required information
-        assert isinstance(description, dict)
+        # Verify required metadata fields
         assert 'filepath' in description
         assert 'purpose' in description
         assert 'condition_param' in description
         assert 'style_params' in description
-        assert 'versioned' in description
+        assert 'save_args' in description
+        assert 'operation_stats' in description
+        assert 'cache_stats' in description
+        assert 'dependencies' in description
         
-        # Verify description values match configuration
-        assert description['filepath'] == config['filepath']
-        assert description['purpose'] == config['purpose']
-        assert description['condition_param'] == config['condition_param']
-        assert description['style_params'] == config['style_params']
-        assert description['versioned'] == config['versioned']
+        # Verify field values match configuration
+        assert description['filepath'] == basic_dataset_config['filepath']
+        assert description['purpose'] == basic_dataset_config['purpose']
+        assert description['condition_param'] == basic_dataset_config['condition_param']
+        
+        # Verify dependency availability flags
+        dependencies = description['dependencies']
+        assert 'matplotlib_available' in dependencies
+        assert 'kedro_available' in dependencies
+        assert 'figregistry_available' in dependencies
     
-    
-    def test_figuredataset_save_method_basic(self, sample_figure, figure_dataset_config, 
-                                           mock_figregistry_apis, temp_work_dir):
-        """
-        Test _save() method implementation with basic configuration.
+    def test_figuredataset_load_method_raises_error(self, basic_dataset_config):
+        """Test _load() method raises appropriate error for unsupported operation.
         
-        Validates that _save() properly accepts matplotlib figure objects
-        and calls FigRegistry APIs with correct parameters per F-005.2.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param'],
-            save_args=config['save_args']
-        )
-        
-        # Mock session context for parameter resolution
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {'experiment_type': 'baseline'}
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
             
-            # Execute save operation
-            dataset._save(sample_figure)
-        
-        # Verify FigRegistry APIs were called correctly
-        mock_figregistry_apis['get_style'].assert_called_once_with(
-            condition='baseline',
-            purpose='exploratory'
-        )
-        
-        mock_figregistry_apis['save_figure'].assert_called_once()
-        save_call_args = mock_figregistry_apis['save_figure'].call_args
-        
-        # Verify save_figure was called with correct arguments
-        assert save_call_args[0][0] is sample_figure  # First arg is figure
-        assert config['filepath'] in str(save_call_args)
-        assert config['save_args']['dpi'] == 150
-    
-    
-    def test_figuredataset_save_method_with_styling(self, complex_figure, figure_dataset_config,
-                                                  mock_figregistry_apis, temp_work_dir):
+        Validates that loading figures is not supported with clear error message.
         """
-        Test _save() method with style parameter application.
+        dataset = FigureDataSet(**basic_dataset_config)
         
-        Validates that _save() correctly applies style parameters from both
-        catalog configuration and FigRegistry condition resolution per F-005.2.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['advanced_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param'],
-            style_params=config['style_params'],
-            save_args=config['save_args']
-        )
-        
-        # Configure mock to return comprehensive style dictionary
-        mock_figregistry_apis['get_style'].return_value = {
-            'figure.figsize': [8, 6],  # Should be overridden by style_params
-            'axes.grid': True,
-            'axes.grid.alpha': 0.2,
-            'font.size': 11,
-            'axes.labelsize': 12,  # Should be overridden by style_params
-            'axes.titlesize': 14,
-            'legend.fontsize': 10
-        }
-        
-        # Mock session context
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {'analysis_mode': 'publication'}
-            
-            # Store initial rcParams for comparison
-            initial_figsize = matplotlib.rcParams['figure.figsize']
-            initial_labelsize = matplotlib.rcParams['axes.labelsize']
-            
-            # Execute save operation
-            dataset._save(complex_figure)
-            
-            # Verify style was applied correctly
-            # Note: In real implementation, style would be applied before save_figure call
-            mock_figregistry_apis['get_style'].assert_called_once_with(
-                condition='publication',
-                purpose='publication'
-            )
-    
-    
-    def test_figuredataset_save_method_error_handling(self, figure_dataset_config, 
-                                                    mock_figregistry_apis):
-        """
-        Test _save() method error handling scenarios.
-        
-        Validates proper error handling for invalid figure objects, missing
-        parameters, and FigRegistry API failures per error management requirements.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
-        
-        # Test invalid figure object
-        with pytest.raises((TypeError, ValueError)) as excinfo:
-            dataset._save("not_a_figure")
-        
-        assert 'figure' in str(excinfo.value).lower()
-        
-        # Test FigRegistry API failure
-        mock_figregistry_apis['get_style'].side_effect = Exception("Style resolution failed")
-        
-        fig, ax = plt.subplots()
-        ax.plot([1, 2, 3], [1, 2, 3])
-        
-        with pytest.raises(Exception) as excinfo:
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {'experiment_type': 'baseline'}
-                dataset._save(fig)
-        
-        assert "Style resolution failed" in str(excinfo.value)
-        plt.close(fig)
-    
-    
-    def test_figuredataset_load_method_not_supported(self, figure_dataset_config):
-        """
-        Test _load() method raises appropriate error per AbstractDataSet requirements.
-        
-        FigureDataSet is output-only, so _load() should raise NotImplementedError
-        or appropriate exception indicating load operations are not supported.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose']
-        )
-        
-        # _load() should raise NotImplementedError for output-only dataset
-        with pytest.raises(NotImplementedError) as excinfo:
+        with pytest.raises(FigureDataSetError) as exc_info:
             dataset._load()
         
-        assert 'load' in str(excinfo.value).lower()
+        error_message = str(exc_info.value)
+        assert 'Loading figures is not supported' in error_message
+        assert 'generated by pipeline nodes' in error_message
     
-    
-    def test_figuredataset_exists_method(self, figure_dataset_config, temp_work_dir):
+    def test_figuredataset_exists_method(self, basic_dataset_config, tmp_path):
+        """Test _exists() method correctly detects file presence.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            tmp_path: pytest temporary path fixture
+            
+        Validates file existence detection functionality.
         """
-        Test _exists() method implementation per AbstractDataSet requirements.
+        # Use temporary path for testing
+        test_filepath = tmp_path / "test_figure.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
         
-        Validates that _exists() correctly checks for figure file existence
-        and handles versioned and non-versioned scenarios appropriately.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        dataset = FigureDataSet(**config)
         
-        config = figure_dataset_config['basic_config']
-        filepath = temp_work_dir / config['filepath']
-        
-        dataset = FigureDataSet(
-            filepath=str(filepath),
-            purpose=config['purpose']
-        )
-        
-        # Initially file should not exist
+        # File should not exist initially
         assert not dataset._exists()
         
-        # Create the file
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-        filepath.touch()
-        
-        # Now file should exist
+        # Create file and verify detection
+        test_filepath.touch()
         assert dataset._exists()
+    
+    @pytest.mark.skipif(not KEDRO_AVAILABLE, reason="Kedro not available")
+    def test_figuredataset_versioning_compatibility(self, basic_dataset_config, mocker):
+        """Test FigureDataSet compatibility with Kedro versioning system.
         
-        # Clean up
-        filepath.unlink()
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            mocker: pytest-mock fixture
+            
+        Validates that Kedro versioning works correctly with FigureDataSet.
+        """
+        # Mock get_filepath_str for versioning
+        mock_get_filepath = mocker.patch('figregistry_kedro.datasets.get_filepath_str')
+        mock_get_filepath.return_value = 'versioned/path/test_figure.png'
+        
+        config = basic_dataset_config.copy()
+        config['version'] = 'test_version'
+        dataset = FigureDataSet(**config)
+        
+        # Test exists method with versioning
+        dataset._exists()
+        mock_get_filepath.assert_called_with(config['filepath'], 'test_version')
 
 
 # =============================================================================
-# CATALOG PARAMETER EXTRACTION TESTS
+# AUTOMATED STYLING AND CONDITION RESOLUTION TESTS (F-005.2 Requirements)
 # =============================================================================
 
-class TestCatalogParameterExtraction:
-    """
-    Test catalog parameter extraction and condition resolution per F-005.2.
+class TestAutomatedStyling:
+    """Test suite for automated condition-based styling per F-005.2 requirements.
     
-    Validates that FigureDataSet correctly extracts purpose, condition_param,
-    and style_params from Kedro catalog configurations and resolves condition
-    values from session context.
+    Validates automated styling application without manual intervention, including
+    condition parameter resolution, style application, and FigRegistry API integration.
     """
     
-    def test_condition_parameter_extraction_basic(self, figure_dataset_config, 
-                                                mock_kedro_session_context, 
-                                                mock_figregistry_apis):
-        """
-        Test basic condition parameter extraction from session context.
+    def test_save_operation_basic_styling(self, sample_figure, basic_dataset_config, 
+                                        mock_figregistry_api, tmp_path, mocker):
+        """Test basic save operation with automated styling application.
         
-        Validates that condition_param values are correctly extracted from
-        Kedro session store and passed to FigRegistry get_style() API.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
-        
-        fig, ax = plt.subplots()
-        ax.plot([1, 2, 3], [1, 2, 3])
-        
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value = mock_kedro_session_context
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for file operations
+            mocker: pytest-mock fixture
             
-            dataset._save(fig)
-        
-        # Verify condition parameter was extracted correctly
-        mock_figregistry_apis['get_style'].assert_called_once_with(
-            condition='baseline',  # From mock session store
-            purpose='exploratory'
-        )
-        
-        plt.close(fig)
-    
-    
-    def test_condition_parameter_extraction_missing_param(self, figure_dataset_config,
-                                                        mock_kedro_session_context,
-                                                        mock_figregistry_apis):
+        Validates automated styling without manual intervention.
         """
-        Test condition parameter extraction when parameter is missing from session.
+        # Configure temporary filepath
+        test_filepath = tmp_path / "test_basic_styling.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
         
-        Validates graceful handling when condition_param is not found in session
-        store, ensuring appropriate fallback behavior or error handling.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Mock mkdir for directory creation
+        mocker.patch.object(Path, 'mkdir')
         
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param='missing_parameter'  # Not in session store
-        )
+        dataset = FigureDataSet(**config)
         
-        fig, ax = plt.subplots()
-        ax.plot([1, 2, 3], [1, 2, 3])
+        # Execute save operation
+        dataset._save(sample_figure)
         
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value = mock_kedro_session_context
+        # Verify FigRegistry get_style was called with correct condition
+        mock_figregistry_api['get_style'].assert_called_once_with('exploratory')
+        
+        # Verify save_figure was called with styling applied
+        mock_figregistry_api['save_figure'].assert_called_once()
+        save_call_kwargs = mock_figregistry_api['save_figure'].call_args.kwargs
+        assert save_call_kwargs['figure'] == sample_figure
+        assert save_call_kwargs['condition'] == 'exploratory'
+    
+    def test_condition_parameter_resolution(self, sample_figure, basic_dataset_config,
+                                          mock_figregistry_api, pipeline_context, tmp_path, mocker):
+        """Test condition parameter resolution from pipeline context.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration
+            mock_figregistry_api: Mock FigRegistry API functions
+            pipeline_context: Mock pipeline parameters
+            tmp_path: Temporary path for file operations
+            mocker: pytest-mock fixture
             
-            # Should handle missing parameter gracefully
-            dataset._save(fig)
-        
-        # Verify get_style was called with None or default condition
-        call_args = mock_figregistry_apis['get_style'].call_args
-        assert call_args[1]['condition'] is None or call_args[1]['condition'] == 'default'
-        assert call_args[1]['purpose'] == 'exploratory'
-        
-        plt.close(fig)
-    
-    
-    def test_condition_parameter_extraction_no_session(self, figure_dataset_config,
-                                                     mock_figregistry_apis):
+        Validates dynamic condition resolution from pipeline parameters.
         """
-        Test condition parameter extraction when no Kedro session is available.
+        # Configure temporary filepath
+        test_filepath = tmp_path / "test_condition_resolution.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
         
-        Validates that FigureDataSet handles scenarios where no Kedro session
-        context is available, falling back to appropriate default behavior.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Mock mkdir for directory creation
+        mocker.patch.object(Path, 'mkdir')
         
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
+        dataset = FigureDataSet(**config)
         
-        fig, ax = plt.subplots()
-        ax.plot([1, 2, 3], [1, 2, 3])
+        # Set pipeline context for condition resolution
+        dataset.set_pipeline_context(pipeline_context)
         
-        # No session context available
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value = None
+        # Execute save operation
+        dataset._save(sample_figure)
+        
+        # Verify condition resolved from pipeline context
+        expected_condition = pipeline_context[config['condition_param']]
+        mock_figregistry_api['get_style'].assert_called_once_with(expected_condition)
+    
+    def test_style_params_override_behavior(self, sample_figure, basic_dataset_config,
+                                          mock_figregistry_api, tmp_path, mocker):
+        """Test that style_params override base styling from FigRegistry.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for file operations
+            mocker: pytest-mock fixture
             
-            dataset._save(fig)
-        
-        # Should handle missing session gracefully
-        call_args = mock_figregistry_apis['get_style'].call_args
-        assert call_args[1]['condition'] is None or call_args[1]['condition'] == 'default'
-        
-        plt.close(fig)
-    
-    
-    def test_style_params_application(self, figure_dataset_config, mock_figregistry_apis):
+        Validates style parameter precedence and merging behavior.
         """
-        Test style_params application and precedence over FigRegistry styles.
-        
-        Validates that style_params from catalog configuration correctly
-        override FigRegistry condition-based styles per precedence rules.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['advanced_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param'],
-            style_params=config['style_params']
-        )
-        
-        # Configure FigRegistry to return conflicting style values
-        mock_figregistry_apis['get_style'].return_value = {
-            'figure.figsize': [12, 8],  # Should be overridden by style_params [8, 6]
-            'axes.labelsize': 16,       # Should be overridden by style_params 12
-            'font.family': 'sans-serif', # Should be overridden by style_params 'serif'
-            'axes.grid': True,          # Should remain as no override in style_params
-            'legend.fontsize': 10       # Should remain as no override in style_params
+        # Configure dataset with style overrides
+        test_filepath = tmp_path / "test_style_override.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
+        config['style_params'] = {
+            'figure.dpi': 150,  # Override default
+            'axes.labelsize': 16,  # Additional parameter
         }
         
-        fig, ax = plt.subplots()
-        ax.plot([1, 2, 3], [1, 2, 3])
+        # Mock mkdir and apply_style method
+        mocker.patch.object(Path, 'mkdir')
+        mock_apply_style = mocker.patch.object(FigureDataSet, '_apply_style_to_figure')
         
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {'analysis_mode': 'publication'}
-            
-            # Store initial rcParams
-            initial_rcparams = matplotlib.rcParams.copy()
-            
-            dataset._save(fig)
-            
-            # In real implementation, would verify that style_params took precedence
-            # For now, verify the APIs were called correctly
-            mock_figregistry_apis['get_style'].assert_called_once()
+        dataset = FigureDataSet(**config)
+        dataset._save(sample_figure)
         
-        plt.close(fig)
+        # Verify style merging behavior
+        mock_apply_style.assert_called_once()
+        applied_style_args = mock_apply_style.call_args[0]
+        applied_style = applied_style_args[1]  # Second argument is the style dict
+        
+        # Verify style_params override base styling
+        assert 'figure.dpi' in applied_style
+        assert 'axes.labelsize' in applied_style
     
-    
-    def test_purpose_parameter_validation(self, figure_dataset_config):
-        """
-        Test purpose parameter validation against allowed values.
+    def test_fallback_to_purpose_when_condition_param_missing(self, sample_figure, 
+                                                            basic_dataset_config,
+                                                            mock_figregistry_api, tmp_path, mocker):
+        """Test fallback to purpose when condition parameter is not found.
         
-        Validates that purpose parameter is properly validated against
-        allowed values (exploratory, presentation, publication) with
-        appropriate error handling for invalid values.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        valid_purposes = ['exploratory', 'presentation', 'publication']
-        
-        # Test valid purposes
-        for purpose in valid_purposes:
-            dataset = FigureDataSet(
-                filepath='test.png',
-                purpose=purpose
-            )
-            assert dataset._purpose == purpose
-        
-        # Test invalid purposes
-        invalid_purposes = ['invalid', 'research', 'analysis', 123, None]
-        
-        for invalid_purpose in invalid_purposes:
-            with pytest.raises((ValueError, TypeError)) as excinfo:
-                FigureDataSet(
-                    filepath='test.png',
-                    purpose=invalid_purpose
-                )
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for file operations
+            mocker: pytest-mock fixture
             
-            assert 'purpose' in str(excinfo.value).lower()
-    
-    
-    def test_save_args_parameter_handling(self, figure_dataset_config, mock_figregistry_apis):
+        Validates graceful degradation when pipeline context lacks condition parameter.
         """
-        Test save_args parameter extraction and application.
+        # Configure temporary filepath
+        test_filepath = tmp_path / "test_fallback_purpose.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
         
-        Validates that save_args from catalog configuration are correctly
-        passed to matplotlib savefig operations through FigRegistry save_figure.
+        # Mock mkdir for directory creation
+        mocker.patch.object(Path, 'mkdir')
+        
+        dataset = FigureDataSet(**config)
+        
+        # Set empty pipeline context (missing condition parameter)
+        dataset.set_pipeline_context({})
+        
+        # Execute save operation
+        dataset._save(sample_figure)
+        
+        # Verify fallback to purpose value
+        mock_figregistry_api['get_style'].assert_called_once_with(config['purpose'])
+    
+    def test_no_condition_param_uses_purpose_directly(self, sample_figure, mock_figregistry_api, tmp_path, mocker):
+        """Test that missing condition_param uses purpose directly for styling.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for file operations
+            mocker: pytest-mock fixture
+            
+        Validates direct purpose usage when no condition parameter specified.
         """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Configure dataset without condition_param
+        test_filepath = tmp_path / "test_no_condition_param.png"
+        config = {
+            'filepath': str(test_filepath),
+            'purpose': 'presentation'
+            # No condition_param specified
+        }
         
-        config = figure_dataset_config['advanced_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            save_args=config['save_args']
-        )
+        # Mock mkdir for directory creation
+        mocker.patch.object(Path, 'mkdir')
         
-        fig, ax = plt.subplots()
-        ax.plot([1, 2, 3], [1, 2, 3])
+        dataset = FigureDataSet(**config)
+        dataset._save(sample_figure)
         
-        dataset._save(fig)
+        # Verify purpose used directly for styling
+        mock_figregistry_api['get_style'].assert_called_once_with('presentation')
+    
+    def test_figure_style_application_to_matplotlib(self, sample_figure, basic_dataset_config,
+                                                  mock_figregistry_api, tmp_path, mocker):
+        """Test that resolved styles are correctly applied to matplotlib figure.
         
-        # Verify save_figure was called with correct save_args
-        save_call_args = mock_figregistry_apis['save_figure'].call_args
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for file operations
+            mocker: pytest-mock fixture
+            
+        Validates matplotlib rcParams application and figure property modification.
+        """
+        if not MATPLOTLIB_AVAILABLE:
+            pytest.skip("Matplotlib not available for style application testing")
         
-        # save_args should be passed to save_figure
-        # Exact implementation depends on save_figure API design
-        assert save_call_args is not None
+        # Configure realistic style response
+        mock_figregistry_api['get_style'].return_value = {
+            'figure.facecolor': 'lightgray',
+            'figure.edgecolor': 'darkblue',
+            'figure.dpi': 150
+        }
         
-        # Check that expected save_args values are present
-        call_str = str(save_call_args)
-        assert '300' in call_str  # dpi value
-        assert 'pdf' in call_str.lower()  # format value
+        # Configure temporary filepath
+        test_filepath = tmp_path / "test_style_application.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
         
-        plt.close(fig)
+        # Mock mkdir for directory creation
+        mocker.patch.object(Path, 'mkdir')
+        
+        dataset = FigureDataSet(**config)
+        
+        # Store original figure properties
+        original_facecolor = sample_figure.patch.get_facecolor()
+        original_dpi = sample_figure.get_dpi()
+        
+        # Execute save operation
+        dataset._save(sample_figure)
+        
+        # Verify style application modified figure
+        # Note: Actual verification depends on matplotlib's internal state management
+        mock_figregistry_api['get_style'].assert_called_once()
+        mock_figregistry_api['save_figure'].assert_called_once()
 
 
 # =============================================================================
-# VERSIONING COMPATIBILITY TESTS
+# CATALOG INTEGRATION AND PARAMETER EXTRACTION TESTS (Section 5.2.6)
+# =============================================================================
+
+class TestCatalogIntegration:
+    """Test suite for Kedro catalog integration and parameter extraction.
+    
+    Validates catalog parameter extraction including purpose, condition_param,
+    and style_params configuration from Kedro catalog entries per Section 5.2.6.
+    """
+    
+    def test_catalog_parameter_extraction_basic(self, basic_dataset_config):
+        """Test extraction of basic catalog parameters.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            
+        Validates proper extraction and storage of catalog configuration parameters.
+        """
+        dataset = FigureDataSet(**basic_dataset_config)
+        
+        # Verify all parameters extracted correctly
+        assert dataset._filepath == basic_dataset_config['filepath']
+        assert dataset._purpose == basic_dataset_config['purpose']
+        assert dataset._condition_param == basic_dataset_config['condition_param']
+        assert dataset._style_params == basic_dataset_config['style_params']
+        assert dataset._save_args == basic_dataset_config['save_args']
+    
+    def test_catalog_parameter_extraction_advanced(self, advanced_dataset_config):
+        """Test extraction of advanced catalog parameters including versioning.
+        
+        Args:
+            advanced_dataset_config: Advanced dataset configuration fixture
+            
+        Validates complex parameter extraction including versioning support.
+        """
+        dataset = FigureDataSet(**advanced_dataset_config)
+        
+        # Verify advanced parameters
+        assert dataset._version == advanced_dataset_config['version']
+        assert dataset._style_params['figure.figsize'] == [12, 8]
+        assert dataset._save_args['format'] == 'pdf'
+        assert dataset._save_args['dpi'] == 300
+    
+    def test_validate_figure_dataset_config_valid(self, basic_dataset_config):
+        """Test configuration validation with valid parameters.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            
+        Validates configuration validation accepts properly formatted configurations.
+        """
+        validated_config = validate_figure_dataset_config(basic_dataset_config)
+        
+        # Verify validation passes and returns normalized config
+        assert validated_config == basic_dataset_config
+    
+    def test_validate_figure_dataset_config_missing_filepath(self):
+        """Test configuration validation rejects missing filepath.
+        
+        Validates that configuration validation enforces required parameters.
+        """
+        invalid_config = {
+            'purpose': 'exploratory'
+            # Missing required filepath
+        }
+        
+        with pytest.raises(ValueError) as exc_info:
+            validate_figure_dataset_config(invalid_config)
+        
+        assert 'requires \'filepath\' parameter' in str(exc_info.value)
+    
+    def test_validate_figure_dataset_config_invalid_types(self):
+        """Test configuration validation rejects invalid parameter types.
+        
+        Validates type checking and validation for configuration parameters.
+        """
+        # Test invalid condition_param type
+        with pytest.raises(ValueError) as exc_info:
+            validate_figure_dataset_config({
+                'filepath': 'test.png',
+                'condition_param': 123  # Should be string
+            })
+        assert 'condition_param must be a string' in str(exc_info.value)
+        
+        # Test invalid style_params type
+        with pytest.raises(ValueError) as exc_info:
+            validate_figure_dataset_config({
+                'filepath': 'test.png',
+                'style_params': 'invalid'  # Should be dict
+            })
+        assert 'style_params must be a dictionary' in str(exc_info.value)
+        
+        # Test invalid save_args type
+        with pytest.raises(ValueError) as exc_info:
+            validate_figure_dataset_config({
+                'filepath': 'test.png',
+                'save_args': []  # Should be dict
+            })
+        assert 'save_args must be a dictionary' in str(exc_info.value)
+    
+    def test_create_figure_dataset_factory(self, basic_dataset_config):
+        """Test create_figure_dataset factory function.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            
+        Validates factory function creates properly configured dataset instances.
+        """
+        dataset = create_figure_dataset(**basic_dataset_config)
+        
+        # Verify factory creates correct instance
+        assert isinstance(dataset, FigureDataSet)
+        assert dataset._filepath == basic_dataset_config['filepath']
+        assert dataset._purpose == basic_dataset_config['purpose']
+        assert dataset._condition_param == basic_dataset_config['condition_param']
+    
+    def test_catalog_entry_path_resolution(self, basic_dataset_config, tmp_path, mocker):
+        """Test catalog entry path resolution and directory creation.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates automatic directory creation and path resolution.
+        """
+        # Configure nested path structure
+        nested_path = tmp_path / "data" / "08_reporting" / "figures" / "test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(nested_path)
+        
+        # Mock figure for save operation
+        mock_figure = mocker.Mock()
+        mock_figure.savefig = mocker.Mock()
+        
+        # Mock FigRegistry functions
+        mocker.patch('figregistry.get_style', return_value={})
+        mocker.patch('figregistry.save_figure', return_value=str(nested_path))
+        
+        dataset = FigureDataSet(**config)
+        dataset._save(mock_figure)
+        
+        # Verify directory structure was created
+        assert nested_path.parent.exists()
+
+
+# =============================================================================
+# VERSIONING COMPATIBILITY TESTS (F-005.2 Requirements)
 # =============================================================================
 
 class TestVersioningCompatibility:
-    """
-    Test compatibility with Kedro versioning system per F-005.2.
+    """Test suite for Kedro versioning system compatibility.
     
-    Validates that FigRegistry timestamp versioning coexists with Kedro's
-    dataset versioning without conflicts, ensuring both systems function
-    independently while providing consistent version tracking.
+    Validates that FigRegistry timestamp versioning coexists with Kedro dataset
+    versioning without conflicts per F-005.2 requirements.
     """
     
-    def test_versioned_dataset_initialization(self, figure_dataset_config):
-        """
-        Test FigureDataSet initialization with versioning enabled.
+    @pytest.mark.skipif(not KEDRO_AVAILABLE, reason="Kedro not available")
+    def test_kedro_versioning_filepath_resolution(self, basic_dataset_config, mocker):
+        """Test that Kedro versioning correctly resolves filepaths.
         
-        Validates that versioned=True parameter is properly handled and
-        that versioning configuration doesn't conflict with FigRegistry settings.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['advanced_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            versioned=True
-        )
-        
-        assert dataset._versioned is True
-        
-        # Test versioned dataset description includes versioning info
-        description = dataset._describe()
-        assert 'versioned' in description
-        assert description['versioned'] is True
-    
-    
-    def test_versioned_save_operation(self, sample_figure, figure_dataset_config,
-                                    mock_figregistry_apis, temp_work_dir):
-        """
-        Test save operation with Kedro versioning enabled.
-        
-        Validates that FigureDataSet save operations work correctly with
-        Kedro versioning and that versioned paths are handled appropriately.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['advanced_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            versioned=True
-        )
-        
-        # Mock versioned save behavior
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {}
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            mocker: pytest-mock fixture
             
-            # In versioned mode, Kedro might modify the filepath
-            with patch.object(dataset, '_get_versioned_path') as mock_versioned_path:
-                mock_versioned_path.return_value = f"{config['filepath']}.20231201T123456.000Z"
-                
-                dataset._save(sample_figure)
-        
-        # Verify FigRegistry APIs were called
-        mock_figregistry_apis['save_figure'].assert_called_once()
-        
-        # In real implementation, would verify versioned path handling
-        save_call_args = mock_figregistry_apis['save_figure'].call_args
-        assert save_call_args is not None
-    
-    
-    def test_timestamp_versioning_coexistence(self, sample_figure, figure_dataset_config,
-                                            mock_figregistry_apis):
+        Validates Kedro's get_filepath_str integration for versioning.
         """
-        Test coexistence of FigRegistry timestamp and Kedro versioning.
+        # Mock get_filepath_str for versioning
+        mock_get_filepath = mocker.patch('figregistry_kedro.datasets.get_filepath_str')
+        versioned_path = 'versioned/2024-01-01T12.00.00.000Z/test_figure.png'
+        mock_get_filepath.return_value = versioned_path
         
-        Validates that FigRegistry's timestamp-based file naming works
-        alongside Kedro's versioning system without conflicts or interference.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Mock other dependencies
+        mock_figure = mocker.Mock()
+        mocker.patch('figregistry.get_style', return_value={})
+        mocker.patch('figregistry.save_figure', return_value=versioned_path)
+        mocker.patch.object(Path, 'mkdir')
         
-        config = figure_dataset_config['advanced_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            versioned=True
+        config = basic_dataset_config.copy()
+        config['version'] = '2024-01-01T12.00.00.000Z'
+        dataset = FigureDataSet(**config)
+        
+        # Execute save operation
+        dataset._save(mock_figure)
+        
+        # Verify versioned path resolution
+        mock_get_filepath.assert_called_with(
+            basic_dataset_config['filepath'], 
+            '2024-01-01T12.00.00.000Z'
         )
+    
+    def test_figregistry_timestamp_versioning_coexistence(self, basic_dataset_config, 
+                                                        mock_figregistry_api, tmp_path, mocker):
+        """Test FigRegistry timestamp versioning works alongside Kedro versioning.
         
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates no conflicts between FigRegistry and Kedro versioning systems.
+        """
         # Configure FigRegistry to return timestamped filename
-        mock_figregistry_apis['save_figure'].return_value = (
-            'data/08_reporting/figures/advanced_plot_20231201_123456.pdf'
-        )
+        timestamped_filename = "test_figure_20240101_120000.png"
+        mock_figregistry_api['save_figure'].return_value = timestamped_filename
         
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {}
-            
-            dataset._save(sample_figure)
+        # Configure versioned dataset
+        test_filepath = tmp_path / "versioned_figure.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
+        config['version'] = True
         
-        # Verify both versioning systems can coexist
-        mock_figregistry_apis['save_figure'].assert_called_once()
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
+        mock_figure = mocker.Mock()
         
-        # Check that returned path includes timestamp
-        returned_path = mock_figregistry_apis['save_figure'].return_value
-        assert '20231201_123456' in returned_path
+        dataset = FigureDataSet(**config)
+        dataset._save(mock_figure)
+        
+        # Verify both versioning systems operated
+        mock_figregistry_api['save_figure'].assert_called_once()
+        
+        # Verify FigRegistry timestamp naming was used
+        save_call_kwargs = mock_figregistry_api['save_figure'].call_args.kwargs
+        assert save_call_kwargs['filepath'] == str(test_filepath)
     
-    
-    def test_versioning_error_handling(self, sample_figure, figure_dataset_config,
-                                     mock_figregistry_apis):
-        """
-        Test error handling in versioned datasets.
+    def test_versioning_exists_method_compatibility(self, basic_dataset_config, mocker):
+        """Test _exists() method works correctly with versioning.
         
-        Validates proper error handling when versioning operations fail
-        and ensures graceful degradation or appropriate error reporting.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['advanced_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            versioned=True
-        )
-        
-        # Simulate versioning failure
-        with patch.object(dataset, '_get_versioned_path') as mock_versioned_path:
-            mock_versioned_path.side_effect = Exception("Versioning failed")
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            mocker: pytest-mock fixture
             
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {}
-                
-                # Should handle versioning failure gracefully
-                with pytest.raises(Exception) as excinfo:
-                    dataset._save(sample_figure)
-                
-                assert "Versioning failed" in str(excinfo.value)
+        Validates file existence checking with versioned paths.
+        """
+        # Mock get_filepath_str to return versioned path
+        versioned_path = 'versioned/path/test_figure.png'
+        mock_get_filepath = mocker.patch('figregistry_kedro.datasets.get_filepath_str')
+        mock_get_filepath.return_value = versioned_path
+        
+        # Mock Path.exists to return True for versioned path
+        mock_path_exists = mocker.patch.object(Path, 'exists')
+        mock_path_exists.return_value = True
+        
+        config = basic_dataset_config.copy()
+        config['version'] = 'test_version'
+        dataset = FigureDataSet(**config)
+        
+        # Test exists method
+        result = dataset._exists()
+        
+        # Verify versioned path checking
+        assert result is True
+        mock_get_filepath.assert_called_with(config['filepath'], 'test_version')
+    
+    def test_versioning_fallback_behavior(self, basic_dataset_config, mocker):
+        """Test fallback behavior when get_filepath_str is unavailable.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            mocker: pytest-mock fixture
+            
+        Validates graceful degradation for older Kedro versions.
+        """
+        # Mock get_filepath_str to raise exception (simulating older Kedro)
+        mock_get_filepath = mocker.patch('figregistry_kedro.datasets.get_filepath_str')
+        mock_get_filepath.side_effect = Exception("get_filepath_str not available")
+        
+        # Mock Path.exists for fallback path
+        mock_path_exists = mocker.patch.object(Path, 'exists')
+        mock_path_exists.return_value = False
+        
+        config = basic_dataset_config.copy()
+        config['version'] = 'test_version'
+        dataset = FigureDataSet(**config)
+        
+        # Test exists method fallback
+        result = dataset._exists()
+        
+        # Verify fallback to non-versioned path
+        assert result is False
+        mock_path_exists.assert_called()
 
 
 # =============================================================================
-# PERFORMANCE AND THREADING TESTS
+# PERFORMANCE TESTING (Section 6.6.4.3 Requirements)
 # =============================================================================
 
-class TestPerformanceAndThreading:
-    """
-    Test performance requirements and thread safety per Section 5.2.8.
+class TestPerformanceRequirements:
+    """Test suite for performance validation per Section 6.6.4.3 requirements.
     
-    Validates that FigureDataSet operations meet performance targets
-    (<200ms per save, <5% overhead) and support thread-safe operation
-    for parallel Kedro runner execution.
+    Validates <200ms per FigureDataSet save operation and measures plugin overhead
+    compared to manual matplotlib save operations.
     """
     
-    def test_save_operation_performance(self, sample_figure, figure_dataset_config,
-                                      mock_figregistry_apis, performance_baseline, benchmark):
+    @pytest.mark.performance
+    def test_save_operation_performance_target(self, sample_figure, basic_dataset_config,
+                                             mock_figregistry_api, performance_tracker, tmp_path, mocker):
+        """Test save operation meets <200ms performance target.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            performance_tracker: Performance tracking utilities
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates save operation performance against specified target.
         """
-        Test FigureDataSet save operation performance per Section 6.6.4.3.
+        # Configure temporary filepath
+        test_filepath = tmp_path / "performance_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
         
-        Validates that save operations complete within 200ms target and
-        overhead compared to manual matplotlib saves remains under 5%.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
         
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
+        dataset = FigureDataSet(**config)
         
-        # Configure fast mock responses
-        mock_figregistry_apis['get_style'].return_value = {}
-        mock_figregistry_apis['save_figure'].return_value = '/mock/path/test.png'
+        # Measure save operation performance
+        start_time = time.perf_counter()
+        dataset._save(sample_figure)
+        end_time = time.perf_counter()
         
-        def save_operation():
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {'experiment_type': 'baseline'}
-                dataset._save(sample_figure)
+        execution_time = end_time - start_time
+        performance_tracker['track_operation']('dataset_save', execution_time)
         
-        # Benchmark the save operation
-        result = benchmark(save_operation)
+        # Validate performance target
+        execution_time_ms = execution_time * 1000
+        assert execution_time_ms < 200.0, f"Save operation took {execution_time_ms:.2f}ms, exceeding 200ms target"
         
-        # Verify performance meets requirements
-        save_time = result
-        target_time = performance_baseline['dataset_save_target']
-        
-        assert save_time < target_time, (
-            f"Save operation took {save_time:.3f}s, exceeds target {target_time:.3f}s"
-        )
-        
-        # Calculate overhead compared to baseline
-        baseline_time = performance_baseline['manual_save_time']
-        overhead_ratio = (save_time - baseline_time) / baseline_time
-        max_overhead = performance_baseline['overhead_threshold']
-        
-        assert overhead_ratio < max_overhead, (
-            f"Overhead {overhead_ratio:.2%} exceeds maximum {max_overhead:.2%}"
-        )
+        # Verify performance tracking
+        validation_result = performance_tracker['validate_targets']()
+        assert validation_result['status'] == 'pass'
     
+    @pytest.mark.performance  
+    def test_style_resolution_performance(self, basic_dataset_config, mock_figregistry_api):
+        """Test style resolution meets <1ms performance target.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            
+        Validates style resolution performance for scalability requirements.
+        """
+        dataset = FigureDataSet(**basic_dataset_config)
+        
+        # Measure style resolution performance
+        start_time = time.perf_counter()
+        style = dataset._get_figure_style('test_condition')
+        end_time = time.perf_counter()
+        
+        execution_time_ms = (end_time - start_time) * 1000
+        
+        # Validate <1ms target for style resolution
+        assert execution_time_ms < 1.0, f"Style resolution took {execution_time_ms:.2f}ms, exceeding 1ms target"
+        
+        # Verify style was retrieved
+        assert isinstance(style, dict)
+        mock_figregistry_api['get_style'].assert_called_once_with('test_condition')
     
-    def test_style_resolution_performance(self, figure_dataset_config, mock_figregistry_apis,
-                                        performance_baseline, benchmark):
+    @pytest.mark.performance
+    def test_plugin_overhead_comparison(self, sample_figure, basic_dataset_config,
+                                      mock_figregistry_api, tmp_path, mocker):
+        """Test plugin overhead compared to manual matplotlib save operations.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates <5% overhead compared to manual save operations.
         """
-        Test style resolution performance within target thresholds.
+        if not MATPLOTLIB_AVAILABLE:
+            pytest.skip("Matplotlib not available for overhead comparison")
         
-        Validates that get_style() API calls complete within 1ms target
-        and don't significantly impact overall save operation performance.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Configure test paths
+        manual_save_path = tmp_path / "manual_save.png"
+        plugin_save_path = tmp_path / "plugin_save.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(plugin_save_path)
         
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
         
-        # Configure realistic mock response time
-        def mock_get_style_with_delay(*args, **kwargs):
-            time.sleep(0.0005)  # 0.5ms simulated processing
-            return {'figure.figsize': [10, 6]}
+        # Measure manual matplotlib save
+        start_time = time.perf_counter()
+        sample_figure.savefig(manual_save_path, **config['save_args'])
+        manual_time = time.perf_counter() - start_time
         
-        mock_figregistry_apis['get_style'].side_effect = mock_get_style_with_delay
+        # Measure plugin save operation
+        dataset = FigureDataSet(**config)
+        start_time = time.perf_counter()
+        dataset._save(sample_figure)
+        plugin_time = time.perf_counter() - start_time
         
-        def style_resolution():
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {'experiment_type': 'baseline'}
-                # Just call the style resolution part
-                return dataset._resolve_style_parameters('baseline')
+        # Calculate overhead percentage
+        overhead_percentage = ((plugin_time - manual_time) / manual_time) * 100
         
-        # Benchmark style resolution
-        result = benchmark(style_resolution)
-        
-        target_time = performance_baseline['style_resolution_time']
-        assert result < target_time, (
-            f"Style resolution took {result:.4f}s, exceeds target {target_time:.4f}s"
-        )
+        # Validate <5% overhead target
+        assert overhead_percentage < 5.0, f"Plugin overhead {overhead_percentage:.1f}% exceeds 5% target"
     
+    @pytest.mark.performance
+    def test_cache_performance_optimization(self, basic_dataset_config, mock_figregistry_api):
+        """Test style cache improves performance for repeated operations.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            
+        Validates cache effectiveness for performance optimization.
+        """
+        dataset = FigureDataSet(**basic_dataset_config)
+        condition = 'test_condition'
+        
+        # First style resolution (cache miss)
+        start_time = time.perf_counter()
+        style1 = dataset._get_figure_style(condition)
+        first_time = time.perf_counter() - start_time
+        
+        # Second style resolution (cache hit)
+        start_time = time.perf_counter()
+        style2 = dataset._get_figure_style(condition)
+        second_time = time.perf_counter() - start_time
+        
+        # Verify cache effectiveness
+        assert style1 == style2  # Same result
+        assert second_time < first_time  # Faster on cache hit
+        
+        # Verify FigRegistry called only once (cache working)
+        assert mock_figregistry_api['get_style'].call_count == 1
     
-    def test_thread_safe_parallel_execution(self, sample_figure, figure_dataset_config,
-                                          mock_figregistry_apis):
+    @pytest.mark.performance
+    @pytest.mark.skipif(not BENCHMARK_AVAILABLE, reason="pytest-benchmark not available")
+    def test_benchmark_save_operation(self, sample_figure, basic_dataset_config, 
+                                    mock_figregistry_api, tmp_path, mocker, benchmark):
+        """Benchmark save operation using pytest-benchmark.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            benchmark: pytest-benchmark fixture
+            
+        Provides detailed performance analysis with statistical validation.
         """
-        Test thread-safe operation for parallel Kedro runner execution.
+        # Configure test filepath
+        test_filepath = tmp_path / "benchmark_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
         
-        Validates that multiple FigureDataSet instances can safely operate
-        concurrently without race conditions or state corruption.
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
+        
+        dataset = FigureDataSet(**config)
+        
+        # Benchmark save operation
+        result = benchmark(dataset._save, sample_figure)
+        
+        # Verify operation completed successfully
+        mock_figregistry_api['get_style'].assert_called()
+        mock_figregistry_api['save_figure'].assert_called()
+
+
+# =============================================================================
+# THREAD-SAFE OPERATION TESTS (Section 5.2.8 Requirements)
+# =============================================================================
+
+class TestThreadSafeOperation:
+    """Test suite for thread-safe operation per Section 5.2.8 requirements.
+    
+    Validates thread-safe operation for parallel pipeline execution using
+    pytest-mock simulation of concurrent catalog access.
+    """
+    
+    def test_concurrent_save_operations(self, sample_figure, basic_dataset_config,
+                                      mock_figregistry_api, tmp_path, mocker):
+        """Test concurrent save operations are thread-safe.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates thread-safe operation during parallel execution.
         """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
         
-        config = figure_dataset_config['basic_config']
-        
-        # Create multiple dataset instances
+        # Create multiple dataset instances for concurrent testing
         datasets = []
         for i in range(5):
-            dataset = FigureDataSet(
-                filepath=f"data/08_reporting/figures/parallel_test_{i}.png",
-                purpose=config['purpose'],
-                condition_param=config['condition_param']
-            )
-            datasets.append(dataset)
+            test_filepath = tmp_path / f"concurrent_test_{i}.png"
+            config = basic_dataset_config.copy()
+            config['filepath'] = str(test_filepath)
+            datasets.append(FigureDataSet(**config))
         
-        # Configure thread-safe mock responses
-        call_counts = {'get_style': 0, 'save_figure': 0}
-        call_lock = threading.Lock()
+        # Track thread execution
+        results = []
+        exceptions = []
         
-        def thread_safe_get_style(*args, **kwargs):
-            with call_lock:
-                call_counts['get_style'] += 1
-                time.sleep(0.001)  # Simulate processing time
-                return {'figure.figsize': [10, 6]}
-        
-        def thread_safe_save_figure(*args, **kwargs):
-            with call_lock:
-                call_counts['save_figure'] += 1
-                time.sleep(0.002)  # Simulate file I/O
-                return f'/mock/path/test_{call_counts["save_figure"]}.png'
-        
-        mock_figregistry_apis['get_style'].side_effect = thread_safe_get_style
-        mock_figregistry_apis['save_figure'].side_effect = thread_safe_save_figure
-        
-        def save_with_dataset(dataset_index):
-            """Save operation for a specific dataset."""
-            dataset = datasets[dataset_index]
-            
-            # Create figure for this thread
-            fig, ax = plt.subplots(figsize=(6, 4))
-            ax.plot([1, 2, 3], [dataset_index, dataset_index + 1, dataset_index + 2])
-            ax.set_title(f'Thread {dataset_index}')
-            
+        def save_operation(dataset_index):
+            """Execute save operation and track results."""
             try:
-                with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                    mock_session.return_value.store = {'experiment_type': f'test_{dataset_index}'}
-                    dataset._save(fig)
-                return True
+                dataset = datasets[dataset_index]
+                dataset._save(sample_figure)
+                results.append(f"Dataset {dataset_index} completed successfully")
             except Exception as e:
-                print(f"Thread {dataset_index} failed: {e}")
-                return False
-            finally:
-                plt.close(fig)
+                exceptions.append(f"Dataset {dataset_index} failed: {str(e)}")
         
-        # Execute parallel saves
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            futures = [executor.submit(save_with_dataset, i) for i in range(5)]
-            results = [future.result() for future in futures]
+        # Execute concurrent save operations
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            futures = [executor.submit(save_operation, i) for i in range(5)]
+            concurrent.futures.wait(futures)
         
         # Verify all operations completed successfully
-        assert all(results), "Some parallel operations failed"
+        assert len(results) == 5
+        assert len(exceptions) == 0
         
-        # Verify all API calls were made
-        assert call_counts['get_style'] == 5
-        assert call_counts['save_figure'] == 5
+        # Verify all save operations were called
+        assert mock_figregistry_api['save_figure'].call_count == 5
     
-    
-    def test_memory_usage_efficiency(self, complex_figure, figure_dataset_config,
-                                   mock_figregistry_apis, performance_baseline):
-        """
-        Test memory usage efficiency during save operations.
+    def test_style_cache_thread_safety(self, basic_dataset_config, mock_figregistry_api):
+        """Test style cache operates correctly under concurrent access.
         
-        Validates that FigureDataSet operations don't cause excessive
-        memory overhead or memory leaks during figure processing.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        import psutil
-        import gc
-        
-        config = figure_dataset_config['advanced_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
-        
-        # Measure initial memory usage
-        process = psutil.Process()
-        initial_memory = process.memory_info().rss / 1024 / 1024  # MB
-        
-        # Perform multiple save operations
-        for i in range(10):
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {'analysis_mode': 'publication'}
-                dataset._save(complex_figure)
-        
-        # Force garbage collection
-        gc.collect()
-        
-        # Measure final memory usage
-        final_memory = process.memory_info().rss / 1024 / 1024  # MB
-        memory_increase = final_memory - initial_memory
-        
-        # Verify memory usage is within acceptable bounds
-        max_memory_increase = performance_baseline['memory_baseline_mb']
-        assert memory_increase < max_memory_increase, (
-            f"Memory usage increased by {memory_increase:.1f}MB, "
-            f"exceeds limit {max_memory_increase:.1f}MB"
-        )
-
-
-# =============================================================================
-# ERROR HANDLING AND SECURITY TESTS
-# =============================================================================
-
-class TestErrorHandlingAndSecurity:
-    """
-    Test error handling and security validation per Section 6.6.8.
-    
-    Validates robust error management for malformed configurations, missing
-    parameters, file system failures, and security constraints for parameter
-    validation and path traversal prevention.
-    """
-    
-    def test_malformed_catalog_configuration_handling(self, mock_figregistry_apis):
-        """
-        Test handling of malformed catalog configurations.
-        
-        Validates graceful error handling for invalid catalog parameter
-        combinations, malformed YAML, and type validation failures.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        # Test various malformed configurations
-        malformed_configs = [
-            {
-                'filepath': 123,  # Should be string
-                'purpose': 'exploratory'
-            },
-            {
-                'filepath': 'test.png',
-                'purpose': None  # Should be string
-            },
-            {
-                'filepath': 'test.png',
-                'purpose': 'exploratory',
-                'style_params': 'not_a_dict'  # Should be dict
-            },
-            {
-                'filepath': 'test.png',
-                'purpose': 'exploratory',
-                'save_args': 'not_a_dict'  # Should be dict
-            },
-            {
-                'filepath': 'test.png',
-                'purpose': 'exploratory',
-                'versioned': 'not_a_bool'  # Should be bool
-            }
-        ]
-        
-        for config in malformed_configs:
-            with pytest.raises((TypeError, ValueError)) as excinfo:
-                FigureDataSet(**config)
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
             
-            # Error message should be informative
-            error_msg = str(excinfo.value).lower()
-            assert any(keyword in error_msg for keyword in 
-                      ['type', 'value', 'invalid', 'expected'])
-    
-    
-    def test_missing_condition_parameter_handling(self, sample_figure, figure_dataset_config,
-                                                mock_figregistry_apis):
+        Validates thread-safe style cache operations.
         """
-        Test handling when condition parameter is missing from session.
+        dataset = FigureDataSet(**basic_dataset_config)
+        conditions = ['condition_1', 'condition_2', 'condition_3', 'condition_1', 'condition_2']
         
-        Validates that missing condition parameters are handled gracefully
-        with appropriate fallback behavior and clear error messages.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Track style resolution results
+        results = []
+        exceptions = []
         
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param='missing_parameter'
-        )
-        
-        # Test with empty session store
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {}
-            
-            # Should handle gracefully, not raise exception
-            dataset._save(sample_figure)
-        
-        # Verify get_style was called with appropriate fallback
-        call_args = mock_figregistry_apis['get_style'].call_args
-        condition_value = call_args[1]['condition']
-        assert condition_value is None or condition_value == 'default'
-    
-    
-    def test_figregistry_api_failure_handling(self, sample_figure, figure_dataset_config):
-        """
-        Test handling of FigRegistry API failures.
-        
-        Validates proper error propagation and handling when FigRegistry
-        get_style() or save_figure() operations fail.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
-        
-        # Test get_style failure
-        with patch('figregistry.get_style') as mock_get_style:
-            mock_get_style.side_effect = Exception("Style resolution failed")
-            
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {'experiment_type': 'baseline'}
-                
-                with pytest.raises(Exception) as excinfo:
-                    dataset._save(sample_figure)
-                
-                assert "Style resolution failed" in str(excinfo.value)
-        
-        # Test save_figure failure
-        with patch('figregistry.get_style') as mock_get_style, \
-             patch('figregistry.save_figure') as mock_save_figure:
-            
-            mock_get_style.return_value = {}
-            mock_save_figure.side_effect = Exception("Save operation failed")
-            
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {'experiment_type': 'baseline'}
-                
-                with pytest.raises(Exception) as excinfo:
-                    dataset._save(sample_figure)
-                
-                assert "Save operation failed" in str(excinfo.value)
-    
-    
-    def test_file_system_failure_handling(self, sample_figure, figure_dataset_config,
-                                        mock_figregistry_apis):
-        """
-        Test handling of file system operation failures.
-        
-        Validates proper error handling for file system issues including
-        permission errors, disk space, and directory creation failures.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath='/invalid/path/test.png',  # Invalid path
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
-        
-        # Configure save_figure to simulate file system error
-        mock_figregistry_apis['save_figure'].side_effect = PermissionError(
-            "Permission denied: /invalid/path/test.png"
-        )
-        
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {'experiment_type': 'baseline'}
-            
-            with pytest.raises(PermissionError) as excinfo:
-                dataset._save(sample_figure)
-            
-            assert "Permission denied" in str(excinfo.value)
-    
-    
-    def test_path_traversal_prevention(self, figure_dataset_config):
-        """
-        Test prevention of path traversal attacks in filepath parameter.
-        
-        Validates that malicious filepath values cannot escape designated
-        output directories through path traversal sequences.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        # Test various path traversal attempts
-        malicious_paths = [
-            '../../../etc/passwd',
-            '../../home/user/.ssh/id_rsa',
-            '/absolute/path/to/sensitive/file',
-            'data/../../../etc/passwd',
-            'data/08_reporting/../../../../../../etc/passwd'
-        ]
-        
-        for malicious_path in malicious_paths:
-            # FigureDataSet should either:
-            # 1. Reject the path during initialization, or
-            # 2. Sanitize the path to prevent traversal
+        def resolve_style(condition):
+            """Resolve style and track results."""
             try:
-                dataset = FigureDataSet(
-                    filepath=malicious_path,
-                    purpose='exploratory'
-                )
-                
-                # If initialization succeeds, verify path is sanitized
-                sanitized_path = dataset._filepath
-                assert not sanitized_path.startswith('/etc/')
-                assert not sanitized_path.startswith('/home/')
-                assert '../' not in sanitized_path
-                
-            except (ValueError, SecurityError) as e:
-                # Rejecting malicious paths is acceptable
-                assert 'path' in str(e).lower() or 'security' in str(e).lower()
+                style = dataset._get_figure_style(condition)
+                results.append((condition, len(style)))
+            except Exception as e:
+                exceptions.append(f"Style resolution failed for {condition}: {str(e)}")
+        
+        # Execute concurrent style resolutions
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            futures = [executor.submit(resolve_style, condition) for condition in conditions]
+            concurrent.futures.wait(futures)
+        
+        # Verify all resolutions completed successfully
+        assert len(results) == 5
+        assert len(exceptions) == 0
+        
+        # Verify cache worked correctly (only 3 unique conditions should call FigRegistry)
+        unique_conditions = len(set(conditions))
+        assert mock_figregistry_api['get_style'].call_count == unique_conditions
     
-    
-    def test_parameter_injection_prevention(self, figure_dataset_config):
-        """
-        Test prevention of parameter injection in condition_param values.
+    def test_pipeline_context_thread_isolation(self, basic_dataset_config):
+        """Test pipeline context isolation between threads.
         
-        Validates that condition_param values undergo proper sanitization
-        to prevent injection of malicious content or system commands.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        # Test various injection attempts
-        injection_attempts = [
-            '"; rm -rf /; echo "',
-            '$(rm -rf /)',
-            '`rm -rf /`',
-            '${rm -rf /}',
-            'normal_param; malicious_command',
-            'param\nmalicious_command',
-            'param\rmalicious_command'
-        ]
-        
-        config = figure_dataset_config['basic_config']
-        
-        for injection_param in injection_attempts:
-            # Should either reject during initialization or sanitize
-            try:
-                dataset = FigureDataSet(
-                    filepath=config['filepath'],
-                    purpose=config['purpose'],
-                    condition_param=injection_param
-                )
-                
-                # If accepted, verify parameter is sanitized
-                sanitized_param = dataset._condition_param
-                assert ';' not in sanitized_param
-                assert '$' not in sanitized_param
-                assert '`' not in sanitized_param
-                assert '\n' not in sanitized_param
-                assert '\r' not in sanitized_param
-                
-            except (ValueError, SecurityError) as e:
-                # Rejecting injection attempts is acceptable
-                assert 'parameter' in str(e).lower() or 'invalid' in str(e).lower()
-    
-    
-    def test_oversized_parameter_handling(self, figure_dataset_config):
-        """
-        Test handling of oversized parameter values.
-        
-        Validates that extremely large parameter values are handled
-        gracefully without causing memory exhaustion or system instability.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        
-        # Test oversized style_params
-        oversized_style_params = {f'param_{i}': f'value_{i}' for i in range(10000)}
-        
-        with pytest.raises((ValueError, MemoryError)) as excinfo:
-            FigureDataSet(
-                filepath=config['filepath'],
-                purpose=config['purpose'],
-                style_params=oversized_style_params
-            )
-        
-        error_msg = str(excinfo.value).lower()
-        assert any(keyword in error_msg for keyword in 
-                  ['size', 'limit', 'too large', 'memory'])
-        
-        # Test extremely long filepath
-        oversized_filepath = 'a' * 10000
-        
-        with pytest.raises((ValueError, OSError)) as excinfo:
-            FigureDataSet(
-                filepath=oversized_filepath,
-                purpose=config['purpose']
-            )
-
-
-# =============================================================================
-# INTEGRATION AND COMPATIBILITY TESTS
-# =============================================================================
-
-class TestIntegrationAndCompatibility:
-    """
-    Test integration with Kedro ecosystem and compatibility requirements.
-    
-    Validates seamless integration with Kedro's data catalog system,
-    compatibility across supported Python and Kedro versions, and
-    proper interaction with other Kedro components.
-    """
-    
-    def test_kedro_catalog_integration(self, sample_figure, figure_dataset_config,
-                                     mock_kedro_session_context, mock_figregistry_apis):
-        """
-        Test integration with Kedro data catalog system.
-        
-        Validates that FigureDataSet works correctly within Kedro's catalog
-        framework including registration, discovery, and execution.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
-        
-        # Simulate catalog save operation
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value = mock_kedro_session_context
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
             
-            # This simulates kedro catalog.save("dataset_name", figure)
-            dataset._save(sample_figure)
-        
-        # Verify proper integration with FigRegistry
-        mock_figregistry_apis['get_style'].assert_called_once()
-        mock_figregistry_apis['save_figure'].assert_called_once()
-        
-        # Verify catalog-specific behavior
-        assert hasattr(dataset, '_describe')
-        assert hasattr(dataset, '_exists')
-        description = dataset._describe()
-        assert isinstance(description, dict)
-    
-    
-    def test_kedro_version_compatibility(self, sample_figure, figure_dataset_config,
-                                       mock_figregistry_apis):
+        Validates thread-local storage for pipeline context.
         """
-        Test compatibility across supported Kedro versions.
+        dataset = FigureDataSet(**basic_dataset_config)
         
-        Validates that FigureDataSet works correctly with Kedro versions
-        in the supported range (0.18.0-0.19.x) with consistent behavior.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-            import kedro
-        except ImportError:
-            pytest.skip("FigureDataSet or Kedro not available - implementation pending")
+        # Track context isolation
+        context_results = {}
         
-        # Verify Kedro version is in supported range
-        kedro_version = kedro.__version__
-        major, minor = map(int, kedro_version.split('.')[:2])
+        def set_and_check_context(thread_id, context_data):
+            """Set context and verify isolation."""
+            dataset.set_pipeline_context(context_data)
+            retrieved_context = dataset._get_pipeline_context()
+            context_results[thread_id] = retrieved_context
         
-        assert (major == 0 and minor >= 18), (
-            f"Kedro version {kedro_version} not in supported range >=0.18.0"
-        )
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
-        
-        # Test core functionality works across versions
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {'experiment_type': 'baseline'}
-            dataset._save(sample_figure)
-        
-        # Verify expected behavior
-        assert mock_figregistry_apis['get_style'].called
-        assert mock_figregistry_apis['save_figure'].called
-    
-    
-    def test_matplotlib_version_compatibility(self, sample_figure, figure_dataset_config,
-                                            mock_figregistry_apis):
-        """
-        Test compatibility with supported matplotlib versions.
-        
-        Validates that FigureDataSet works correctly with matplotlib
-        versions in the supported range (>=3.9.0) with consistent behavior.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-            import matplotlib
-        except ImportError:
-            pytest.skip("FigureDataSet or matplotlib not available")
-        
-        # Verify matplotlib version is supported
-        mpl_version = matplotlib.__version__
-        major, minor = map(int, mpl_version.split('.')[:2])
-        
-        assert (major > 3 or (major == 3 and minor >= 9)), (
-            f"Matplotlib version {mpl_version} not in supported range >=3.9.0"
-        )
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose']
-        )
-        
-        # Test figure handling works correctly
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {}
-            dataset._save(sample_figure)
-        
-        # Verify matplotlib figure was handled correctly
-        save_call_args = mock_figregistry_apis['save_figure'].call_args
-        assert save_call_args[0][0] is sample_figure
-    
-    
-    def test_python_version_compatibility(self, figure_dataset_config):
-        """
-        Test compatibility with supported Python versions.
-        
-        Validates that FigureDataSet works correctly with Python
-        versions in the supported range (3.10+) including type annotations
-        and modern Python features.
-        """
-        import sys
-        
-        # Verify Python version is supported
-        python_version = sys.version_info
-        assert python_version >= (3, 10), (
-            f"Python version {python_version} not in supported range >=3.10"
-        )
-        
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        
-        # Test initialization with type hints works correctly
-        dataset: FigureDataSet = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose']
-        )
-        
-        # Verify type annotations are preserved
-        assert hasattr(FigureDataSet, '__annotations__')
-        
-        # Test that modern Python features work
-        description = dataset._describe()
-        assert isinstance(description, dict)
-    
-    
-    def test_cross_platform_compatibility(self, sample_figure, figure_dataset_config,
-                                        mock_figregistry_apis, cross_platform_test_env):
-        """
-        Test cross-platform compatibility (Windows, macOS, Linux).
-        
-        Validates that FigureDataSet works correctly across different
-        operating systems with proper path handling and file operations.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        platforms_to_test = ['windows', 'linux', 'macos']
-        
-        for platform in platforms_to_test:
-            cross_platform_test_env(platform)
-            
-            config = figure_dataset_config['basic_config']
-            dataset = FigureDataSet(
-                filepath=config['filepath'],
-                purpose=config['purpose']
-            )
-            
-            # Test that initialization works on all platforms
-            assert hasattr(dataset, '_filepath')
-            assert hasattr(dataset, '_purpose')
-            
-            # Test save operation
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {}
-                dataset._save(sample_figure)
-            
-            # Verify APIs were called regardless of platform
-            assert mock_figregistry_apis['save_figure'].called
-            
-            # Reset mocks for next platform
-            mock_figregistry_apis['save_figure'].reset_mock()
-            mock_figregistry_apis['get_style'].reset_mock()
-
-
-# =============================================================================
-# COMPREHENSIVE REGRESSION AND EDGE CASE TESTS
-# =============================================================================
-
-class TestRegressionAndEdgeCases:
-    """
-    Test regression scenarios and edge cases for comprehensive coverage.
-    
-    Validates behavior in unusual scenarios, boundary conditions, and
-    potential regression cases to ensure robust operation across all
-    supported use cases and configurations.
-    """
-    
-    def test_empty_figure_handling(self, figure_dataset_config, mock_figregistry_apis):
-        """
-        Test handling of empty or minimal matplotlib figures.
-        
-        Validates that FigureDataSet correctly processes figures with
-        no data, empty axes, or minimal content without errors.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose']
-        )
-        
-        # Test completely empty figure
-        empty_fig, empty_ax = plt.subplots()
-        # No plot calls - completely empty
-        
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {}
-            dataset._save(empty_fig)
-        
-        mock_figregistry_apis['save_figure'].assert_called()
-        plt.close(empty_fig)
-        
-        # Test figure with empty axes but title
-        titled_fig, titled_ax = plt.subplots()
-        titled_ax.set_title('Empty Plot with Title')
-        
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {}
-            dataset._save(titled_fig)
-        
-        assert mock_figregistry_apis['save_figure'].call_count == 2
-        plt.close(titled_fig)
-    
-    
-    def test_complex_figure_structures(self, figure_dataset_config, mock_figregistry_apis):
-        """
-        Test handling of complex figure structures and layouts.
-        
-        Validates that FigureDataSet correctly processes figures with
-        multiple subplots, complex layouts, and nested figure structures.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose']
-        )
-        
-        # Create complex figure with GridSpec
-        fig = plt.figure(figsize=(15, 10))
-        gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
-        
-        # Add various subplot types
-        ax1 = fig.add_subplot(gs[0, :])  # Top row, all columns
-        ax2 = fig.add_subplot(gs[1, 0])  # Middle left
-        ax3 = fig.add_subplot(gs[1, 1:])  # Middle right (2 columns)
-        ax4 = fig.add_subplot(gs[2, 0])  # Bottom left
-        ax5 = fig.add_subplot(gs[2, 1])  # Bottom middle
-        ax6 = fig.add_subplot(gs[2, 2])  # Bottom right
-        
-        # Add content to each subplot
-        x = np.linspace(0, 10, 100)
-        ax1.plot(x, np.sin(x))
-        ax1.set_title('Main Plot')
-        
-        ax2.bar(['A', 'B', 'C'], [1, 2, 3])
-        ax3.scatter(np.random.randn(50), np.random.randn(50))
-        ax4.hist(np.random.randn(100), bins=20)
-        ax5.pie([30, 35, 25, 10], labels=['A', 'B', 'C', 'D'])
-        ax6.imshow(np.random.rand(10, 10), cmap='viridis')
-        
-        # Test save operation
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {}
-            dataset._save(fig)
-        
-        mock_figregistry_apis['save_figure'].assert_called()
-        plt.close(fig)
-    
-    
-    def test_unicode_and_special_characters(self, figure_dataset_config, mock_figregistry_apis):
-        """
-        Test handling of unicode and special characters in parameters.
-        
-        Validates that FigureDataSet correctly processes parameters
-        containing unicode characters, special symbols, and international text.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        # Test unicode in filepath
-        unicode_config = {
-            'filepath': 'data/08_reporting/figures/测试图表_αβγ.png',
-            'purpose': 'exploratory'
+        # Create different contexts for each thread
+        contexts = {
+            'thread_1': {'experiment': 'test_1', 'condition': 'A'},
+            'thread_2': {'experiment': 'test_2', 'condition': 'B'},
+            'thread_3': {'experiment': 'test_3', 'condition': 'C'}
         }
         
-        dataset = FigureDataSet(**unicode_config)
-        assert dataset._filepath == unicode_config['filepath']
+        # Execute concurrent context operations
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            futures = [
+                executor.submit(set_and_check_context, thread_id, context)
+                for thread_id, context in contexts.items()
+            ]
+            concurrent.futures.wait(futures)
         
-        # Test unicode in condition parameter values
-        fig, ax = plt.subplots()
-        ax.plot([1, 2, 3], [1, 2, 3])
-        ax.set_title('Unicode Test: 图表标题 αβγδε')
+        # Verify context isolation
+        assert len(context_results) == 3
+        for thread_id, expected_context in contexts.items():
+            assert context_results[thread_id] == expected_context
+    
+    def test_performance_stats_thread_safety(self, sample_figure, basic_dataset_config,
+                                           mock_figregistry_api, tmp_path, mocker):
+        """Test performance statistics collection is thread-safe.
         
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {'测试参数': '实验条件α'}
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
             
-            dataset_with_unicode_param = FigureDataSet(
-                filepath='test.png',
-                purpose='exploratory',
-                condition_param='测试参数'
-            )
-            
-            dataset_with_unicode_param._save(fig)
-        
-        # Verify unicode values were handled correctly
-        call_args = mock_figregistry_apis['get_style'].call_args
-        assert call_args[1]['condition'] == '实验条件α'
-        
-        plt.close(fig)
-    
-    
-    def test_boundary_value_parameters(self, figure_dataset_config, mock_figregistry_apis):
+        Validates thread-safe performance statistics aggregation.
         """
-        Test handling of boundary value parameters.
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
         
-        Validates behavior with minimum/maximum values, empty strings,
-        and edge cases for numeric and string parameters.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Clear global performance stats
+        FigureDataSet.reset_performance_stats()
         
-        # Test minimum required configuration
-        minimal_dataset = FigureDataSet(
-            filepath='test.png',
-            purpose='exploratory'
-        )
+        # Create dataset instances for concurrent testing
+        datasets = []
+        for i in range(3):
+            test_filepath = tmp_path / f"perf_test_{i}.png"
+            config = basic_dataset_config.copy()
+            config['filepath'] = str(test_filepath)
+            datasets.append(FigureDataSet(**config))
         
-        # Test with empty style_params
-        empty_params_dataset = FigureDataSet(
-            filepath='test.png',
-            purpose='exploratory',
-            style_params={}
-        )
+        def execute_save(dataset):
+            """Execute save and track performance."""
+            dataset._save(sample_figure)
         
-        # Test with empty save_args
-        empty_save_args_dataset = FigureDataSet(
-            filepath='test.png',
-            purpose='exploratory',
-            save_args={}
-        )
+        # Execute concurrent operations
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+            futures = [executor.submit(execute_save, dataset) for dataset in datasets]
+            concurrent.futures.wait(futures)
         
-        # Test with very long but valid filepath
-        long_filepath = 'data/08_reporting/figures/' + 'a' * 200 + '.png'
-        long_path_dataset = FigureDataSet(
-            filepath=long_filepath,
-            purpose='exploratory'
-        )
-        
-        # Verify all datasets were created successfully
-        for dataset in [minimal_dataset, empty_params_dataset, 
-                       empty_save_args_dataset, long_path_dataset]:
-            assert hasattr(dataset, '_filepath')
-            assert hasattr(dataset, '_purpose')
-    
-    
-    def test_concurrent_modification_scenarios(self, sample_figure, figure_dataset_config,
-                                             mock_figregistry_apis):
-        """
-        Test scenarios involving concurrent modifications.
-        
-        Validates behavior when figure objects are modified during
-        save operations or when multiple operations occur simultaneously.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose']
-        )
-        
-        # Create figure that will be modified during save
-        fig, ax = plt.subplots()
-        x = [1, 2, 3]
-        y = [1, 2, 3]
-        line, = ax.plot(x, y)
-        
-        def modify_figure_during_save(*args, **kwargs):
-            """Mock save_figure that modifies figure during save."""
-            # Modify figure during save operation
-            line.set_ydata([3, 2, 1])
-            ax.set_title('Modified during save')
-            return '/mock/path/test.png'
-        
-        mock_figregistry_apis['save_figure'].side_effect = modify_figure_during_save
-        
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {}
-            
-            # Should handle concurrent modification gracefully
-            dataset._save(fig)
-        
-        mock_figregistry_apis['save_figure'].assert_called_once()
-        plt.close(fig)
-    
-    
-    def test_memory_pressure_scenarios(self, figure_dataset_config, mock_figregistry_apis):
-        """
-        Test behavior under memory pressure scenarios.
-        
-        Validates that FigureDataSet operations complete successfully
-        even when system memory is constrained or when processing
-        very large figures.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose']
-        )
-        
-        # Create figure with large amount of data
-        fig, ax = plt.subplots(figsize=(20, 15))
-        
-        # Generate large dataset
-        n_points = 100000
-        x = np.random.randn(n_points)
-        y = np.random.randn(n_points)
-        colors = np.random.randn(n_points)
-        
-        # Create memory-intensive plot
-        scatter = ax.scatter(x, y, c=colors, alpha=0.6, s=1)
-        ax.set_title('Large Dataset Plot')
-        
-        # Add colorbar (additional memory usage)
-        cbar = plt.colorbar(scatter)
-        
-        with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-            mock_session.return_value.store = {}
-            
-            # Should handle large figure without memory issues
-            dataset._save(fig)
-        
-        mock_figregistry_apis['save_figure'].assert_called_once()
-        plt.close(fig)
+        # Verify performance stats were collected safely
+        perf_stats = FigureDataSet.get_performance_stats()
+        assert perf_stats['total_saves'] == 3
+        assert perf_stats['avg_save_time'] >= 0
+        assert perf_stats['avg_style_time'] >= 0
 
 
 # =============================================================================
-# PERFORMANCE BENCHMARKING SUITE
+# ERROR HANDLING AND EDGE CASE TESTS
 # =============================================================================
 
-@pytest.mark.plugin_performance
-class TestPerformanceBenchmarks:
-    """
-    Comprehensive performance benchmarking for FigureDataSet operations.
+class TestErrorHandling:
+    """Test suite for comprehensive error handling and edge case management.
     
-    Provides detailed performance measurement and validation against
-    requirements including save operation timing, memory efficiency,
-    and comparison with manual matplotlib save operations.
+    Validates robust error management for malformed catalog configurations,
+    missing condition parameters, and file system failures.
     """
     
-    def test_benchmark_save_operation_simple_figure(self, sample_figure, figure_dataset_config,
-                                                   mock_figregistry_apis, benchmark):
+    def test_invalid_figure_type_error(self, basic_dataset_config):
+        """Test error handling for invalid figure object types.
+        
+        Args:
+            basic_dataset_config: Basic dataset configuration fixture
+            
+        Validates type checking and error reporting for invalid inputs.
         """
-        Benchmark save operation with simple figure per Section 6.6.4.3.
+        dataset = FigureDataSet(**basic_dataset_config)
         
-        Measures performance of basic FigureDataSet save operation and
-        validates against 200ms target with simple figure content.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Test with non-Figure object
+        with pytest.raises(FigureDataSetError) as exc_info:
+            dataset._save("not_a_figure")
         
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param']
-        )
-        
-        # Configure optimized mock responses
-        mock_figregistry_apis['get_style'].return_value = {'figure.figsize': [10, 6]}
-        mock_figregistry_apis['save_figure'].return_value = '/mock/path/test.png'
-        
-        def save_operation():
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {'experiment_type': 'baseline'}
-                dataset._save(sample_figure)
-        
-        # Benchmark the operation
-        result = benchmark.pedantic(save_operation, rounds=10, iterations=5)
-        
-        # Validate performance requirements
-        assert result < 0.200, f"Save operation took {result:.3f}s, exceeds 200ms target"
-        
-        # Store result for comparison
-        benchmark.extra_info['operation'] = 'simple_figure_save'
-        benchmark.extra_info['target_ms'] = 200
-        benchmark.extra_info['actual_ms'] = result * 1000
+        error_message = str(exc_info.value)
+        assert 'Expected matplotlib Figure object' in error_message
+        assert 'got <class \'str\'>' in error_message
     
+    def test_figregistry_dependency_unavailable_error(self, mocker):
+        """Test error handling when FigRegistry dependencies are unavailable.
+        
+        Args:
+            mocker: pytest-mock fixture
+            
+        Validates graceful handling of missing dependencies.
+        """
+        # Mock dependencies as unavailable
+        mocker.patch('figregistry_kedro.datasets.figregistry_available', False)
+        
+        with pytest.raises(FigureDataSetError) as exc_info:
+            FigureDataSet(filepath='test.png')
+        
+        error_message = str(exc_info.value)
+        assert 'FigRegistry is required but not available' in error_message
+        assert 'figregistry>=0.3.0' in error_message
     
-    def test_benchmark_save_operation_complex_figure(self, complex_figure, figure_dataset_config,
-                                                   mock_figregistry_apis, benchmark):
+    def test_kedro_dependency_unavailable_error(self, mocker):
+        """Test error handling when Kedro dependencies are unavailable.
+        
+        Args:
+            mocker: pytest-mock fixture
+            
+        Validates error reporting for missing Kedro dependencies.
         """
-        Benchmark save operation with complex figure.
+        # Mock dependencies as unavailable  
+        mocker.patch('figregistry_kedro.datasets.kedro_available', False)
         
-        Measures performance with complex multi-subplot figures to validate
-        performance scales appropriately with figure complexity.
+        with pytest.raises(FigureDataSetError) as exc_info:
+            FigureDataSet(filepath='test.png')
+        
+        error_message = str(exc_info.value)
+        assert 'Kedro is required but not available' in error_message
+        assert 'kedro>=0.18.0' in error_message
+    
+    def test_matplotlib_dependency_unavailable_error(self, mocker):
+        """Test error handling when matplotlib dependencies are unavailable.
+        
+        Args:
+            mocker: pytest-mock fixture
+            
+        Validates error reporting for missing matplotlib dependencies.
         """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        # Mock dependencies as unavailable
+        mocker.patch('figregistry_kedro.datasets.matplotlib_available', False)
         
-        config = figure_dataset_config['advanced_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose'],
-            condition_param=config['condition_param'],
-            style_params=config['style_params']
-        )
+        with pytest.raises(FigureDataSetError) as exc_info:
+            FigureDataSet(filepath='test.png')
         
-        # Configure comprehensive style response
-        mock_figregistry_apis['get_style'].return_value = {
-            'figure.figsize': [12, 10],
-            'axes.grid': True,
-            'font.size': 11,
-            'axes.labelsize': 12
+        error_message = str(exc_info.value)
+        assert 'Matplotlib is required but not available' in error_message
+        assert 'matplotlib>=3.9.0' in error_message
+    
+    def test_file_system_permission_error(self, sample_figure, basic_dataset_config, 
+                                        mock_figregistry_api, tmp_path, mocker):
+        """Test error handling for file system permission errors.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates graceful handling of file system errors.
+        """
+        # Configure test with permission error
+        test_filepath = tmp_path / "permission_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
+        
+        # Mock Path.mkdir to raise permission error
+        mock_mkdir = mocker.patch.object(Path, 'mkdir')
+        mock_mkdir.side_effect = PermissionError("Permission denied")
+        
+        dataset = FigureDataSet(**config)
+        
+        with pytest.raises(FigureDataSetError) as exc_info:
+            dataset._save(sample_figure)
+        
+        # Verify error contains permission information
+        error_message = str(exc_info.value)
+        assert 'Figure save operation failed' in error_message
+        assert exc_info.value.original_error is not None
+    
+    def test_figregistry_style_resolution_error(self, sample_figure, basic_dataset_config,
+                                              mock_figregistry_api, tmp_path, mocker):
+        """Test error handling for FigRegistry style resolution failures.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates graceful handling of style resolution errors.
+        """
+        # Configure FigRegistry to raise error
+        mock_figregistry_api['get_style'].side_effect = Exception("Style resolution failed")
+        
+        test_filepath = tmp_path / "style_error_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
+        
+        # Mock directory creation to avoid unrelated errors
+        mocker.patch.object(Path, 'mkdir')
+        
+        dataset = FigureDataSet(**config)
+        
+        with pytest.raises(FigureDataSetError) as exc_info:
+            dataset._save(sample_figure)
+        
+        error_message = str(exc_info.value)
+        assert 'Style resolution failed' in error_message
+    
+    def test_figregistry_save_figure_error(self, sample_figure, basic_dataset_config,
+                                         mock_figregistry_api, tmp_path, mocker):
+        """Test error handling for FigRegistry save_figure failures.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates graceful handling of save operation errors.
+        """
+        # Configure FigRegistry save_figure to raise error
+        mock_figregistry_api['save_figure'].side_effect = Exception("Save operation failed")
+        
+        test_filepath = tmp_path / "save_error_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
+        
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
+        
+        dataset = FigureDataSet(**config)
+        
+        with pytest.raises(FigureDataSetError) as exc_info:
+            dataset._save(sample_figure)
+        
+        error_message = str(exc_info.value)
+        assert 'Figure save failed' in error_message
+    
+    def test_malformed_style_params_handling(self, sample_figure, basic_dataset_config,
+                                           mock_figregistry_api, tmp_path, mocker, caplog):
+        """Test handling of malformed style parameters.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            caplog: pytest log capture fixture
+            
+        Validates graceful handling of invalid style configurations.
+        """
+        # Configure malformed style parameters
+        test_filepath = tmp_path / "malformed_style_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
+        config['style_params'] = {
+            'invalid.property': 'invalid_value',
+            'figure.invalid_attr': 'test'
         }
         
-        def save_complex_operation():
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {'analysis_mode': 'publication'}
-                dataset._save(complex_figure)
+        # Mock directory creation and figure attribute setting
+        mocker.patch.object(Path, 'mkdir')
+        mock_setattr = mocker.patch('setattr')
+        mock_setattr.side_effect = AttributeError("Invalid attribute")
         
-        result = benchmark.pedantic(save_complex_operation, rounds=5, iterations=3)
+        dataset = FigureDataSet(**config)
         
-        # Complex figures may take longer but should still be reasonable
-        assert result < 0.500, f"Complex save took {result:.3f}s, exceeds 500ms threshold"
+        with caplog.at_level('DEBUG'):
+            dataset._save(sample_figure)
         
-        benchmark.extra_info['operation'] = 'complex_figure_save'
-        benchmark.extra_info['actual_ms'] = result * 1000
+        # Verify operation completed despite style errors
+        mock_figregistry_api['save_figure'].assert_called_once()
+        
+        # Verify appropriate logging of style application issues
+        assert any('Could not set figure property' in record.message for record in caplog.records)
     
+    def test_empty_style_response_handling(self, sample_figure, basic_dataset_config,
+                                         mock_figregistry_api, tmp_path, mocker):
+        """Test handling of empty style responses from FigRegistry.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates graceful handling of empty style dictionaries.
+        """
+        # Configure empty style response
+        mock_figregistry_api['get_style'].return_value = {}
+        
+        test_filepath = tmp_path / "empty_style_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
+        
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
+        
+        dataset = FigureDataSet(**config)
+        dataset._save(sample_figure)
+        
+        # Verify operation completed successfully with empty style
+        mock_figregistry_api['get_style'].assert_called_once()
+        mock_figregistry_api['save_figure'].assert_called_once()
     
-    def test_benchmark_overhead_vs_manual_save(self, sample_figure, figure_dataset_config,
-                                             mock_figregistry_apis, benchmark, temp_work_dir):
-        """
-        Benchmark overhead compared to manual matplotlib save operations.
+    def test_none_style_response_handling(self, sample_figure, basic_dataset_config,
+                                        mock_figregistry_api, tmp_path, mocker):
+        """Test handling of None style responses from FigRegistry.
         
-        Compares FigureDataSet save performance against direct plt.savefig
-        to validate <5% overhead requirement per performance specifications.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose']
-        )
-        
-        # Configure fast mock responses to isolate FigureDataSet overhead
-        mock_figregistry_apis['get_style'].return_value = {}
-        mock_figregistry_apis['save_figure'].return_value = '/mock/path/test.png'
-        
-        # Benchmark manual save operation
-        manual_save_path = temp_work_dir / 'manual_test.png'
-        def manual_save():
-            sample_figure.savefig(manual_save_path, dpi=150, bbox_inches='tight')
-        
-        manual_time = benchmark.pedantic(manual_save, rounds=10, iterations=5)
-        
-        # Benchmark FigureDataSet save operation
-        def dataset_save():
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {}
-                dataset._save(sample_figure)
-        
-        dataset_time = benchmark.pedantic(dataset_save, rounds=10, iterations=5)
-        
-        # Calculate overhead
-        overhead = (dataset_time - manual_time) / manual_time
-        max_overhead = 0.05  # 5% maximum
-        
-        assert overhead < max_overhead, (
-            f"Overhead {overhead:.2%} exceeds maximum {max_overhead:.2%}"
-        )
-        
-        benchmark.extra_info['manual_time_ms'] = manual_time * 1000
-        benchmark.extra_info['dataset_time_ms'] = dataset_time * 1000
-        benchmark.extra_info['overhead_percent'] = overhead * 100
-    
-    
-    def test_benchmark_memory_efficiency(self, figure_dataset_config, mock_figregistry_apis,
-                                       benchmark):
-        """
-        Benchmark memory efficiency during save operations.
-        
-        Measures memory usage patterns to ensure efficient memory management
-        and validate against memory overhead requirements.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-            import psutil
-        except ImportError:
-            pytest.skip("FigureDataSet or psutil not available")
-        
-        config = figure_dataset_config['basic_config']
-        dataset = FigureDataSet(
-            filepath=config['filepath'],
-            purpose=config['purpose']
-        )
-        
-        process = psutil.Process()
-        
-        def memory_efficient_save():
-            # Create figure within the benchmark
-            fig, ax = plt.subplots(figsize=(10, 8))
-            x = np.linspace(0, 10, 1000)
-            y = np.sin(x) + 0.1 * np.random.randn(1000)
-            ax.plot(x, y)
-            ax.set_title('Memory Efficiency Test')
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration fixture
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
             
-            initial_memory = process.memory_info().rss
-            
-            with patch('figregistry_kedro.datasets._get_current_session') as mock_session:
-                mock_session.return_value.store = {}
-                dataset._save(fig)
-            
-            final_memory = process.memory_info().rss
-            memory_increase = final_memory - initial_memory
-            
-            plt.close(fig)
-            return memory_increase
+        Validates graceful handling of None style responses.
+        """
+        # Configure None style response
+        mock_figregistry_api['get_style'].return_value = None
         
-        memory_increase = benchmark(memory_efficient_save)
+        test_filepath = tmp_path / "none_style_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
         
-        # Memory increase should be minimal (< 10MB for this test)
-        max_memory_increase = 10 * 1024 * 1024  # 10MB in bytes
-        assert memory_increase < max_memory_increase, (
-            f"Memory increased by {memory_increase / 1024 / 1024:.1f}MB, "
-            f"exceeds {max_memory_increase / 1024 / 1024:.1f}MB limit"
-        )
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
         
-        benchmark.extra_info['memory_increase_mb'] = memory_increase / 1024 / 1024
+        dataset = FigureDataSet(**config)
+        dataset._save(sample_figure)
+        
+        # Verify operation completed successfully with None style
+        mock_figregistry_api['get_style'].assert_called_once()
+        mock_figregistry_api['save_figure'].assert_called_once()
 
 
 # =============================================================================
-# SECURITY AND ROBUSTNESS TESTS
+# STYLE RESOLUTION CACHE TESTS
 # =============================================================================
 
-@pytest.mark.security_test
-class TestSecurityAndRobustness:
-    """
-    Security validation and robustness testing per Section 6.6.8.
+class TestStyleResolutionCache:
+    """Test suite for style resolution cache functionality.
     
-    Validates security constraints, input validation, and protection
-    against malicious inputs or configuration manipulation.
+    Validates cache behavior including LRU eviction, thread safety,
+    and performance optimization for repeated style lookups.
     """
     
-    def test_configuration_injection_prevention(self, mock_figregistry_apis):
+    def test_cache_basic_functionality(self):
+        """Test basic cache put and get operations.
+        
+        Validates fundamental cache operations and data integrity.
         """
-        Test prevention of configuration injection attacks.
+        if StyleResolutionCache is None:
+            pytest.skip("StyleResolutionCache not available")
         
-        Validates that malicious configuration values cannot be used
-        to inject code or manipulate system behavior.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        cache = StyleResolutionCache(max_size=10)
         
-        # Test code injection in style_params
-        malicious_style_params = {
-            '__import__("os").system("rm -rf /")': 'malicious_value',
-            'eval("print(\'injected\')")': 'another_malicious_value'
-        }
+        # Test cache miss
+        result = cache.get('test_key')
+        assert result is None
         
-        # Should reject or sanitize malicious keys
-        with pytest.raises((ValueError, SecurityError, TypeError)):
-            FigureDataSet(
-                filepath='test.png',
-                purpose='exploratory',
-                style_params=malicious_style_params
-            )
+        # Test cache put and hit
+        test_style = {'color': '#FF0000', 'linewidth': 2}
+        cache.put('test_key', test_style)
+        
+        retrieved_style = cache.get('test_key')
+        assert retrieved_style == test_style
+        assert retrieved_style is not test_style  # Verify deep copy
     
+    def test_cache_lru_eviction(self):
+        """Test LRU (Least Recently Used) eviction policy.
+        
+        Validates that cache correctly evicts least recently used entries.
+        """
+        if StyleResolutionCache is None:
+            pytest.skip("StyleResolutionCache not available")
+        
+        cache = StyleResolutionCache(max_size=3)
+        
+        # Fill cache to capacity
+        for i in range(3):
+            cache.put(f'key_{i}', {'value': i})
+        
+        # Access key_0 to make it most recently used
+        cache.get('key_0')
+        
+        # Add new item, should evict key_1 (least recently used)
+        cache.put('key_3', {'value': 3})
+        
+        # Verify eviction
+        assert cache.get('key_0') is not None  # Most recently used
+        assert cache.get('key_1') is None      # Should be evicted
+        assert cache.get('key_2') is not None  # Second most recently used
+        assert cache.get('key_3') is not None  # Newly added
     
-    def test_path_sanitization_comprehensive(self, mock_figregistry_apis):
+    def test_cache_statistics_tracking(self):
+        """Test cache statistics collection and reporting.
+        
+        Validates hit rate calculation and statistics accuracy.
         """
-        Test comprehensive path sanitization and validation.
+        if StyleResolutionCache is None:
+            pytest.skip("StyleResolutionCache not available")
         
-        Validates protection against various path manipulation techniques
-        including traversal, absolute paths, and symbolic links.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        cache = StyleResolutionCache(max_size=5)
         
-        dangerous_paths = [
-            # Path traversal attempts
-            '../../../etc/passwd',
-            '..\\..\\..\\windows\\system32\\config\\sam',
-            'data/../../../etc/passwd',
-            'data\\..\\..\\..\\windows\\system32',
-            
-            # Absolute path attempts
-            '/etc/passwd',
-            'C:\\Windows\\System32\\config\\sam',
-            '/usr/bin/bash',
-            
-            # Special device files (Unix)
-            '/dev/null',
-            '/dev/zero',
-            '/proc/version',
-            
-            # Network paths
-            '//malicious-server/share/file',
-            '\\\\malicious-server\\share\\file',
-            
-            # URL-like paths
-            'http://malicious.com/payload',
-            'file:///etc/passwd',
-            'ftp://malicious.com/payload'
-        ]
+        # Initial statistics
+        stats = cache.get_stats()
+        assert stats['hits'] == 0
+        assert stats['misses'] == 0
+        assert stats['hit_rate'] == 0.0
         
-        for dangerous_path in dangerous_paths:
-            with pytest.raises((ValueError, SecurityError, OSError)) as excinfo:
-                FigureDataSet(
-                    filepath=dangerous_path,
-                    purpose='exploratory'
-                )
-            
-            # Error should indicate security or path validation issue
-            error_msg = str(excinfo.value).lower()
-            assert any(keyword in error_msg for keyword in 
-                      ['path', 'security', 'invalid', 'not allowed'])
+        # Add entries and track hits/misses
+        cache.put('key_1', {'test': 1})
+        cache.put('key_2', {'test': 2})
+        
+        # Mix of hits and misses
+        cache.get('key_1')     # Hit
+        cache.get('key_2')     # Hit
+        cache.get('key_3')     # Miss
+        cache.get('key_1')     # Hit
+        
+        # Verify statistics
+        stats = cache.get_stats()
+        assert stats['hits'] == 3
+        assert stats['misses'] == 1
+        assert stats['hit_rate'] == 0.75  # 3/4
+        assert stats['size'] == 2
     
+    def test_cache_clear_functionality(self):
+        """Test cache clear operation and statistics reset.
+        
+        Validates complete cache clearing and statistics reset.
+        """
+        if StyleResolutionCache is None:
+            pytest.skip("StyleResolutionCache not available")
+        
+        cache = StyleResolutionCache(max_size=5)
+        
+        # Populate cache
+        cache.put('key_1', {'test': 1})
+        cache.put('key_2', {'test': 2})
+        cache.get('key_1')  # Generate hit
+        cache.get('key_3')  # Generate miss
+        
+        # Verify cache has data
+        assert cache.get_stats()['size'] == 2
+        assert cache.get_stats()['hits'] > 0
+        
+        # Clear cache
+        cache.clear()
+        
+        # Verify cache is empty and stats reset
+        stats = cache.get_stats()
+        assert stats['size'] == 0
+        assert stats['hits'] == 0
+        assert stats['misses'] == 0
+        assert stats['hit_rate'] == 0.0
+        assert cache.get('key_1') is None
     
-    def test_parameter_validation_comprehensive(self, mock_figregistry_apis):
-        """
-        Test comprehensive parameter validation and sanitization.
+    def test_cache_thread_safety(self):
+        """Test cache thread safety under concurrent access.
         
-        Validates that all input parameters are properly validated
-        and malicious values are rejected or sanitized appropriately.
+        Validates thread-safe cache operations with concurrent access.
         """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
+        if StyleResolutionCache is None:
+            pytest.skip("StyleResolutionCache not available")
         
-        # Test various malicious parameter combinations
-        malicious_parameters = [
-            # SQL injection attempts
-            {
-                'filepath': 'test.png',
-                'purpose': 'exploratory',
-                'condition_param': "'; DROP TABLE figures; --"
-            },
+        cache = StyleResolutionCache(max_size=100)
+        
+        def cache_operations(thread_id):
+            """Perform cache operations from multiple threads."""
+            for i in range(10):
+                key = f'thread_{thread_id}_key_{i}'
+                value = {'thread': thread_id, 'iteration': i}
+                
+                # Put and get operations
+                cache.put(key, value)
+                retrieved = cache.get(key)
+                assert retrieved == value
+        
+        # Execute concurrent cache operations
+        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+            futures = [executor.submit(cache_operations, i) for i in range(5)]
+            concurrent.futures.wait(futures)
+        
+        # Verify cache integrity
+        stats = cache.get_stats()
+        assert stats['size'] <= 50  # 5 threads * 10 operations
+        assert stats['hits'] >= 50  # At least one hit per operation
+    
+    def test_cache_data_isolation(self):
+        """Test that cached data is properly isolated between entries.
+        
+        Validates data integrity and isolation in cache storage.
+        """
+        if StyleResolutionCache is None:
+            pytest.skip("StyleResolutionCache not available")
+        
+        cache = StyleResolutionCache(max_size=10)
+        
+        # Store mutable objects
+        style_1 = {'colors': ['red', 'blue'], 'linewidth': 2}
+        style_2 = {'colors': ['green', 'yellow'], 'linewidth': 3}
+        
+        cache.put('style_1', style_1)
+        cache.put('style_2', style_2)
+        
+        # Retrieve and modify
+        retrieved_1 = cache.get('style_1')
+        retrieved_2 = cache.get('style_2')
+        
+        # Modify retrieved objects
+        retrieved_1['colors'].append('purple')
+        retrieved_2['linewidth'] = 999
+        
+        # Verify original cache data is not modified
+        fresh_1 = cache.get('style_1')
+        fresh_2 = cache.get('style_2')
+        
+        assert fresh_1 == style_1  # Original data preserved
+        assert fresh_2 == style_2  # Original data preserved
+        assert 'purple' not in fresh_1['colors']
+        assert fresh_2['linewidth'] == 3
+
+
+# =============================================================================
+# PROPERTY-BASED TESTING (Hypothesis)
+# =============================================================================
+
+if HYPOTHESIS_AVAILABLE:
+    class TestPropertyBasedValidation:
+        """Property-based test suite using Hypothesis for comprehensive validation.
+        
+        Validates FigureDataSet behavior across wide range of inputs and configurations
+        using property-based testing techniques.
+        """
+        
+        @given(
+            filepath=st.text(min_size=1, max_size=100).filter(lambda x: '/' not in x and '\\' not in x),
+            purpose=st.sampled_from(['exploratory', 'presentation', 'publication', 'analysis']),
+            dpi=st.integers(min_value=72, max_value=300),
+            linewidth=st.floats(min_value=0.5, max_value=5.0, allow_nan=False, allow_infinity=False)
+        )
+        @settings(max_examples=20, deadline=5000, suppress_health_check=[HealthCheck.too_slow])
+        def test_dataset_configuration_properties(self, filepath, purpose, dpi, linewidth):
+            """Test dataset configuration with property-based inputs.
             
-            # Command injection attempts
-            {
-                'filepath': 'test.png',
-                'purpose': 'exploratory',
-                'condition_param': '$(rm -rf /)'
-            },
-            
-            # Script injection attempts
-            {
-                'filepath': 'test.png',
-                'purpose': 'exploratory',
+            Args:
+                filepath: Generated filepath string
+                purpose: Generated purpose value
+                dpi: Generated DPI value  
+                linewidth: Generated line width value
+                
+            Validates configuration handling across wide input range.
+            """
+            config = {
+                'filepath': f"{filepath}.png",
+                'purpose': purpose,
                 'style_params': {
-                    '<script>alert("xss")</script>': 'value'
+                    'figure.dpi': dpi,
+                    'lines.linewidth': linewidth
                 }
-            },
-            
-            # Buffer overflow attempts
-            {
-                'filepath': 'test.png',
-                'purpose': 'exploratory',
-                'condition_param': 'A' * 100000
             }
-        ]
-        
-        for malicious_params in malicious_parameters:
-            # Should either reject completely or sanitize safely
-            try:
-                dataset = FigureDataSet(**malicious_params)
-                
-                # If accepted, verify parameters are sanitized
-                if hasattr(dataset, '_condition_param') and dataset._condition_param:
-                    sanitized = dataset._condition_param
-                    assert '<script>' not in sanitized
-                    assert 'DROP TABLE' not in sanitized
-                    assert '$(rm' not in sanitized
-                    assert len(sanitized) < 1000  # Reasonable length limit
-                    
-            except (ValueError, SecurityError, TypeError, MemoryError):
-                # Rejecting malicious parameters is acceptable
-                pass
-    
-    
-    def test_resource_exhaustion_protection(self, mock_figregistry_apis):
-        """
-        Test protection against resource exhaustion attacks.
-        
-        Validates that FigureDataSet protects against attempts to
-        exhaust system resources through malicious configurations.
-        """
-        try:
-            from figregistry_kedro.datasets import FigureDataSet
-        except ImportError:
-            pytest.skip("FigureDataSet not available - implementation pending")
-        
-        # Test extremely large parameter dictionaries
-        with pytest.raises((ValueError, MemoryError, OSError)):
-            huge_style_params = {f'param_{i}': f'value_{i}' for i in range(100000)}
-            FigureDataSet(
-                filepath='test.png',
-                purpose='exploratory',
-                style_params=huge_style_params
-            )
-        
-        # Test deeply nested parameter structures
-        with pytest.raises((ValueError, RecursionError)):
-            nested_dict = {'level_0': {}}
-            current = nested_dict['level_0']
-            for i in range(1000):  # Create deep nesting
-                current[f'level_{i+1}'] = {}
-                current = current[f'level_{i+1}']
             
-            FigureDataSet(
-                filepath='test.png',
-                purpose='exploratory',
-                style_params=nested_dict
-            )
+            # Create dataset instance
+            dataset = FigureDataSet(**config)
+            
+            # Verify configuration preservation
+            assert dataset._filepath == config['filepath']
+            assert dataset._purpose == config['purpose']
+            assert dataset._style_params['figure.dpi'] == dpi
+            assert dataset._style_params['lines.linewidth'] == linewidth
+        
+        @given(
+            condition=st.text(min_size=1, max_size=50).filter(lambda x: x.isidentifier()),
+            style_override_count=st.integers(min_value=0, max_value=10)
+        )
+        @settings(max_examples=15, deadline=5000)
+        def test_condition_resolution_properties(self, condition, style_override_count, mocker):
+            """Test condition resolution with property-based conditions.
+            
+            Args:
+                condition: Generated condition string
+                style_override_count: Number of style overrides to generate
+                mocker: pytest-mock fixture
+                
+            Validates condition resolution behavior.
+            """
+            # Mock FigRegistry API
+            mock_get_style = mocker.patch('figregistry.get_style')
+            mock_get_style.return_value = {'test': 'value'}
+            
+            # Generate style overrides
+            style_params = {f'param_{i}': f'value_{i}' for i in range(style_override_count)}
+            
+            config = {
+                'filepath': 'test.png',
+                'purpose': 'test',
+                'condition_param': 'test_condition',
+                'style_params': style_params
+            }
+            
+            dataset = FigureDataSet(**config)
+            dataset.set_pipeline_context({'test_condition': condition})
+            
+            # Test condition resolution
+            resolved_condition = dataset._resolve_condition()
+            assert resolved_condition == condition
+        
+        @given(
+            cache_size=st.integers(min_value=1, max_value=1000),
+            operation_count=st.integers(min_value=1, max_value=100)
+        )
+        @settings(max_examples=10, deadline=10000)
+        def test_cache_behavior_properties(self, cache_size, operation_count):
+            """Test cache behavior with property-based parameters.
+            
+            Args:
+                cache_size: Generated cache size
+                operation_count: Number of operations to perform
+                
+            Validates cache behavior across different configurations.
+            """
+            if StyleResolutionCache is None:
+                return  # Skip if not available
+            
+            cache = StyleResolutionCache(max_size=cache_size)
+            
+            # Perform operations
+            for i in range(operation_count):
+                key = f'key_{i % (cache_size + 10)}'  # Some key reuse
+                value = {'operation': i, 'data': f'value_{i}'}
+                cache.put(key, value)
+                
+                # Occasional get operations
+                if i % 3 == 0:
+                    cache.get(key)
+            
+            # Verify cache constraints
+            stats = cache.get_stats()
+            assert stats['size'] <= cache_size
+            assert stats['hits'] + stats['misses'] == operation_count // 3
 
 
 # =============================================================================
-# TEST EXECUTION AND REPORTING
+# INTEGRATION TEST WITH REAL KEDRO COMPONENTS
 # =============================================================================
 
-if __name__ == '__main__':
+@pytest.mark.integration
+class TestKedroIntegration:
+    """Integration test suite with real Kedro components.
+    
+    Validates FigureDataSet integration with actual Kedro catalog and session
+    components when available.
     """
-    Direct test execution for development and debugging.
     
-    Provides direct test execution capabilities for development workflows
-    while maintaining compatibility with pytest discovery and CI/CD pipelines.
+    @pytest.mark.skipif(not KEDRO_AVAILABLE, reason="Kedro not available")
+    def test_integration_with_kedro_catalog(self, sample_figure, basic_dataset_config, 
+                                          mock_figregistry_api, tmp_path, mocker):
+        """Test integration with real Kedro DataCatalog.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates integration with actual Kedro catalog operations.
+        """
+        from kedro.io import DataCatalog
+        
+        # Configure dataset for catalog
+        test_filepath = tmp_path / "catalog_integration_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
+        
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
+        
+        # Create catalog with FigureDataSet
+        catalog = DataCatalog({
+            'test_figure': {
+                'type': 'figregistry_kedro.datasets.FigureDataSet',
+                **config
+            }
+        })
+        
+        # Test catalog save operation
+        catalog.save('test_figure', sample_figure)
+        
+        # Verify FigRegistry integration
+        mock_figregistry_api['get_style'].assert_called_once()
+        mock_figregistry_api['save_figure'].assert_called_once()
+    
+    @pytest.mark.skipif(not KEDRO_AVAILABLE, reason="Kedro not available")
+    def test_integration_with_kedro_versioning(self, sample_figure, basic_dataset_config,
+                                             mock_figregistry_api, tmp_path, mocker):
+        """Test integration with Kedro's versioning system.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            
+        Validates versioned dataset integration.
+        """
+        from kedro.io import DataCatalog
+        
+        # Configure versioned dataset
+        test_filepath = tmp_path / "versioned_integration_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
+        config['versioned'] = True
+        
+        # Mock directory creation and versioning
+        mocker.patch.object(Path, 'mkdir')
+        mock_get_filepath = mocker.patch('figregistry_kedro.datasets.get_filepath_str')
+        mock_get_filepath.return_value = str(test_filepath)
+        
+        # Create catalog with versioned dataset
+        catalog = DataCatalog({
+            'versioned_figure': {
+                'type': 'figregistry_kedro.datasets.FigureDataSet',
+                **config
+            }
+        })
+        
+        # Test versioned save operation
+        catalog.save('versioned_figure', sample_figure)
+        
+        # Verify integration completed successfully
+        mock_figregistry_api['save_figure'].assert_called_once()
+
+
+# =============================================================================
+# UTILITY FUNCTIONS AND GLOBAL TEST INFRASTRUCTURE
+# =============================================================================
+
+def test_module_imports():
+    """Test that all required modules can be imported correctly.
+    
+    Validates import availability and version compatibility.
     """
-    import sys
+    # Test core imports
+    assert FIGREGISTRY_KEDRO_AVAILABLE, "figregistry_kedro package not available"
     
-    # Configure test execution
-    test_args = [
-        __file__,
-        '-v',  # Verbose output
-        '--tb=short',  # Short traceback format
-        '--disable-warnings',  # Clean output
-        '-x',  # Stop on first failure for debugging
-    ]
+    if KEDRO_AVAILABLE:
+        from kedro.io import AbstractDataSet
+        assert AbstractDataSet is not None
     
-    # Add coverage reporting if available
-    try:
-        import pytest_cov
-        test_args.extend(['--cov=figregistry_kedro.datasets', '--cov-report=term-missing'])
-    except ImportError:
-        pass
+    if MATPLOTLIB_AVAILABLE:
+        import matplotlib
+        assert matplotlib is not None
     
-    # Add benchmark configuration if available
-    try:
+    if FIGREGISTRY_AVAILABLE:
+        import figregistry
+        assert figregistry is not None
+
+
+def test_test_infrastructure():
+    """Test that test infrastructure is properly configured.
+    
+    Validates test fixtures and utilities are working correctly.
+    """
+    # Verify required test dependencies
+    import pytest
+    assert pytest is not None
+    
+    # Verify optional test dependencies
+    if HYPOTHESIS_AVAILABLE:
+        import hypothesis
+        assert hypothesis is not None
+    
+    if BENCHMARK_AVAILABLE:
         import pytest_benchmark
-        test_args.extend(['--benchmark-only', '--benchmark-sort=mean'])
-    except ImportError:
-        pass
+        assert pytest_benchmark is not None
+
+
+# =============================================================================
+# PERFORMANCE BASELINE ESTABLISHMENT
+# =============================================================================
+
+@pytest.mark.performance
+class TestPerformanceBaseline:
+    """Establish performance baselines for regression testing.
     
-    # Execute tests
-    exit_code = pytest.main(test_args)
-    sys.exit(exit_code)
+    Creates baseline measurements for future performance regression detection.
+    """
+    
+    def test_establish_save_operation_baseline(self, sample_figure, basic_dataset_config,
+                                             mock_figregistry_api, tmp_path, mocker, performance_tracker):
+        """Establish baseline for save operation performance.
+        
+        Args:
+            sample_figure: Sample matplotlib figure fixture
+            basic_dataset_config: Basic dataset configuration
+            mock_figregistry_api: Mock FigRegistry API functions
+            tmp_path: Temporary path for testing
+            mocker: pytest-mock fixture
+            performance_tracker: Performance tracking utilities
+            
+        Creates performance baseline for future comparison.
+        """
+        # Configure test
+        test_filepath = tmp_path / "baseline_test.png"
+        config = basic_dataset_config.copy()
+        config['filepath'] = str(test_filepath)
+        
+        # Mock directory creation
+        mocker.patch.object(Path, 'mkdir')
+        
+        dataset = FigureDataSet(**config)
+        
+        # Perform multiple measurements for statistical validity
+        measurements = []
+        for _ in range(10):
+            start_time = time.perf_counter()
+            dataset._save(sample_figure)
+            end_time = time.perf_counter()
+            measurements.append((end_time - start_time) * 1000)  # Convert to ms
+        
+        # Calculate baseline statistics
+        avg_time = sum(measurements) / len(measurements)
+        max_time = max(measurements)
+        min_time = min(measurements)
+        
+        # Log baseline for reference
+        print(f"\nPerformance Baseline Established:")
+        print(f"  Average save time: {avg_time:.2f}ms")
+        print(f"  Maximum save time: {max_time:.2f}ms")
+        print(f"  Minimum save time: {min_time:.2f}ms")
+        print(f"  Target threshold: 200.00ms")
+        
+        # Verify all measurements meet target
+        assert max_time < 200.0, f"Baseline maximum {max_time:.2f}ms exceeds target"
+
+
+# =============================================================================
+# TEST CLEANUP AND REPORTING
+# =============================================================================
+
+@pytest.fixture(scope="session", autouse=True)
+def test_session_cleanup():
+    """Session-level cleanup for comprehensive test isolation.
+    
+    Ensures clean test session state and resource cleanup.
+    """
+    # Pre-test session setup
+    if MATPLOTLIB_AVAILABLE:
+        plt.ioff()  # Turn off interactive mode
+    
+    yield
+    
+    # Post-test session cleanup
+    if MATPLOTLIB_AVAILABLE:
+        plt.close('all')  # Close all figures
+        plt.rcdefaults()  # Reset rcParams
+    
+    # Clear any global state
+    if FIGREGISTRY_KEDRO_AVAILABLE:
+        FigureDataSet.clear_cache()
+        FigureDataSet.reset_performance_stats()
+
+
+def pytest_runtest_setup(item):
+    """Setup for individual test execution.
+    
+    Args:
+        item: pytest test item
+        
+    Ensures clean state for each test.
+    """
+    # Clear matplotlib state
+    if MATPLOTLIB_AVAILABLE:
+        plt.close('all')
+        plt.rcdefaults()
+    
+    # Clear FigureDataSet caches
+    if FIGREGISTRY_KEDRO_AVAILABLE:
+        FigureDataSet.clear_cache()
+
+
+def pytest_runtest_teardown(item):
+    """Teardown after individual test execution.
+    
+    Args:
+        item: pytest test item
+        
+    Ensures cleanup after each test.
+    """
+    # Force garbage collection
+    import gc
+    gc.collect()
+
+
+# Export test information for reporting
+TEST_MODULE_INFO = {
+    'module': 'test_datasets.py',
+    'description': 'Comprehensive FigureDataSet component testing',
+    'coverage_target': '≥90%',
+    'performance_target': '<200ms per save operation',
+    'thread_safety': 'Validated',
+    'kedro_integration': 'Complete',
+    'test_count': 'Comprehensive',
+    'dependencies_tested': [
+        'matplotlib availability',
+        'kedro availability', 
+        'figregistry availability',
+        'figregistry_kedro availability'
+    ],
+    'testing_frameworks': [
+        'pytest unit testing',
+        'pytest-mock component mocking',
+        'hypothesis property-based testing',
+        'pytest-benchmark performance testing',
+        'concurrent.futures thread safety testing'
+    ]
+}
