@@ -1,296 +1,505 @@
-experiment_id,condition,treatment_type,measurement_value,timestamp,researcher_id,batch_id,replicate,sample_size,temperature_c,ph_level,notes
-EXP_001,control,baseline,24.73,2023-11-01T09:30:00.000Z,researcher_001,BATCH_A,1,100,22.5,7.2,Initial baseline measurement
-EXP_001,control,baseline,23.89,2023-11-01T09:45:00.000Z,researcher_001,BATCH_A,2,100,22.5,7.2,
-EXP_001,control,baseline,25.12,2023-11-01T10:00:00.000Z,researcher_001,BATCH_A,3,100,22.5,7.2,
-EXP_001,treatment_a,compound_x,31.45,2023-11-01T10:30:00.000Z,researcher_001,BATCH_A,1,100,22.5,7.2,First treatment application
-EXP_001,treatment_a,compound_x,32.18,2023-11-01T10:45:00.000Z,researcher_001,BATCH_A,2,100,22.5,7.2,
-EXP_001,treatment_a,compound_x,30.94,2023-11-01T11:00:00.000Z,researcher_001,BATCH_A,3,100,22.5,7.2,
-EXP_001,treatment_b,compound_y,28.67,2023-11-01T11:30:00.000Z,researcher_001,BATCH_A,1,100,22.5,7.2,Alternative treatment
-EXP_001,treatment_b,compound_y,29.34,2023-11-01T11:45:00.000Z,researcher_001,BATCH_A,2,100,22.5,7.2,
-EXP_001,treatment_b,compound_y,27.98,2023-11-01T12:00:00.000Z,researcher_001,BATCH_A,3,100,22.5,7.2,
-EXP_001,exploratory,dose_response,26.81,2023-11-01T13:00:00.000Z,researcher_001,BATCH_A,1,50,22.5,7.2,Exploratory dose testing
-EXP_001,exploratory,dose_response,35.67,2023-11-01T13:15:00.000Z,researcher_001,BATCH_A,2,50,22.5,7.2,Higher dose
-EXP_001,exploratory,dose_response,41.23,2023-11-01T13:30:00.000Z,researcher_001,BATCH_A,3,50,22.5,7.2,Maximum dose
-EXP_002,control,baseline,23.45,2023-11-02T09:30:00.000Z,researcher_002,BATCH_B,1,120,23.0,7.1,Second experiment baseline
-EXP_002,control,baseline,24.12,2023-11-02T09:45:00.000Z,researcher_002,BATCH_B,2,120,23.0,7.1,
-EXP_002,control,baseline,22.89,2023-11-02T10:00:00.000Z,researcher_002,BATCH_B,3,120,23.0,7.1,
-EXP_002,treatment_a,compound_x,30.78,2023-11-02T10:30:00.000Z,researcher_002,BATCH_B,1,120,23.0,7.1,Replication of treatment A
-EXP_002,treatment_a,compound_x,31.56,2023-11-02T10:45:00.000Z,researcher_002,BATCH_B,2,120,23.0,7.1,
-EXP_002,treatment_a,compound_x,29.89,2023-11-02T11:00:00.000Z,researcher_002,BATCH_B,3,120,23.0,7.1,
-EXP_002,treatment_b,compound_y,27.34,2023-11-02T11:30:00.000Z,researcher_002,BATCH_B,1,120,23.0,7.1,Replication of treatment B
-EXP_002,treatment_b,compound_y,28.91,2023-11-02T11:45:00.000Z,researcher_002,BATCH_B,2,120,23.0,7.1,
-EXP_002,treatment_b,compound_y,26.78,2023-11-02T12:00:00.000Z,researcher_002,BATCH_B,3,120,23.0,7.1,
-EXP_002,presentation,summary_stats,29.45,2023-11-02T14:00:00.000Z,researcher_002,BATCH_B,1,360,23.0,7.1,Data for presentation
-EXP_002,presentation,summary_stats,28.67,2023-11-02T14:15:00.000Z,researcher_002,BATCH_B,2,360,23.0,7.1,
-EXP_002,presentation,summary_stats,30.12,2023-11-02T14:30:00.000Z,researcher_002,BATCH_B,3,360,23.0,7.1,
-EXP_003,control,baseline,25.01,2023-11-03T08:00:00.000Z,researcher_003,BATCH_C,1,80,21.8,7.3,Weekend experiment
-EXP_003,control,baseline,24.67,2023-11-03T08:15:00.000Z,researcher_003,BATCH_C,2,80,21.8,7.3,
-EXP_003,control,baseline,,2023-11-03T08:30:00.000Z,researcher_003,BATCH_C,3,80,21.8,7.3,Equipment malfunction - missing data
-EXP_003,treatment_a,compound_x,32.89,2023-11-03T09:00:00.000Z,researcher_003,BATCH_C,1,80,21.8,7.3,
-EXP_003,treatment_a,compound_x,33.45,2023-11-03T09:15:00.000Z,researcher_003,BATCH_C,2,80,21.8,7.3,
-EXP_003,treatment_a,compound_x,31.78,2023-11-03T09:30:00.000Z,researcher_003,BATCH_C,3,80,21.8,7.3,
-EXP_003,treatment_b,compound_y,27.12,2023-11-03T10:00:00.000Z,researcher_003,BATCH_C,1,80,21.8,7.3,
-EXP_003,treatment_b,compound_y,28.45,2023-11-03T10:15:00.000Z,researcher_003,BATCH_C,2,80,21.8,7.3,
-EXP_003,treatment_b,compound_y,26.89,2023-11-03T10:30:00.000Z,researcher_003,BATCH_C,3,80,21.8,7.3,
-EXP_003,exploratory,time_course,24.56,2023-11-03T11:00:00.000Z,researcher_003,BATCH_C,1,40,21.8,7.3,Time course analysis
-EXP_003,exploratory,time_course,26.78,2023-11-03T11:30:00.000Z,researcher_003,BATCH_C,2,40,21.8,7.3,30-minute timepoint
-EXP_003,exploratory,time_course,29.34,2023-11-03T12:00:00.000Z,researcher_003,BATCH_C,3,40,21.8,7.3,60-minute timepoint
-EXP_003,exploratory,time_course,32.11,2023-11-03T12:30:00.000Z,researcher_003,BATCH_C,4,40,21.8,7.3,90-minute timepoint
-EXP_003,publication,final_analysis,30.89,2023-11-03T15:00:00.000Z,researcher_003,BATCH_C,1,200,21.8,7.3,Publication quality data
-EXP_003,publication,final_analysis,31.45,2023-11-03T15:15:00.000Z,researcher_003,BATCH_C,2,200,21.8,7.3,
-EXP_003,publication,final_analysis,30.12,2023-11-03T15:30:00.000Z,researcher_003,BATCH_C,3,200,21.8,7.3,
-EXP_004,control,baseline,23.78,2023-11-06T10:00:00.000Z,researcher_001,BATCH_D,1,150,22.2,7.0,Monday restart
-EXP_004,control,baseline,24.34,2023-11-06T10:15:00.000Z,researcher_001,BATCH_D,2,150,22.2,7.0,
-EXP_004,control,baseline,23.12,2023-11-06T10:30:00.000Z,researcher_001,BATCH_D,3,150,22.2,7.0,
-EXP_004,treatment_a,compound_x,30.45,2023-11-06T11:00:00.000Z,researcher_001,BATCH_D,1,150,22.2,7.0,
-EXP_004,treatment_a,compound_x,31.23,2023-11-06T11:15:00.000Z,researcher_001,BATCH_D,2,150,22.2,7.0,
-EXP_004,treatment_a,compound_x,29.89,2023-11-06T11:30:00.000Z,researcher_001,BATCH_D,3,150,22.2,7.0,
-EXP_004,treatment_b,compound_y,28.12,2023-11-06T12:00:00.000Z,researcher_001,BATCH_D,1,150,22.2,7.0,
-EXP_004,treatment_b,compound_y,28.89,2023-11-06T12:15:00.000Z,researcher_001,BATCH_D,2,150,22.2,7.0,
-EXP_004,treatment_b,compound_y,27.45,2023-11-06T12:30:00.000Z,researcher_001,BATCH_D,3,150,22.2,7.0,
-EXP_004,exploratory,ph_variation,22.34,2023-11-06T13:00:00.000Z,researcher_001,BATCH_D,1,75,22.2,6.5,pH stress test
-EXP_004,exploratory,ph_variation,19.67,2023-11-06T13:15:00.000Z,researcher_001,BATCH_D,2,75,22.2,6.0,Lower pH
-EXP_004,exploratory,ph_variation,15.23,2023-11-06T13:30:00.000Z,researcher_001,BATCH_D,3,75,22.2,5.5,Very low pH
-EXP_004,exploratory,ph_variation,32.45,2023-11-06T13:45:00.000Z,researcher_001,BATCH_D,4,75,22.2,8.0,High pH
-EXP_004,exploratory,ph_variation,35.78,2023-11-06T14:00:00.000Z,researcher_001,BATCH_D,5,75,22.2,8.5,Very high pH
-EXP_005,control,baseline,24.89,2023-11-07T09:00:00.000Z,researcher_004,BATCH_E,1,200,22.0,7.2,Large sample control
-EXP_005,control,baseline,25.12,2023-11-07T09:15:00.000Z,researcher_004,BATCH_E,2,200,22.0,7.2,
-EXP_005,control,baseline,24.67,2023-11-07T09:30:00.000Z,researcher_004,BATCH_E,3,200,22.0,7.2,
-EXP_005,control,baseline,23.98,2023-11-07T09:45:00.000Z,researcher_004,BATCH_E,4,200,22.0,7.2,
-EXP_005,control,baseline,25.34,2023-11-07T10:00:00.000Z,researcher_004,BATCH_E,5,200,22.0,7.2,
-EXP_005,treatment_a,compound_x,31.78,2023-11-07T10:30:00.000Z,researcher_004,BATCH_E,1,200,22.0,7.2,
-EXP_005,treatment_a,compound_x,32.45,2023-11-07T10:45:00.000Z,researcher_004,BATCH_E,2,200,22.0,7.2,
-EXP_005,treatment_a,compound_x,30.89,2023-11-07T11:00:00.000Z,researcher_004,BATCH_E,3,200,22.0,7.2,
-EXP_005,treatment_a,compound_x,33.12,2023-11-07T11:15:00.000Z,researcher_004,BATCH_E,4,200,22.0,7.2,
-EXP_005,treatment_a,compound_x,31.56,2023-11-07T11:30:00.000Z,researcher_004,BATCH_E,5,200,22.0,7.2,
-EXP_005,treatment_b,compound_y,28.45,2023-11-07T12:00:00.000Z,researcher_004,BATCH_E,1,200,22.0,7.2,
-EXP_005,treatment_b,compound_y,29.12,2023-11-07T12:15:00.000Z,researcher_004,BATCH_E,2,200,22.0,7.2,
-EXP_005,treatment_b,compound_y,27.89,2023-11-07T12:30:00.000Z,researcher_004,BATCH_E,3,200,22.0,7.2,
-EXP_005,treatment_b,compound_y,28.67,2023-11-07T12:45:00.000Z,researcher_004,BATCH_E,4,200,22.0,7.2,
-EXP_005,treatment_b,compound_y,29.34,2023-11-07T13:00:00.000Z,researcher_004,BATCH_E,5,200,22.0,7.2,
-EXP_005,presentation,weekly_review,29.67,2023-11-07T16:00:00.000Z,researcher_004,BATCH_E,1,1000,22.0,7.2,Weekly presentation data
-EXP_005,presentation,weekly_review,30.12,2023-11-07T16:15:00.000Z,researcher_004,BATCH_E,2,1000,22.0,7.2,
-EXP_005,presentation,weekly_review,28.98,2023-11-07T16:30:00.000Z,researcher_004,BATCH_E,3,1000,22.0,7.2,
-EXP_006,control,baseline,24.12,2023-11-08T08:30:00.000Z,researcher_002,BATCH_F,1,90,23.5,7.4,Temperature variation test
-EXP_006,control,baseline,23.89,2023-11-08T08:45:00.000Z,researcher_002,BATCH_F,2,90,23.5,7.4,
-EXP_006,control,baseline,24.45,2023-11-08T09:00:00.000Z,researcher_002,BATCH_F,3,90,23.5,7.4,
-EXP_006,treatment_a,compound_x,30.12,2023-11-08T09:30:00.000Z,researcher_002,BATCH_F,1,90,25.0,7.4,Higher temperature
-EXP_006,treatment_a,compound_x,31.89,2023-11-08T09:45:00.000Z,researcher_002,BATCH_F,2,90,25.0,7.4,
-EXP_006,treatment_a,compound_x,29.67,2023-11-08T10:00:00.000Z,researcher_002,BATCH_F,3,90,25.0,7.4,
-EXP_006,treatment_b,compound_y,27.78,2023-11-08T10:30:00.000Z,researcher_002,BATCH_F,1,90,25.0,7.4,
-EXP_006,treatment_b,compound_y,28.34,2023-11-08T10:45:00.000Z,researcher_002,BATCH_F,2,90,25.0,7.4,
-EXP_006,treatment_b,compound_y,26.98,2023-11-08T11:00:00.000Z,researcher_002,BATCH_F,3,90,25.0,7.4,
-EXP_006,exploratory,temperature_response,25.67,2023-11-08T11:30:00.000Z,researcher_002,BATCH_F,1,45,20.0,7.4,Cold stress
-EXP_006,exploratory,temperature_response,23.12,2023-11-08T11:45:00.000Z,researcher_002,BATCH_F,2,45,18.0,7.4,Very cold
-EXP_006,exploratory,temperature_response,36.78,2023-11-08T12:00:00.000Z,researcher_002,BATCH_F,3,45,30.0,7.4,Heat stress
-EXP_006,exploratory,temperature_response,42.34,2023-11-08T12:15:00.000Z,researcher_002,BATCH_F,4,45,35.0,7.4,Extreme heat
-EXP_007,control,baseline,23.67,2023-11-09T14:00:00.000Z,researcher_005,BATCH_G,1,110,22.8,7.1,Afternoon experiment
-EXP_007,control,baseline,24.23,2023-11-09T14:15:00.000Z,researcher_005,BATCH_G,2,110,22.8,7.1,
-EXP_007,control,baseline,23.45,2023-11-09T14:30:00.000Z,researcher_005,BATCH_G,3,110,22.8,7.1,
-EXP_007,treatment_a,compound_x,31.12,2023-11-09T15:00:00.000Z,researcher_005,BATCH_G,1,110,22.8,7.1,
-EXP_007,treatment_a,compound_x,30.89,2023-11-09T15:15:00.000Z,researcher_005,BATCH_G,2,110,22.8,7.1,
-EXP_007,treatment_a,compound_x,32.34,2023-11-09T15:30:00.000Z,researcher_005,BATCH_G,3,110,22.8,7.1,
-EXP_007,treatment_b,compound_y,28.56,2023-11-09T16:00:00.000Z,researcher_005,BATCH_G,1,110,22.8,7.1,
-EXP_007,treatment_b,compound_y,27.89,2023-11-09T16:15:00.000Z,researcher_005,BATCH_G,2,110,22.8,7.1,
-EXP_007,treatment_b,compound_y,28.12,2023-11-09T16:30:00.000Z,researcher_005,BATCH_G,3,110,22.8,7.1,
-EXP_007,publication,manuscript_fig1,30.45,2023-11-09T17:00:00.000Z,researcher_005,BATCH_G,1,330,22.8,7.1,Figure 1 for manuscript
-EXP_007,publication,manuscript_fig1,31.23,2023-11-09T17:15:00.000Z,researcher_005,BATCH_G,2,330,22.8,7.1,
-EXP_007,publication,manuscript_fig1,29.89,2023-11-09T17:30:00.000Z,researcher_005,BATCH_G,3,330,22.8,7.1,
-EXP_008,control,baseline,24.78,2023-11-10T07:30:00.000Z,researcher_003,BATCH_H,1,180,21.5,7.3,Early morning run
-EXP_008,control,baseline,25.12,2023-11-10T07:45:00.000Z,researcher_003,BATCH_H,2,180,21.5,7.3,
-EXP_008,control,baseline,24.34,2023-11-10T08:00:00.000Z,researcher_003,BATCH_H,3,180,21.5,7.3,
-EXP_008,treatment_a,compound_x,32.67,2023-11-10T08:30:00.000Z,researcher_003,BATCH_H,1,180,21.5,7.3,
-EXP_008,treatment_a,compound_x,31.89,2023-11-10T08:45:00.000Z,researcher_003,BATCH_H,2,180,21.5,7.3,
-EXP_008,treatment_a,compound_x,33.45,2023-11-10T09:00:00.000Z,researcher_003,BATCH_H,3,180,21.5,7.3,
-EXP_008,treatment_b,compound_y,28.91,2023-11-10T09:30:00.000Z,researcher_003,BATCH_H,1,180,21.5,7.3,
-EXP_008,treatment_b,compound_y,27.56,2023-11-10T09:45:00.000Z,researcher_003,BATCH_H,2,180,21.5,7.3,
-EXP_008,treatment_b,compound_y,29.12,2023-11-10T10:00:00.000Z,researcher_003,BATCH_H,3,180,21.5,7.3,
-EXP_008,exploratory,dose_titration,26.34,2023-11-10T10:30:00.000Z,researcher_003,BATCH_H,1,60,21.5,7.3,Low dose titration
-EXP_008,exploratory,dose_titration,28.78,2023-11-10T10:45:00.000Z,researcher_003,BATCH_H,2,60,21.5,7.3,Medium dose
-EXP_008,exploratory,dose_titration,33.45,2023-11-10T11:00:00.000Z,researcher_003,BATCH_H,3,60,21.5,7.3,High dose
-EXP_008,exploratory,dose_titration,39.12,2023-11-10T11:15:00.000Z,researcher_003,BATCH_H,4,60,21.5,7.3,Maximum dose
-EXP_008,exploratory,dose_titration,44.67,2023-11-10T11:30:00.000Z,researcher_003,BATCH_H,5,60,21.5,7.3,Overdose test
-EXP_009,control,baseline,23.89,2023-11-13T11:00:00.000Z,researcher_006,BATCH_I,1,130,22.3,7.2,New researcher validation
-EXP_009,control,baseline,24.56,2023-11-13T11:15:00.000Z,researcher_006,BATCH_I,2,130,22.3,7.2,
-EXP_009,control,baseline,23.34,2023-11-13T11:30:00.000Z,researcher_006,BATCH_I,3,130,22.3,7.2,
-EXP_009,treatment_a,compound_x,30.78,2023-11-13T12:00:00.000Z,researcher_006,BATCH_I,1,130,22.3,7.2,
-EXP_009,treatment_a,compound_x,31.45,2023-11-13T12:15:00.000Z,researcher_006,BATCH_I,2,130,22.3,7.2,
-EXP_009,treatment_a,compound_x,29.89,2023-11-13T12:30:00.000Z,researcher_006,BATCH_I,3,130,22.3,7.2,
-EXP_009,treatment_b,compound_y,27.67,2023-11-13T13:00:00.000Z,researcher_006,BATCH_I,1,130,22.3,7.2,
-EXP_009,treatment_b,compound_y,28.34,2023-11-13T13:15:00.000Z,researcher_006,BATCH_I,2,130,22.3,7.2,
-EXP_009,treatment_b,compound_y,26.98,2023-11-13T13:30:00.000Z,researcher_006,BATCH_I,3,130,22.3,7.2,
-EXP_009,presentation,team_meeting,29.34,2023-11-13T15:30:00.000Z,researcher_006,BATCH_I,1,390,22.3,7.2,Team presentation data
-EXP_009,presentation,team_meeting,30.12,2023-11-13T15:45:00.000Z,researcher_006,BATCH_I,2,390,22.3,7.2,
-EXP_009,presentation,team_meeting,28.67,2023-11-13T16:00:00.000Z,researcher_006,BATCH_I,3,390,22.3,7.2,
-EXP_010,control,baseline,24.45,2023-11-14T09:15:00.000Z,researcher_001,BATCH_J,1,160,22.7,7.0,Cross-validation experiment
-EXP_010,control,baseline,23.78,2023-11-14T09:30:00.000Z,researcher_001,BATCH_J,2,160,22.7,7.0,
-EXP_010,control,baseline,25.12,2023-11-14T09:45:00.000Z,researcher_001,BATCH_J,3,160,22.7,7.0,
-EXP_010,treatment_a,compound_x,31.56,2023-11-14T10:15:00.000Z,researcher_001,BATCH_J,1,160,22.7,7.0,
-EXP_010,treatment_a,compound_x,32.23,2023-11-14T10:30:00.000Z,researcher_001,BATCH_J,2,160,22.7,7.0,
-EXP_010,treatment_a,compound_x,30.89,2023-11-14T10:45:00.000Z,researcher_001,BATCH_J,3,160,22.7,7.0,
-EXP_010,treatment_b,compound_y,28.12,2023-11-14T11:15:00.000Z,researcher_001,BATCH_J,1,160,22.7,7.0,
-EXP_010,treatment_b,compound_y,27.45,2023-11-14T11:30:00.000Z,researcher_001,BATCH_J,2,160,22.7,7.0,
-EXP_010,treatment_b,compound_y,28.78,2023-11-14T11:45:00.000Z,researcher_001,BATCH_J,3,160,22.7,7.0,
-EXP_010,exploratory,solvent_comparison,24.89,2023-11-14T12:15:00.000Z,researcher_001,BATCH_J,1,80,22.7,7.0,DMSO solvent
-EXP_010,exploratory,solvent_comparison,25.67,2023-11-14T12:30:00.000Z,researcher_001,BATCH_J,2,80,22.7,7.0,Ethanol solvent
-EXP_010,exploratory,solvent_comparison,23.12,2023-11-14T12:45:00.000Z,researcher_001,BATCH_J,3,80,22.7,7.0,Water solvent
-EXP_010,exploratory,solvent_comparison,26.45,2023-11-14T13:00:00.000Z,researcher_001,BATCH_J,4,80,22.7,7.0,Acetone solvent
-EXP_010,publication,supplementary_fig,30.78,2023-11-14T16:00:00.000Z,researcher_001,BATCH_J,1,480,22.7,7.0,Supplementary figure data
-EXP_010,publication,supplementary_fig,31.34,2023-11-14T16:15:00.000Z,researcher_001,BATCH_J,2,480,22.7,7.0,
-EXP_010,publication,supplementary_fig,29.89,2023-11-14T16:30:00.000Z,researcher_001,BATCH_J,3,480,22.7,7.0,
-EXP_011,control,baseline,25.23,2023-11-15T13:45:00.000Z,researcher_004,BATCH_K,1,140,23.2,7.5,Late afternoon run
-EXP_011,control,baseline,24.67,2023-11-15T14:00:00.000Z,researcher_004,BATCH_K,2,140,23.2,7.5,
-EXP_011,control,baseline,25.78,2023-11-15T14:15:00.000Z,researcher_004,BATCH_K,3,140,23.2,7.5,
-EXP_011,treatment_a,compound_x,32.45,2023-11-15T14:45:00.000Z,researcher_004,BATCH_K,1,140,23.2,7.5,
-EXP_011,treatment_a,compound_x,31.78,2023-11-15T15:00:00.000Z,researcher_004,BATCH_K,2,140,23.2,7.5,
-EXP_011,treatment_a,compound_x,33.12,2023-11-15T15:15:00.000Z,researcher_004,BATCH_K,3,140,23.2,7.5,
-EXP_011,treatment_b,compound_y,28.89,2023-11-15T15:45:00.000Z,researcher_004,BATCH_K,1,140,23.2,7.5,
-EXP_011,treatment_b,compound_y,27.34,2023-11-15T16:00:00.000Z,researcher_004,BATCH_K,2,140,23.2,7.5,
-EXP_011,treatment_b,compound_y,29.56,2023-11-15T16:15:00.000Z,researcher_004,BATCH_K,3,140,23.2,7.5,
-EXP_011,exploratory,stability_test,25.78,2023-11-15T16:45:00.000Z,researcher_004,BATCH_K,1,70,23.2,7.5,Day 0 stability
-EXP_011,exploratory,stability_test,25.12,2023-11-15T17:00:00.000Z,researcher_004,BATCH_K,2,70,23.2,7.5,Day 1 stability
-EXP_011,exploratory,stability_test,24.45,2023-11-15T17:15:00.000Z,researcher_004,BATCH_K,3,70,23.2,7.5,Day 3 stability
-EXP_011,exploratory,stability_test,23.67,2023-11-15T17:30:00.000Z,researcher_004,BATCH_K,4,70,23.2,7.5,Day 7 stability
-EXP_011,exploratory,stability_test,22.34,2023-11-15T17:45:00.000Z,researcher_004,BATCH_K,5,70,23.2,7.5,Day 14 stability
-EXP_012,control,baseline,,2023-11-16T08:00:00.000Z,researcher_002,BATCH_L,1,170,21.9,7.1,Equipment failure - data lost
-EXP_012,control,baseline,24.12,2023-11-16T08:30:00.000Z,researcher_002,BATCH_L,2,170,21.9,7.1,Equipment repaired
-EXP_012,control,baseline,23.89,2023-11-16T08:45:00.000Z,researcher_002,BATCH_L,3,170,21.9,7.1,
-EXP_012,treatment_a,compound_x,30.67,2023-11-16T09:15:00.000Z,researcher_002,BATCH_L,1,170,21.9,7.1,
-EXP_012,treatment_a,compound_x,31.34,2023-11-16T09:30:00.000Z,researcher_002,BATCH_L,2,170,21.9,7.1,
-EXP_012,treatment_a,compound_x,29.78,2023-11-16T09:45:00.000Z,researcher_002,BATCH_L,3,170,21.9,7.1,
-EXP_012,treatment_b,compound_y,27.89,2023-11-16T10:15:00.000Z,researcher_002,BATCH_L,1,170,21.9,7.1,
-EXP_012,treatment_b,compound_y,28.45,2023-11-16T10:30:00.000Z,researcher_002,BATCH_L,2,170,21.9,7.1,
-EXP_012,treatment_b,compound_y,26.78,2023-11-16T10:45:00.000Z,researcher_002,BATCH_L,3,170,21.9,7.1,
-EXP_012,exploratory,buffer_screen,25.34,2023-11-16T11:15:00.000Z,researcher_002,BATCH_L,1,85,21.9,6.8,Phosphate buffer
-EXP_012,exploratory,buffer_screen,26.78,2023-11-16T11:30:00.000Z,researcher_002,BATCH_L,2,85,21.9,7.2,Tris buffer
-EXP_012,exploratory,buffer_screen,24.12,2023-11-16T11:45:00.000Z,researcher_002,BATCH_L,3,85,21.9,7.6,HEPES buffer
-EXP_012,exploratory,buffer_screen,23.56,2023-11-16T12:00:00.000Z,researcher_002,BATCH_L,4,85,21.9,8.0,Bicine buffer
-EXP_012,presentation,progress_update,29.12,2023-11-16T14:30:00.000Z,researcher_002,BATCH_L,1,510,21.9,7.1,Monthly progress review
-EXP_012,presentation,progress_update,30.45,2023-11-16T14:45:00.000Z,researcher_002,BATCH_L,2,510,21.9,7.1,
-EXP_012,presentation,progress_update,28.67,2023-11-16T15:00:00.000Z,researcher_002,BATCH_L,3,510,21.9,7.1,
-EXP_013,control,baseline,24.56,2023-11-17T10:30:00.000Z,researcher_007,BATCH_M,1,190,22.1,7.3,New batch validation
-EXP_013,control,baseline,25.12,2023-11-17T10:45:00.000Z,researcher_007,BATCH_M,2,190,22.1,7.3,
-EXP_013,control,baseline,23.78,2023-11-17T11:00:00.000Z,researcher_007,BATCH_M,3,190,22.1,7.3,
-EXP_013,treatment_a,compound_x,31.89,2023-11-17T11:30:00.000Z,researcher_007,BATCH_M,1,190,22.1,7.3,
-EXP_013,treatment_a,compound_x,30.45,2023-11-17T11:45:00.000Z,researcher_007,BATCH_M,2,190,22.1,7.3,
-EXP_013,treatment_a,compound_x,32.67,2023-11-17T12:00:00.000Z,researcher_007,BATCH_M,3,190,22.1,7.3,
-EXP_013,treatment_b,compound_y,28.34,2023-11-17T12:30:00.000Z,researcher_007,BATCH_M,1,190,22.1,7.3,
-EXP_013,treatment_b,compound_y,27.78,2023-11-17T12:45:00.000Z,researcher_007,BATCH_M,2,190,22.1,7.3,
-EXP_013,treatment_b,compound_y,29.12,2023-11-17T13:00:00.000Z,researcher_007,BATCH_M,3,190,22.1,7.3,
-EXP_013,exploratory,incubation_time,26.45,2023-11-17T13:30:00.000Z,researcher_007,BATCH_M,1,95,22.1,7.3,5 minute incubation
-EXP_013,exploratory,incubation_time,28.67,2023-11-17T13:45:00.000Z,researcher_007,BATCH_M,2,95,22.1,7.3,15 minute incubation
-EXP_013,exploratory,incubation_time,31.23,2023-11-17T14:00:00.000Z,researcher_007,BATCH_M,3,95,22.1,7.3,30 minute incubation
-EXP_013,exploratory,incubation_time,34.78,2023-11-17T14:15:00.000Z,researcher_007,BATCH_M,4,95,22.1,7.3,60 minute incubation
-EXP_013,exploratory,incubation_time,37.45,2023-11-17T14:30:00.000Z,researcher_007,BATCH_M,5,95,22.1,7.3,120 minute incubation
-EXP_013,publication,figure_2,31.67,2023-11-17T16:00:00.000Z,researcher_007,BATCH_M,1,570,22.1,7.3,Manuscript Figure 2
-EXP_013,publication,figure_2,32.34,2023-11-17T16:15:00.000Z,researcher_007,BATCH_M,2,570,22.1,7.3,
-EXP_013,publication,figure_2,30.89,2023-11-17T16:30:00.000Z,researcher_007,BATCH_M,3,570,22.1,7.3,
-EXP_014,control,baseline,23.34,2023-11-20T07:45:00.000Z,researcher_005,BATCH_N,1,210,21.7,7.0,Monday morning experiment
-EXP_014,control,baseline,24.78,2023-11-20T08:00:00.000Z,researcher_005,BATCH_N,2,210,21.7,7.0,
-EXP_014,control,baseline,23.56,2023-11-20T08:15:00.000Z,researcher_005,BATCH_N,3,210,21.7,7.0,
-EXP_014,treatment_a,compound_x,30.12,2023-11-20T08:45:00.000Z,researcher_005,BATCH_N,1,210,21.7,7.0,
-EXP_014,treatment_a,compound_x,31.78,2023-11-20T09:00:00.000Z,researcher_005,BATCH_N,2,210,21.7,7.0,
-EXP_014,treatment_a,compound_x,29.45,2023-11-20T09:15:00.000Z,researcher_005,BATCH_N,3,210,21.7,7.0,
-EXP_014,treatment_b,compound_y,27.56,2023-11-20T09:45:00.000Z,researcher_005,BATCH_N,1,210,21.7,7.0,
-EXP_014,treatment_b,compound_y,28.89,2023-11-20T10:00:00.000Z,researcher_005,BATCH_N,2,210,21.7,7.0,
-EXP_014,treatment_b,compound_y,26.34,2023-11-20T10:15:00.000Z,researcher_005,BATCH_N,3,210,21.7,7.0,
-EXP_014,exploratory,competition_assay,22.45,2023-11-20T10:45:00.000Z,researcher_005,BATCH_N,1,105,21.7,7.0,No competitor
-EXP_014,exploratory,competition_assay,25.78,2023-11-20T11:00:00.000Z,researcher_005,BATCH_N,2,105,21.7,7.0,Low competitor
-EXP_014,exploratory,competition_assay,29.12,2023-11-20T11:15:00.000Z,researcher_005,BATCH_N,3,105,21.7,7.0,Medium competitor
-EXP_014,exploratory,competition_assay,32.67,2023-11-20T11:30:00.000Z,researcher_005,BATCH_N,4,105,21.7,7.0,High competitor
-EXP_014,exploratory,competition_assay,35.89,2023-11-20T11:45:00.000Z,researcher_005,BATCH_N,5,105,21.7,7.0,Saturating competitor
-EXP_015,control,baseline,25.01,2023-11-21T12:00:00.000Z,researcher_008,BATCH_O,1,120,22.4,7.2,Midday control experiment
-EXP_015,control,baseline,24.34,2023-11-21T12:15:00.000Z,researcher_008,BATCH_O,2,120,22.4,7.2,
-EXP_015,control,baseline,25.67,2023-11-21T12:30:00.000Z,researcher_008,BATCH_O,3,120,22.4,7.2,
-EXP_015,treatment_a,compound_x,31.45,2023-11-21T13:00:00.000Z,researcher_008,BATCH_O,1,120,22.4,7.2,
-EXP_015,treatment_a,compound_x,32.78,2023-11-21T13:15:00.000Z,researcher_008,BATCH_O,2,120,22.4,7.2,
-EXP_015,treatment_a,compound_x,30.23,2023-11-21T13:30:00.000Z,researcher_008,BATCH_O,3,120,22.4,7.2,
-EXP_015,treatment_b,compound_y,28.12,2023-11-21T14:00:00.000Z,researcher_008,BATCH_O,1,120,22.4,7.2,
-EXP_015,treatment_b,compound_y,27.89,2023-11-21T14:15:00.000Z,researcher_008,BATCH_O,2,120,22.4,7.2,
-EXP_015,treatment_b,compound_y,28.56,2023-11-21T14:30:00.000Z,researcher_008,BATCH_O,3,120,22.4,7.2,
-EXP_015,presentation,department_seminar,29.78,2023-11-21T16:30:00.000Z,researcher_008,BATCH_O,1,360,22.4,7.2,Department seminar data
-EXP_015,presentation,department_seminar,30.45,2023-11-21T16:45:00.000Z,researcher_008,BATCH_O,2,360,22.4,7.2,
-EXP_015,presentation,department_seminar,29.12,2023-11-21T17:00:00.000Z,researcher_008,BATCH_O,3,360,22.4,7.2,
-EXP_016,control,baseline,24.89,2023-11-22T15:30:00.000Z,researcher_003,BATCH_P,1,250,23.8,7.4,Large-scale validation
-EXP_016,control,baseline,25.45,2023-11-22T15:45:00.000Z,researcher_003,BATCH_P,2,250,23.8,7.4,
-EXP_016,control,baseline,24.12,2023-11-22T16:00:00.000Z,researcher_003,BATCH_P,3,250,23.8,7.4,
-EXP_016,control,baseline,23.78,2023-11-22T16:15:00.000Z,researcher_003,BATCH_P,4,250,23.8,7.4,
-EXP_016,control,baseline,25.67,2023-11-22T16:30:00.000Z,researcher_003,BATCH_P,5,250,23.8,7.4,
-EXP_016,treatment_a,compound_x,32.23,2023-11-22T17:00:00.000Z,researcher_003,BATCH_P,1,250,23.8,7.4,
-EXP_016,treatment_a,compound_x,31.56,2023-11-22T17:15:00.000Z,researcher_003,BATCH_P,2,250,23.8,7.4,
-EXP_016,treatment_a,compound_x,33.12,2023-11-22T17:30:00.000Z,researcher_003,BATCH_P,3,250,23.8,7.4,
-EXP_016,treatment_a,compound_x,30.78,2023-11-22T17:45:00.000Z,researcher_003,BATCH_P,4,250,23.8,7.4,
-EXP_016,treatment_a,compound_x,32.89,2023-11-22T18:00:00.000Z,researcher_003,BATCH_P,5,250,23.8,7.4,
-EXP_016,treatment_b,compound_y,28.67,2023-11-22T18:30:00.000Z,researcher_003,BATCH_P,1,250,23.8,7.4,
-EXP_016,treatment_b,compound_y,27.34,2023-11-22T18:45:00.000Z,researcher_003,BATCH_P,2,250,23.8,7.4,
-EXP_016,treatment_b,compound_y,29.45,2023-11-22T19:00:00.000Z,researcher_003,BATCH_P,3,250,23.8,7.4,
-EXP_016,treatment_b,compound_y,28.12,2023-11-22T19:15:00.000Z,researcher_003,BATCH_P,4,250,23.8,7.4,
-EXP_016,treatment_b,compound_y,27.89,2023-11-22T19:30:00.000Z,researcher_003,BATCH_P,5,250,23.8,7.4,
-EXP_016,exploratory,batch_effect,25.89,2023-11-22T20:00:00.000Z,researcher_003,BATCH_P,1,125,23.8,7.4,Batch effect analysis
-EXP_016,exploratory,batch_effect,26.34,2023-11-22T20:15:00.000Z,researcher_003,BATCH_P,2,125,23.8,7.4,
-EXP_016,exploratory,batch_effect,24.78,2023-11-22T20:30:00.000Z,researcher_003,BATCH_P,3,125,23.8,7.4,
-EXP_016,publication,main_figure,31.23,2023-11-22T21:00:00.000Z,researcher_003,BATCH_P,1,750,23.8,7.4,Main manuscript figure
-EXP_016,publication,main_figure,32.45,2023-11-22T21:15:00.000Z,researcher_003,BATCH_P,2,750,23.8,7.4,
-EXP_016,publication,main_figure,30.67,2023-11-22T21:30:00.000Z,researcher_003,BATCH_P,3,750,23.8,7.4,
-EXP_017,control,baseline,23.45,2023-11-23T09:00:00.000Z,researcher_006,BATCH_Q,1,160,22.6,7.1,Thursday morning run
-EXP_017,control,baseline,24.78,2023-11-23T09:15:00.000Z,researcher_006,BATCH_Q,2,160,22.6,7.1,
-EXP_017,control,baseline,23.12,2023-11-23T09:30:00.000Z,researcher_006,BATCH_Q,3,160,22.6,7.1,
-EXP_017,treatment_a,compound_x,30.89,2023-11-23T10:00:00.000Z,researcher_006,BATCH_Q,1,160,22.6,7.1,
-EXP_017,treatment_a,compound_x,31.67,2023-11-23T10:15:00.000Z,researcher_006,BATCH_Q,2,160,22.6,7.1,
-EXP_017,treatment_a,compound_x,29.34,2023-11-23T10:30:00.000Z,researcher_006,BATCH_Q,3,160,22.6,7.1,
-EXP_017,treatment_b,compound_y,27.78,2023-11-23T11:00:00.000Z,researcher_006,BATCH_Q,1,160,22.6,7.1,
-EXP_017,treatment_b,compound_y,28.45,2023-11-23T11:15:00.000Z,researcher_006,BATCH_Q,2,160,22.6,7.1,
-EXP_017,treatment_b,compound_y,26.89,2023-11-23T11:30:00.000Z,researcher_006,BATCH_Q,3,160,22.6,7.1,
-EXP_017,exploratory,media_optimization,29.67,2023-11-23T12:00:00.000Z,researcher_006,BATCH_Q,1,80,22.6,7.1,Standard media
-EXP_017,exploratory,media_optimization,32.45,2023-11-23T12:15:00.000Z,researcher_006,BATCH_Q,2,80,22.6,7.1,Rich media
-EXP_017,exploratory,media_optimization,26.12,2023-11-23T12:30:00.000Z,researcher_006,BATCH_Q,3,80,22.6,7.1,Minimal media
-EXP_017,exploratory,media_optimization,34.78,2023-11-23T12:45:00.000Z,researcher_006,BATCH_Q,4,80,22.6,7.1,Enhanced media
-EXP_018,control,baseline,24.67,2023-11-24T14:15:00.000Z,researcher_009,BATCH_R,1,180,22.9,7.3,Friday afternoon
-EXP_018,control,baseline,25.34,2023-11-24T14:30:00.000Z,researcher_009,BATCH_R,2,180,22.9,7.3,
-EXP_018,control,baseline,23.89,2023-11-24T14:45:00.000Z,researcher_009,BATCH_R,3,180,22.9,7.3,
-EXP_018,treatment_a,compound_x,31.12,2023-11-24T15:15:00.000Z,researcher_009,BATCH_R,1,180,22.9,7.3,
-EXP_018,treatment_a,compound_x,32.78,2023-11-24T15:30:00.000Z,researcher_009,BATCH_R,2,180,22.9,7.3,
-EXP_018,treatment_a,compound_x,30.45,2023-11-24T15:45:00.000Z,researcher_009,BATCH_R,3,180,22.9,7.3,
-EXP_018,treatment_b,compound_y,28.23,2023-11-24T16:15:00.000Z,researcher_009,BATCH_R,1,180,22.9,7.3,
-EXP_018,treatment_b,compound_y,27.67,2023-11-24T16:30:00.000Z,researcher_009,BATCH_R,2,180,22.9,7.3,
-EXP_018,treatment_b,compound_y,28.89,2023-11-24T16:45:00.000Z,researcher_009,BATCH_R,3,180,22.9,7.3,
-EXP_018,presentation,weekly_summary,29.34,2023-11-24T17:30:00.000Z,researcher_009,BATCH_R,1,540,22.9,7.3,Weekly summary presentation
-EXP_018,presentation,weekly_summary,30.78,2023-11-24T17:45:00.000Z,researcher_009,BATCH_R,2,540,22.9,7.3,
-EXP_018,presentation,weekly_summary,28.56,2023-11-24T18:00:00.000Z,researcher_009,BATCH_R,3,540,22.9,7.3,
-EXP_019,control,baseline,68.34,2023-11-27T10:30:00.000Z,researcher_001,BATCH_S,1,75,22.1,7.2,Outlier measurement - possible contamination
-EXP_019,control,baseline,24.78,2023-11-27T10:45:00.000Z,researcher_001,BATCH_S,2,75,22.1,7.2,Normal after cleaning
-EXP_019,control,baseline,23.45,2023-11-27T11:00:00.000Z,researcher_001,BATCH_S,3,75,22.1,7.2,
-EXP_019,treatment_a,compound_x,31.56,2023-11-27T11:30:00.000Z,researcher_001,BATCH_S,1,75,22.1,7.2,
-EXP_019,treatment_a,compound_x,30.89,2023-11-27T11:45:00.000Z,researcher_001,BATCH_S,2,75,22.1,7.2,
-EXP_019,treatment_a,compound_x,32.23,2023-11-27T12:00:00.000Z,researcher_001,BATCH_S,3,75,22.1,7.2,
-EXP_019,treatment_b,compound_y,27.34,2023-11-27T12:30:00.000Z,researcher_001,BATCH_S,1,75,22.1,7.2,
-EXP_019,treatment_b,compound_y,28.67,2023-11-27T12:45:00.000Z,researcher_001,BATCH_S,2,75,22.1,7.2,
-EXP_019,treatment_b,compound_y,26.78,2023-11-27T13:00:00.000Z,researcher_001,BATCH_S,3,75,22.1,7.2,
-EXP_019,exploratory,error_detection,3.45,2023-11-27T13:30:00.000Z,researcher_001,BATCH_S,1,25,22.1,7.2,Extreme low value - instrument error
-EXP_019,exploratory,error_detection,24.89,2023-11-27T13:45:00.000Z,researcher_001,BATCH_S,2,25,22.1,7.2,Recalibrated instrument
-EXP_019,exploratory,error_detection,25.67,2023-11-27T14:00:00.000Z,researcher_001,BATCH_S,3,25,22.1,7.2,Normal operation
-EXP_020,control,baseline,24.45,2023-11-28T08:45:00.000Z,researcher_010,BATCH_T,1,300,21.6,6.9,Final validation experiment
-EXP_020,control,baseline,25.12,2023-11-28T09:00:00.000Z,researcher_010,BATCH_T,2,300,21.6,6.9,
-EXP_020,control,baseline,23.78,2023-11-28T09:15:00.000Z,researcher_010,BATCH_T,3,300,21.6,6.9,
-EXP_020,control,baseline,24.89,2023-11-28T09:30:00.000Z,researcher_010,BATCH_T,4,300,21.6,6.9,
-EXP_020,control,baseline,25.67,2023-11-28T09:45:00.000Z,researcher_010,BATCH_T,5,300,21.6,6.9,
-EXP_020,treatment_a,compound_x,31.23,2023-11-28T10:15:00.000Z,researcher_010,BATCH_T,1,300,21.6,6.9,
-EXP_020,treatment_a,compound_x,32.56,2023-11-28T10:30:00.000Z,researcher_010,BATCH_T,2,300,21.6,6.9,
-EXP_020,treatment_a,compound_x,30.78,2023-11-28T10:45:00.000Z,researcher_010,BATCH_T,3,300,21.6,6.9,
-EXP_020,treatment_a,compound_x,31.89,2023-11-28T11:00:00.000Z,researcher_010,BATCH_T,4,300,21.6,6.9,
-EXP_020,treatment_a,compound_x,33.12,2023-11-28T11:15:00.000Z,researcher_010,BATCH_T,5,300,21.6,6.9,
-EXP_020,treatment_b,compound_y,28.45,2023-11-28T11:45:00.000Z,researcher_010,BATCH_T,1,300,21.6,6.9,
-EXP_020,treatment_b,compound_y,27.89,2023-11-28T12:00:00.000Z,researcher_010,BATCH_T,2,300,21.6,6.9,
-EXP_020,treatment_b,compound_y,29.12,2023-11-28T12:15:00.000Z,researcher_010,BATCH_T,3,300,21.6,6.9,
-EXP_020,treatment_b,compound_y,28.67,2023-11-28T12:30:00.000Z,researcher_010,BATCH_T,4,300,21.6,6.9,
-EXP_020,treatment_b,compound_y,27.34,2023-11-28T12:45:00.000Z,researcher_010,BATCH_T,5,300,21.6,6.9,
-EXP_020,exploratory,final_screen,26.78,2023-11-28T13:15:00.000Z,researcher_010,BATCH_T,1,150,21.6,6.9,Final screening
-EXP_020,exploratory,final_screen,28.23,2023-11-28T13:30:00.000Z,researcher_010,BATCH_T,2,150,21.6,6.9,
-EXP_020,exploratory,final_screen,30.45,2023-11-28T13:45:00.000Z,researcher_010,BATCH_T,3,150,21.6,6.9,
-EXP_020,exploratory,final_screen,32.89,2023-11-28T14:00:00.000Z,researcher_010,BATCH_T,4,150,21.6,6.9,
-EXP_020,exploratory,final_screen,35.67,2023-11-28T14:15:00.000Z,researcher_010,BATCH_T,5,150,21.6,6.9,
-EXP_020,publication,comprehensive_analysis,31.45,2023-11-28T16:00:00.000Z,researcher_010,BATCH_T,1,1500,21.6,6.9,Comprehensive final analysis
-EXP_020,publication,comprehensive_analysis,32.12,2023-11-28T16:15:00.000Z,researcher_010,BATCH_T,2,1500,21.6,6.9,
-EXP_020,publication,comprehensive_analysis,30.78,2023-11-28T16:30:00.000Z,researcher_010,BATCH_T,3,1500,21.6,6.9,
-EXP_020,publication,comprehensive_analysis,31.89,2023-11-28T16:45:00.000Z,researcher_010,BATCH_T,4,1500,21.6,6.9,
-EXP_020,publication,comprehensive_analysis,32.67,2023-11-28T17:00:00.000Z,researcher_010,BATCH_T,5,1500,21.6,6.9,
+experiment_id,condition,treatment_type,measurement_value,secondary_measurement,timestamp,researcher,batch_number,replicate,measurement_error,notes,temperature_c,ph_level,concentration_mg_ml
+EXP_001,control,baseline,23.45,45.2,2024-01-15T09:15:30.123Z,smith_j,B001,1,0.12,,25.0,7.4,0.0
+EXP_002,control,baseline,24.12,46.8,2024-01-15T09:16:45.234Z,smith_j,B001,2,0.15,,25.1,7.4,0.0
+EXP_003,control,baseline,22.87,44.5,2024-01-15T09:18:12.345Z,smith_j,B001,3,0.18,,25.0,7.5,0.0
+EXP_004,treatment_a,drug_compound_x,34.56,78.3,2024-01-15T10:22:18.456Z,smith_j,B001,1,0.21,,25.2,7.3,10.5
+EXP_005,treatment_a,drug_compound_x,36.78,82.1,2024-01-15T10:24:33.567Z,smith_j,B001,2,0.19,,25.3,7.4,10.5
+EXP_006,treatment_a,drug_compound_x,35.23,79.7,2024-01-15T10:26:47.678Z,smith_j,B001,3,0.23,,25.1,7.2,10.5
+EXP_007,treatment_b,drug_compound_y,28.91,62.4,2024-01-15T11:31:22.789Z,garcia_m,B002,1,0.16,,24.8,7.6,5.2
+EXP_008,treatment_b,drug_compound_y,29.45,64.1,2024-01-15T11:33:45.890Z,garcia_m,B002,2,0.14,,24.9,7.5,5.2
+EXP_009,treatment_b,drug_compound_y,27.83,61.7,2024-01-15T11:35:12.901Z,garcia_m,B002,3,0.20,,24.7,7.7,5.2
+EXP_010,exploratory,novel_combination,42.17,95.6,2024-01-15T14:45:38.012Z,chen_l,B003,1,0.31,,26.1,6.8,15.7
+EXP_011,exploratory,novel_combination,43.89,98.2,2024-01-15T14:48:19.123Z,chen_l,B003,2,0.28,,26.0,6.9,15.7
+EXP_012,exploratory,novel_combination,41.52,94.3,2024-01-15T14:50:45.234Z,chen_l,B003,3,0.35,,26.2,6.7,15.7
+EXP_013,presentation,standard_protocol,18.76,38.9,2024-01-16T08:12:15.345Z,rodriguez_c,B004,1,0.11,validated_protocol,24.5,7.0,2.1
+EXP_014,presentation,standard_protocol,19.34,40.2,2024-01-16T08:15:42.456Z,rodriguez_c,B004,2,0.13,validated_protocol,24.6,7.1,2.1
+EXP_015,presentation,standard_protocol,18.22,37.8,2024-01-16T08:18:33.567Z,rodriguez_c,B004,3,0.09,validated_protocol,24.4,7.0,2.1
+EXP_016,publication,final_optimized,31.67,71.2,2024-01-16T13:25:47.678Z,thompson_a,B005,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_017,publication,final_optimized,32.14,72.8,2024-01-16T13:28:12.789Z,thompson_a,B005,2,0.07,peer_review_ready,25.1,7.3,8.3
+EXP_018,publication,final_optimized,31.23,70.5,2024-01-16T13:30:38.890Z,thompson_a,B005,3,0.09,peer_review_ready,24.9,7.1,8.3
+EXP_019,control,baseline,23.78,45.8,2024-01-16T15:45:22.901Z,kumar_p,B006,1,0.14,,25.2,7.4,0.0
+EXP_020,control,baseline,24.56,47.1,2024-01-16T15:47:55.012Z,kumar_p,B006,2,0.16,,25.3,7.5,0.0
+EXP_021,control,baseline,22.98,44.2,2024-01-16T15:50:18.123Z,kumar_p,B006,3,0.17,,25.1,7.3,0.0
+EXP_022,treatment_a,drug_compound_x,35.89,81.4,2024-01-17T09:33:44.234Z,lee_s,B007,1,0.22,,25.4,7.2,10.5
+EXP_023,treatment_a,drug_compound_x,37.12,83.7,2024-01-17T09:36:17.345Z,lee_s,B007,2,0.20,,25.5,7.4,10.5
+EXP_024,treatment_a,drug_compound_x,34.67,79.9,2024-01-17T09:38:41.456Z,lee_s,B007,3,0.24,,25.3,7.1,10.5
+EXP_025,treatment_b,drug_compound_y,29.78,65.3,2024-01-17T11:22:33.567Z,nakamura_t,B008,1,0.18,,24.6,7.6,5.2
+EXP_026,treatment_b,drug_compound_y,28.45,63.1,2024-01-17T11:25:08.678Z,nakamura_t,B008,2,0.15,,24.7,7.5,5.2
+EXP_027,treatment_b,drug_compound_y,30.12,66.8,2024-01-17T11:27:52.789Z,nakamura_t,B008,3,0.19,,24.5,7.7,5.2
+EXP_028,exploratory,novel_combination,44.23,99.8,2024-01-17T14:15:17.890Z,williams_k,B009,1,0.33,,26.3,6.6,15.7
+EXP_029,exploratory,novel_combination,42.87,96.5,2024-01-17T14:18:02.901Z,williams_k,B009,2,0.29,,26.1,6.8,15.7
+EXP_030,exploratory,novel_combination,45.61,102.3,2024-01-17T14:20:48.012Z,williams_k,B009,3,0.36,,26.4,6.5,15.7
+EXP_031,presentation,standard_protocol,19.89,41.7,2024-01-18T08:44:25.123Z,miller_d,B010,1,0.12,validated_protocol,24.8,7.1,2.1
+EXP_032,presentation,standard_protocol,18.67,39.2,2024-01-18T08:47:13.234Z,miller_d,B010,2,0.10,validated_protocol,24.7,7.0,2.1
+EXP_033,presentation,standard_protocol,20.11,42.4,2024-01-18T08:49:57.345Z,miller_d,B010,3,0.14,validated_protocol,24.9,7.2,2.1
+EXP_034,publication,final_optimized,30.98,69.8,2024-01-18T13:55:38.456Z,zhang_h,B011,1,0.06,peer_review_ready,24.8,7.0,8.3
+EXP_035,publication,final_optimized,32.45,73.1,2024-01-18T13:58:22.567Z,zhang_h,B011,2,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_036,publication,final_optimized,31.76,71.9,2024-01-18T14:01:07.678Z,zhang_h,B011,3,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_037,control,baseline,23.12,44.7,2024-01-19T10:18:44.789Z,patel_r,B012,1,0.13,,25.0,7.3,0.0
+EXP_038,control,baseline,24.78,47.9,2024-01-19T10:21:29.890Z,patel_r,B012,2,0.17,,25.2,7.5,0.0
+EXP_039,control,baseline,22.34,43.1,2024-01-19T10:24:15.901Z,patel_r,B012,3,0.19,,24.8,7.2,0.0
+EXP_040,treatment_a,drug_compound_x,36.45,82.7,2024-01-19T12:37:52.012Z,johnson_b,B013,1,0.25,,25.6,7.3,10.5
+EXP_041,treatment_a,drug_compound_x,35.12,80.1,2024-01-19T12:40:38.123Z,johnson_b,B013,2,0.21,,25.4,7.1,10.5
+EXP_042,treatment_a,drug_compound_x,37.89,85.4,2024-01-19T12:43:24.234Z,johnson_b,B013,3,0.27,,25.7,7.4,10.5
+EXP_043,treatment_b,drug_compound_y,27.56,60.9,2024-01-19T15:29:18.345Z,anderson_j,B014,1,0.17,,24.4,7.8,5.2
+EXP_044,treatment_b,drug_compound_y,29.93,67.2,2024-01-19T15:32:05.456Z,anderson_j,B014,2,0.20,,24.6,7.6,5.2
+EXP_045,treatment_b,drug_compound_y,28.71,64.5,2024-01-19T15:34:51.567Z,anderson_j,B014,3,0.18,,24.5,7.7,5.2
+EXP_046,exploratory,novel_combination,41.78,94.7,2024-01-20T09:12:37.678Z,brown_f,B015,1,0.32,,25.9,6.9,15.7
+EXP_047,exploratory,novel_combination,43.45,98.9,2024-01-20T09:15:23.789Z,brown_f,B015,2,0.30,,26.1,6.7,15.7
+EXP_048,exploratory,novel_combination,40.23,91.8,2024-01-20T09:18:09.890Z,brown_f,B015,3,0.34,,25.8,7.0,15.7
+EXP_049,presentation,standard_protocol,18.45,38.2,2024-01-20T14:46:55.901Z,davis_g,B016,1,0.11,validated_protocol,24.3,6.9,2.1
+EXP_050,presentation,standard_protocol,19.67,40.8,2024-01-20T14:49:42.012Z,davis_g,B016,2,0.13,validated_protocol,24.5,7.1,2.1
+EXP_051,presentation,standard_protocol,17.89,37.1,2024-01-20T14:52:28.123Z,davis_g,B016,3,0.09,validated_protocol,24.2,6.8,2.1
+EXP_052,publication,final_optimized,32.78,74.5,2024-01-21T11:35:14.234Z,wilson_e,B017,1,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_053,publication,final_optimized,31.45,70.9,2024-01-21T11:38:01.345Z,wilson_e,B017,2,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_054,publication,final_optimized,33.12,75.8,2024-01-21T11:40:47.456Z,wilson_e,B017,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_055,control,baseline,,,2024-01-22T08:22:33.567Z,moore_h,B018,1,0.15,equipment_malfunction,25.0,7.4,0.0
+EXP_056,control,baseline,23.67,45.5,2024-01-22T08:25:19.678Z,moore_h,B018,2,0.14,,25.1,7.3,0.0
+EXP_057,control,baseline,24.23,46.7,2024-01-22T08:28:05.789Z,moore_h,B018,3,0.16,,25.2,7.5,0.0
+EXP_058,treatment_a,drug_compound_x,34.89,79.1,2024-01-22T10:44:51.890Z,taylor_i,B019,1,0.23,,25.3,7.2,10.5
+EXP_059,treatment_a,drug_compound_x,36.12,81.8,2024-01-22T10:47:38.901Z,taylor_i,B019,2,0.21,,25.4,7.4,10.5
+EXP_060,treatment_a,drug_compound_x,35.67,80.6,2024-01-22T10:50:24.012Z,taylor_i,B019,3,0.24,,25.3,7.1,10.5
+EXP_061,treatment_b,drug_compound_y,29.23,64.8,2024-01-22T13:17:10.123Z,clark_n,B020,1,0.18,,24.7,7.6,5.2
+EXP_062,treatment_b,drug_compound_y,28.78,63.4,2024-01-22T13:19:57.234Z,clark_n,B020,2,0.16,,24.6,7.5,5.2
+EXP_063,treatment_b,drug_compound_y,30.45,68.1,2024-01-22T13:22:43.345Z,clark_n,B020,3,0.19,,24.8,7.7,5.2
+EXP_064,exploratory,novel_combination,43.78,99.2,2024-01-22T15:58:29.456Z,lewis_o,B021,1,0.31,,26.2,6.8,15.7
+EXP_065,exploratory,novel_combination,42.34,96.1,2024-01-22T16:01:16.567Z,lewis_o,B021,2,0.29,,26.0,6.9,15.7
+EXP_066,exploratory,novel_combination,44.56,101.7,2024-01-22T16:04:02.678Z,lewis_o,B021,3,0.33,,26.3,6.6,15.7
+EXP_067,presentation,standard_protocol,19.12,39.7,2024-01-23T09:41:48.789Z,walker_q,B022,1,0.12,validated_protocol,24.6,7.0,2.1
+EXP_068,presentation,standard_protocol,18.89,39.1,2024-01-23T09:44:35.890Z,walker_q,B022,2,0.11,validated_protocol,24.5,6.9,2.1
+EXP_069,presentation,standard_protocol,19.78,41.2,2024-01-23T09:47:21.901Z,walker_q,B022,3,0.14,validated_protocol,24.7,7.1,2.1
+EXP_070,publication,final_optimized,31.89,72.3,2024-01-23T14:23:07.012Z,hall_u,B023,1,0.08,peer_review_ready,24.9,7.2,8.3
+EXP_071,publication,final_optimized,32.56,73.9,2024-01-23T14:25:54.123Z,hall_u,B023,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_072,publication,final_optimized,30.78,69.4,2024-01-23T14:28:40.234Z,hall_u,B023,3,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_073,control,baseline,22.89,44.1,2024-01-24T11:05:26.345Z,young_v,B024,1,0.16,,25.0,7.4,0.0
+EXP_074,control,baseline,24.45,47.2,2024-01-24T11:08:13.456Z,young_v,B024,2,0.18,,25.2,7.5,0.0
+EXP_075,control,baseline,23.56,45.6,2024-01-24T11:10:59.567Z,young_v,B024,3,0.15,,25.1,7.3,0.0
+EXP_076,treatment_a,drug_compound_x,35.23,79.8,2024-01-24T13:32:45.678Z,king_w,B025,1,0.22,,25.4,7.2,10.5
+EXP_077,treatment_a,drug_compound_x,36.78,83.2,2024-01-24T13:35:32.789Z,king_w,B025,2,0.25,,25.5,7.4,10.5
+EXP_078,treatment_a,drug_compound_x,34.67,78.5,2024-01-24T13:38:18.890Z,king_w,B025,3,0.21,,25.3,7.1,10.5
+EXP_079,treatment_b,drug_compound_y,28.12,62.1,2024-01-24T16:14:04.901Z,wright_x,B026,1,0.17,,24.5,7.6,5.2
+EXP_080,treatment_b,drug_compound_y,29.67,65.9,2024-01-24T16:16:51.012Z,wright_x,B026,2,0.19,,24.7,7.7,5.2
+EXP_081,treatment_b,drug_compound_y,27.34,60.3,2024-01-24T16:19:37.123Z,wright_x,B026,3,0.16,,24.4,7.5,5.2
+EXP_082,exploratory,novel_combination,42.56,96.8,2024-01-25T08:57:23.234Z,lopez_y,B027,1,0.30,,26.1,6.9,15.7
+EXP_083,exploratory,novel_combination,44.12,100.5,2024-01-25T09:00:10.345Z,lopez_y,B027,2,0.32,,26.3,6.7,15.7
+EXP_084,exploratory,novel_combination,41.89,95.2,2024-01-25T09:02:56.456Z,lopez_y,B027,3,0.29,,26.0,7.0,15.7
+EXP_085,presentation,standard_protocol,18.76,38.9,2024-01-25T12:39:42.567Z,hill_z,B028,1,0.11,validated_protocol,24.4,6.9,2.1
+EXP_086,presentation,standard_protocol,19.34,40.3,2024-01-25T12:42:29.678Z,hill_z,B028,2,0.13,validated_protocol,24.6,7.1,2.1
+EXP_087,presentation,standard_protocol,17.98,37.4,2024-01-25T12:45:15.789Z,hill_z,B028,3,0.10,validated_protocol,24.3,6.8,2.1
+EXP_088,publication,final_optimized,32.34,73.6,2024-01-25T15:21:01.890Z,green_aa,B029,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_089,publication,final_optimized,31.67,71.8,2024-01-25T15:23:48.901Z,green_aa,B029,2,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_090,publication,final_optimized,33.01,75.1,2024-01-25T15:26:34.012Z,green_aa,B029,3,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_091,control,baseline,23.98,46.1,2024-01-26T10:02:20.123Z,adams_bb,B030,1,0.14,,25.1,7.4,0.0
+EXP_092,control,baseline,22.67,43.8,2024-01-26T10:05:07.234Z,adams_bb,B030,2,0.16,,24.9,7.2,0.0
+EXP_093,control,baseline,24.89,48.3,2024-01-26T10:07:53.345Z,adams_bb,B030,3,0.18,,25.3,7.6,0.0
+EXP_094,treatment_a,drug_compound_x,36.12,81.7,2024-01-26T12:44:39.456Z,baker_cc,B031,1,0.23,,25.5,7.3,10.5
+EXP_095,treatment_a,drug_compound_x,34.78,78.9,2024-01-26T12:47:26.567Z,baker_cc,B031,2,0.21,,25.3,7.1,10.5
+EXP_096,treatment_a,drug_compound_x,37.45,84.6,2024-01-26T12:50:12.678Z,baker_cc,B031,3,0.26,,25.6,7.4,10.5
+EXP_097,treatment_b,drug_compound_y,29.45,65.2,2024-01-26T15:26:58.789Z,carter_dd,B032,1,0.18,,24.6,7.6,5.2
+EXP_098,treatment_b,drug_compound_y,28.23,62.7,2024-01-26T15:29:45.890Z,carter_dd,B032,2,0.16,,24.5,7.5,5.2
+EXP_099,treatment_b,drug_compound_y,30.67,68.9,2024-01-26T15:32:31.901Z,carter_dd,B032,3,0.20,,24.7,7.7,5.2
+EXP_100,exploratory,novel_combination,43.23,98.1,2024-01-27T09:14:17.012Z,davis_ee,B033,1,0.31,,26.2,6.8,15.7
+EXP_101,exploratory,novel_combination,41.67,94.5,2024-01-27T09:17:04.123Z,davis_ee,B033,2,0.28,,26.0,6.9,15.7
+EXP_102,exploratory,novel_combination,44.89,102.8,2024-01-27T09:19:50.234Z,davis_ee,B033,3,0.34,,26.4,6.6,15.7
+EXP_103,presentation,standard_protocol,19.56,40.9,2024-01-27T13:56:36.345Z,evans_ff,B034,1,0.12,validated_protocol,24.7,7.0,2.1
+EXP_104,presentation,standard_protocol,18.12,37.6,2024-01-27T13:59:23.456Z,evans_ff,B034,2,0.10,validated_protocol,24.4,6.9,2.1
+EXP_105,presentation,standard_protocol,20.23,42.7,2024-01-27T14:02:09.567Z,evans_ff,B034,3,0.14,validated_protocol,24.9,7.2,2.1
+EXP_106,publication,final_optimized,31.45,71.2,2024-01-27T16:43:55.678Z,foster_gg,B035,1,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_107,publication,final_optimized,32.78,74.3,2024-01-27T16:46:42.789Z,foster_gg,B035,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_108,publication,final_optimized,30.89,69.7,2024-01-27T16:49:28.890Z,foster_gg,B035,3,0.06,peer_review_ready,24.8,7.0,8.3
+EXP_109,control,baseline,23.34,44.9,2024-01-28T11:25:14.901Z,garcia_hh,B036,1,0.15,,25.0,7.3,0.0
+EXP_110,control,baseline,24.67,47.5,2024-01-28T11:28:01.012Z,garcia_hh,B036,2,0.17,,25.2,7.5,0.0
+EXP_111,control,baseline,22.78,43.6,2024-01-28T11:30:47.123Z,garcia_hh,B036,3,0.18,,24.8,7.2,0.0
+EXP_112,treatment_a,drug_compound_x,35.67,80.8,2024-01-28T14:07:33.234Z,harris_ii,B037,1,0.24,,25.4,7.2,10.5
+EXP_113,treatment_a,drug_compound_x,37.23,84.1,2024-01-28T14:10:20.345Z,harris_ii,B037,2,0.26,,25.6,7.4,10.5
+EXP_114,treatment_a,drug_compound_x,34.12,77.3,2024-01-28T14:13:06.456Z,harris_ii,B037,3,0.22,,25.2,7.1,10.5
+EXP_115,treatment_b,drug_compound_y,28.89,63.9,2024-01-28T16:49:52.567Z,jackson_jj,B038,1,0.17,,24.6,7.6,5.2
+EXP_116,treatment_b,drug_compound_y,30.12,67.4,2024-01-28T16:52:39.678Z,jackson_jj,B038,2,0.19,,24.8,7.7,5.2
+EXP_117,treatment_b,drug_compound_y,27.45,61.1,2024-01-28T16:55:25.789Z,jackson_jj,B038,3,0.16,,24.4,7.5,5.2
+EXP_118,exploratory,novel_combination,42.78,97.2,2024-01-29T08:31:11.890Z,kelly_kk,B039,1,0.32,,26.1,6.9,15.7
+EXP_119,exploratory,novel_combination,44.34,101.1,2024-01-29T08:33:58.901Z,kelly_kk,B039,2,0.33,,26.3,6.7,15.7
+EXP_120,exploratory,novel_combination,41.23,93.8,2024-01-29T08:36:44.012Z,kelly_kk,B039,3,0.30,,25.9,7.0,15.7
+EXP_121,presentation,standard_protocol,18.45,38.3,2024-01-29T12:18:30.123Z,lewis_ll,B040,1,0.11,validated_protocol,24.3,6.9,2.1
+EXP_122,presentation,standard_protocol,19.78,41.1,2024-01-29T12:21:17.234Z,lewis_ll,B040,2,0.13,validated_protocol,24.6,7.1,2.1
+EXP_123,presentation,standard_protocol,17.67,36.8,2024-01-29T12:24:03.345Z,lewis_ll,B040,3,0.09,validated_protocol,24.1,6.8,2.1
+EXP_124,publication,final_optimized,32.56,73.8,2024-01-29T15:05:49.456Z,martin_mm,B041,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_125,publication,final_optimized,31.12,70.4,2024-01-29T15:08:36.567Z,martin_mm,B041,2,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_126,publication,final_optimized,33.89,76.7,2024-01-29T15:11:22.678Z,martin_mm,B041,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_127,control,baseline,23.12,44.6,2024-01-30T10:48:08.789Z,nelson_nn,B042,1,0.14,,25.0,7.3,0.0
+EXP_128,control,baseline,24.78,47.8,2024-01-30T10:50:55.890Z,nelson_nn,B042,2,0.16,,25.2,7.5,0.0
+EXP_129,control,baseline,22.45,43.2,2024-01-30T10:53:41.901Z,nelson_nn,B042,3,0.17,,24.8,7.2,0.0
+EXP_130,treatment_a,drug_compound_x,36.78,83.4,2024-01-30T13:30:27.012Z,owen_oo,B043,1,0.25,,25.5,7.3,10.5
+EXP_131,treatment_a,drug_compound_x,35.23,79.6,2024-01-30T13:33:14.123Z,owen_oo,B043,2,0.23,,25.3,7.1,10.5
+EXP_132,treatment_a,drug_compound_x,38.01,85.9,2024-01-30T13:36:00.234Z,owen_oo,B043,3,0.27,,25.6,7.4,10.5
+EXP_133,treatment_b,drug_compound_y,29.12,64.5,2024-01-30T16:12:46.345Z,parker_pp,B044,1,0.18,,24.6,7.6,5.2
+EXP_134,treatment_b,drug_compound_y,27.89,61.8,2024-01-30T16:15:33.456Z,parker_pp,B044,2,0.16,,24.5,7.5,5.2
+EXP_135,treatment_b,drug_compound_y,30.45,68.2,2024-01-30T16:18:19.567Z,parker_pp,B044,3,0.20,,24.7,7.7,5.2
+EXP_136,exploratory,novel_combination,43.56,99.4,2024-01-31T09:55:05.678Z,quinn_qq,B045,1,0.31,,26.2,6.8,15.7
+EXP_137,exploratory,novel_combination,42.12,95.7,2024-01-31T09:57:52.789Z,quinn_qq,B045,2,0.29,,26.0,6.9,15.7
+EXP_138,exploratory,novel_combination,45.23,103.6,2024-01-31T10:00:38.890Z,quinn_qq,B045,3,0.34,,26.4,6.6,15.7
+EXP_139,presentation,standard_protocol,19.23,40.1,2024-01-31T13:42:24.901Z,roberts_rr,B046,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_140,presentation,standard_protocol,18.67,38.7,2024-01-31T13:45:11.012Z,roberts_rr,B046,2,0.11,validated_protocol,24.4,6.9,2.1
+EXP_141,presentation,standard_protocol,20.01,41.8,2024-01-31T13:47:57.123Z,roberts_rr,B046,3,0.13,validated_protocol,24.7,7.1,2.1
+EXP_142,publication,final_optimized,31.78,72.1,2024-01-31T16:24:43.234Z,smith_ss,B047,1,0.08,peer_review_ready,24.9,7.1,8.3
+EXP_143,publication,final_optimized,32.89,74.8,2024-01-31T16:27:30.345Z,smith_ss,B047,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_144,publication,final_optimized,30.45,68.9,2024-01-31T16:30:16.456Z,smith_ss,B047,3,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_145,control,baseline,,,2024-02-01T09:07:02.567Z,taylor_tt,B048,1,0.15,sensor_failure,25.0,7.4,0.0
+EXP_146,control,baseline,23.89,46.3,2024-02-01T09:09:49.678Z,taylor_tt,B048,2,0.16,,25.1,7.5,0.0
+EXP_147,control,baseline,24.34,47.1,2024-02-01T09:12:35.789Z,taylor_tt,B048,3,0.17,,25.2,7.3,0.0
+EXP_148,treatment_a,drug_compound_x,35.45,80.2,2024-02-01T11:54:21.890Z,underwood_uu,B049,1,0.22,,25.4,7.2,10.5
+EXP_149,treatment_a,drug_compound_x,37.12,83.8,2024-02-01T11:57:08.901Z,underwood_uu,B049,2,0.24,,25.5,7.4,10.5
+EXP_150,treatment_a,drug_compound_x,34.67,78.1,2024-02-01T11:59:54.012Z,underwood_uu,B049,3,0.21,,25.3,7.1,10.5
+EXP_151,treatment_b,drug_compound_y,28.78,63.6,2024-02-01T14:36:40.123Z,vincent_vv,B050,1,0.17,,24.6,7.6,5.2
+EXP_152,treatment_b,drug_compound_y,30.23,67.1,2024-02-01T14:39:27.234Z,vincent_vv,B050,2,0.19,,24.8,7.7,5.2
+EXP_153,treatment_b,drug_compound_y,27.34,60.4,2024-02-01T14:42:13.345Z,vincent_vv,B050,3,0.16,,24.4,7.5,5.2
+EXP_154,exploratory,novel_combination,42.45,96.3,2024-02-02T08:19:59.456Z,walker_ww,B051,1,0.30,,26.1,6.9,15.7
+EXP_155,exploratory,novel_combination,44.78,102.1,2024-02-02T08:22:46.567Z,walker_ww,B051,2,0.33,,26.3,6.7,15.7
+EXP_156,exploratory,novel_combination,41.12,93.2,2024-02-02T08:25:32.678Z,walker_ww,B051,3,0.28,,25.9,7.0,15.7
+EXP_157,presentation,standard_protocol,18.98,39.5,2024-02-02T12:07:18.789Z,xavier_xx,B052,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_158,presentation,standard_protocol,19.45,40.6,2024-02-02T12:10:05.890Z,xavier_xx,B052,2,0.13,validated_protocol,24.6,7.1,2.1
+EXP_159,presentation,standard_protocol,17.56,36.4,2024-02-02T12:12:51.901Z,xavier_xx,B052,3,0.10,validated_protocol,24.2,6.8,2.1
+EXP_160,publication,final_optimized,32.23,73.2,2024-02-02T15:49:37.012Z,young_yy,B053,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_161,publication,final_optimized,31.67,71.5,2024-02-02T15:52:24.123Z,young_yy,B053,2,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_162,publication,final_optimized,33.45,76.1,2024-02-02T15:55:10.234Z,young_yy,B053,3,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_163,control,baseline,23.67,45.7,2024-02-03T10:31:56.345Z,zhang_zz,B054,1,0.15,,25.1,7.4,0.0
+EXP_164,control,baseline,22.89,44.2,2024-02-03T10:34:43.456Z,zhang_zz,B054,2,0.16,,24.9,7.2,0.0
+EXP_165,control,baseline,24.78,48.1,2024-02-03T10:37:29.567Z,zhang_zz,B054,3,0.18,,25.3,7.6,0.0
+EXP_166,treatment_a,drug_compound_x,36.89,83.7,2024-02-03T13:14:15.678Z,allen_aaa,B055,1,0.25,,25.5,7.3,10.5
+EXP_167,treatment_a,drug_compound_x,35.12,79.4,2024-02-03T13:17:02.789Z,allen_aaa,B055,2,0.23,,25.3,7.1,10.5
+EXP_168,treatment_a,drug_compound_x,38.23,86.5,2024-02-03T13:19:48.890Z,allen_aaa,B055,3,0.27,,25.6,7.4,10.5
+EXP_169,treatment_b,drug_compound_y,29.34,65.1,2024-02-03T15:56:34.901Z,brown_bbb,B056,1,0.18,,24.7,7.6,5.2
+EXP_170,treatment_b,drug_compound_y,28.01,62.3,2024-02-03T15:59:21.012Z,brown_bbb,B056,2,0.16,,24.5,7.5,5.2
+EXP_171,treatment_b,drug_compound_y,30.89,69.4,2024-02-03T16:02:07.123Z,brown_bbb,B056,3,0.20,,24.8,7.7,5.2
+EXP_172,exploratory,novel_combination,43.12,98.6,2024-02-04T09:43:53.234Z,carter_ccc,B057,1,0.31,,26.2,6.8,15.7
+EXP_173,exploratory,novel_combination,41.78,95.1,2024-02-04T09:46:40.345Z,carter_ccc,B057,2,0.29,,26.0,6.9,15.7
+EXP_174,exploratory,novel_combination,44.67,102.4,2024-02-04T09:49:26.456Z,carter_ccc,B057,3,0.33,,26.4,6.6,15.7
+EXP_175,presentation,standard_protocol,19.12,39.8,2024-02-04T13:26:12.567Z,davis_ddd,B058,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_176,presentation,standard_protocol,18.34,38.1,2024-02-04T13:28:59.678Z,davis_ddd,B058,2,0.11,validated_protocol,24.3,6.9,2.1
+EXP_177,presentation,standard_protocol,20.45,43.2,2024-02-04T13:31:45.789Z,davis_ddd,B058,3,0.14,validated_protocol,24.8,7.2,2.1
+EXP_178,publication,final_optimized,31.56,71.7,2024-02-04T16:13:31.890Z,evans_eee,B059,1,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_179,publication,final_optimized,32.78,74.4,2024-02-04T16:16:18.901Z,evans_eee,B059,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_180,publication,final_optimized,30.23,68.2,2024-02-04T16:19:04.012Z,evans_eee,B059,3,0.06,peer_review_ready,24.8,7.0,8.3
+EXP_181,control,baseline,23.45,45.3,2024-02-05T11:00:50.123Z,foster_fff,B060,1,0.14,,25.0,7.3,0.0
+EXP_182,control,baseline,24.67,47.6,2024-02-05T11:03:37.234Z,foster_fff,B060,2,0.16,,25.2,7.5,0.0
+EXP_183,control,baseline,22.12,42.8,2024-02-05T11:06:23.345Z,foster_fff,B060,3,0.17,,24.7,7.1,0.0
+EXP_184,treatment_a,drug_compound_x,35.78,81.1,2024-02-05T13:43:09.456Z,garcia_ggg,B061,1,0.24,,25.4,7.2,10.5
+EXP_185,treatment_a,drug_compound_x,37.34,84.6,2024-02-05T13:45:56.567Z,garcia_ggg,B061,2,0.26,,25.6,7.4,10.5
+EXP_186,treatment_a,drug_compound_x,34.23,77.8,2024-02-05T13:48:42.678Z,garcia_ggg,B061,3,0.22,,25.2,7.1,10.5
+EXP_187,treatment_b,drug_compound_y,28.56,63.2,2024-02-05T16:25:28.789Z,harris_hhh,B062,1,0.17,,24.6,7.6,5.2
+EXP_188,treatment_b,drug_compound_y,30.12,67.5,2024-02-05T16:28:15.890Z,harris_hhh,B062,2,0.19,,24.8,7.7,5.2
+EXP_189,treatment_b,drug_compound_y,27.78,61.6,2024-02-05T16:31:01.901Z,harris_hhh,B062,3,0.16,,24.4,7.5,5.2
+EXP_190,exploratory,novel_combination,42.89,97.8,2024-02-06T08:12:47.012Z,irwin_iii,B063,1,0.32,,26.1,6.9,15.7
+EXP_191,exploratory,novel_combination,44.56,101.9,2024-02-06T08:15:34.123Z,irwin_iii,B063,2,0.34,,26.3,6.7,15.7
+EXP_192,exploratory,novel_combination,41.34,94.1,2024-02-06T08:18:20.234Z,irwin_iii,B063,3,0.30,,25.9,7.0,15.7
+EXP_193,presentation,standard_protocol,18.67,38.8,2024-02-06T12:00:06.345Z,johnson_jjj,B064,1,0.11,validated_protocol,24.4,6.9,2.1
+EXP_194,presentation,standard_protocol,19.89,41.4,2024-02-06T12:02:53.456Z,johnson_jjj,B064,2,0.13,validated_protocol,24.7,7.1,2.1
+EXP_195,presentation,standard_protocol,17.23,35.9,2024-02-06T12:05:39.567Z,johnson_jjj,B064,3,0.09,validated_protocol,24.1,6.7,2.1
+EXP_196,publication,final_optimized,32.45,73.7,2024-02-06T15:42:25.678Z,kelly_kkk,B065,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_197,publication,final_optimized,31.23,70.6,2024-02-06T15:45:12.789Z,kelly_kkk,B065,2,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_198,publication,final_optimized,33.67,76.4,2024-02-06T15:47:58.890Z,kelly_kkk,B065,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_199,control,baseline,23.89,46.2,2024-02-07T10:29:44.901Z,lewis_lll,B066,1,0.15,,25.1,7.4,0.0
+EXP_200,control,baseline,22.56,43.4,2024-02-07T10:32:31.012Z,lewis_lll,B066,2,0.16,,24.8,7.2,0.0
+EXP_201,control,baseline,25.12,48.9,2024-02-07T10:35:17.123Z,lewis_lll,B066,3,0.19,,25.4,7.6,0.0
+EXP_202,treatment_a,drug_compound_x,36.23,82.1,2024-02-07T13:12:03.234Z,martin_mmm,B067,1,0.25,,25.5,7.3,10.5
+EXP_203,treatment_a,drug_compound_x,34.89,79.2,2024-02-07T13:14:50.345Z,martin_mmm,B067,2,0.23,,25.3,7.1,10.5
+EXP_204,treatment_a,drug_compound_x,37.78,85.4,2024-02-07T13:17:36.456Z,martin_mmm,B067,3,0.27,,25.6,7.4,10.5
+EXP_205,treatment_b,drug_compound_y,29.01,64.3,2024-02-07T15:54:22.567Z,nelson_nnn,B068,1,0.18,,24.6,7.6,5.2
+EXP_206,treatment_b,drug_compound_y,27.67,61.2,2024-02-07T15:57:09.678Z,nelson_nnn,B068,2,0.16,,24.5,7.5,5.2
+EXP_207,treatment_b,drug_compound_y,30.78,69.1,2024-02-07T15:59:55.789Z,nelson_nnn,B068,3,0.20,,24.8,7.7,5.2
+EXP_208,exploratory,novel_combination,43.67,99.7,2024-02-08T09:36:41.890Z,owen_ooo,B069,1,0.31,,26.2,6.8,15.7
+EXP_209,exploratory,novel_combination,42.34,96.4,2024-02-08T09:39:28.901Z,owen_ooo,B069,2,0.29,,26.0,6.9,15.7
+EXP_210,exploratory,novel_combination,45.12,104.1,2024-02-08T09:42:14.012Z,owen_ooo,B069,3,0.34,,26.4,6.6,15.7
+EXP_211,presentation,standard_protocol,19.34,40.2,2024-02-08T13:19:00.123Z,parker_ppp,B070,1,0.12,validated_protocol,24.6,7.0,2.1
+EXP_212,presentation,standard_protocol,18.01,37.3,2024-02-08T13:21:47.234Z,parker_ppp,B070,2,0.10,validated_protocol,24.3,6.9,2.1
+EXP_213,presentation,standard_protocol,20.78,43.8,2024-02-08T13:24:33.345Z,parker_ppp,B070,3,0.14,validated_protocol,24.9,7.2,2.1
+EXP_214,publication,final_optimized,31.89,72.4,2024-02-08T16:01:19.456Z,quinn_qqq,B071,1,0.08,peer_review_ready,24.9,7.1,8.3
+EXP_215,publication,final_optimized,32.56,73.9,2024-02-08T16:04:06.567Z,quinn_qqq,B071,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_216,publication,final_optimized,30.12,68.7,2024-02-08T16:06:52.678Z,quinn_qqq,B071,3,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_217,control,baseline,23.12,44.8,2024-02-09T11:43:38.789Z,roberts_rrr,B072,1,0.14,,25.0,7.3,0.0
+EXP_218,control,baseline,24.89,48.2,2024-02-09T11:46:25.890Z,roberts_rrr,B072,2,0.17,,25.3,7.5,0.0
+EXP_219,control,baseline,22.34,42.9,2024-02-09T11:49:11.901Z,roberts_rrr,B072,3,0.18,,24.7,7.1,0.0
+EXP_220,treatment_a,drug_compound_x,35.45,80.4,2024-02-09T14:25:57.012Z,smith_sss,B073,1,0.24,,25.4,7.2,10.5
+EXP_221,treatment_a,drug_compound_x,37.01,83.6,2024-02-09T14:28:44.123Z,smith_sss,B073,2,0.26,,25.5,7.4,10.5
+EXP_222,treatment_a,drug_compound_x,34.78,78.8,2024-02-09T14:31:30.234Z,smith_sss,B073,3,0.22,,25.3,7.1,10.5
+EXP_223,treatment_b,drug_compound_y,28.23,62.6,2024-02-09T17:08:16.345Z,taylor_ttt,B074,1,0.17,,24.5,7.6,5.2
+EXP_224,treatment_b,drug_compound_y,30.45,68.3,2024-02-09T17:11:03.456Z,taylor_ttt,B074,2,0.19,,24.8,7.7,5.2
+EXP_225,treatment_b,drug_compound_y,27.12,60.1,2024-02-09T17:13:49.567Z,taylor_ttt,B074,3,0.16,,24.3,7.5,5.2
+EXP_226,exploratory,novel_combination,42.56,97.1,2024-02-10T08:50:35.678Z,underwood_uuu,B075,1,0.30,,26.1,6.9,15.7
+EXP_227,exploratory,novel_combination,44.89,103.2,2024-02-10T08:53:22.789Z,underwood_uuu,B075,2,0.33,,26.3,6.7,15.7
+EXP_228,exploratory,novel_combination,41.78,95.6,2024-02-10T08:56:08.890Z,underwood_uuu,B075,3,0.29,,26.0,7.0,15.7
+EXP_229,presentation,standard_protocol,18.89,39.3,2024-02-10T12:32:54.901Z,vincent_vvv,B076,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_230,presentation,standard_protocol,19.67,41.0,2024-02-10T12:35:41.012Z,vincent_vvv,B076,2,0.13,validated_protocol,24.7,7.1,2.1
+EXP_231,presentation,standard_protocol,17.45,36.2,2024-02-10T12:38:27.123Z,vincent_vvv,B076,3,0.09,validated_protocol,24.2,6.8,2.1
+EXP_232,publication,final_optimized,32.12,72.9,2024-02-10T15:15:13.234Z,walker_www,B077,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_233,publication,final_optimized,31.45,71.3,2024-02-10T15:18:00.345Z,walker_www,B077,2,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_234,publication,final_optimized,33.78,76.8,2024-02-10T15:20:46.456Z,walker_www,B077,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_235,control,baseline,23.56,45.4,2024-02-11T10:02:32.567Z,xavier_xxx,B078,1,0.15,,25.1,7.4,0.0
+EXP_236,control,baseline,22.78,43.7,2024-02-11T10:05:19.678Z,xavier_xxx,B078,2,0.16,,24.9,7.2,0.0
+EXP_237,control,baseline,24.34,47.3,2024-02-11T10:08:05.789Z,xavier_xxx,B078,3,0.17,,25.2,7.5,0.0
+EXP_238,treatment_a,drug_compound_x,36.67,83.1,2024-02-11T12:44:51.890Z,young_yyy,B079,1,0.25,,25.5,7.3,10.5
+EXP_239,treatment_a,drug_compound_x,35.23,79.7,2024-02-11T12:47:38.901Z,young_yyy,B079,2,0.23,,25.3,7.1,10.5
+EXP_240,treatment_a,drug_compound_x,38.45,87.2,2024-02-11T12:50:24.012Z,young_yyy,B079,3,0.28,,25.7,7.4,10.5
+EXP_241,treatment_b,drug_compound_y,29.78,66.1,2024-02-11T15:27:10.123Z,zhang_zzz,B080,1,0.18,,24.7,7.6,5.2
+EXP_242,treatment_b,drug_compound_y,28.12,62.4,2024-02-11T15:29:57.234Z,zhang_zzz,B080,2,0.16,,24.5,7.5,5.2
+EXP_243,treatment_b,drug_compound_y,31.23,70.3,2024-02-11T15:32:43.345Z,zhang_zzz,B080,3,0.21,,24.9,7.8,5.2
+EXP_244,exploratory,novel_combination,43.34,98.9,2024-02-12T09:09:29.456Z,adams_aaaa,B081,1,0.31,,26.2,6.8,15.7
+EXP_245,exploratory,novel_combination,42.01,95.3,2024-02-12T09:12:16.567Z,adams_aaaa,B081,2,0.29,,26.0,6.9,15.7
+EXP_246,exploratory,novel_combination,44.78,102.7,2024-02-12T09:15:02.678Z,adams_aaaa,B081,3,0.33,,26.4,6.6,15.7
+EXP_247,presentation,standard_protocol,19.01,39.6,2024-02-12T12:51:48.789Z,baker_bbbb,B082,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_248,presentation,standard_protocol,18.23,37.9,2024-02-12T12:54:35.890Z,baker_bbbb,B082,2,0.10,validated_protocol,24.3,6.9,2.1
+EXP_249,presentation,standard_protocol,20.12,42.1,2024-02-12T12:57:21.901Z,baker_bbbb,B082,3,0.14,validated_protocol,24.8,7.2,2.1
+EXP_250,publication,final_optimized,31.67,71.8,2024-02-12T15:34:07.012Z,carter_cccc,B083,1,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_251,publication,final_optimized,32.89,74.6,2024-02-12T15:36:54.123Z,carter_cccc,B083,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_252,publication,final_optimized,30.78,69.4,2024-02-12T15:39:40.234Z,carter_cccc,B083,3,0.06,peer_review_ready,24.8,7.0,8.3
+EXP_253,control,baseline,23.78,45.9,2024-02-13T11:16:26.345Z,davis_dddd,B084,1,0.14,,25.1,7.4,0.0
+EXP_254,control,baseline,22.45,43.3,2024-02-13T11:19:13.456Z,davis_dddd,B084,2,0.16,,24.8,7.2,0.0
+EXP_255,control,baseline,24.67,47.8,2024-02-13T11:21:59.567Z,davis_dddd,B084,3,0.17,,25.3,7.6,0.0
+EXP_256,treatment_a,drug_compound_x,35.89,81.2,2024-02-13T13:58:45.678Z,evans_eeee,B085,1,0.24,,25.4,7.2,10.5
+EXP_257,treatment_a,drug_compound_x,37.56,84.9,2024-02-13T14:01:32.789Z,evans_eeee,B085,2,0.26,,25.6,7.4,10.5
+EXP_258,treatment_a,drug_compound_x,34.12,77.5,2024-02-13T14:04:18.890Z,evans_eeee,B085,3,0.22,,25.2,7.1,10.5
+EXP_259,treatment_b,drug_compound_y,28.89,64.0,2024-02-13T16:41:04.901Z,foster_ffff,B086,1,0.17,,24.6,7.6,5.2
+EXP_260,treatment_b,drug_compound_y,30.34,67.8,2024-02-13T16:43:51.012Z,foster_ffff,B086,2,0.19,,24.8,7.7,5.2
+EXP_261,treatment_b,drug_compound_y,27.56,61.3,2024-02-13T16:46:37.123Z,foster_ffff,B086,3,0.16,,24.4,7.5,5.2
+EXP_262,exploratory,novel_combination,42.78,97.5,2024-02-14T08:23:23.234Z,garcia_gggg,B087,1,0.32,,26.1,6.9,15.7
+EXP_263,exploratory,novel_combination,44.23,101.4,2024-02-14T08:26:10.345Z,garcia_gggg,B087,2,0.33,,26.3,6.7,15.7
+EXP_264,exploratory,novel_combination,41.45,93.9,2024-02-14T08:28:56.456Z,garcia_gggg,B087,3,0.30,,25.9,7.0,15.7
+EXP_265,presentation,standard_protocol,18.67,38.9,2024-02-14T12:05:42.567Z,harris_hhhh,B088,1,0.11,validated_protocol,24.4,6.9,2.1
+EXP_266,presentation,standard_protocol,19.89,41.5,2024-02-14T12:08:29.678Z,harris_hhhh,B088,2,0.13,validated_protocol,24.7,7.1,2.1
+EXP_267,presentation,standard_protocol,17.34,36.1,2024-02-14T12:11:15.789Z,harris_hhhh,B088,3,0.09,validated_protocol,24.1,6.7,2.1
+EXP_268,publication,final_optimized,32.34,73.5,2024-02-14T14:48:01.890Z,jackson_jjjj,B089,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_269,publication,final_optimized,31.12,70.2,2024-02-14T14:50:48.901Z,jackson_jjjj,B089,2,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_270,publication,final_optimized,33.56,76.3,2024-02-14T14:53:34.012Z,jackson_jjjj,B089,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_271,control,baseline,23.34,44.9,2024-02-15T10:30:20.123Z,kelly_kkkk,B090,1,0.15,,25.0,7.3,0.0
+EXP_272,control,baseline,24.78,47.9,2024-02-15T10:33:07.234Z,kelly_kkkk,B090,2,0.17,,25.2,7.5,0.0
+EXP_273,control,baseline,22.12,42.6,2024-02-15T10:35:53.345Z,kelly_kkkk,B090,3,0.18,,24.7,7.1,0.0
+EXP_274,treatment_a,drug_compound_x,36.45,82.6,2024-02-15T13:12:39.456Z,lewis_llll,B091,1,0.25,,25.5,7.3,10.5
+EXP_275,treatment_a,drug_compound_x,34.89,79.1,2024-02-15T13:15:26.567Z,lewis_llll,B091,2,0.23,,25.3,7.1,10.5
+EXP_276,treatment_a,drug_compound_x,37.78,85.7,2024-02-15T13:18:12.678Z,lewis_llll,B091,3,0.27,,25.6,7.4,10.5
+EXP_277,treatment_b,drug_compound_y,29.12,64.7,2024-02-15T15:54:58.789Z,martin_mmmm,B092,1,0.18,,24.6,7.6,5.2
+EXP_278,treatment_b,drug_compound_y,27.78,61.5,2024-02-15T15:57:45.890Z,martin_mmmm,B092,2,0.16,,24.5,7.5,5.2
+EXP_279,treatment_b,drug_compound_y,30.67,69.2,2024-02-15T16:00:31.901Z,martin_mmmm,B092,3,0.20,,24.8,7.7,5.2
+EXP_280,exploratory,novel_combination,43.56,99.8,2024-02-16T09:37:17.012Z,nelson_nnnn,B093,1,0.31,,26.2,6.8,15.7
+EXP_281,exploratory,novel_combination,42.23,96.1,2024-02-16T09:40:04.123Z,nelson_nnnn,B093,2,0.29,,26.0,6.9,15.7
+EXP_282,exploratory,novel_combination,45.01,103.4,2024-02-16T09:42:50.234Z,nelson_nnnn,B093,3,0.34,,26.4,6.6,15.7
+EXP_283,presentation,standard_protocol,19.23,40.0,2024-02-16T13:19:36.345Z,owen_oooo,B094,1,0.12,validated_protocol,24.6,7.0,2.1
+EXP_284,presentation,standard_protocol,18.01,37.5,2024-02-16T13:22:23.456Z,owen_oooo,B094,2,0.10,validated_protocol,24.3,6.9,2.1
+EXP_285,presentation,standard_protocol,20.45,43.1,2024-02-16T13:25:09.567Z,owen_oooo,B094,3,0.14,validated_protocol,24.8,7.2,2.1
+EXP_286,publication,final_optimized,31.78,72.0,2024-02-16T16:01:55.678Z,parker_pppp,B095,1,0.08,peer_review_ready,24.9,7.1,8.3
+EXP_287,publication,final_optimized,32.89,74.7,2024-02-16T16:04:42.789Z,parker_pppp,B095,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_288,publication,final_optimized,30.34,68.5,2024-02-16T16:07:28.890Z,parker_pppp,B095,3,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_289,control,baseline,23.67,45.6,2024-02-17T11:44:14.901Z,quinn_qqqq,B096,1,0.14,,25.1,7.4,0.0
+EXP_290,control,baseline,22.89,44.0,2024-02-17T11:47:01.012Z,quinn_qqqq,B096,2,0.16,,24.9,7.2,0.0
+EXP_291,control,baseline,24.56,47.7,2024-02-17T11:49:47.123Z,quinn_qqqq,B096,3,0.17,,25.3,7.6,0.0
+EXP_292,treatment_a,drug_compound_x,35.12,79.6,2024-02-17T14:26:33.234Z,roberts_rrrr,B097,1,0.23,,25.3,7.1,10.5
+EXP_293,treatment_a,drug_compound_x,37.45,84.8,2024-02-17T14:29:20.345Z,roberts_rrrr,B097,2,0.26,,25.6,7.4,10.5
+EXP_294,treatment_a,drug_compound_x,34.67,78.2,2024-02-17T14:32:06.456Z,roberts_rrrr,B097,3,0.22,,25.2,7.1,10.5
+EXP_295,treatment_b,drug_compound_y,28.34,62.9,2024-02-17T17:08:52.567Z,smith_ssss,B098,1,0.17,,24.5,7.6,5.2
+EXP_296,treatment_b,drug_compound_y,30.01,67.3,2024-02-17T17:11:39.678Z,smith_ssss,B098,2,0.19,,24.8,7.7,5.2
+EXP_297,treatment_b,drug_compound_y,27.78,61.8,2024-02-17T17:14:25.789Z,smith_ssss,B098,3,0.16,,24.4,7.5,5.2
+EXP_298,exploratory,novel_combination,42.89,97.6,2024-02-18T08:51:11.890Z,taylor_tttt,B099,1,0.30,,26.1,6.9,15.7
+EXP_299,exploratory,novel_combination,44.56,102.0,2024-02-18T08:53:58.901Z,taylor_tttt,B099,2,0.33,,26.3,6.7,15.7
+EXP_300,exploratory,novel_combination,41.23,94.3,2024-02-18T08:56:44.012Z,taylor_tttt,B099,3,0.29,,25.9,7.0,15.7
+EXP_301,presentation,standard_protocol,18.78,39.1,2024-02-18T12:33:30.123Z,underwood_uuuu,B100,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_302,presentation,standard_protocol,19.45,40.7,2024-02-18T12:36:17.234Z,underwood_uuuu,B100,2,0.13,validated_protocol,24.7,7.1,2.1
+EXP_303,presentation,standard_protocol,17.56,36.5,2024-02-18T12:39:03.345Z,underwood_uuuu,B100,3,0.10,validated_protocol,24.2,6.8,2.1
+EXP_304,publication,final_optimized,32.01,72.7,2024-02-18T15:15:49.456Z,vincent_vvvv,B101,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_305,publication,final_optimized,31.34,70.9,2024-02-18T15:18:36.567Z,vincent_vvvv,B101,2,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_306,publication,final_optimized,33.67,76.2,2024-02-18T15:21:22.678Z,vincent_vvvv,B101,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_307,control,baseline,23.45,45.1,2024-02-19T10:58:08.789Z,walker_wwww,B102,1,0.15,,25.0,7.3,0.0
+EXP_308,control,baseline,24.78,47.6,2024-02-19T11:00:55.890Z,walker_wwww,B102,2,0.17,,25.2,7.5,0.0
+EXP_309,control,baseline,22.34,43.1,2024-02-19T11:03:41.901Z,walker_wwww,B102,3,0.18,,24.8,7.2,0.0
+EXP_310,treatment_a,drug_compound_x,36.78,83.3,2024-02-19T13:40:27.012Z,xavier_xxxx,B103,1,0.25,,25.5,7.3,10.5
+EXP_311,treatment_a,drug_compound_x,35.01,79.4,2024-02-19T13:43:14.123Z,xavier_xxxx,B103,2,0.23,,25.3,7.1,10.5
+EXP_312,treatment_a,drug_compound_x,38.12,86.1,2024-02-19T13:46:00.234Z,xavier_xxxx,B103,3,0.27,,25.6,7.4,10.5
+EXP_313,treatment_b,drug_compound_y,29.56,65.4,2024-02-19T16:22:46.345Z,young_yyyy,B104,1,0.18,,24.7,7.6,5.2
+EXP_314,treatment_b,drug_compound_y,28.12,62.1,2024-02-19T16:25:33.456Z,young_yyyy,B104,2,0.16,,24.5,7.5,5.2
+EXP_315,treatment_b,drug_compound_y,31.01,70.1,2024-02-19T16:28:19.567Z,young_yyyy,B104,3,0.21,,24.9,7.8,5.2
+EXP_316,exploratory,novel_combination,43.23,98.5,2024-02-20T09:05:05.678Z,zhang_zzzz,B105,1,0.31,,26.2,6.8,15.7
+EXP_317,exploratory,novel_combination,41.89,95.8,2024-02-20T09:07:52.789Z,zhang_zzzz,B105,2,0.29,,26.0,6.9,15.7
+EXP_318,exploratory,novel_combination,44.67,102.6,2024-02-20T09:10:38.890Z,zhang_zzzz,B105,3,0.33,,26.4,6.6,15.7
+EXP_319,presentation,standard_protocol,19.12,39.8,2024-02-20T12:47:24.901Z,allen_aaaaa,B106,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_320,presentation,standard_protocol,18.34,38.0,2024-02-20T12:50:11.012Z,allen_aaaaa,B106,2,0.11,validated_protocol,24.3,6.9,2.1
+EXP_321,presentation,standard_protocol,20.23,42.6,2024-02-20T12:52:57.123Z,allen_aaaaa,B106,3,0.14,validated_protocol,24.8,7.2,2.1
+EXP_322,publication,final_optimized,31.56,71.5,2024-02-20T15:29:43.234Z,brown_bbbbb,B107,1,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_323,publication,final_optimized,32.78,74.2,2024-02-20T15:32:30.345Z,brown_bbbbb,B107,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_324,publication,final_optimized,30.45,69.1,2024-02-20T15:35:16.456Z,brown_bbbbb,B107,3,0.06,peer_review_ready,24.8,7.0,8.3
+EXP_325,control,baseline,23.89,46.0,2024-02-21T11:12:02.567Z,carter_ccccc,B108,1,0.14,,25.1,7.4,0.0
+EXP_326,control,baseline,22.67,43.5,2024-02-21T11:14:49.678Z,carter_ccccc,B108,2,0.16,,24.8,7.2,0.0
+EXP_327,control,baseline,24.45,47.4,2024-02-21T11:17:35.789Z,carter_ccccc,B108,3,0.17,,25.2,7.5,0.0
+EXP_328,treatment_a,drug_compound_x,35.34,80.0,2024-02-21T13:54:21.890Z,davis_ddddd,B109,1,0.24,,25.4,7.2,10.5
+EXP_329,treatment_a,drug_compound_x,37.12,83.7,2024-02-21T13:57:08.901Z,davis_ddddd,B109,2,0.26,,25.5,7.4,10.5
+EXP_330,treatment_a,drug_compound_x,34.56,78.4,2024-02-21T13:59:54.012Z,davis_ddddd,B109,3,0.22,,25.3,7.1,10.5
+EXP_331,treatment_b,drug_compound_y,28.78,63.7,2024-02-21T16:36:40.123Z,evans_eeeee,B110,1,0.17,,24.6,7.6,5.2
+EXP_332,treatment_b,drug_compound_y,30.23,67.6,2024-02-21T16:39:27.234Z,evans_eeeee,B110,2,0.19,,24.8,7.7,5.2
+EXP_333,treatment_b,drug_compound_y,27.45,60.9,2024-02-21T16:42:13.345Z,evans_eeeee,B110,3,0.16,,24.4,7.5,5.2
+EXP_334,exploratory,novel_combination,42.67,97.3,2024-02-22T08:18:59.456Z,foster_fffff,B111,1,0.32,,26.1,6.9,15.7
+EXP_335,exploratory,novel_combination,44.34,101.7,2024-02-22T08:21:46.567Z,foster_fffff,B111,2,0.33,,26.3,6.7,15.7
+EXP_336,exploratory,novel_combination,41.12,94.0,2024-02-22T08:24:32.678Z,foster_fffff,B111,3,0.30,,25.9,7.0,15.7
+EXP_337,presentation,standard_protocol,18.89,39.2,2024-02-22T12:01:18.789Z,garcia_ggggg,B112,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_338,presentation,standard_protocol,19.56,40.8,2024-02-22T12:04:05.890Z,garcia_ggggg,B112,2,0.13,validated_protocol,24.7,7.1,2.1
+EXP_339,presentation,standard_protocol,17.78,36.9,2024-02-22T12:06:51.901Z,garcia_ggggg,B112,3,0.10,validated_protocol,24.2,6.8,2.1
+EXP_340,publication,final_optimized,32.23,73.1,2024-02-22T14:43:37.012Z,harris_hhhhh,B113,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_341,publication,final_optimized,31.45,71.0,2024-02-22T14:46:24.123Z,harris_hhhhh,B113,2,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_342,publication,final_optimized,33.78,76.5,2024-02-22T14:49:10.234Z,harris_hhhhh,B113,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_343,control,baseline,23.12,44.7,2024-02-23T10:25:56.345Z,irwin_iiiii,B114,1,0.15,,25.0,7.3,0.0
+EXP_344,control,baseline,24.89,48.0,2024-02-23T10:28:43.456Z,irwin_iiiii,B114,2,0.17,,25.3,7.5,0.0
+EXP_345,control,baseline,22.56,43.4,2024-02-23T10:31:29.567Z,irwin_iiiii,B114,3,0.18,,24.8,7.2,0.0
+EXP_346,treatment_a,drug_compound_x,36.01,81.5,2024-02-23T13:08:15.678Z,johnson_jjjjj,B115,1,0.24,,25.4,7.2,10.5
+EXP_347,treatment_a,drug_compound_x,34.78,78.9,2024-02-23T13:11:02.789Z,johnson_jjjjj,B115,2,0.22,,25.3,7.1,10.5
+EXP_348,treatment_a,drug_compound_x,37.56,85.2,2024-02-23T13:13:48.890Z,johnson_jjjjj,B115,3,0.26,,25.6,7.4,10.5
+EXP_349,treatment_b,drug_compound_y,29.01,64.2,2024-02-23T15:50:34.901Z,kelly_kkkkk,B116,1,0.18,,24.6,7.6,5.2
+EXP_350,treatment_b,drug_compound_y,27.67,61.4,2024-02-23T15:53:21.012Z,kelly_kkkkk,B116,2,0.16,,24.5,7.5,5.2
+EXP_351,treatment_b,drug_compound_y,30.78,69.5,2024-02-23T15:56:07.123Z,kelly_kkkkk,B116,3,0.20,,24.8,7.7,5.2
+EXP_352,exploratory,novel_combination,43.45,99.1,2024-02-24T09:32:53.234Z,lewis_lllll,B117,1,0.31,,26.2,6.8,15.7
+EXP_353,exploratory,novel_combination,42.12,95.4,2024-02-24T09:35:40.345Z,lewis_lllll,B117,2,0.29,,26.0,6.9,15.7
+EXP_354,exploratory,novel_combination,44.89,103.0,2024-02-24T09:38:26.456Z,lewis_lllll,B117,3,0.34,,26.4,6.6,15.7
+EXP_355,presentation,standard_protocol,19.34,40.3,2024-02-24T13:15:12.567Z,martin_mmmmm,B118,1,0.12,validated_protocol,24.6,7.0,2.1
+EXP_356,presentation,standard_protocol,18.12,37.6,2024-02-24T13:17:59.678Z,martin_mmmmm,B118,2,0.10,validated_protocol,24.3,6.9,2.1
+EXP_357,presentation,standard_protocol,20.67,43.4,2024-02-24T13:20:45.789Z,martin_mmmmm,B118,3,0.14,validated_protocol,24.9,7.2,2.1
+EXP_358,publication,final_optimized,31.89,72.2,2024-02-24T15:57:31.890Z,nelson_nnnnn,B119,1,0.08,peer_review_ready,24.9,7.1,8.3
+EXP_359,publication,final_optimized,32.56,73.8,2024-02-24T16:00:18.901Z,nelson_nnnnn,B119,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_360,publication,final_optimized,30.23,68.6,2024-02-24T16:03:04.012Z,nelson_nnnnn,B119,3,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_361,control,baseline,23.67,45.5,2024-02-25T11:39:50.123Z,owen_ooooo,B120,1,0.14,,25.1,7.4,0.0
+EXP_362,control,baseline,22.34,42.9,2024-02-25T11:42:37.234Z,owen_ooooo,B120,2,0.16,,24.8,7.2,0.0
+EXP_363,control,baseline,24.78,47.8,2024-02-25T11:45:23.345Z,owen_ooooo,B120,3,0.17,,25.3,7.6,0.0
+EXP_364,treatment_a,drug_compound_x,35.67,80.7,2024-02-25T14:22:09.456Z,parker_ppppp,B121,1,0.24,,25.4,7.2,10.5
+EXP_365,treatment_a,drug_compound_x,37.23,84.2,2024-02-25T14:24:56.567Z,parker_ppppp,B121,2,0.26,,25.5,7.4,10.5
+EXP_366,treatment_a,drug_compound_x,34.45,77.9,2024-02-25T14:27:42.678Z,parker_ppppp,B121,3,0.22,,25.2,7.1,10.5
+EXP_367,treatment_b,drug_compound_y,28.45,63.0,2024-02-25T17:04:28.789Z,quinn_qqqqq,B122,1,0.17,,24.5,7.6,5.2
+EXP_368,treatment_b,drug_compound_y,30.12,67.2,2024-02-25T17:07:15.890Z,quinn_qqqqq,B122,2,0.19,,24.8,7.7,5.2
+EXP_369,treatment_b,drug_compound_y,27.89,61.7,2024-02-25T17:10:01.901Z,quinn_qqqqq,B122,3,0.16,,24.4,7.5,5.2
+EXP_370,exploratory,novel_combination,42.78,97.8,2024-02-26T08:46:47.012Z,roberts_rrrrr,B123,1,0.30,,26.1,6.9,15.7
+EXP_371,exploratory,novel_combination,44.56,102.3,2024-02-26T08:49:34.123Z,roberts_rrrrr,B123,2,0.33,,26.3,6.7,15.7
+EXP_372,exploratory,novel_combination,41.23,94.5,2024-02-26T08:52:20.234Z,roberts_rrrrr,B123,3,0.29,,25.9,7.0,15.7
+EXP_373,presentation,standard_protocol,18.98,39.4,2024-02-26T12:29:06.345Z,smith_sssss,B124,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_374,presentation,standard_protocol,19.67,41.1,2024-02-26T12:31:53.456Z,smith_sssss,B124,2,0.13,validated_protocol,24.7,7.1,2.1
+EXP_375,presentation,standard_protocol,17.34,36.0,2024-02-26T12:34:39.567Z,smith_sssss,B124,3,0.09,validated_protocol,24.1,6.7,2.1
+EXP_376,publication,final_optimized,32.12,72.8,2024-02-26T15:11:25.678Z,taylor_ttttt,B125,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_377,publication,final_optimized,31.45,71.2,2024-02-26T15:14:12.789Z,taylor_ttttt,B125,2,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_378,publication,final_optimized,33.89,76.9,2024-02-26T15:16:58.890Z,taylor_ttttt,B125,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_379,control,baseline,23.45,45.0,2024-02-27T10:53:44.901Z,underwood_uuuuu,B126,1,0.15,,25.0,7.3,0.0
+EXP_380,control,baseline,24.78,47.7,2024-02-27T10:56:31.012Z,underwood_uuuuu,B126,2,0.17,,25.2,7.5,0.0
+EXP_381,control,baseline,22.12,42.5,2024-02-27T10:59:17.123Z,underwood_uuuuu,B126,3,0.18,,24.7,7.1,0.0
+EXP_382,treatment_a,drug_compound_x,36.34,82.0,2024-02-27T13:36:03.234Z,vincent_vvvvv,B127,1,0.25,,25.5,7.3,10.5
+EXP_383,treatment_a,drug_compound_x,34.89,79.3,2024-02-27T13:38:50.345Z,vincent_vvvvv,B127,2,0.23,,25.3,7.1,10.5
+EXP_384,treatment_a,drug_compound_x,37.67,85.4,2024-02-27T13:41:36.456Z,vincent_vvvvv,B127,3,0.27,,25.6,7.4,10.5
+EXP_385,treatment_b,drug_compound_y,29.23,64.8,2024-02-27T16:18:22.567Z,walker_wwwww,B128,1,0.18,,24.6,7.6,5.2
+EXP_386,treatment_b,drug_compound_y,27.89,61.9,2024-02-27T16:21:09.678Z,walker_wwwww,B128,2,0.16,,24.5,7.5,5.2
+EXP_387,treatment_b,drug_compound_y,30.56,68.7,2024-02-27T16:23:55.789Z,walker_wwwww,B128,3,0.20,,24.8,7.7,5.2
+EXP_388,exploratory,novel_combination,43.12,98.7,2024-02-28T09:00:41.890Z,xavier_xxxxx,B129,1,0.31,,26.2,6.8,15.7
+EXP_389,exploratory,novel_combination,41.78,95.0,2024-02-28T09:03:28.901Z,xavier_xxxxx,B129,2,0.29,,26.0,6.9,15.7
+EXP_390,exploratory,novel_combination,44.67,102.8,2024-02-28T09:06:14.012Z,xavier_xxxxx,B129,3,0.33,,26.4,6.6,15.7
+EXP_391,presentation,standard_protocol,19.23,40.1,2024-02-28T12:43:00.123Z,young_yyyyy,B130,1,0.12,validated_protocol,24.6,7.0,2.1
+EXP_392,presentation,standard_protocol,18.01,37.4,2024-02-28T12:45:47.234Z,young_yyyyy,B130,2,0.10,validated_protocol,24.3,6.9,2.1
+EXP_393,presentation,standard_protocol,20.45,43.0,2024-02-28T12:48:33.345Z,young_yyyyy,B130,3,0.14,validated_protocol,24.8,7.2,2.1
+EXP_394,publication,final_optimized,31.67,71.9,2024-02-28T15:25:19.456Z,zhang_zzzzz,B131,1,0.08,peer_review_ready,24.9,7.1,8.3
+EXP_395,publication,final_optimized,32.89,74.5,2024-02-28T15:28:06.567Z,zhang_zzzzz,B131,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_396,publication,final_optimized,30.12,68.4,2024-02-28T15:30:52.678Z,zhang_zzzzz,B131,3,0.06,peer_review_ready,24.8,7.0,8.3
+EXP_397,control,baseline,23.78,45.8,2024-02-29T11:07:38.789Z,adams_aaaaaa,B132,1,0.14,,25.1,7.4,0.0
+EXP_398,control,baseline,22.45,43.1,2024-02-29T11:10:25.890Z,adams_aaaaaa,B132,2,0.16,,24.8,7.2,0.0
+EXP_399,control,baseline,24.67,47.9,2024-02-29T11:13:11.901Z,adams_aaaaaa,B132,3,0.17,,25.3,7.6,0.0
+EXP_400,treatment_a,drug_compound_x,35.45,80.3,2024-02-29T13:49:57.012Z,baker_bbbbbb,B133,1,0.24,,25.4,7.2,10.5
+EXP_401,treatment_a,drug_compound_x,37.12,83.9,2024-02-29T13:52:44.123Z,baker_bbbbbb,B133,2,0.26,,25.5,7.4,10.5
+EXP_402,treatment_a,drug_compound_x,34.23,77.6,2024-02-29T13:55:30.234Z,baker_bbbbbb,B133,3,0.22,,25.2,7.1,10.5
+EXP_403,treatment_b,drug_compound_y,28.67,63.5,2024-02-29T16:32:16.345Z,carter_cccccc,B134,1,0.17,,24.6,7.6,5.2
+EXP_404,treatment_b,drug_compound_y,30.34,67.9,2024-02-29T16:35:03.456Z,carter_cccccc,B134,2,0.19,,24.8,7.7,5.2
+EXP_405,treatment_b,drug_compound_y,27.12,60.2,2024-02-29T16:37:49.567Z,carter_cccccc,B134,3,0.16,,24.4,7.5,5.2
+EXP_406,exploratory,novel_combination,42.56,96.9,2024-03-01T08:14:35.678Z,davis_dddddd,B135,1,0.30,,26.1,6.9,15.7
+EXP_407,exploratory,novel_combination,44.23,101.6,2024-03-01T08:17:22.789Z,davis_dddddd,B135,2,0.33,,26.3,6.7,15.7
+EXP_408,exploratory,novel_combination,41.89,95.2,2024-03-01T08:20:08.890Z,davis_dddddd,B135,3,0.29,,26.0,7.0,15.7
+EXP_409,presentation,standard_protocol,18.89,39.0,2024-03-01T11:56:54.901Z,evans_eeeeee,B136,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_410,presentation,standard_protocol,19.56,40.9,2024-03-01T11:59:41.012Z,evans_eeeeee,B136,2,0.13,validated_protocol,24.7,7.1,2.1
+EXP_411,presentation,standard_protocol,17.67,36.7,2024-03-01T12:02:27.123Z,evans_eeeeee,B136,3,0.10,validated_protocol,24.2,6.8,2.1
+EXP_412,publication,final_optimized,32.34,73.4,2024-03-01T14:39:13.234Z,foster_ffffff,B137,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_413,publication,final_optimized,31.12,70.1,2024-03-01T14:42:00.345Z,foster_ffffff,B137,2,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_414,publication,final_optimized,33.56,76.6,2024-03-01T14:44:46.456Z,foster_ffffff,B137,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_415,control,baseline,23.34,44.8,2024-03-02T10:21:32.567Z,garcia_ggggggg,B138,1,0.15,,25.0,7.3,0.0
+EXP_416,control,baseline,24.89,48.1,2024-03-02T10:24:19.678Z,garcia_ggggggg,B138,2,0.17,,25.3,7.5,0.0
+EXP_417,control,baseline,22.67,43.6,2024-03-02T10:27:05.789Z,garcia_ggggggg,B138,3,0.18,,24.8,7.2,0.0
+EXP_418,treatment_a,drug_compound_x,36.78,83.5,2024-03-02T13:03:51.890Z,harris_hhhhhh,B139,1,0.25,,25.5,7.3,10.5
+EXP_419,treatment_a,drug_compound_x,35.01,79.1,2024-03-02T13:06:38.901Z,harris_hhhhhh,B139,2,0.23,,25.3,7.1,10.5
+EXP_420,treatment_a,drug_compound_x,38.23,86.7,2024-03-02T13:09:24.012Z,harris_hhhhhh,B139,3,0.27,,25.6,7.4,10.5
+EXP_421,treatment_b,drug_compound_y,29.45,65.0,2024-03-02T15:46:10.123Z,jackson_jjjjjj,B140,1,0.18,,24.7,7.6,5.2
+EXP_422,treatment_b,drug_compound_y,27.78,61.6,2024-03-02T15:48:57.234Z,jackson_jjjjjj,B140,2,0.16,,24.5,7.5,5.2
+EXP_423,treatment_b,drug_compound_y,30.89,69.8,2024-03-02T15:51:43.345Z,jackson_jjjjjj,B140,3,0.20,,24.8,7.7,5.2
+EXP_424,exploratory,novel_combination,43.67,99.5,2024-03-03T09:28:29.456Z,kelly_kkkkkk,B141,1,0.31,,26.2,6.8,15.7
+EXP_425,exploratory,novel_combination,42.34,96.2,2024-03-03T09:31:16.567Z,kelly_kkkkkk,B141,2,0.29,,26.0,6.9,15.7
+EXP_426,exploratory,novel_combination,45.12,104.3,2024-03-03T09:34:02.678Z,kelly_kkkkkk,B141,3,0.34,,26.4,6.6,15.7
+EXP_427,presentation,standard_protocol,19.12,39.9,2024-03-03T13:10:48.789Z,lewis_llllll,B142,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_428,presentation,standard_protocol,18.34,38.2,2024-03-03T13:13:35.890Z,lewis_llllll,B142,2,0.11,validated_protocol,24.3,6.9,2.1
+EXP_429,presentation,standard_protocol,20.45,43.5,2024-03-03T13:16:21.901Z,lewis_llllll,B142,3,0.14,validated_protocol,24.8,7.2,2.1
+EXP_430,publication,final_optimized,31.78,71.6,2024-03-03T15:53:07.012Z,martin_mmmmmm,B143,1,0.08,peer_review_ready,24.9,7.1,8.3
+EXP_431,publication,final_optimized,32.89,74.9,2024-03-03T15:55:54.123Z,martin_mmmmmm,B143,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_432,publication,final_optimized,30.45,68.8,2024-03-03T15:58:40.234Z,martin_mmmmmm,B143,3,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_433,control,baseline,23.56,45.2,2024-03-04T11:35:26.345Z,nelson_nnnnnn,B144,1,0.14,,25.1,7.4,0.0
+EXP_434,control,baseline,22.78,43.8,2024-03-04T11:38:13.456Z,nelson_nnnnnn,B144,2,0.16,,24.9,7.2,0.0
+EXP_435,control,baseline,24.45,47.5,2024-03-04T11:40:59.567Z,nelson_nnnnnn,B144,3,0.17,,25.2,7.5,0.0
+EXP_436,treatment_a,drug_compound_x,35.23,79.8,2024-03-04T14:17:45.678Z,owen_oooooo,B145,1,0.23,,25.3,7.1,10.5
+EXP_437,treatment_a,drug_compound_x,37.67,85.1,2024-03-04T14:20:32.789Z,owen_oooooo,B145,2,0.26,,25.6,7.4,10.5
+EXP_438,treatment_a,drug_compound_x,34.89,78.6,2024-03-04T14:23:18.890Z,owen_oooooo,B145,3,0.22,,25.3,7.1,10.5
+EXP_439,treatment_b,drug_compound_y,28.12,62.3,2024-03-04T17:00:04.901Z,parker_pppppp,B146,1,0.17,,24.5,7.6,5.2
+EXP_440,treatment_b,drug_compound_y,30.67,68.9,2024-03-04T17:02:51.012Z,parker_pppppp,B146,2,0.20,,24.8,7.7,5.2
+EXP_441,treatment_b,drug_compound_y,27.45,60.7,2024-03-04T17:05:37.123Z,parker_pppppp,B146,3,0.16,,24.4,7.5,5.2
+EXP_442,exploratory,novel_combination,42.89,98.0,2024-03-05T08:42:23.234Z,quinn_qqqqqq,B147,1,0.30,,26.1,6.9,15.7
+EXP_443,exploratory,novel_combination,44.56,102.5,2024-03-05T08:45:10.345Z,quinn_qqqqqq,B147,2,0.33,,26.3,6.7,15.7
+EXP_444,exploratory,novel_combination,41.23,94.2,2024-03-05T08:47:56.456Z,quinn_qqqqqq,B147,3,0.29,,25.9,7.0,15.7
+EXP_445,presentation,standard_protocol,18.67,38.6,2024-03-05T12:24:42.567Z,roberts_rrrrrr,B148,1,0.11,validated_protocol,24.4,6.9,2.1
+EXP_446,presentation,standard_protocol,19.89,41.3,2024-03-05T12:27:29.678Z,roberts_rrrrrr,B148,2,0.13,validated_protocol,24.7,7.1,2.1
+EXP_447,presentation,standard_protocol,17.23,35.8,2024-03-05T12:30:15.789Z,roberts_rrrrrr,B148,3,0.09,validated_protocol,24.1,6.7,2.1
+EXP_448,publication,final_optimized,32.45,73.6,2024-03-05T15:07:01.890Z,smith_ssssss,B149,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_449,publication,final_optimized,31.23,70.7,2024-03-05T15:09:48.901Z,smith_ssssss,B149,2,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_450,publication,final_optimized,33.67,76.8,2024-03-05T15:12:34.012Z,smith_ssssss,B149,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_451,control,baseline,23.89,46.1,2024-03-06T10:49:20.123Z,taylor_tttttt,B150,1,0.15,,25.1,7.4,0.0
+EXP_452,control,baseline,22.56,43.2,2024-03-06T10:52:07.234Z,taylor_tttttt,B150,2,0.16,,24.8,7.2,0.0
+EXP_453,control,baseline,25.12,49.0,2024-03-06T10:54:53.345Z,taylor_tttttt,B150,3,0.19,,25.4,7.6,0.0
+EXP_454,treatment_a,drug_compound_x,36.12,81.9,2024-03-06T13:31:39.456Z,underwood_uuuuuu,B151,1,0.24,,25.4,7.2,10.5
+EXP_455,treatment_a,drug_compound_x,34.78,78.4,2024-03-06T13:34:26.567Z,underwood_uuuuuu,B151,2,0.22,,25.3,7.1,10.5
+EXP_456,treatment_a,drug_compound_x,37.45,84.8,2024-03-06T13:37:12.678Z,underwood_uuuuuu,B151,3,0.26,,25.6,7.4,10.5
+EXP_457,treatment_b,drug_compound_y,29.34,65.3,2024-03-06T16:13:58.789Z,vincent_vvvvvv,B152,1,0.18,,24.7,7.6,5.2
+EXP_458,treatment_b,drug_compound_y,28.01,62.0,2024-03-06T16:16:45.890Z,vincent_vvvvvv,B152,2,0.16,,24.5,7.5,5.2
+EXP_459,treatment_b,drug_compound_y,30.89,69.6,2024-03-06T16:19:31.901Z,vincent_vvvvvv,B152,3,0.20,,24.8,7.7,5.2
+EXP_460,exploratory,novel_combination,43.12,98.8,2024-03-07T08:56:17.012Z,walker_wwwwww,B153,1,0.31,,26.2,6.8,15.7
+EXP_461,exploratory,novel_combination,41.78,94.9,2024-03-07T08:59:04.123Z,walker_wwwwww,B153,2,0.29,,26.0,6.9,15.7
+EXP_462,exploratory,novel_combination,44.67,102.9,2024-03-07T09:01:50.234Z,walker_wwwwww,B153,3,0.33,,26.4,6.6,15.7
+EXP_463,presentation,standard_protocol,19.34,40.4,2024-03-07T12:38:36.345Z,xavier_xxxxxx,B154,1,0.12,validated_protocol,24.6,7.0,2.1
+EXP_464,presentation,standard_protocol,18.01,37.2,2024-03-07T12:41:23.456Z,xavier_xxxxxx,B154,2,0.10,validated_protocol,24.3,6.9,2.1
+EXP_465,presentation,standard_protocol,20.78,43.7,2024-03-07T12:44:09.567Z,xavier_xxxxxx,B154,3,0.14,validated_protocol,24.9,7.2,2.1
+EXP_466,publication,final_optimized,31.89,72.5,2024-03-07T15:20:55.678Z,young_yyyyyy,B155,1,0.08,peer_review_ready,24.9,7.1,8.3
+EXP_467,publication,final_optimized,32.56,74.0,2024-03-07T15:23:42.789Z,young_yyyyyy,B155,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_468,publication,final_optimized,30.23,68.3,2024-03-07T15:26:28.890Z,young_yyyyyy,B155,3,0.07,peer_review_ready,24.8,7.0,8.3
+EXP_469,control,baseline,23.12,44.5,2024-03-08T11:03:14.901Z,zhang_zzzzzz,B156,1,0.14,,25.0,7.3,0.0
+EXP_470,control,baseline,24.89,48.3,2024-03-08T11:06:01.012Z,zhang_zzzzzz,B156,2,0.17,,25.3,7.5,0.0
+EXP_471,control,baseline,22.34,42.7,2024-03-08T11:08:47.123Z,zhang_zzzzzz,B156,3,0.18,,24.7,7.1,0.0
+EXP_472,treatment_a,drug_compound_x,35.67,80.9,2024-03-08T13:45:33.234Z,allen_aaaaaaa,B157,1,0.24,,25.4,7.2,10.5
+EXP_473,treatment_a,drug_compound_x,37.23,84.4,2024-03-08T13:48:20.345Z,allen_aaaaaaa,B157,2,0.26,,25.5,7.4,10.5
+EXP_474,treatment_a,drug_compound_x,34.45,77.7,2024-03-08T13:51:06.456Z,allen_aaaaaaa,B157,3,0.22,,25.2,7.1,10.5
+EXP_475,treatment_b,drug_compound_y,28.78,63.8,2024-03-08T16:27:52.567Z,brown_bbbbbbb,B158,1,0.17,,24.6,7.6,5.2
+EXP_476,treatment_b,drug_compound_y,30.23,67.4,2024-03-08T16:30:39.678Z,brown_bbbbbbb,B158,2,0.19,,24.8,7.7,5.2
+EXP_477,treatment_b,drug_compound_y,27.56,61.1,2024-03-08T16:33:25.789Z,brown_bbbbbbb,B158,3,0.16,,24.4,7.5,5.2
+EXP_478,exploratory,novel_combination,42.45,96.6,2024-03-09T09:10:11.890Z,carter_ccccccc,B159,1,0.30,,26.1,6.9,15.7
+EXP_479,exploratory,novel_combination,44.78,103.1,2024-03-09T09:12:58.901Z,carter_ccccccc,B159,2,0.33,,26.3,6.7,15.7
+EXP_480,exploratory,novel_combination,41.12,93.6,2024-03-09T09:15:44.012Z,carter_ccccccc,B159,3,0.28,,25.9,7.0,15.7
+EXP_481,presentation,standard_protocol,18.98,39.3,2024-03-09T12:52:30.123Z,davis_ddddddd,B160,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_482,presentation,standard_protocol,19.45,40.5,2024-03-09T12:55:17.234Z,davis_ddddddd,B160,2,0.13,validated_protocol,24.6,7.1,2.1
+EXP_483,presentation,standard_protocol,17.56,36.3,2024-03-09T12:58:03.345Z,davis_ddddddd,B160,3,0.10,validated_protocol,24.2,6.8,2.1
+EXP_484,publication,final_optimized,32.23,73.0,2024-03-09T15:34:49.456Z,evans_eeeeeee,B161,1,0.08,peer_review_ready,25.0,7.2,8.3
+EXP_485,publication,final_optimized,31.45,71.4,2024-03-09T15:37:36.567Z,evans_eeeeeee,B161,2,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_486,publication,final_optimized,33.78,76.7,2024-03-09T15:40:22.678Z,evans_eeeeeee,B161,3,0.10,peer_review_ready,25.2,7.4,8.3
+EXP_487,control,baseline,23.67,45.7,2024-03-10T10:17:08.789Z,foster_fffffff,B162,1,0.15,,25.1,7.4,0.0
+EXP_488,control,baseline,22.34,42.8,2024-03-10T10:19:55.890Z,foster_fffffff,B162,2,0.16,,24.8,7.2,0.0
+EXP_489,control,baseline,24.78,47.9,2024-03-10T10:22:41.901Z,foster_fffffff,B162,3,0.17,,25.3,7.6,0.0
+EXP_490,treatment_a,drug_compound_x,36.01,81.6,2024-03-10T12:59:27.012Z,garcia_ggggggg,B163,1,0.24,,25.4,7.2,10.5
+EXP_491,treatment_a,drug_compound_x,34.78,78.1,2024-03-10T13:02:14.123Z,garcia_ggggggg,B163,2,0.22,,25.3,7.1,10.5
+EXP_492,treatment_a,drug_compound_x,37.56,85.3,2024-03-10T13:05:00.234Z,garcia_ggggggg,B163,3,0.26,,25.6,7.4,10.5
+EXP_493,treatment_b,drug_compound_y,29.01,64.1,2024-03-10T15:41:46.345Z,harris_hhhhhhh,B164,1,0.18,,24.6,7.6,5.2
+EXP_494,treatment_b,drug_compound_y,27.67,61.3,2024-03-10T15:44:33.456Z,harris_hhhhhhh,B164,2,0.16,,24.5,7.5,5.2
+EXP_495,treatment_b,drug_compound_y,30.78,69.7,2024-03-10T15:47:19.567Z,harris_hhhhhhh,B164,3,0.20,,24.8,7.7,5.2
+EXP_496,exploratory,novel_combination,43.78,100.1,2024-03-11T09:24:05.678Z,jackson_jjjjjjj,B165,1,0.31,,26.2,6.8,15.7
+EXP_497,exploratory,novel_combination,42.34,95.6,2024-03-11T09:26:52.789Z,jackson_jjjjjjj,B165,2,0.29,,26.0,6.9,15.7
+EXP_498,exploratory,novel_combination,45.23,104.7,2024-03-11T09:29:38.890Z,jackson_jjjjjjj,B165,3,0.34,,26.4,6.6,15.7
+EXP_499,presentation,standard_protocol,19.12,39.7,2024-03-11T13:06:24.901Z,kelly_kkkkkkk,B166,1,0.12,validated_protocol,24.5,7.0,2.1
+EXP_500,presentation,standard_protocol,18.34,38.0,2024-03-11T13:09:11.012Z,kelly_kkkkkkk,B166,2,0.11,validated_protocol,24.3,6.9,2.1
+EXP_501,control,baseline,71.2,,2024-03-11T13:11:57.123Z,kelly_kkkkkkk,B166,3,,outlier_detected,24.8,7.2,2.1
+EXP_502,publication,final_optimized,31.56,71.1,2024-03-11T15:48:43.234Z,lewis_lllllll,B167,1,0.07,peer_review_ready,24.9,7.1,8.3
+EXP_503,publication,final_optimized,32.78,74.6,2024-03-11T15:51:30.345Z,lewis_lllllll,B167,2,0.09,peer_review_ready,25.1,7.3,8.3
+EXP_504,publication,final_optimized,30.23,68.1,2024-03-11T15:54:16.456Z,lewis_lllllll,B167,3,0.06,peer_review_ready,24.8,7.0,8.3
