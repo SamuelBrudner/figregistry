@@ -1,0 +1,253 @@
+# Kedro Logging Configuration for FigRegistry Integration Example
+# 
+# This configuration provides comprehensive logging for the basic FigRegistry-Kedro
+# integration example, enabling visibility into automated figure styling and management
+# processes while maintaining optimal performance for development and demonstration.
+#
+# Key Features:
+# - Debug-level logging for FigRegistry integration components
+# - Performance monitoring for configuration bridge operations
+# - Structured logging for hook lifecycle events and dataset transactions
+# - Educational visibility into plugin workflow automation
+# - Console and file-based logging for comprehensive coverage
+#
+# Logger Hierarchy:
+# - kedro: Main Kedro framework logger (INFO level)
+# - kedro.figregistry.*: FigRegistry plugin namespace (DEBUG level)
+# - figregistry: Core FigRegistry library (DEBUG level for integration insights)
+
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  # Detailed formatter for development and debugging
+  verbose:
+    format: "[%(asctime)s] {%(name)s:%(lineno)d} %(levelname)s - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  
+  # Simplified formatter for console output
+  simple:
+    format: "%(levelname)s %(name)s: %(message)s"
+  
+  # Performance-focused formatter for timing analysis
+  performance:
+    format: "[%(asctime)s] PERF {%(name)s} %(levelname)s - %(message)s [%(funcName)s:%(lineno)d]"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+
+handlers:
+  # Console output for immediate feedback during example execution
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+    stream: ext://sys.stdout
+  
+  # Debug console output for FigRegistry integration visibility
+  debug_console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: verbose
+    stream: ext://sys.stdout
+    filters: [figregistry_filter]
+  
+  # File-based logging for persistent log capture
+  info_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: verbose
+    filename: logs/info.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 3
+    encoding: utf8
+  
+  # Debug file logging specifically for FigRegistry components
+  debug_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: verbose
+    filename: logs/debug.log
+    maxBytes: 5242880   # 5MB
+    backupCount: 2
+    encoding: utf8
+    filters: [figregistry_filter]
+  
+  # Performance monitoring file for timing analysis
+  performance_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: performance
+    filename: logs/performance.log
+    maxBytes: 2097152   # 2MB
+    backupCount: 1
+    encoding: utf8
+    filters: [performance_filter]
+
+filters:
+  # Filter to capture only FigRegistry-related log messages
+  figregistry_filter:
+    (): __main__.FigRegistryLogFilter
+    
+  # Filter to capture performance-related log messages
+  performance_filter:
+    (): __main__.PerformanceLogFilter
+
+loggers:
+  # Root Kedro framework logger - moderate verbosity
+  kedro:
+    level: INFO
+    handlers: [console, info_file_handler]
+    propagate: false
+  
+  # Kedro runner components - minimal logging to reduce noise
+  kedro.runner:
+    level: WARNING
+    handlers: [console]
+    propagate: false
+  
+  # Kedro IO operations - info level for catalog visibility
+  kedro.io:
+    level: INFO
+    handlers: [console, info_file_handler]
+    propagate: false
+  
+  # FigRegistry plugin root logger - debug level for integration insights
+  kedro.figregistry:
+    level: DEBUG
+    handlers: [debug_console, debug_file_handler, performance_file_handler]
+    propagate: false
+  
+  # FigRegistryHooks - detailed lifecycle event logging
+  kedro.figregistry.hooks:
+    level: DEBUG
+    handlers: [debug_console, debug_file_handler]
+    propagate: false
+    # Key events logged:
+    # - Hook registration and initialization
+    # - Configuration bridge setup timing
+    # - Pipeline context establishment
+    # - Resource cleanup operations
+  
+  # FigureDataSet - comprehensive dataset operation logging
+  kedro.figregistry.datasets:
+    level: DEBUG
+    handlers: [debug_console, debug_file_handler, performance_file_handler]
+    propagate: false
+    # Key events logged:
+    # - Figure save operation timing
+    # - Style resolution and application
+    # - Condition parameter extraction
+    # - Catalog integration workflow
+  
+  # FigRegistryConfigBridge - configuration merge operation logging  
+  kedro.figregistry.config:
+    level: DEBUG
+    handlers: [debug_console, debug_file_handler, performance_file_handler]
+    propagate: false
+    # Key events logged:
+    # - Configuration file loading
+    # - Kedro/FigRegistry config merging
+    # - Validation results and failures
+    # - Performance metrics for merge operations
+  
+  # Core FigRegistry library - debug level for educational visibility
+  figregistry:
+    level: DEBUG
+    handlers: [debug_file_handler]
+    propagate: false
+    # Events logged:
+    # - Style resolution timing
+    # - Configuration validation
+    # - Output manager operations
+  
+  # Scientific computing libraries - warning level to reduce verbosity
+  matplotlib:
+    level: WARNING
+    handlers: [console]
+    propagate: false
+  
+  matplotlib.font_manager:
+    level: ERROR
+    handlers: [console]
+    propagate: false
+  
+  # Pydantic validation - info level for configuration debugging
+  pydantic:
+    level: INFO
+    handlers: [info_file_handler]
+    propagate: false
+  
+  # Python warnings - capture for debugging
+  py.warnings:
+    level: WARNING
+    handlers: [console, info_file_handler]
+    propagate: false
+
+# Root logger configuration
+root:
+  level: INFO
+  handlers: [console, info_file_handler]
+
+# Custom filter implementations for log processing
+# These would typically be implemented in a separate module, but shown here for reference
+---
+# Log Filter Class Definitions (for reference - would be in separate .py file)
+
+class FigRegistryLogFilter:
+    """Filter to capture FigRegistry-related log messages for focused debugging."""
+    
+    def filter(self, record):
+        """Return True if the log record should be processed."""
+        # Include all FigRegistry and Kedro FigRegistry namespace logs
+        figregistry_namespaces = [
+            'kedro.figregistry',
+            'figregistry'
+        ]
+        
+        return any(record.name.startswith(namespace) for namespace in figregistry_namespaces)
+
+class PerformanceLogFilter:
+    """Filter to capture performance-related log messages for timing analysis."""
+    
+    def filter(self, record):
+        """Return True if the log record contains performance information."""
+        # Include messages with timing, performance, or SLA keywords
+        performance_keywords = [
+            'timing', 'performance', 'duration', 'elapsed',
+            'sla', 'latency', 'overhead', 'benchmark'
+        ]
+        
+        message = record.getMessage().lower()
+        return any(keyword in message for keyword in performance_keywords)
+
+# Configuration Notes:
+#
+# 1. Logger Hierarchy:
+#    - kedro.figregistry.* loggers inherit from kedro.figregistry root
+#    - All plugin loggers use DEBUG level for maximum visibility
+#    - Core Kedro loggers remain at INFO to avoid excessive output
+#
+# 2. Handler Strategy:
+#    - debug_console: Real-time FigRegistry integration feedback
+#    - debug_file_handler: Persistent debugging information
+#    - performance_file_handler: Timing analysis for optimization
+#    - info_file_handler: General pipeline execution logs
+#
+# 3. Educational Focus:
+#    - Detailed logging helps users understand plugin workflow
+#    - Performance metrics demonstrate integration efficiency
+#    - Error messages provide clear troubleshooting guidance
+#
+# 4. Production Considerations:
+#    - Log rotation prevents disk space issues
+#    - Configurable log levels via environment variables
+#    - Performance impact minimal due to efficient filtering
+#
+# 5. Integration Benefits:
+#    - Seamless propagation through Kedro logger hierarchy
+#    - Respect for project-level log configurations
+#    - Environment-specific logging policy compliance
+#
+# Usage in Kedro Project:
+# This configuration automatically activates when the basic example runs,
+# providing comprehensive visibility into FigRegistry automation without
+# requiring manual configuration or code changes in pipeline nodes.

@@ -1,0 +1,183 @@
+# Basic FigRegistry-Kedro Integration Example Project Configuration
+# ================================================================
+#
+# This Kedro project configuration defines the minimal demonstration project
+# showcasing core figregistry-kedro plugin capabilities. The project provides
+# a straightforward introduction to automated figure styling and versioning
+# within Kedro pipelines, demonstrating essential integration patterns without
+# complex enterprise features.
+#
+# Features Demonstrated:
+# - Basic FigureDataSet integration for automated figure management per F-005
+# - Simple FigRegistryHooks lifecycle integration per F-006 requirements
+# - Core configuration bridge functionality per F-007 specifications
+# - Essential plugin integration showcasing fundamental capabilities
+# - Automated styling elimination of manual plt.savefig() calls per Section 0.1.1
+# - Straightforward condition-based styling per F-002 requirements
+#
+# Technical Specifications Compliance:
+# - Kedro version compatibility: >=0.18.0,<0.20.0 per Section 3.2.1.3
+# - AbstractDataSet interface support for FigureDataSet integration per F-005
+# - Basic ConfigLoader compatibility for configuration merging per F-007
+# - Essential lifecycle hook specifications per F-006 requirements
+# - Standard plugin discovery patterns per F-008 specifications
+
+# ================================================================
+# CORE PROJECT METADATA
+# ================================================================
+
+# Project identity and basic naming conventions
+context_path: src/figregistry_kedro_basic_example
+package_name: figregistry_kedro_basic_example
+
+# Project identification for basic demonstration
+project_name: FigRegistry Kedro Basic Example
+project_version: "1.0.0"
+
+# ================================================================
+# KEDRO FRAMEWORK CONFIGURATION
+# ================================================================
+
+# Kedro version compatibility ensuring plugin functionality
+kedro_version: "0.18.14"
+
+# Basic Kedro features enabling essential plugin integration
+tools:
+  # Standard configuration management for basic example
+  kedro.config:
+    # Use standard ConfigLoader for straightforward configuration
+    config_loader_class: kedro.config.ConfigLoader
+    config_loader_args:
+      base_env: base
+      default_run_env: local
+      # Basic configuration patterns for simple demonstration
+      config_patterns:
+        parameters: ["parameters*"]
+        catalog: ["catalog*"]
+        logging: ["logging*"]
+        figregistry: ["figregistry*"]
+
+# ================================================================
+# BASIC PROJECT STRUCTURE CONFIGURATION
+# ================================================================
+
+# Simple source code organization for basic demonstration
+source_dir: src
+package_dir: src/figregistry_kedro_basic_example
+
+# Basic pipeline discovery for essential functionality
+pipeline_discovery:
+  # Simple pipeline discovery pattern for basic example
+  patterns:
+    - "src/figregistry_kedro_basic_example/pipelines/data_visualization/pipeline.py"
+
+# Standard package discovery for basic project structure
+package_discovery:
+  # Basic package patterns for straightforward project organization
+  include_patterns:
+    - "src/figregistry_kedro_basic_example/**/*.py"
+  exclude_patterns:
+    - "**/__pycache__/**"
+    - "**/tests/**"
+    - "**/*.pyc"
+
+# ================================================================
+# FIGREGISTRY INTEGRATION CONFIGURATION
+# ================================================================
+
+# Basic FigRegistry-Kedro plugin integration per F-005, F-006, F-007
+figregistry_integration:
+  # Simple configuration bridge per F-007 requirements
+  config_bridge:
+    enabled: true
+    merge_strategy: "simple"           # Basic configuration merging
+    validation_enabled: true           # Essential validation only
+    
+  # Basic lifecycle hooks per F-006 specifications
+  lifecycle_hooks:
+    enabled: true
+    initialization_mode: "standard"    # Standard initialization pattern
+    context_management: "basic"        # Basic context management
+    
+  # Essential FigureDataSet integration per F-005 requirements
+  dataset_integration:
+    enabled: true
+    automatic_styling: true            # Core automatic styling functionality
+    condition_resolution: "simple"     # Simple parameter resolution
+
+# ================================================================
+# BASIC PROJECT SETTINGS
+# ================================================================
+
+# Essential project configuration for basic demonstration
+project_settings:
+  # Simple experimental design
+  experimental_design:
+    condition_mapping: true            # Basic condition-based styling per F-002
+    
+  # Basic visualization management
+  visualization_management:
+    automated_output: true             # Automated figure output per F-004
+    format_support: ["png", "pdf"]     # Standard output formats
+    
+  # Simple pipeline integration
+  pipeline_integration:
+    zero_touch_management: true        # Eliminate manual plt.savefig() per Section 0.1.1
+
+# ================================================================
+# PROJECT METADATA AND DOCUMENTATION
+# ================================================================
+
+# Basic metadata for project tracking and learning
+project_metadata:
+  # Technical requirements compliance
+  specification_compliance:
+    figregistry_core_version: ">=0.3.0"
+    kedro_framework_version: ">=0.18.0,<0.20.0"
+    python_version_requirement: ">=3.10"
+    
+  # Core features demonstrated in basic example
+  demonstrated_features:
+    - "F-005: Basic FigureDataSet Integration"
+    - "F-006: Essential Lifecycle Hooks"
+    - "F-007: Simple Config Bridge"
+    - "Automated figure styling elimination of manual saves"
+    - "Condition-based styling with simple parameters"
+    - "Zero-touch figure management in pipelines"
+    
+  # Educational objectives for basic example
+  educational_objectives:
+    primary_goal: "Demonstrate essential figregistry-kedro integration"
+    secondary_goals:
+      - "Show automated figure styling in Kedro pipelines"
+      - "Eliminate manual plt.savefig() calls"
+      - "Provide simple condition-based styling examples"
+      - "Enable quick start with figregistry-kedro plugin"
+    
+  # Example classification
+  example_classification:
+    complexity_level: "basic"
+    target_audience: "new_figregistry_kedro_users"
+    use_case_category: "introductory_demonstration"
+    integration_scope: "essential_plugin_features"
+
+# ================================================================
+# END OF BASIC KEDRO PROJECT CONFIGURATION
+# ================================================================
+
+# This configuration file establishes a simple Kedro project demonstrating
+# the essential capabilities of the figregistry-kedro plugin through 
+# straightforward configuration patterns and basic feature demonstration.
+#
+# Key achievements:
+# - Basic FigureDataSet integration per F-005 requirements
+# - Essential FigRegistryHooks lifecycle integration per F-006
+# - Simple configuration bridge per F-007 specifications
+# - Automated elimination of manual plt.savefig() calls per Section 0.1.1
+# - Condition-based styling demonstration per F-002 requirements
+# - Standard project structure per Kedro conventions
+# - Clear educational progression from basic to advanced examples
+#
+# This configuration serves as an accessible entry point for users
+# new to figregistry-kedro integration, providing essential functionality
+# in a straightforward, easy-to-understand format.

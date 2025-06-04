@@ -1,0 +1,990 @@
+# Advanced Kedro Catalog Configuration for Comprehensive FigureDataSet Testing
+# ============================================================================
+#
+# This catalog configuration provides sophisticated parameter combinations for
+# comprehensive testing of FigRegistry-Kedro integration capabilities including:
+# - Complex style_params overrides for dataset-specific styling (F-005 advanced scenarios)
+# - Multi-dimensional condition parameter patterns and hierarchical resolution (F-005-RQ-004)
+# - Advanced template variable substitution and complex filepath patterns
+# - Nested parameter structures for pipeline context extraction testing
+# - Sophisticated rcParams configurations and matplotlib styling options
+# - Complex load_args scenarios with metadata preservation capabilities
+# - Advanced dataset dependencies and parameter inheritance patterns
+#
+# Key Testing Scenarios Covered:
+# - F-005 Advanced FigureDataSet integration scenarios
+# - F-005-RQ-004 Complex condition resolution and parameter extraction
+# - Advanced catalog parameter extraction from Kedro pipeline context
+# - Multi-dimensional experimental condition testing per styling requirements
+# - Complex parameter inheritance and override patterns
+# - Performance testing under sophisticated configuration scenarios
+#
+# File Organization:
+# - Basic configurations with minimal parameters
+# - Standard configurations with condition parameters  
+# - Advanced configurations with complex style overrides
+# - Versioned configurations with sophisticated metadata
+# - Multi-dimensional configurations with nested conditions
+# - Performance testing configurations with complex scenarios
+# - Edge case configurations for comprehensive validation
+# - Template-based configurations with variable substitution
+# - Inheritance-based configurations with parameter dependencies
+
+# =============================================================================
+# BASIC FIGUREDATASET CONFIGURATIONS
+# =============================================================================
+# Foundational configurations for testing core FigureDataSet functionality
+# with minimal parameters to validate basic integration capabilities
+
+basic_exploratory_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/basic/exploratory_figure.png
+  purpose: exploratory
+
+basic_presentation_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/basic/presentation_figure.png
+  purpose: presentation
+
+basic_publication_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/basic/publication_figure.pdf
+  purpose: publication
+
+# =============================================================================
+# STANDARD CONFIGURATIONS WITH CONDITION PARAMETERS
+# =============================================================================
+# Testing condition parameter resolution from pipeline context with
+# various complexity levels and parameter extraction scenarios
+
+condition_based_analysis:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/conditions/analysis_${params:experiment_condition}.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  format_kwargs:
+    dpi: 200
+    bbox_inches: tight
+
+experiment_type_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/experiments/${params:experiment_type}/${params:model_version}/results.png
+  purpose: presentation
+  condition_param: experiment_type
+  metadata:
+    experiment_tracking: true
+    model_version: "${params:model_version}"
+
+model_comparison_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/models/${params:model_type}_vs_${params:baseline_model}.svg
+  purpose: publication
+  condition_param: model_type
+  format_kwargs:
+    dpi: 300
+    transparent: false
+    bbox_inches: tight
+
+# =============================================================================
+# ADVANCED CONFIGURATIONS WITH COMPLEX STYLE OVERRIDES
+# =============================================================================
+# Testing sophisticated style_params overrides with nested parameter
+# structures and complex rcParams combinations per F-005 advanced scenarios
+
+advanced_styling_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/advanced/styled_${params:analysis_type}_${params:condition}.png
+  purpose: presentation
+  condition_param: analysis_type
+  style_params:
+    # Advanced color configuration
+    color: "#2E86AB"
+    linewidth: 2.5
+    marker: "o"
+    markersize: 8
+    alpha: 0.85
+    zorder: 5
+    # Complex rcParams for comprehensive styling
+    "font.family": "serif"
+    "font.size": 14
+    "font.weight": "bold"
+    "axes.linewidth": 1.8
+    "axes.edgecolor": "#1A1A1A"
+    "axes.labelcolor": "#2E86AB"
+    "axes.titlesize": 16
+    "axes.labelsize": 14
+    "axes.spines.top": false
+    "axes.spines.right": false
+    "legend.frameon": true
+    "legend.shadow": true
+    "legend.fancybox": false
+    "legend.loc": "best"
+    "legend.fontsize": 12
+    "grid.alpha": 0.4
+    "grid.linewidth": 0.8
+    "grid.linestyle": "--"
+  format_kwargs:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.2
+    facecolor: "white"
+    edgecolor: "none"
+    metadata:
+      Title: "Advanced Styled Figure"
+      Subject: "FigRegistry-Kedro Integration Testing"
+      Keywords: "advanced,styling,rcParams"
+
+multi_dimensional_styling:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/multidim/${params:experiment_phase}_${params:dose_level}_${params:timepoint}.pdf
+  purpose: publication
+  condition_param: experiment_phase
+  style_params:
+    # Base styling parameters
+    linewidth: 3.0
+    marker: "^" 
+    markersize: 10
+    alpha: 1.0
+    # Conditional color mapping based on dose level
+    color: >
+      {% if params.dose_level == "low" %}
+      "#A8E6CF"
+      {% elif params.dose_level == "medium" %}
+      "#FFD93D"
+      {% elif params.dose_level == "high" %}
+      "#FF6B6B"
+      {% else %}
+      "#1f77b4"
+      {% endif %}
+    # Advanced figure-level rcParams
+    "figure.figsize": [12, 9]
+    "figure.dpi": 300
+    "figure.facecolor": "white"
+    "figure.edgecolor": "none"
+    "figure.autolayout": true
+    # Sophisticated axes configuration
+    "axes.prop_cycle": "cycler('color', ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'])"
+    "axes.linewidth": 2.0
+    "axes.edgecolor": "#000000"
+    "axes.axisbelow": true
+    "axes.xmargin": 0.05
+    "axes.ymargin": 0.05
+    # Complex subplot parameters
+    "figure.subplot.left": 0.125
+    "figure.subplot.bottom": 0.125
+    "figure.subplot.right": 0.9
+    "figure.subplot.top": 0.88
+    "figure.subplot.wspace": 0.3
+    "figure.subplot.hspace": 0.3
+  format_kwargs:
+    dpi: 300
+    bbox_inches: tight
+    transparent: false
+    metadata:
+      Creator: "FigRegistry-Kedro Plugin"
+      Producer: "Advanced Multi-Dimensional Styling Test"
+      Subject: "Dose-Response Analysis"
+
+nested_condition_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/nested/${params:primary_condition}/${params:secondary_condition}/${params:tertiary_condition}_analysis.png
+  purpose: exploratory
+  condition_param: primary_condition
+  style_params:
+    # Primary condition styling
+    color: >
+      {% if params.primary_condition == "baseline" %}
+      "#1f77b4"
+      {% elif params.primary_condition == "treatment" %}
+      "#ff7f0e"
+      {% else %}
+      "#2ca02c"
+      {% endif %}
+    # Secondary condition marker selection
+    marker: >
+      {% if params.secondary_condition == "control" %}
+      "o"
+      {% elif params.secondary_condition == "experimental" %}
+      "s"
+      {% else %}
+      "^"
+      {% endif %}
+    # Tertiary condition line styling
+    linestyle: >
+      {% if params.tertiary_condition == "pre" %}
+      "-"
+      {% elif params.tertiary_condition == "post" %}
+      "--"
+      {% else %}
+      "-."
+      {% endif %}
+    linewidth: 2.2
+    alpha: 0.8
+    # Conditional rcParams based on nested conditions
+    "legend.title": "{{ params.primary_condition|title }} - {{ params.secondary_condition|title }}"
+    "axes.title": "{{ params.tertiary_condition|title }} Analysis"
+  metadata:
+    nested_conditions:
+      primary: "${params:primary_condition}"
+      secondary: "${params:secondary_condition}"
+      tertiary: "${params:tertiary_condition}"
+
+# =============================================================================
+# VERSIONED CONFIGURATIONS WITH SOPHISTICATED METADATA
+# =============================================================================
+# Testing Kedro versioning integration with complex metadata structures
+# and advanced versioning scenarios per F-005-RQ-002
+
+versioned_experiment_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/experiment_${params:experiment_id}.png
+  purpose: exploratory
+  condition_param: experiment_type
+  versioned: true
+  metadata:
+    experiment_id: "${params:experiment_id}"
+    experiment_type: "${params:experiment_type}"
+    model_version: "${params:model_version}"
+    dataset_hash: "${params:dataset_hash}"
+    pipeline_version: "${params:pipeline_version}"
+    researcher: "${params:researcher}"
+    timestamp: "${params:run_timestamp}"
+    reproducibility:
+      random_seed: "${params:random_seed}"
+      python_version: "${params:python_version}"
+      kedro_version: "${params:kedro_version}"
+      figregistry_version: "${params:figregistry_version}"
+
+versioned_with_load_save_specs:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned/load_save_test.png
+  purpose: presentation
+  condition_param: model_stage
+  versioned: true
+  load_version: "${params:load_version}"
+  save_version: "${params:save_version}"
+  style_params:
+    color: "#4A90E2"
+    linewidth: 2.0
+    marker: "o"
+    alpha: 0.9
+  metadata:
+    version_control:
+      load_from: "${params:load_version}"
+      save_to: "${params:save_version}"
+      version_strategy: "explicit"
+
+time_series_versioned:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/timeseries/ts_${params:frequency}_${params:analysis_window}.svg
+  purpose: publication
+  condition_param: frequency
+  versioned: true
+  style_params:
+    # Time series specific styling
+    linewidth: 1.5
+    marker: "."
+    markersize: 4
+    alpha: 0.8
+    # Time-aware color scheme
+    color: >
+      {% if params.frequency == "daily" %}
+      "#FF9999"
+      {% elif params.frequency == "weekly" %}
+      "#CC6666"
+      {% elif params.frequency == "monthly" %}
+      "#993333"
+      {% else %}
+      "#660000"
+      {% endif %}
+    # Time series specific rcParams
+    "axes.xmargin": 0.02
+    "axes.ymargin": 0.05
+    "xtick.labelsize": 10
+    "ytick.labelsize": 10
+    "xtick.rotation": 45
+  format_kwargs:
+    dpi: 300
+    bbox_inches: tight
+    transparent: true
+  metadata:
+    time_series:
+      frequency: "${params:frequency}"
+      analysis_window: "${params:analysis_window}"
+      data_points: "${params:data_points}"
+      time_range: "${params:time_range}"
+
+# =============================================================================
+# MULTI-DIMENSIONAL CONFIGURATIONS WITH COMPLEX CONDITION RESOLUTION
+# =============================================================================
+# Testing sophisticated condition parameter extraction and multi-dimensional
+# experimental condition scenarios per advanced F-005 requirements
+
+dose_response_analysis:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/dose_response/${params:compound}_${params:dose_unit}/${params:dose_level}_${params:timepoint}.png
+  purpose: presentation
+  condition_param: dose_level
+  style_params:
+    # Dose-dependent styling with sophisticated logic
+    linewidth: >
+      {% if params.dose_level == "vehicle" %}
+      1.5
+      {% elif params.dose_level == "low" %}
+      2.0
+      {% elif params.dose_level == "medium" %}
+      2.5
+      {% elif params.dose_level == "high" %}
+      3.0
+      {% else %}
+      1.8
+      {% endif %}
+    # Color mapping for dose levels
+    color: >
+      {% if params.dose_level == "vehicle" %}
+      "#E0E0E0"
+      {% elif params.dose_level == "low" %}
+      "#A8E6CF"
+      {% elif params.dose_level == "medium" %}
+      "#FFD93D"
+      {% elif params.dose_level == "high" %}
+      "#FF6B6B"
+      {% else %}
+      "#1f77b4"
+      {% endif %}
+    # Marker based on timepoint
+    marker: >
+      {% if params.timepoint == "0h" %}
+      "o"
+      {% elif params.timepoint == "4h" %}
+      "s"
+      {% elif params.timepoint == "8h" %}
+      "^"
+      {% elif params.timepoint == "24h" %}
+      "v"
+      {% else %}
+      "D"
+      {% endif %}
+    markersize: 8
+    alpha: 0.85
+    # Compound-specific rcParams
+    "axes.title": "{{ params.compound|title }} Dose Response ({{ params.dose_unit }})"
+    "legend.title": "{{ params.timepoint }} Timepoint"
+  metadata:
+    experimental_design:
+      compound: "${params:compound}"
+      dose_levels: "${params:available_doses}"
+      timepoints: "${params:timepoints}"
+      replicates: "${params:replicates}"
+      protocol_version: "${params:protocol_version}"
+
+phase_dependent_analysis:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/phases/${params:study_phase}/${params:cohort}/${params:endpoint}_${params:analysis_method}.pdf
+  purpose: publication
+  condition_param: study_phase
+  style_params:
+    # Phase-dependent base styling
+    linewidth: 2.5
+    alpha: 0.9
+    # Phase-specific color schemes
+    color: >
+      {% if params.study_phase == "phase1" %}
+      "#1f77b4"
+      {% elif params.study_phase == "phase2" %}
+      "#ff7f0e"
+      {% elif params.study_phase == "phase3" %}
+      "#2ca02c"
+      {% else %}
+      "#d62728"
+      {% endif %}
+    # Cohort-dependent markers
+    marker: >
+      {% if params.cohort == "young" %}
+      "o"
+      {% elif params.cohort == "adult" %}
+      "s"
+      {% elif params.cohort == "elderly" %}
+      "^"
+      {% else %}
+      "D"
+      {% endif %}
+    # Endpoint-specific line styles
+    linestyle: >
+      {% if params.endpoint == "primary" %}
+      "-"
+      {% elif params.endpoint == "secondary" %}
+      "--"
+      {% else %}
+      "-."
+      {% endif %}
+    # Analysis method dependent rcParams
+    "figure.figsize": >
+      {% if params.analysis_method == "descriptive" %}
+      [10, 6]
+      {% elif params.analysis_method == "inferential" %}
+      [12, 8]
+      {% else %}
+      [14, 10]
+      {% endif %}
+    "axes.titlesize": >
+      {% if params.study_phase == "phase3" %}
+      18
+      {% else %}
+      16
+      {% endif %}
+  format_kwargs:
+    dpi: 300
+    bbox_inches: tight
+    metadata:
+      Study: "{{ params.study_phase|title }}"
+      Cohort: "{{ params.cohort|title }}"
+      Endpoint: "{{ params.endpoint|title }}"
+      Analysis: "{{ params.analysis_method|title }}"
+
+machine_learning_pipeline:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/ml/${params:model_family}/${params:model_type}/${params:dataset_split}_${params:metric_type}.png
+  purpose: exploratory
+  condition_param: model_family
+  style_params:
+    # Model family color coding
+    color: >
+      {% if params.model_family == "linear" %}
+      "#1f77b4"
+      {% elif params.model_family == "tree" %}
+      "#2ca02c"
+      {% elif params.model_family == "ensemble" %}
+      "#ff7f0e"
+      {% elif params.model_family == "neural" %}
+      "#d62728"
+      {% else %}
+      "#9467bd"
+      {% endif %}
+    # Dataset split markers
+    marker: >
+      {% if params.dataset_split == "train" %}
+      "o"
+      {% elif params.dataset_split == "validation" %}
+      "s"
+      {% elif params.dataset_split == "test" %}
+      "^"
+      {% else %}
+      "v"
+      {% endif %}
+    # Metric-dependent line properties
+    linestyle: >
+      {% if params.metric_type == "accuracy" %}
+      "-"
+      {% elif params.metric_type == "precision" %}
+      "--"
+      {% elif params.metric_type == "recall" %}
+      "-."
+      {% else %}
+      ":"
+      {% endif %}
+    linewidth: 2.0
+    alpha: 0.8
+    # Model-specific rcParams
+    "legend.title": "{{ params.model_type|title }} ({{ params.model_family|title }})"
+    "axes.ylabel": "{{ params.metric_type|title }}"
+  metadata:
+    machine_learning:
+      model_family: "${params:model_family}"
+      model_type: "${params:model_type}"
+      hyperparameters: "${params:hyperparameters}"
+      training_data: "${params:training_data_hash}"
+      cross_validation: "${params:cv_strategy}"
+
+# =============================================================================
+# PERFORMANCE TESTING CONFIGURATIONS
+# =============================================================================
+# Configurations designed to test performance under complex scenarios
+# including caching effectiveness and style resolution optimization
+
+performance_test_simple:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/simple_${params:test_iteration}.png
+  purpose: exploratory
+  condition_param: test_condition
+  enable_caching: true
+
+performance_test_complex:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/complex_${params:test_iteration}_${params:complexity_level}.png
+  purpose: presentation
+  condition_param: test_condition
+  style_params:
+    color: "#FF5733"
+    linewidth: 2.0
+    marker: "o"
+    alpha: 0.8
+    "font.size": 12
+    "axes.linewidth": 1.5
+  enable_caching: true
+  metadata:
+    performance_test: true
+    iteration: "${params:test_iteration}"
+    complexity: "${params:complexity_level}"
+
+cache_effectiveness_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/cache/test_${params:cache_scenario}_${params:test_run}.png
+  purpose: exploratory
+  condition_param: cache_scenario
+  style_params:
+    # Identical styling for cache hit testing
+    color: "#2E86AB"
+    linewidth: 2.5
+    marker: "s"
+    alpha: 0.9
+  enable_caching: true
+  metadata:
+    cache_test: true
+    scenario: "${params:cache_scenario}"
+    run: "${params:test_run}"
+
+# =============================================================================
+# EDGE CASE CONFIGURATIONS FOR COMPREHENSIVE VALIDATION
+# =============================================================================
+# Configurations testing edge cases, error scenarios, and boundary conditions
+# to ensure robust handling of complex parameter scenarios
+
+missing_condition_fallback:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/edge_cases/missing_condition.png
+  purpose: exploratory
+  condition_param: nonexistent_param
+  style_params:
+    color: "#FF0000"
+    linewidth: 1.5
+  metadata:
+    edge_case: "missing_condition_parameter"
+
+empty_style_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/edge_cases/empty_style.png
+  purpose: presentation
+  condition_param: experiment_type
+  style_params: {}
+  metadata:
+    edge_case: "empty_style_parameters"
+
+extreme_path_length:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/edge_cases/very_long_path_name_with_many_parameters/${params:param1}/${params:param2}/${params:param3}/${params:param4}/${params:param5}/extremely_long_filename_for_testing_path_limits.png
+  purpose: exploratory
+  condition_param: param1
+  metadata:
+    edge_case: "extreme_path_length"
+
+special_characters_handling:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/special_chars/file_with_spaces_and-dashes_and.dots.png
+  purpose: presentation
+  condition_param: special_condition
+  style_params:
+    color: "#123ABC"
+    linewidth: 2.0
+  metadata:
+    edge_case: "special_characters_in_paths"
+
+# =============================================================================
+# TEMPLATE-BASED CONFIGURATIONS WITH VARIABLE SUBSTITUTION
+# =============================================================================
+# Advanced configurations testing complex template variable substitution
+# and dynamic parameter resolution from multiple contexts
+
+template_heavy_config:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/templates/${params:project_code}/${params:experiment_date}/${params:researcher_id}/${params:analysis_type}_${params:data_version}_${params:run_id}.pdf
+  purpose: publication
+  condition_param: analysis_type
+  style_params:
+    # Template-driven color selection
+    color: >
+      {% set color_map = {
+        "eda": "#1f77b4",
+        "modeling": "#ff7f0e", 
+        "validation": "#2ca02c",
+        "final": "#d62728"
+      } %}
+      {{ color_map.get(params.analysis_type, "#9467bd") }}
+    linewidth: >
+      {% if params.data_version.startswith("v1") %}
+      2.0
+      {% elif params.data_version.startswith("v2") %}
+      2.5
+      {% else %}
+      3.0
+      {% endif %}
+    # Dynamic rcParams based on researcher preferences
+    "font.family": >
+      {% if params.researcher_id == "researcher_001" %}
+      "serif"
+      {% else %}
+      "sans-serif"
+      {% endif %}
+    "figure.figsize": >
+      {% if params.analysis_type == "final" %}
+      [12, 9]
+      {% else %}
+      [10, 7]
+      {% endif %}
+  format_kwargs:
+    dpi: >
+      {% if params.analysis_type == "final" %}
+      300
+      {% else %}
+      200
+      {% endif %}
+    bbox_inches: tight
+    metadata:
+      Project: "{{ params.project_code }}"
+      Date: "{{ params.experiment_date }}"
+      Researcher: "{{ params.researcher_id }}"
+      Analysis: "{{ params.analysis_type }}"
+      Version: "{{ params.data_version }}"
+      Run: "{{ params.run_id }}"
+
+conditional_formatting_config:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: >
+    {% if params.output_type == "draft" %}
+    data/08_reporting/drafts/{{ params.figure_name }}.png
+    {% elif params.output_type == "review" %}
+    data/08_reporting/review/{{ params.figure_name }}.pdf
+    {% elif params.output_type == "final" %}
+    data/08_reporting/final/{{ params.figure_name }}.svg
+    {% else %}
+    data/08_reporting/misc/{{ params.figure_name }}.png
+    {% endif %}
+  purpose: >
+    {% if params.output_type == "final" %}
+    publication
+    {% elif params.output_type == "review" %}
+    presentation
+    {% else %}
+    exploratory
+    {% endif %}
+  condition_param: analysis_context
+  style_params:
+    # Output type dependent styling
+    linewidth: >
+      {% if params.output_type == "final" %}
+      3.0
+      {% elif params.output_type == "review" %}
+      2.5
+      {% else %}
+      2.0
+      {% endif %}
+    # Context-aware color selection
+    color: >
+      {% set context_colors = {
+        "preliminary": "#CCCCCC",
+        "interim": "#FFD93D",
+        "final": "#2ca02c",
+        "comparative": "#ff7f0e"
+      } %}
+      {{ context_colors.get(params.analysis_context, "#1f77b4") }}
+  metadata:
+    output_context:
+      type: "${params:output_type}"
+      context: "${params:analysis_context}"
+      figure_name: "${params:figure_name}"
+
+# =============================================================================
+# INHERITANCE-BASED CONFIGURATIONS WITH PARAMETER DEPENDENCIES
+# =============================================================================
+# Configurations testing parameter inheritance patterns and complex
+# dataset dependencies with sophisticated parameter propagation
+
+base_analysis_config: &base_analysis
+  type: figregistry_kedro.datasets.FigureDataSet
+  purpose: exploratory
+  style_params:
+    linewidth: 2.0
+    alpha: 0.8
+    "font.size": 12
+    "axes.linewidth": 1.5
+  format_kwargs:
+    dpi: 200
+    bbox_inches: tight
+
+derived_analysis_config:
+  <<: *base_analysis
+  filepath: data/08_reporting/inheritance/derived_analysis.png
+  condition_param: derived_condition
+  style_params:
+    <<: *base_analysis.style_params
+    color: "#FF6B6B"
+    marker: "o"
+    "font.weight": "bold"
+
+specialized_analysis_config:
+  <<: *base_analysis
+  filepath: data/08_reporting/inheritance/specialized_${params:specialization_type}.png
+  purpose: presentation
+  condition_param: specialization_type
+  style_params:
+    <<: *base_analysis.style_params
+    linewidth: 2.5
+    "font.size": 14
+    "axes.titlesize": 16
+  format_kwargs:
+    <<: *base_analysis.format_kwargs
+    dpi: 250
+
+publication_ready_config:
+  <<: *base_analysis
+  filepath: data/08_reporting/inheritance/publication_${params:publication_target}.pdf
+  purpose: publication
+  condition_param: publication_target
+  style_params:
+    color: "#000000"
+    linewidth: 3.0
+    alpha: 1.0
+    "font.family": "serif"
+    "font.size": 16
+    "axes.linewidth": 2.0
+    "legend.frameon": true
+    "legend.shadow": true
+  format_kwargs:
+    dpi: 300
+    bbox_inches: tight
+    transparent: false
+    metadata:
+      Publication: "{{ params.publication_target }}"
+      Quality: "Publication Ready"
+
+# =============================================================================
+# COMPLEX LOAD_ARGS SCENARIOS FOR METADATA PRESERVATION
+# =============================================================================
+# Testing advanced load scenarios with metadata preservation and
+# sophisticated figure reconstruction capabilities
+
+metadata_preserving_load:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/metadata/preserved_${params:metadata_id}.png
+  purpose: exploratory
+  condition_param: metadata_context
+  load_args:
+    preserve_metadata: true
+    validate_checksum: true
+    load_creation_context: true
+  metadata:
+    preservation_settings:
+      preserve_style_info: true
+      preserve_creation_params: true
+      validate_integrity: true
+    metadata_id: "${params:metadata_id}"
+    context: "${params:metadata_context}"
+
+complex_load_scenario:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/complex_load/scenario_${params:load_scenario}.svg
+  purpose: presentation
+  condition_param: load_scenario
+  load_args:
+    # Complex loading configuration
+    verify_format: true
+    extract_embedded_metadata: true
+    reconstruct_style_params: true
+    validate_figure_integrity: true
+    load_performance_metrics: true
+  save_args:
+    # Advanced save configuration for future loading
+    embed_style_metadata: true
+    include_creation_timestamp: true
+    store_condition_info: true
+    compress_metadata: false
+  metadata:
+    load_test_scenario: "${params:load_scenario}"
+    preservation_level: "maximum"
+
+# =============================================================================
+# SOPHISTICATED DATASET DEPENDENCIES AND PARAMETER INHERITANCE
+# =============================================================================
+# Advanced configurations testing complex dataset relationships and
+# parameter inheritance patterns across multiple dataset instances
+
+primary_analysis_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/dependencies/primary_${params:analysis_id}.png
+  purpose: exploratory
+  condition_param: primary_condition
+  style_params:
+    color: "#1f77b4"
+    linewidth: 2.0
+    marker: "o"
+  metadata:
+    analysis_role: "primary"
+    analysis_id: "${params:analysis_id}"
+    depends_on: null
+
+secondary_analysis_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/dependencies/secondary_${params:analysis_id}.png
+  purpose: presentation
+  condition_param: secondary_condition
+  style_params:
+    # Inherit from primary but with modifications
+    color: "#ff7f0e"
+    linewidth: 2.0  # Same as primary
+    marker: "s"     # Different marker
+    # Additional secondary-specific styling
+    alpha: 0.8
+    "legend.loc": "upper right"
+  metadata:
+    analysis_role: "secondary"
+    analysis_id: "${params:analysis_id}"
+    depends_on: "primary_analysis_figure"
+    inheritance_pattern: "partial_override"
+
+comparative_analysis_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/dependencies/comparative_${params:analysis_id}.pdf
+  purpose: publication
+  condition_param: comparative_condition
+  style_params:
+    # Combine elements from both primary and secondary
+    color: "#2ca02c"
+    linewidth: 2.5  # Enhanced from base
+    marker: "^"     # Unique marker
+    alpha: 0.9
+    # Publication-specific enhancements
+    "font.family": "serif"
+    "font.size": 14
+    "axes.linewidth": 2.0
+  format_kwargs:
+    dpi: 300
+    bbox_inches: tight
+    metadata:
+      Analysis: "Comparative"
+      Primary_ID: "{{ params.analysis_id }}"
+      Dependencies: "primary_analysis_figure,secondary_analysis_figure"
+  metadata:
+    analysis_role: "comparative"
+    analysis_id: "${params:analysis_id}"
+    depends_on: ["primary_analysis_figure", "secondary_analysis_figure"]
+    inheritance_pattern: "multi_source_synthesis"
+
+# =============================================================================
+# COMPREHENSIVE INTEGRATION TESTING CONFIGURATION
+# =============================================================================
+# Master configuration combining all advanced features for comprehensive
+# integration testing of FigRegistry-Kedro plugin capabilities
+
+comprehensive_integration_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/integration/${params:test_suite}/${params:test_category}/${params:test_name}_${params:timestamp}.png
+  purpose: >
+    {% if params.test_category == "validation" %}
+    presentation
+    {% elif params.test_category == "final" %}
+    publication
+    {% else %}
+    exploratory
+    {% endif %}
+  condition_param: test_category
+  versioned: true
+  style_params:
+    # Comprehensive styling with all advanced features
+    color: >
+      {% set category_colors = {
+        "unit": "#1f77b4",
+        "integration": "#ff7f0e",
+        "performance": "#2ca02c", 
+        "validation": "#d62728",
+        "final": "#000000"
+      } %}
+      {{ category_colors.get(params.test_category, "#9467bd") }}
+    linewidth: >
+      {% if params.test_category == "final" %}
+      3.0
+      {% else %}
+      2.0
+      {% endif %}
+    marker: >
+      {% set category_markers = {
+        "unit": "o",
+        "integration": "s",
+        "performance": "^",
+        "validation": "v",
+        "final": "D"
+      } %}
+      {{ category_markers.get(params.test_category, "+") }}
+    alpha: >
+      {% if params.test_category == "final" %}
+      1.0
+      {% else %}
+      0.8
+      {% endif %}
+    # Complex rcParams with conditional logic
+    "font.family": >
+      {% if params.test_category == "final" %}
+      "serif"
+      {% else %}
+      "sans-serif"
+      {% endif %}
+    "font.size": >
+      {% if params.test_category == "final" %}
+      16
+      {% else %}
+      12
+      {% endif %}
+    "axes.linewidth": >
+      {% if params.test_category == "final" %}
+      2.0
+      {% else %}
+      1.5
+      {% endif %}
+    "legend.title": "{{ params.test_suite|title }} - {{ params.test_category|title }}"
+    "axes.title": "{{ params.test_name|title }} ({{ params.timestamp }})"
+  format_kwargs:
+    dpi: >
+      {% if params.test_category == "final" %}
+      300
+      {% else %}
+      200
+      {% endif %}
+    bbox_inches: tight
+    transparent: >
+      {% if params.test_category == "presentation" %}
+      true
+      {% else %}
+      false
+      {% endif %}
+    metadata:
+      TestSuite: "{{ params.test_suite }}"
+      Category: "{{ params.test_category }}"
+      TestName: "{{ params.test_name }}"
+      Timestamp: "{{ params.timestamp }}"
+      Integration: "Comprehensive"
+  enable_caching: true
+  metadata:
+    comprehensive_test: true
+    test_parameters:
+      suite: "${params:test_suite}"
+      category: "${params:test_category}" 
+      name: "${params:test_name}"
+      timestamp: "${params:timestamp}"
+    feature_coverage:
+      - "F-005 Advanced FigureDataSet integration"
+      - "F-005-RQ-004 Complex condition resolution"
+      - "Multi-dimensional parameter extraction"
+      - "Sophisticated style_params overrides"
+      - "Advanced template variable substitution"
+      - "Complex rcParams configuration"
+      - "Versioning with metadata preservation"
+      - "Performance optimization testing"
+      - "Parameter inheritance patterns"
+      - "Edge case handling validation"
+    validation_criteria:
+      style_resolution: "< 5ms"
+      save_operation: "< 200ms"
+      cache_hit_rate: "> 90%"
+      memory_usage: "< 50MB"
+      parameter_extraction_accuracy: "100%"
+      template_substitution_success: "100%"
+      condition_resolution_accuracy: "100%"

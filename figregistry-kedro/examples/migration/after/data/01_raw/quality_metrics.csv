@@ -1,0 +1,105 @@
+experiment_id,metric_type,instrument_id,measurement_value,pass_fail_status,measurement_timestamp,operator,protocol_step,upper_limit,lower_limit,notes
+EXP001,calibration,HPLC_001,99.8,pass,2024-01-15 08:30:00,tech_sarah,step_001,101.0,98.0,Standard calibration curve linearity check - automated styling for control baseline
+EXP001,validation,HPLC_001,0.95,pass,2024-01-15 09:00:00,tech_sarah,step_002,1.0,0.9,Method precision validation - R² correlation coefficient
+EXP001,control_check,HPLC_001,100.2,pass,2024-01-15 09:30:00,tech_sarah,step_003,102.0,98.0,Quality control standard recovery - demonstrates threshold styling
+EXP001,drift_monitoring,HPLC_001,0.3,pass,2024-01-15 10:00:00,tech_sarah,step_004,2.0,-2.0,Signal drift monitoring over time - baseline control styling pattern
+EXP002,calibration,HPLC_001,99.5,pass,2024-01-15 08:35:00,tech_sarah,step_001,101.0,98.0,Low dose group calibration - automated styling differentiation from control
+EXP002,validation,HPLC_001,0.92,pass,2024-01-15 09:05:00,tech_sarah,step_002,1.0,0.9,Method validation for low dose samples - dose-dependent styling
+EXP002,control_check,HPLC_001,99.8,pass,2024-01-15 09:35:00,tech_sarah,step_003,102.0,98.0,QC recovery for low dose matrix - dose group conditional styling
+EXP002,drift_monitoring,HPLC_001,0.5,pass,2024-01-15 10:05:00,tech_sarah,step_004,2.0,-2.0,Instrument stability during low dose analysis - group-specific monitoring
+EXP003,calibration,HPLC_001,100.1,pass,2024-01-15 08:40:00,tech_sarah,step_001,101.0,98.0,Medium dose calibration - intermediate styling gradient demonstration
+EXP003,validation,HPLC_001,0.96,pass,2024-01-15 09:10:00,tech_sarah,step_002,1.0,0.9,Validation precision for medium dose - gradient styling patterns
+EXP003,control_check,HPLC_001,100.5,pass,2024-01-15 09:40:00,tech_sarah,step_003,102.0,98.0,Medium dose QC recovery - demonstrates automated condition styling
+EXP003,drift_monitoring,HPLC_001,-0.2,pass,2024-01-15 10:10:00,tech_sarah,step_004,2.0,-2.0,Signal stability for medium dose analysis - condition-based monitoring styling
+EXP004,calibration,HPLC_001,99.2,pass,2024-01-15 08:45:00,tech_sarah,step_001,101.0,98.0,High dose calibration - maximum dose distinct visual styling
+EXP004,validation,HPLC_001,0.89,fail,2024-01-15 09:15:00,tech_sarah,step_002,1.0,0.9,High dose validation failure - fail status styling demonstration
+EXP004,control_check,HPLC_001,102.5,fail,2024-01-15 09:45:00,tech_sarah,step_003,102.0,98.0,High dose QC recovery failure - threshold-based fail styling
+EXP004,drift_monitoring,HPLC_001,2.3,fail,2024-01-15 10:15:00,tech_sarah,step_004,2.0,-2.0,Excessive drift during high dose analysis - drift failure styling pattern
+EXP005,calibration,LC_MS_002,98.9,pass,2024-03-01 07:30:00,tech_mike,step_001,101.0,98.0,Time course 6h calibration - validation phase styling
+EXP005,validation,LC_MS_002,0.94,pass,2024-03-01 08:00:00,tech_mike,step_002,1.0,0.9,6h timepoint validation - temporal styling differentiation
+EXP005,control_check,LC_MS_002,99.7,pass,2024-03-01 08:30:00,tech_mike,step_003,102.0,98.0,6h timepoint QC check - time-dependent conditional styling
+EXP005,drift_monitoring,LC_MS_002,0.4,pass,2024-03-01 09:00:00,tech_mike,step_004,2.0,-2.0,LC-MS drift monitoring 6h - timepoint-specific monitoring styling
+EXP006,calibration,LC_MS_002,99.4,pass,2024-03-01 07:35:00,tech_mike,step_001,101.0,98.0,Time course 12h calibration - mid-validation styling
+EXP006,validation,LC_MS_002,0.91,pass,2024-03-01 08:05:00,tech_mike,step_002,1.0,0.9,12h timepoint validation - progressive temporal styling
+EXP006,control_check,LC_MS_002,100.8,pass,2024-03-01 08:35:00,tech_mike,step_003,102.0,98.0,12h timepoint QC recovery - temporal progression styling
+EXP006,drift_monitoring,LC_MS_002,-0.1,pass,2024-03-01 09:05:00,tech_mike,step_004,2.0,-2.0,12h drift assessment - timepoint monitoring with automated styling
+EXP007,calibration,LC_MS_002,100.3,pass,2024-03-01 07:40:00,tech_mike,step_001,101.0,98.0,Time course 24h calibration - late validation styling
+EXP007,validation,LC_MS_002,0.97,pass,2024-03-01 08:10:00,tech_mike,step_002,1.0,0.9,24h timepoint validation - final timepoint distinct styling
+EXP007,control_check,LC_MS_002,98.9,pass,2024-03-01 08:40:00,tech_mike,step_003,102.0,98.0,24h timepoint QC check - temporal endpoint styling
+EXP007,drift_monitoring,LC_MS_002,1.2,pass,2024-03-01 09:10:00,tech_mike,step_004,2.0,-2.0,24h drift monitoring - extended timepoint monitoring styling
+EXP008,calibration,UPLC_003,99.6,pass,2024-04-16 08:00:00,tech_lisa,step_001,101.0,98.0,Novel compound calibration - discovery phase experimental styling
+EXP008,validation,UPLC_003,0.88,fail,2024-04-16 08:30:00,tech_lisa,step_002,1.0,0.9,Novel compound validation failure - experimental compound styling
+EXP008,control_check,UPLC_003,103.2,fail,2024-04-16 09:00:00,tech_lisa,step_003,102.0,98.0,Novel compound QC failure - compound-specific fail styling
+EXP008,drift_monitoring,UPLC_003,0.7,pass,2024-04-16 09:30:00,tech_lisa,step_004,2.0,-2.0,UPLC drift for novel compound - experimental monitoring styling
+EXP009,calibration,UPLC_003,100.0,pass,2024-04-16 08:05:00,tech_lisa,step_001,101.0,98.0,Standard treatment calibration - reference styling for comparison
+EXP009,validation,UPLC_003,0.95,pass,2024-04-16 08:35:00,tech_lisa,step_002,1.0,0.9,Standard treatment validation - established reference styling
+EXP009,control_check,UPLC_003,99.5,pass,2024-04-16 09:05:00,tech_lisa,step_003,102.0,98.0,Standard QC recovery - standard treatment styling pattern
+EXP009,drift_monitoring,UPLC_003,0.1,pass,2024-04-16 09:35:00,tech_lisa,step_004,2.0,-2.0,Standard drift monitoring - reference compound monitoring styling
+EXP010,calibration,NMR_004,98.7,pass,2024-06-01 07:45:00,tech_james,step_001,101.0,98.0,High responder calibration - validation with distinct biomarker styling
+EXP010,validation,NMR_004,0.93,pass,2024-06-01 08:15:00,tech_james,step_002,1.0,0.9,High biomarker validation - responder-specific styling differentiation
+EXP010,control_check,NMR_004,101.1,pass,2024-06-01 08:45:00,tech_james,step_003,102.0,98.0,High responder QC check - biomarker-dependent styling
+EXP010,drift_monitoring,NMR_004,0.6,pass,2024-06-01 09:15:00,tech_james,step_004,2.0,-2.0,NMR drift high responder - biomarker group monitoring styling
+EXP011,calibration,NMR_004,99.1,pass,2024-06-01 07:50:00,tech_james,step_001,101.0,98.0,Low responder calibration - contrasting validation styling
+EXP011,validation,NMR_004,0.90,pass,2024-06-01 08:20:00,tech_james,step_002,1.0,0.9,Low biomarker validation - low responder styling contrast
+EXP011,control_check,NMR_004,98.3,pass,2024-06-01 08:50:00,tech_james,step_003,102.0,98.0,Low responder QC recovery - biomarker contrast styling
+EXP011,drift_monitoring,NMR_004,-0.3,pass,2024-06-01 09:20:00,tech_james,step_004,2.0,-2.0,NMR drift low responder - contrasting biomarker monitoring styling
+EXP012,calibration,SPECTROMETER_005,100.2,pass,2024-07-16 08:15:00,tech_emma,step_001,101.0,98.0,Longitudinal baseline calibration - temporal styling differentiation
+EXP012,validation,SPECTROMETER_005,0.96,pass,2024-07-16 08:45:00,tech_emma,step_002,1.0,0.9,Baseline timepoint validation - longitudinal baseline styling
+EXP012,control_check,SPECTROMETER_005,99.8,pass,2024-07-16 09:15:00,tech_emma,step_003,102.0,98.0,Baseline QC recovery - longitudinal study baseline styling
+EXP012,drift_monitoring,SPECTROMETER_005,0.2,pass,2024-07-16 09:45:00,tech_emma,step_004,2.0,-2.0,Spectrometer baseline drift - longitudinal monitoring baseline
+EXP013,calibration,SPECTROMETER_005,99.7,pass,2024-07-16 08:20:00,tech_emma,step_001,101.0,98.0,4-week followup calibration - progressive styling changes
+EXP013,validation,SPECTROMETER_005,0.92,pass,2024-07-16 08:50:00,tech_emma,step_002,1.0,0.9,Week 4 validation - mid-study temporal styling
+EXP013,control_check,SPECTROMETER_005,100.6,pass,2024-07-16 09:20:00,tech_emma,step_003,102.0,98.0,Week 4 QC check - progressive longitudinal styling
+EXP013,drift_monitoring,SPECTROMETER_005,0.8,pass,2024-07-16 09:50:00,tech_emma,step_004,2.0,-2.0,4-week drift monitoring - temporal progression styling
+EXP014,calibration,SPECTROMETER_005,98.9,pass,2024-07-16 08:25:00,tech_emma,step_001,101.0,98.0,8-week followup calibration - final timepoint styling
+EXP014,validation,SPECTROMETER_005,0.89,fail,2024-07-16 08:55:00,tech_emma,step_002,1.0,0.9,Week 8 validation failure - final timepoint failure styling
+EXP014,control_check,SPECTROMETER_005,102.8,fail,2024-07-16 09:25:00,tech_emma,step_003,102.0,98.0,Week 8 QC failure - longitudinal endpoint failure styling
+EXP014,drift_monitoring,SPECTROMETER_005,1.9,pass,2024-07-16 09:55:00,tech_emma,step_004,2.0,-2.0,8-week drift at limit - extended study monitoring styling
+EXP015,calibration,BIOANALYZER_006,99.9,pass,2024-09-01 07:30:00,tech_robert,step_001,101.0,98.0,Pathway A calibration - mechanistic validation styling
+EXP015,validation,BIOANALYZER_006,0.94,pass,2024-09-01 08:00:00,tech_robert,step_002,1.0,0.9,Pathway A validation - mechanistic pathway styling
+EXP015,control_check,BIOANALYZER_006,100.4,pass,2024-09-01 08:30:00,tech_robert,step_003,102.0,98.0,Pathway A QC recovery - pathway-specific styling
+EXP015,drift_monitoring,BIOANALYZER_006,0.3,pass,2024-09-01 09:00:00,tech_robert,step_004,2.0,-2.0,Bioanalyzer pathway A drift - pathway monitoring styling
+EXP016,calibration,BIOANALYZER_006,100.1,pass,2024-09-01 07:35:00,tech_robert,step_001,101.0,98.0,Pathway B calibration - alternative pathway styling
+EXP016,validation,BIOANALYZER_006,0.91,pass,2024-09-01 08:05:00,tech_robert,step_002,1.0,0.9,Pathway B validation - alternative mechanistic styling
+EXP016,control_check,BIOANALYZER_006,99.2,pass,2024-09-01 08:35:00,tech_robert,step_003,102.0,98.0,Pathway B QC check - pathway contrast styling
+EXP016,drift_monitoring,BIOANALYZER_006,-0.4,pass,2024-09-01 09:05:00,tech_robert,step_004,2.0,-2.0,Pathway B drift monitoring - alternative pathway monitoring
+EXP017,calibration,GC_MS_007,100.0,pass,2024-10-16 06:30:00,tech_angela,step_001,101.0,98.0,Vehicle control calibration - regulatory phase safety styling
+EXP017,validation,GC_MS_007,0.97,pass,2024-10-16 07:00:00,tech_angela,step_002,1.0,0.9,Vehicle control validation - regulatory control styling
+EXP017,control_check,GC_MS_007,99.6,pass,2024-10-16 07:30:00,tech_angela,step_003,102.0,98.0,Vehicle QC recovery - regulatory safety styling pattern
+EXP017,drift_monitoring,GC_MS_007,0.1,pass,2024-10-16 08:00:00,tech_angela,step_004,2.0,-2.0,GC-MS vehicle drift - regulatory monitoring styling
+EXP018,calibration,GC_MS_007,99.8,pass,2024-10-16 06:35:00,tech_angela,step_001,101.0,98.0,Low dose safety calibration - regulatory safety dose styling
+EXP018,validation,GC_MS_007,0.95,pass,2024-10-16 07:05:00,tech_angela,step_002,1.0,0.9,Safety low dose validation - regulatory dose-dependent styling
+EXP018,control_check,GC_MS_007,100.2,pass,2024-10-16 07:35:00,tech_angela,step_003,102.0,98.0,Safety low dose QC - regulatory low dose styling
+EXP018,drift_monitoring,GC_MS_007,0.5,pass,2024-10-16 08:05:00,tech_angela,step_004,2.0,-2.0,Low dose safety drift - regulatory monitoring styling
+EXP019,calibration,GC_MS_007,99.3,pass,2024-10-16 06:40:00,tech_angela,step_001,101.0,98.0,High dose safety calibration - maximum safety dose styling
+EXP019,validation,GC_MS_007,0.88,fail,2024-10-16 07:10:00,tech_angela,step_002,1.0,0.9,Safety high dose validation failure - regulatory failure styling
+EXP019,control_check,GC_MS_007,103.5,fail,2024-10-16 07:40:00,tech_angela,step_003,102.0,98.0,High dose safety QC failure - regulatory safety failure styling
+EXP019,drift_monitoring,GC_MS_007,2.5,fail,2024-10-16 08:10:00,tech_angela,step_004,2.0,-2.0,High dose safety drift failure - critical safety monitoring failure
+EXP020,calibration,ACQUITY_008,100.1,pass,2024-12-01 06:00:00,tech_david,step_001,101.0,98.0,Placebo calibration - regulatory placebo styling
+EXP020,validation,ACQUITY_008,0.96,pass,2024-12-01 06:30:00,tech_david,step_002,1.0,0.9,Placebo validation - regulatory control group styling
+EXP020,control_check,ACQUITY_008,99.9,pass,2024-12-01 07:00:00,tech_david,step_003,102.0,98.0,Placebo QC recovery - regulatory placebo styling pattern
+EXP020,drift_monitoring,ACQUITY_008,0.2,pass,2024-12-01 07:30:00,tech_david,step_004,2.0,-2.0,Acquity placebo drift - regulatory placebo monitoring
+EXP021,calibration,ACQUITY_008,99.7,pass,2024-12-01 06:05:00,tech_david,step_001,101.0,98.0,Active treatment calibration - regulatory treatment styling
+EXP021,validation,ACQUITY_008,0.93,pass,2024-12-01 06:35:00,tech_david,step_002,1.0,0.9,Active treatment validation - regulatory efficacy styling
+EXP021,control_check,ACQUITY_008,100.3,pass,2024-12-01 07:05:00,tech_david,step_003,102.0,98.0,Active treatment QC - regulatory treatment styling
+EXP021,drift_monitoring,ACQUITY_008,0.7,pass,2024-12-01 07:35:00,tech_david,step_004,2.0,-2.0,Active treatment drift - efficacy monitoring styling
+EXP022,calibration,ORBITRAP_009,99.9,pass,2025-01-16 05:30:00,tech_jennifer,step_001,101.0,98.0,Reference formulation calibration - bioequivalence reference styling
+EXP022,validation,ORBITRAP_009,0.98,pass,2025-01-16 06:00:00,tech_jennifer,step_002,1.0,0.9,Reference validation - regulatory bioequivalence styling
+EXP022,control_check,ORBITRAP_009,100.0,pass,2025-01-16 06:30:00,tech_jennifer,step_003,102.0,98.0,Reference QC recovery - bioequivalence reference styling
+EXP022,drift_monitoring,ORBITRAP_009,0.0,pass,2025-01-16 07:00:00,tech_jennifer,step_004,2.0,-2.0,Orbitrap reference drift - bioequivalence monitoring styling
+EXP023,calibration,ORBITRAP_009,99.6,pass,2025-01-16 05:35:00,tech_jennifer,step_001,101.0,98.0,Test formulation calibration - bioequivalence test styling
+EXP023,validation,ORBITRAP_009,0.94,pass,2025-01-16 06:05:00,tech_jennifer,step_002,1.0,0.9,Test formulation validation - test formulation styling
+EXP023,control_check,ORBITRAP_009,99.4,pass,2025-01-16 06:35:00,tech_jennifer,step_003,102.0,98.0,Test formulation QC - bioequivalence test styling
+EXP023,drift_monitoring,ORBITRAP_009,-0.3,pass,2025-01-16 07:05:00,tech_jennifer,step_004,2.0,-2.0,Test formulation drift - bioequivalence comparison styling
+EXP024,calibration,QTOF_010,100.2,pass,2025-03-01 07:00:00,tech_thomas,step_001,101.0,98.0,Monotherapy A calibration - combination baseline styling
+EXP024,validation,QTOF_010,0.95,pass,2025-03-01 07:30:00,tech_thomas,step_002,1.0,0.9,Single agent A validation - monotherapy baseline styling
+EXP024,control_check,QTOF_010,99.8,pass,2025-03-01 08:00:00,tech_thomas,step_003,102.0,98.0,Monotherapy A QC - single agent styling pattern
+EXP024,drift_monitoring,QTOF_010,0.4,pass,2025-03-01 08:30:00,tech_thomas,step_004,2.0,-2.0,Q-TOF monotherapy A drift - single agent monitoring styling
+EXP025,calibration,QTOF_010,99.9,pass,2025-03-01 07:05:00,tech_thomas,step_001,101.0,98.0,Monotherapy B calibration - combination comparator styling
+EXP025,validation,QTOF_010,0.92,pass,2025-03-01 07:35:00,tech_thomas,step_002,1.0,0.9,Single agent B validation - monotherapy comparator styling
+EXP025,control_check,QTOF_010,100.5,pass,2025-03-01 08:05:00,tech_thomas,step_003,102.0,98.0,Monotherapy B QC - agent B styling pattern
+EXP025,drift_monitoring,QTOF_010,0.1,pass,2025-03-01 08:35:00,tech_thomas,step_004,2.0,-2.0,Monotherapy B drift - comparator agent monitoring styling
+EXP026,calibration,QTOF_010,99.4,pass,2025-03-01 07:10:00,tech_thomas,step_001,101.0,98.0,Combination therapy calibration - synergistic combination styling
+EXP026,validation,QTOF_010,0.89,fail,2025-03-01 07:40:00,tech_thomas,step_002,1.0,0.9,Combination validation failure - combination therapy failure styling
+EXP026,control_check,QTOF_010,102.3,fail,2025-03-01 08:10:00,tech_thomas,step_003,102.0,98.0,Combination QC failure - synergistic failure styling pattern
+EXP026,drift_monitoring,QTOF_010,2.1,fail,2025-03-01 08:40:00,tech_thomas,step_004,2.0,-2.0,Combination drift failure - complex therapy monitoring failure

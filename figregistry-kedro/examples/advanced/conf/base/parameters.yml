@@ -1,0 +1,1008 @@
+# Advanced Kedro Project Parameters Configuration for FigRegistry Integration
+# ============================================================================
+#
+# This parameters file demonstrates sophisticated experimental condition management
+# and complex parameter hierarchies that enable advanced condition-based styling
+# through the figregistry-kedro plugin. It showcases enterprise-grade parameter
+# management patterns for multi-environment deployment scenarios while providing
+# comprehensive support for dynamic style resolution through complex condition_param
+# mechanisms.
+#
+# Key Features Demonstrated:
+# - Complex experimental condition parameters for advanced condition-based styling (F-002)
+# - Sophisticated condition parameter resolution supporting FigureDataSet (F-005-RQ-004)
+# - Multi-environment parameter management for enterprise deployment (Section 0.2.5)
+# - Advanced parameter hierarchies enabling complex pipeline orchestration
+# - Comprehensive experimental scenarios for multiple styling conditions
+# - Parameter-driven styling variations showcasing advanced plugin capabilities
+# - Support for complex condition_param resolution with metadata injection
+#
+# Architecture:
+# These parameters serve as the foundation for condition resolution within
+# FigureDataSet configurations, enabling automatic style application based on
+# experimental contexts, model types, evaluation metrics, and environmental
+# conditions across multiple pipeline stages.
+
+# ==============================================================================
+# CONFIGURATION METADATA AND VERSIONING
+# ==============================================================================
+
+# Parameter configuration metadata for tracking and validation
+metadata:
+  config_version: "2.1.0"
+  created_date: "2024-12-19"
+  last_modified: "2024-12-19"
+  author: "FigRegistry-Kedro Advanced Integration Team"
+  purpose: "advanced_experimental_parameter_management"
+  description: "Enterprise-grade parameter configuration demonstrating sophisticated condition-based styling resolution, complex experimental design support, and multi-environment deployment patterns"
+  
+  # Configuration compliance and compatibility tracking
+  compliance:
+    figregistry_kedro_version: ">=0.1.0"
+    kedro_version: ">=0.18.0,<0.20.0"
+    python_version: ">=3.10"
+    parameter_schema_version: "2.1"
+    
+  # Advanced parameter features utilized in this configuration
+  features_demonstrated:
+    complex_condition_hierarchies: true
+    multi_environment_support: true
+    statistical_significance_parameters: true
+    model_algorithm_variations: true
+    experimental_design_automation: true
+    performance_optimization_parameters: true
+    enterprise_integration_patterns: true
+    parameter_driven_styling: true
+    
+  # Educational and documentation context
+  documentation:
+    parameter_guide: "docs/parameters.md"
+    condition_resolution: "docs/condition-resolution.md"
+    styling_examples: "examples/advanced/README.md"
+    troubleshooting: "docs/troubleshooting.md"
+
+# ==============================================================================
+# CORE EXPERIMENTAL CONDITION PARAMETERS
+# ==============================================================================
+
+# Central experimental condition management for condition-based styling resolution
+experimental_conditions:
+  
+  # Primary experimental design configuration
+  control:
+    condition_id: "experiment.control"
+    description: "Control group baseline experimental conditions"
+    group_name: "control_baseline"
+    sample_size: 1000
+    random_seed: 42
+    validation_split: 0.2
+    
+  # Treatment group configurations with unique identifiers
+  treatment_groups:
+    group_a:
+      condition_id: "experiment.treatment.group_a"
+      description: "Algorithm enhancement treatment group"
+      intervention_type: "algorithm_optimization"
+      enhancement_level: "moderate"
+      expected_improvement: 0.15
+      sample_size: 1000
+      random_seed: 43
+      
+    group_b:
+      condition_id: "experiment.treatment.group_b"
+      description: "Hyperparameter optimization treatment group"
+      intervention_type: "hyperparameter_tuning"
+      optimization_method: "bayesian"
+      search_iterations: 100
+      expected_improvement: 0.12
+      sample_size: 1000
+      random_seed: 44
+      
+    group_c:
+      condition_id: "experiment.treatment.group_c"
+      description: "Ensemble method treatment group"
+      intervention_type: "ensemble_integration"
+      ensemble_strategy: "stacking"
+      base_models: ["rf", "gbm", "nn"]
+      expected_improvement: 0.18
+      sample_size: 1000
+      random_seed: 45
+      
+    group_d:
+      condition_id: "experiment.treatment.group_d"
+      description: "Neural network architecture treatment group"
+      intervention_type: "architecture_optimization"
+      architecture_type: "transformer"
+      layer_optimization: true
+      expected_improvement: 0.20
+      sample_size: 1000
+      random_seed: 46
+
+# ==============================================================================
+# SOPHISTICATED MODEL CONFIGURATION PARAMETERS
+# ==============================================================================
+
+# Comprehensive model configuration supporting multiple algorithms and scenarios
+model_configuration:
+  
+  # Baseline model specifications
+  baseline_models:
+    logistic_regression:
+      model_name: "baseline_logistic"
+      model_type: "training.model.baseline"
+      algorithm: "logistic_regression"
+      regularization: "l2"
+      regularization_strength: 0.01
+      max_iterations: 1000
+      solver: "lbfgs"
+      performance_threshold: 0.75
+      
+    decision_tree:
+      model_name: "baseline_tree"
+      model_type: "training.model.baseline"
+      algorithm: "decision_tree"
+      max_depth: 10
+      min_samples_split: 20
+      min_samples_leaf: 10
+      criterion: "gini"
+      performance_threshold: 0.70
+      
+  # Candidate model configurations with advanced parameters
+  candidate_models:
+    random_forest:
+      model_name: "candidate_rf"
+      model_type: "training.model.candidate"
+      algorithm: "random_forest"
+      n_estimators: 100
+      max_depth: 15
+      min_samples_split: 10
+      min_samples_leaf: 5
+      max_features: "sqrt"
+      bootstrap: true
+      oob_score: true
+      performance_threshold: 0.82
+      
+    gradient_boosting:
+      model_name: "candidate_gbm"
+      model_type: "training.model.candidate"
+      algorithm: "gradient_boosting"
+      n_estimators: 200
+      learning_rate: 0.1
+      max_depth: 8
+      min_samples_split: 15
+      min_samples_leaf: 5
+      subsample: 0.8
+      performance_threshold: 0.84
+      
+    neural_network:
+      model_name: "candidate_nn"
+      model_type: "training.model.candidate"
+      algorithm: "neural_network"
+      hidden_layers: [128, 64, 32]
+      activation: "relu"
+      dropout_rate: 0.3
+      learning_rate: 0.001
+      batch_size: 32
+      epochs: 100
+      early_stopping: true
+      patience: 10
+      performance_threshold: 0.86
+      
+  # Champion model configuration with optimal parameters
+  champion_model:
+    ensemble_champion:
+      model_name: "champion_ensemble"
+      model_type: "training.model.champion"
+      algorithm: "ensemble"
+      base_models: ["random_forest", "gradient_boosting", "neural_network"]
+      ensemble_method: "stacking"
+      meta_learner: "logistic_regression"
+      cv_folds: 5
+      performance_threshold: 0.90
+      confidence_threshold: 0.85
+      
+# Advanced hyperparameter optimization configuration
+hyperparameter_optimization:
+  
+  # Bayesian optimization configuration
+  bayesian_optimization:
+    method: "gaussian_process"
+    acquisition_function: "expected_improvement"
+    n_initial_points: 10
+    n_iterations: 50
+    random_state: 42
+    
+  # Grid search configuration
+  grid_search:
+    cv_folds: 5
+    scoring: "roc_auc"
+    n_jobs: -1
+    verbose: 1
+    
+  # Random search configuration
+  random_search:
+    n_iterations: 100
+    cv_folds: 5
+    scoring: "roc_auc"
+    random_state: 42
+
+# ==============================================================================
+# DATA PROCESSING AND PIPELINE PARAMETERS
+# ==============================================================================
+
+# Comprehensive data processing configuration for multi-stage pipelines
+data_processing:
+  
+  # Raw data quality assessment parameters
+  data_quality:
+    quality_checks:
+      missing_values:
+        threshold: 0.05
+        condition_id: "training.data.raw"
+        action: "flag"
+        
+      outlier_detection:
+        method: "isolation_forest"
+        contamination: 0.1
+        condition_id: "training.data.raw"
+        
+      data_drift:
+        reference_period: 30
+        significance_level: 0.05
+        condition_id: "training.data.raw"
+        
+    quality_condition: "training.data.raw"  # Used for condition_param resolution
+    
+  # Data cleaning and preprocessing parameters
+  preprocessing:
+    cleaning_steps:
+      missing_values:
+        strategy: "median"
+        condition_id: "training.data.cleaned"
+        
+      outlier_treatment:
+        method: "winsorization"
+        percentiles: [0.01, 0.99]
+        condition_id: "training.data.cleaned"
+        
+      normalization:
+        method: "standard_scaler"
+        condition_id: "training.data.cleaned"
+        
+    data_quality_condition: "training.data.cleaned"  # Condition parameter
+    
+  # Feature engineering configuration
+  feature_engineering:
+    transformations:
+      categorical_encoding:
+        method: "one_hot"
+        drop_first: true
+        condition_id: "training.data.transformed"
+        
+      feature_selection:
+        method: "mutual_info"
+        k_best: 50
+        condition_id: "training.data.transformed"
+        
+      dimensionality_reduction:
+        method: "pca"
+        n_components: 0.95
+        condition_id: "training.data.transformed"
+        
+    data_quality_condition: "training.data.transformed"  # Final condition
+    
+# Data split configuration with validation strategies
+data_splits:
+  train_test_split:
+    test_size: 0.2
+    random_state: 42
+    stratify: true
+    
+  cross_validation:
+    cv_method: "stratified_kfold"
+    n_splits: 5
+    shuffle: true
+    random_state: 42
+    
+  time_series_split:
+    n_splits: 5
+    max_train_size: null
+    test_size: null
+
+# ==============================================================================
+# EVALUATION AND PERFORMANCE PARAMETERS
+# ==============================================================================
+
+# Comprehensive evaluation configuration with statistical significance testing
+evaluation_metrics:
+  
+  # Primary performance metrics
+  primary_metrics:
+    classification:
+      accuracy:
+        threshold: 0.80
+        improvement_target: 0.05
+        
+      precision:
+        threshold: 0.75
+        improvement_target: 0.03
+        
+      recall:
+        threshold: 0.75
+        improvement_target: 0.03
+        
+      f1_score:
+        threshold: 0.78
+        improvement_target: 0.04
+        
+      roc_auc:
+        threshold: 0.85
+        improvement_target: 0.02
+        
+  # Statistical significance testing parameters
+  significance_testing:
+    alpha_level: 0.05
+    beta_level: 0.20
+    effect_size_threshold: 0.1
+    
+    # P-value thresholds for condition resolution
+    p_value_thresholds:
+      highly_significant: 0.001
+      very_significant: 0.01
+      significant: 0.05
+      
+    # Confidence level configuration
+    confidence_levels:
+      high: 0.85
+      medium: 0.70
+      low: 0.50
+      
+# Performance monitoring configuration
+performance_monitoring:
+  
+  # Model performance tracking
+  tracking:
+    performance_degradation_threshold: 0.05
+    monitoring_window: 30  # days
+    alert_threshold: 0.10
+    
+  # Quality status classification
+  quality_classification:
+    excellent: 0.90
+    good: 0.80
+    satisfactory: 0.70
+    poor: 0.60
+
+# ==============================================================================
+# INFERENCE AND PREDICTION PARAMETERS
+# ==============================================================================
+
+# Comprehensive inference configuration for production deployment
+inference_configuration:
+  
+  # Prediction type parameters
+  prediction_types:
+    batch_processing:
+      condition_id: "inference.prediction.batch"
+      batch_size: 1000
+      processing_interval: "hourly"
+      max_latency_ms: 5000
+      
+    realtime_processing:
+      condition_id: "inference.prediction.realtime"
+      max_latency_ms: 100
+      throughput_target: 1000  # predictions per second
+      timeout_ms: 500
+      
+  # Confidence threshold configuration
+  confidence_thresholds:
+    high_confidence:
+      threshold: 0.85
+      condition_id: "inference.confidence.high"
+      action: "auto_approve"
+      
+    medium_confidence:
+      threshold: 0.65
+      condition_id: "inference.confidence.medium"
+      action: "manual_review"
+      
+    low_confidence:
+      threshold: 0.50
+      condition_id: "inference.confidence.low"
+      action: "reject"
+      
+  # Model drift detection parameters
+  drift_detection:
+    detection_method: "ks_test"
+    significance_level: 0.05
+    window_size: 1000
+    alert_threshold: 0.01
+    
+# Prediction quality assessment
+prediction_quality:
+  quality_metrics:
+    calibration:
+      method: "platt_scaling"
+      calibration_threshold: 0.1
+      
+    uncertainty:
+      method: "monte_carlo_dropout"
+      n_samples: 100
+      
+    explainability:
+      method: "shap"
+      feature_importance_threshold: 0.05
+
+# ==============================================================================
+# ENVIRONMENT-SPECIFIC PARAMETERS
+# ==============================================================================
+
+# Multi-environment configuration supporting development, staging, and production
+environment_configuration:
+  
+  # Development environment parameters
+  development:
+    environment: "development"
+    training_environment: "training.model.baseline.development"
+    inference_environment: "inference.prediction.batch.development"
+    
+    # Development-specific settings
+    debug_mode: true
+    verbose_logging: true
+    data_sample_size: 10000  # Reduced for faster development
+    model_iterations: 10     # Reduced for quick testing
+    
+    # Performance relaxed for development
+    performance_targets:
+      training_time_limit: 300  # 5 minutes
+      inference_latency_ms: 1000
+      memory_limit_mb: 2048
+      
+  # Staging environment parameters
+  staging:
+    environment: "staging"
+    training_environment: "training.model.candidate.staging"
+    inference_environment: "inference.prediction.realtime.staging"
+    
+    # Staging validation settings
+    validation_mode: true
+    integration_testing: true
+    data_sample_size: 50000  # Moderate sample for validation
+    model_iterations: 50     # Moderate for validation
+    
+    # Performance targets for staging
+    performance_targets:
+      training_time_limit: 1800  # 30 minutes
+      inference_latency_ms: 200
+      memory_limit_mb: 4096
+      
+  # Production environment parameters
+  production:
+    environment: "production"
+    training_environment: "training.model.champion.production"
+    inference_environment: "inference.prediction.realtime.production"
+    
+    # Production optimization settings
+    optimization_mode: true
+    monitoring_enabled: true
+    data_sample_size: null   # Full dataset
+    model_iterations: 200    # Full training
+    
+    # Strict performance targets for production
+    performance_targets:
+      training_time_limit: 7200  # 2 hours
+      inference_latency_ms: 50
+      memory_limit_mb: 8192
+      
+    # Production-specific quality gates
+    quality_gates:
+      minimum_accuracy: 0.90
+      maximum_error_rate: 0.05
+      maximum_drift_score: 0.02
+
+# ==============================================================================
+# ADVANCED EXPERIMENTAL SCENARIOS
+# ==============================================================================
+
+# Complex experimental scenario configuration for advanced demonstrations
+experimental_scenarios:
+  
+  # Algorithm comparison study
+  algorithm_comparison_study:
+    description: "Comprehensive comparison of machine learning algorithms"
+    study_type: "comparative_analysis"
+    
+    conditions:
+      baseline_comparison:
+        condition_id: "experimental_algorithm_comparison.baseline"
+        algorithms: ["logistic_regression", "decision_tree"]
+        evaluation_metric: "roc_auc"
+        
+      advanced_comparison:
+        condition_id: "experimental_algorithm_comparison.advanced"
+        algorithms: ["random_forest", "gradient_boosting", "neural_network"]
+        evaluation_metric: "roc_auc"
+        
+      ensemble_comparison:
+        condition_id: "experimental_algorithm_comparison.ensemble"
+        algorithms: ["voting_classifier", "stacking_classifier", "bagging_classifier"]
+        evaluation_metric: "roc_auc"
+        
+  # Hyperparameter optimization study
+  hyperparameter_optimization_study:
+    description: "Advanced hyperparameter optimization comparison"
+    study_type: "optimization_analysis"
+    
+    conditions:
+      grid_search_optimization:
+        condition_id: "experimental_optimization.grid_search"
+        method: "grid_search"
+        parameter_space: "discrete"
+        
+      random_search_optimization:
+        condition_id: "experimental_optimization.random_search"
+        method: "random_search"
+        parameter_space: "continuous"
+        
+      bayesian_optimization:
+        condition_id: "experimental_optimization.bayesian"
+        method: "bayesian_optimization"
+        parameter_space: "mixed"
+        
+  # Model interpretability study
+  interpretability_study:
+    description: "Model interpretability and explainability analysis"
+    study_type: "interpretability_analysis"
+    
+    conditions:
+      feature_importance:
+        condition_id: "experimental_interpretability.feature_importance"
+        method: "permutation_importance"
+        analysis_type: "global"
+        
+      shap_analysis:
+        condition_id: "experimental_interpretability.shap"
+        method: "shap_values"
+        analysis_type: "local"
+        
+      lime_analysis:
+        condition_id: "experimental_interpretability.lime"
+        method: "lime_explanation"
+        analysis_type: "instance"
+        
+  # Deployment validation study
+  deployment_validation_study:
+    description: "Production deployment validation and monitoring"
+    study_type: "deployment_analysis"
+    
+    environment_conditions:
+      development_validation:
+        condition_id: "experimental_deployment.development"
+        environment: "development"
+        validation_type: "unit_testing"
+        
+      staging_validation:
+        condition_id: "experimental_deployment.staging"
+        environment: "staging"
+        validation_type: "integration_testing"
+        
+      production_validation:
+        condition_id: "experimental_deployment.production"
+        environment: "production"
+        validation_type: "performance_monitoring"
+
+# ==============================================================================
+# CONDITION PARAMETER MAPPING
+# ==============================================================================
+
+# Advanced condition parameter mapping for complex FigureDataSet resolution
+condition_parameter_mapping:
+  
+  # Training pipeline condition mappings
+  training_conditions:
+    data_quality_condition: "experimental_conditions.control.condition_id"
+    model_type: "model_configuration.candidate_models.random_forest.model_type"
+    model_algorithm: "model_configuration.candidate_models.random_forest.algorithm"
+    model_name: "model_configuration.candidate_models.random_forest.model_name"
+    training_environment: "environment_configuration.development.training_environment"
+    validation_score: "evaluation_metrics.primary_metrics.classification.roc_auc.threshold"
+    
+  # Inference pipeline condition mappings
+  inference_conditions:
+    confidence_level: "inference_configuration.confidence_thresholds.high_confidence.condition_id"
+    prediction_type: "inference_configuration.prediction_types.batch_processing.condition_id"
+    inference_environment: "environment_configuration.staging.inference_environment"
+    quality_status: "performance_monitoring.quality_classification.good"
+    
+  # Reporting pipeline condition mappings
+  reporting_conditions:
+    report_type: "reporting.summary.executive"
+    report_section: "reporting.detail.performance"
+    target_audience: "reporting.summary.technical"
+    reporting_environment: "environment_configuration.production.environment"
+    
+  # Experimental analysis condition mappings
+  experimental_conditions:
+    experimental_group: "experimental_conditions.treatment_groups.group_a.condition_id"
+    group_id: "experimental_conditions.treatment_groups.group_b.condition_id"
+    p_value: "evaluation_metrics.significance_testing.p_value_thresholds.significant"
+    significance_level: "evaluation_metrics.significance_testing.alpha_level"
+    
+  # Complex hierarchical condition examples
+  hierarchical_conditions:
+    algorithm_comparison_baseline: "experimental_scenarios.algorithm_comparison_study.conditions.baseline_comparison.condition_id"
+    optimization_study_bayesian: "experimental_scenarios.hyperparameter_optimization_study.conditions.bayesian_optimization.condition_id"
+    interpretability_shap: "experimental_scenarios.interpretability_study.conditions.shap_analysis.condition_id"
+    deployment_production: "experimental_scenarios.deployment_validation_study.environment_conditions.production_validation.condition_id"
+
+# ==============================================================================
+# PERFORMANCE OPTIMIZATION PARAMETERS
+# ==============================================================================
+
+# Advanced performance optimization configuration
+performance_optimization:
+  
+  # Caching configuration
+  caching:
+    enable_parameter_caching: true
+    cache_size_limit: 1000
+    cache_ttl_seconds: 3600
+    
+  # Memory management
+  memory_optimization:
+    garbage_collection_enabled: true
+    memory_pool_size_mb: 1024
+    memory_monitoring_interval: 60
+    
+  # Parallel processing configuration
+  parallel_processing:
+    max_workers: 4
+    chunk_size: 1000
+    timeout_seconds: 300
+    
+  # Resource monitoring
+  resource_monitoring:
+    cpu_threshold_percent: 80
+    memory_threshold_percent: 85
+    disk_threshold_percent: 90
+
+# ==============================================================================
+# QUALITY ASSURANCE AND VALIDATION PARAMETERS
+# ==============================================================================
+
+# Comprehensive quality assurance configuration
+quality_assurance:
+  
+  # Data validation parameters
+  data_validation:
+    schema_validation: true
+    data_type_checking: true
+    range_validation: true
+    consistency_checking: true
+    
+  # Model validation parameters
+  model_validation:
+    cross_validation_enabled: true
+    holdout_validation: true
+    statistical_testing: true
+    performance_benchmarking: true
+    
+  # Pipeline validation parameters
+  pipeline_validation:
+    integration_testing: true
+    end_to_end_testing: true
+    performance_testing: true
+    regression_testing: true
+    
+# Error handling and logging configuration
+error_handling:
+  
+  # Logging configuration
+  logging:
+    log_level: "INFO"
+    log_format: "detailed"
+    log_rotation: true
+    max_log_size_mb: 100
+    
+  # Error recovery configuration
+  error_recovery:
+    retry_attempts: 3
+    retry_delay_seconds: 5
+    fallback_enabled: true
+    graceful_degradation: true
+
+# ==============================================================================
+# ADVANCED STYLING AND VISUALIZATION PARAMETERS
+# ==============================================================================
+
+# Advanced parameters for driving FigRegistry styling engine
+visualization_parameters:
+  
+  # Statistical significance visualization
+  significance_visualization:
+    p_value: 0.0005  # Maps to result.significant.p001
+    effect_size: 0.25
+    confidence_interval: 0.95
+    statistical_power: 0.80
+    
+  # Performance visualization parameters
+  performance_visualization:
+    performance: 0.89  # Maps to high performance styling
+    baseline_performance: 0.75
+    improvement_delta: 0.14
+    performance_trend: "increasing"
+    
+  # Experimental condition visualization
+  condition_visualization:
+    experimental_condition: "treatment_a"
+    control_condition: "baseline"
+    comparison_type: "between_groups"
+    effect_magnitude: "large"
+    
+# Model-specific visualization parameters
+model_visualization_parameters:
+  
+  # Algorithm-specific parameters
+  algorithm_parameters:
+    logistic_regression:
+      complexity: "low"
+      interpretability: "high"
+      performance_category: "baseline"
+      
+    random_forest:
+      complexity: "medium"
+      interpretability: "medium"
+      performance_category: "candidate"
+      
+    neural_network:
+      complexity: "high"
+      interpretability: "low"
+      performance_category: "champion"
+      
+  # Performance tier parameters
+  performance_tiers:
+    baseline:
+      color_intensity: 0.6
+      marker_size: 6
+      line_style: "dashed"
+      
+    candidate:
+      color_intensity: 0.8
+      marker_size: 8
+      line_style: "solid"
+      
+    champion:
+      color_intensity: 1.0
+      marker_size: 10
+      line_style: "solid"
+
+# ==============================================================================
+# COMPREHENSIVE EXAMPLE PARAMETER SETS
+# ==============================================================================
+
+# Example parameter sets demonstrating complex condition resolution
+example_parameter_sets:
+  
+  # Basic condition resolution example
+  basic_example:
+    description: "Simple model type condition resolution"
+    model_type: "candidate"  # Resolves to training.model.candidate
+    purpose: "exploration"
+    
+  # Hierarchical condition resolution example
+  hierarchical_example:
+    description: "Complex nested parameter resolution"
+    experimental_group: "group_a"  # Resolves through condition_parameter_mapping
+    environment: "production"      # Adds environment suffix
+    
+  # Multi-parameter condition example
+  multi_parameter_example:
+    description: "Multiple parameter condition resolution"
+    algorithm: "neural_network"
+    performance: 0.92
+    significance: 0.001
+    confidence: 0.90
+    
+  # Statistical analysis example
+  statistical_example:
+    description: "Statistical significance condition resolution"
+    p_value: 0.0003          # Highly significant
+    effect_size: 0.35        # Large effect
+    sample_size: 5000        # Adequate power
+    confidence_level: 0.99   # High confidence
+    
+  # Time series analysis example
+  time_series_example:
+    description: "Time series specific parameters"
+    temporal_split: "forward_chaining"
+    seasonality: "monthly"
+    trend_component: "linear"
+    forecast_horizon: 30
+
+# ==============================================================================
+# ENTERPRISE INTEGRATION PARAMETERS
+# ==============================================================================
+
+# Enterprise-grade integration configuration
+enterprise_integration:
+  
+  # Security and compliance parameters
+  security:
+    data_encryption: true
+    access_logging: true
+    audit_trail: true
+    compliance_mode: "strict"
+    
+  # Governance parameters
+  governance:
+    model_approval_required: true
+    change_control_enabled: true
+    version_control_mandatory: true
+    documentation_required: true
+    
+  # Monitoring and observability
+  observability:
+    metrics_collection: true
+    distributed_tracing: true
+    health_checks: true
+    alerting_enabled: true
+    
+# Deployment orchestration parameters
+deployment_orchestration:
+  
+  # Blue-green deployment
+  blue_green:
+    enabled: true
+    traffic_split_percentage: 10
+    rollback_threshold: 0.95
+    monitoring_duration_minutes: 30
+    
+  # Canary deployment
+  canary:
+    enabled: true
+    canary_percentage: 5
+    promotion_criteria: 0.98
+    monitoring_duration_minutes: 60
+    
+# Infrastructure configuration
+infrastructure:
+  
+  # Computing resources
+  compute:
+    cpu_cores: 8
+    memory_gb: 32
+    gpu_enabled: false
+    distributed_training: false
+    
+  # Storage configuration
+  storage:
+    data_storage_gb: 1000
+    model_storage_gb: 100
+    backup_enabled: true
+    versioning_enabled: true
+
+# ==============================================================================
+# PARAMETER VALIDATION AND TESTING
+# ==============================================================================
+
+# Parameter validation configuration for quality assurance
+parameter_validation:
+  
+  # Schema validation rules
+  schema_validation:
+    strict_typing: true
+    required_fields_validation: true
+    range_checking: true
+    enum_validation: true
+    
+  # Business rule validation
+  business_rules:
+    performance_threshold_validation: true
+    resource_constraint_checking: true
+    dependency_validation: true
+    compatibility_checking: true
+    
+  # Integration testing parameters
+  integration_testing:
+    parameter_injection_testing: true
+    condition_resolution_testing: true
+    styling_application_testing: true
+    end_to_end_validation: true
+
+# Testing configuration for parameter-driven workflows
+testing_configuration:
+  
+  # Unit testing parameters
+  unit_testing:
+    test_coverage_threshold: 0.90
+    parameter_mocking: true
+    isolation_testing: true
+    
+  # Integration testing parameters
+  integration_testing:
+    cross_component_testing: true
+    parameter_flow_testing: true
+    condition_resolution_testing: true
+    
+  # Performance testing parameters
+  performance_testing:
+    load_testing: true
+    stress_testing: true
+    scalability_testing: true
+    latency_testing: true
+
+# ==============================================================================
+# DOCUMENTATION AND METADATA
+# ==============================================================================
+
+# Comprehensive documentation metadata
+documentation_metadata:
+  
+  # Parameter documentation
+  parameter_documentation:
+    description_required: true
+    usage_examples: true
+    validation_rules: true
+    troubleshooting_guides: true
+    
+  # Configuration tracking
+  configuration_tracking:
+    change_history: true
+    version_comparison: true
+    impact_analysis: true
+    rollback_capability: true
+    
+  # Knowledge management
+  knowledge_management:
+    best_practices: true
+    common_patterns: true
+    anti_patterns: true
+    optimization_tips: true
+
+# Parameter lifecycle management
+parameter_lifecycle:
+  
+  # Development lifecycle
+  development:
+    parameter_design: true
+    validation_testing: true
+    integration_verification: true
+    documentation_completion: true
+    
+  # Production lifecycle
+  production:
+    deployment_validation: true
+    monitoring_setup: true
+    performance_tracking: true
+    maintenance_scheduling: true
+    
+  # Retirement lifecycle
+  retirement:
+    deprecation_notice: true
+    migration_path: true
+    cleanup_procedures: true
+    historical_preservation: true
+
+# ==============================================================================
+# END OF ADVANCED PARAMETERS CONFIGURATION
+# ==============================================================================
+
+# This parameters configuration represents the culmination of sophisticated
+# experimental parameter management, demonstrating:
+#
+# ✓ Complex experimental condition parameters for advanced condition-based styling (F-002)
+# ✓ Sophisticated condition parameter resolution supporting FigureDataSet (F-005-RQ-004)
+# ✓ Multi-environment parameter management for enterprise deployment (Section 0.2.5)
+# ✓ Advanced parameter hierarchies enabling complex pipeline orchestration
+# ✓ Comprehensive experimental scenarios for multiple styling conditions
+# ✓ Parameter-driven styling variations showcasing advanced plugin capabilities
+# ✓ Support for complex condition_param resolution with metadata injection
+# ✓ Enterprise-grade parameter management patterns
+# ✓ Statistical significance parameter integration
+# ✓ Performance optimization parameter configuration
+# ✓ Quality assurance and validation parameter frameworks
+#
+# This configuration serves as both a functional parameter set for the advanced
+# example project and a comprehensive reference for implementing sophisticated
+# parameter-driven experimental workflows with the figregistry-kedro plugin
+# integration across complex production environments.

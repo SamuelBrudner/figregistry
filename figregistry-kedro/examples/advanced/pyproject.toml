@@ -1,0 +1,499 @@
+[build-system]
+requires = [
+    "setuptools>=42", 
+    "wheel",
+    "pytest-mock>=3.14.0",
+    "hypothesis>=6.0.0"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "figregistry-kedro-advanced-example"
+version = "0.1.0"
+description = "Advanced multi-environment example demonstrating enterprise-grade FigRegistry integration with Kedro pipelines for sophisticated data science workflows"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "FigRegistry Development Team", email = "figregistry@example.com"},
+    {name = "FigRegistry Contributors", email = "contributors@figregistry.org"}
+]
+maintainers = [
+    {name = "FigRegistry Maintainers", email = "maintainers@figregistry.org"}
+]
+keywords = [
+    "kedro", 
+    "figregistry", 
+    "visualization", 
+    "data-science", 
+    "machine-learning",
+    "enterprise",
+    "multi-environment",
+    "production",
+    "advanced-example"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Financial and Insurance Industry",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Office/Business :: Financial",
+    "Framework :: Jupyter",
+    "Typing :: Typed",
+]
+
+# Core runtime dependencies for advanced enterprise scenarios per Section 0.2.1
+dependencies = [
+    # Core FigRegistry and Kedro integration (F-005, F-006, F-007 requirements)
+    "figregistry>=0.3.0",
+    "figregistry-kedro>=0.1.0",
+    
+    # Kedro framework with version constraints per Section 3.2.1.3
+    "kedro>=0.18.0,<0.20.0",
+    "kedro-datasets>=1.0.0",
+    
+    # Multiple visualization backends for diverse figure output scenarios per F-004 requirements
+    "matplotlib>=3.9.0",           # Primary plotting backend per Section 3.2.1.2
+    "seaborn>=0.12.0",            # Statistical visualization for advanced analytics
+    "plotly>=5.0.0",              # Interactive visualizations for complex data exploration
+    
+    # Advanced data processing stack per Section 2.2.5.1
+    "numpy>=1.24.0",              # Scientific computing foundation
+    "pandas>=2.0.0",              # Enhanced data manipulation with improved performance
+    "scipy>=1.10.0",              # Scientific computing utilities for advanced algorithms
+    "polars>=0.20.0",             # High-performance DataFrame library for large datasets
+    
+    # Configuration management per Section 3.2.2.2
+    "pydantic>=2.9.0",            # Schema validation with advanced features
+    "pyyaml>=6.0.1",              # YAML parsing with security considerations
+    "omegaconf>=2.3.0",           # Advanced configuration management
+    
+    # ML workflow dependencies for sophisticated pipelines
+    "scikit-learn>=1.3.0",        # Machine learning algorithms and model utilities
+    "xgboost>=1.7.0",             # Gradient boosting for advanced modeling
+    "lightgbm>=4.0.0",            # Efficient gradient boosting implementation
+    
+    # Time series and forecasting capabilities
+    "statsmodels>=0.14.0",        # Statistical modeling and econometrics
+    "prophet>=1.1.0",             # Time series forecasting
+    
+    # Data validation and quality assurance
+    "great-expectations>=0.17.0", # Data quality validation framework
+    "pandera>=0.17.0",            # Data validation with Panda DataFrames
+    
+    # Performance and optimization
+    "numba>=0.58.0",              # JIT compilation for numerical computations
+    "dask>=2023.10.0",            # Parallel computing for large datasets
+    "joblib>=1.3.0",              # Efficient serialization and parallel processing
+    
+    # Database and storage connectors for enterprise data sources
+    "sqlalchemy>=2.0.0",          # Database toolkit and ORM
+    "psycopg2-binary>=2.9.0",     # PostgreSQL adapter
+    "pymongo>=4.5.0",             # MongoDB driver for document databases
+    "pyarrow>=13.0.0",            # Apache Arrow for columnar data processing
+    
+    # Cloud and distributed computing
+    "boto3>=1.28.0",              # AWS SDK for cloud storage integration
+    "azure-storage-blob>=12.17.0", # Azure Blob Storage client
+    "google-cloud-storage>=2.10.0", # Google Cloud Storage client
+    
+    # API and web service integration
+    "requests>=2.31.0",           # HTTP library for API integration
+    "httpx>=0.25.0",              # Modern async HTTP client
+    "fastapi>=0.100.0",           # Modern web framework for API development
+    
+    # Logging and monitoring for production environments
+    "structlog>=23.1.0",          # Structured logging for enterprise applications
+    "prometheus-client>=0.18.0",  # Prometheus metrics for monitoring
+]
+
+[project.optional-dependencies]
+# Development dependencies for advanced testing per F-008 requirements
+dev = [
+    # Core testing framework per Section 3.3.2.1
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.14.0",       # Kedro component mocking for plugin tests
+    "pytest-xdist>=3.3.0",       # Parallel test execution
+    "pytest-benchmark>=4.0.0",   # Performance benchmarking
+    "pytest-asyncio>=0.21.0",    # Async testing support
+    
+    # Property-based and advanced testing
+    "hypothesis>=6.0.0",          # Configuration validation testing
+    "mutmut>=2.4.0",             # Mutation testing for code quality
+    "faker>=19.0.0",             # Test data generation
+    
+    # Code quality and formatting
+    "black>=23.0.0",             # Code formatting
+    "isort>=5.0.0",              # Import sorting
+    "mypy>=1.0.0",               # Static type checking
+    "ruff>=0.1.0",               # Fast Python linter
+    "flake8>=7.0.0",             # Additional linting
+    "bandit>=1.7.0",             # Security linting
+    "safety>=2.3.0",             # Dependency vulnerability scanning
+    
+    # Pre-commit and automation
+    "pre-commit>=3.0.0",         # Git hooks for quality assurance
+    "interrogate>=1.5.0",        # Docstring coverage analysis
+    
+    # Performance profiling and analysis
+    "py-spy>=0.3.0",             # Sampling profiler
+    "memory-profiler>=0.61.0",   # Memory usage profiling
+    "line-profiler>=4.0.0",      # Line-by-line profiling
+    
+    # Database testing and fixtures
+    "pytest-postgresql>=5.0.0",  # PostgreSQL testing fixtures
+    "pytest-mongo>=2.2.0",       # MongoDB testing fixtures
+    "fakeredis>=2.18.0",         # Redis testing mock
+]
+
+# Documentation dependencies for comprehensive documentation
+docs = [
+    "mkdocs>=1.4.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings>=0.20.0",
+    "mkdocs-jupyter>=0.24.0",    # Jupyter notebook integration
+    "mkdocs-plotly>=0.1.0",      # Plotly visualization support
+    "mkdocs-macros-plugin>=1.0.0", # Template macros for dynamic content
+]
+
+# Kedro visualization and workflow tools
+kedro-viz = [
+    "kedro-viz>=6.0.0",          # Pipeline visualization tool
+    "kedro-mlflow>=0.12.0",      # MLflow experiment tracking integration
+    "kedro-docker>=0.3.0",       # Docker containerization support
+]
+
+# Jupyter and interactive development
+jupyter = [
+    "jupyter>=1.0.0",
+    "jupyterlab>=4.0.0",
+    "notebook>=7.0.0",
+    "ipykernel>=6.25.0",
+    "ipywidgets>=8.1.0",         # Interactive widgets
+    "jupyterlab-plotly>=5.17.0", # Plotly support in JupyterLab
+    "nbconvert>=7.8.0",          # Notebook conversion utilities
+]
+
+# Production deployment dependencies
+production = [
+    "gunicorn>=21.2.0",          # WSGI HTTP Server
+    "uvicorn>=0.23.0",           # ASGI server for FastAPI
+    "celery>=5.3.0",             # Distributed task queue
+    "redis>=5.0.0",              # In-memory data structure store
+    "flower>=2.0.0",             # Celery monitoring tool
+]
+
+# Machine learning experiment tracking and model management
+mlops = [
+    "mlflow>=2.7.0",             # ML lifecycle management
+    "wandb>=0.15.0",             # Experiment tracking and collaboration
+    "dvc>=3.0.0",                # Data version control
+    "kedro-mlflow>=0.12.0",      # MLflow integration for Kedro
+]
+
+# Advanced visualization and plotting extensions
+viz-advanced = [
+    "bokeh>=3.2.0",              # Interactive visualization library
+    "altair>=5.1.0",             # Statistical visualization based on Vega-Lite
+    "holoviews>=1.17.0",         # High-level data visualization
+    "datashader>=0.15.0",        # Large dataset visualization
+    "folium>=0.14.0",            # Interactive maps
+]
+
+# Time series and forecasting specialized dependencies
+timeseries = [
+    "prophet>=1.1.0",
+    "statsforecast>=1.5.0",      # Statistical forecasting models
+    "neuralprophet>=0.6.0",      # Neural network-based forecasting
+    "sktime>=0.24.0",            # Time series machine learning
+    "tsfresh>=0.20.0",           # Time series feature extraction
+]
+
+# Natural language processing capabilities
+nlp = [
+    "spacy>=3.7.0",              # Industrial-strength NLP
+    "transformers>=4.34.0",      # State-of-the-art ML models
+    "sentence-transformers>=2.2.0", # Sentence embeddings
+    "nltk>=3.8.0",               # Natural language toolkit
+]
+
+# Computer vision and image processing
+cv = [
+    "opencv-python>=4.8.0",      # Computer vision library
+    "pillow>=10.0.0",            # Python Imaging Library
+    "scikit-image>=0.21.0",      # Image processing
+    "imageio>=2.31.0",           # Image I/O library
+]
+
+# All optional dependencies combined for comprehensive development
+all = [
+    "figregistry-kedro-advanced-example[dev,docs,kedro-viz,jupyter,production,mlops,viz-advanced,timeseries,nlp,cv]"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/figregistry/figregistry-kedro"
+"Repository" = "https://github.com/figregistry/figregistry-kedro"
+"Documentation" = "https://figregistry-kedro.readthedocs.io/"
+"Bug Reports" = "https://github.com/figregistry/figregistry-kedro/issues"
+"Changelog" = "https://github.com/figregistry/figregistry-kedro/blob/main/CHANGELOG.md"
+"Discussions" = "https://github.com/figregistry/figregistry-kedro/discussions"
+"Examples" = "https://github.com/figregistry/figregistry-kedro/tree/main/examples"
+
+[project.entry-points."kedro.project_commands"]
+# Enable Kedro project discovery and command execution for advanced example
+advanced-example = "figregistry_kedro_advanced_example.cli:commands"
+
+[project.entry-points."kedro.hooks"]
+# Register FigRegistry hooks for automatic discovery
+figregistry = "figregistry_kedro.hooks:FigRegistryHooks"
+
+[project.scripts]
+# Command-line utilities for advanced example management
+figregistry-advanced-demo = "figregistry_kedro_advanced_example.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["figregistry_kedro_advanced_example*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"figregistry_kedro_advanced_example" = [
+    "conf/**/*", 
+    "data/**/*",
+    "notebooks/**/*",
+    "pipelines/**/*"
+]
+
+# Black configuration for enterprise code formatting standards
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | data
+)/
+'''
+
+# isort configuration for import sorting with advanced project structure
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["figregistry_kedro_advanced_example"]
+known_third_party = [
+    "kedro", 
+    "figregistry", 
+    "matplotlib", 
+    "seaborn", 
+    "plotly",
+    "pandas", 
+    "numpy", 
+    "scipy",
+    "sklearn",
+    "xgboost",
+    "lightgbm",
+    "statsmodels",
+    "prophet",
+    "great_expectations",
+    "pandera",
+    "dask",
+    "boto3",
+    "azure",
+    "google"
+]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+force_grid_wrap = 0
+combine_as_imports = true
+force_single_line = false
+
+# MyPy configuration for strict type checking in enterprise environments
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+strict_optional = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+
+[[tool.mypy.overrides]]
+module = [
+    "kedro.*",
+    "figregistry.*",
+    "matplotlib.*",
+    "seaborn.*",
+    "plotly.*",
+    "scipy.*",
+    "sklearn.*",
+    "xgboost.*",
+    "lightgbm.*",
+    "statsmodels.*",
+    "prophet.*",
+    "great_expectations.*",
+    "pandera.*",
+    "dask.*",
+    "boto3.*",
+    "azure.*",
+    "google.*",
+]
+ignore_missing_imports = true
+
+# Pytest configuration for comprehensive testing
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=figregistry_kedro_advanced_example",
+    "--cov-report=html",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=xml",
+    "--cov-fail-under=90",
+    "--tb=short",
+    "--maxfail=10",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "e2e: marks tests as end-to-end tests",
+    "performance: marks tests as performance benchmarks",
+    "security: marks tests as security validation",
+    "regression: marks tests as regression tests",
+    "smoke: marks tests as smoke tests for deployment validation",
+]
+filterwarnings = [
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+# Coverage configuration for enterprise-grade testing
+[tool.coverage.run]
+branch = true
+source = ["src/figregistry_kedro_advanced_example"]
+omit = [
+    "tests/*",
+    "*/test_*",
+    "src/figregistry_kedro_advanced_example/cli.py",
+    "src/figregistry_kedro_advanced_example/__main__.py",
+]
+parallel = true
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+    "except ImportError:",
+    "except ModuleNotFoundError:",
+]
+show_missing = true
+precision = 2
+
+# Ruff configuration for fast linting
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+    "ARG", # flake8-unused-arguments
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+    "TID", # flake8-tidy-imports
+    "Q",  # flake8-quotes
+    "RUF", # Ruff-specific rules
+]
+ignore = [
+    "E501",  # line too long (handled by black)
+    "B008",  # do not perform function calls in argument defaults
+    "B905",  # zip() without an explicit strict= parameter
+    "C901",  # too complex (handled by other tools)
+]
+
+[tool.ruff.per-file-ignores]
+"tests/*" = ["ARG", "S101"]  # Allow unused arguments and assert statements in tests
+"__init__.py" = ["F401"]     # Allow unused imports in __init__.py files
+
+# Bandit security linting configuration
+[tool.bandit]
+exclude_dirs = ["tests", "data"]
+skips = ["B101", "B601"]  # Skip assert_used and shell_injection_subprocess
+
+# Interrogate docstring coverage configuration
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = false
+ignore-magic = false
+ignore-semiprivate = false
+ignore-private = false
+ignore-property-decorators = false
+ignore-module = false
+ignore-nested-functions = false
+ignore-nested-classes = true
+fail-under = 80
+exclude = ["setup.py", "docs", "build", "tests"]
+ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
+verbose = 2
+quiet = false
+whitelist-regex = []
+color = true
+omit-covered-files = false
+
+# Build metadata for advanced example project
+[tool.setuptools.dynamic]
+version = {attr = "figregistry_kedro_advanced_example.__version__"}
+
+[tool.setuptools_scm]
+# Enable setuptools_scm for dynamic versioning from git tags
+write_to = "src/figregistry_kedro_advanced_example/_version.py"
+fallback_version = "0.1.0"

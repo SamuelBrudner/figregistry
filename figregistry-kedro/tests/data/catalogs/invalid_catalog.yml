@@ -1,0 +1,553 @@
+# Invalid Kedro Catalog Configuration for FigureDataSet Error Handling Testing
+#
+# This file contains intentionally malformed FigureDataSet catalog entries designed
+# to test comprehensive error handling, parameter validation robustness, and security
+# vulnerability prevention per F-005-RQ-003 and Section 6.6.8.1.
+#
+# Each entry represents a specific category of invalid configuration that should
+# trigger clear, descriptive error messages during catalog loading and dataset
+# instantiation while maintaining security boundaries.
+#
+# Test Categories:
+# 1. Required Parameter Violations (F-005-RQ-003)
+# 2. Purpose Category Validation Errors
+# 3. Condition Parameter Pattern Violations  
+# 4. Style Parameters Type Validation Errors
+# 5. Security Vulnerability Patterns (Section 6.6.8.1)
+# 6. Conflicting Parameter Combinations
+# 7. Format Arguments Validation Errors
+# 8. Path Traversal and Injection Attempts
+
+# =============================================================================
+# 1. REQUIRED PARAMETER VIOLATIONS (F-005-RQ-003)
+# =============================================================================
+
+# Missing required filepath parameter - should trigger immediate validation error
+missing_filepath_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  # filepath parameter intentionally omitted
+  purpose: exploratory
+  condition_param: experiment_type
+
+# Empty filepath parameter - should reject empty strings
+empty_filepath_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: ""
+  purpose: presentation
+
+# Null filepath parameter - should reject null values
+null_filepath_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: null
+  purpose: publication
+
+# Non-string filepath parameter - should reject non-string types
+numeric_filepath_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: 12345
+  purpose: exploratory
+
+# List filepath parameter - should reject complex types
+list_filepath_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: ["data", "figures", "output.png"]
+  purpose: presentation
+
+# =============================================================================
+# 2. PURPOSE CATEGORY VALIDATION ERRORS
+# =============================================================================
+
+# Invalid purpose value - should reject unrecognized purposes
+invalid_purpose_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/invalid_purpose.png
+  purpose: invalid_category
+
+# Numeric purpose parameter - should reject non-string types
+numeric_purpose_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/numeric_purpose.png
+  purpose: 123
+
+# List purpose parameter - should reject complex types
+list_purpose_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/list_purpose.png
+  purpose: [exploratory, presentation]
+
+# Empty purpose parameter - should reject empty strings
+empty_purpose_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/empty_purpose.png
+  purpose: ""
+
+# Null purpose parameter - should handle null gracefully
+null_purpose_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/null_purpose.png
+  purpose: null
+
+# Case-sensitive purpose validation - should test exact matching
+wrong_case_purpose_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/wrong_case.png
+  purpose: EXPLORATORY
+
+# Whitespace purpose parameter - should reject whitespace-only values
+whitespace_purpose_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/whitespace_purpose.png
+  purpose: "   "
+
+# =============================================================================
+# 3. CONDITION PARAMETER PATTERN VIOLATIONS
+# =============================================================================
+
+# Invalid Python identifier - should reject non-identifier strings
+invalid_identifier_condition:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/invalid_identifier.png
+  purpose: exploratory
+  condition_param: "123invalid_start"
+
+# Reserved keyword condition parameter - should reject Python keywords
+reserved_keyword_condition:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/reserved_keyword.png
+  purpose: presentation
+  condition_param: "class"
+
+# Special characters in condition parameter - should reject invalid characters
+special_chars_condition:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/special_chars.png
+  purpose: exploratory
+  condition_param: "param-with-hyphens"
+
+# Dot notation condition parameter - should reject attribute access patterns
+dot_notation_condition:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/dot_notation.png
+  purpose: publication
+  condition_param: "config.experiment.type"
+
+# Numeric condition parameter - should reject non-string types
+numeric_condition_param:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/numeric_condition.png
+  purpose: exploratory
+  condition_param: 42
+
+# Empty condition parameter - should reject empty strings when provided
+empty_condition_param:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/empty_condition.png
+  purpose: presentation
+  condition_param: ""
+
+# Whitespace-only condition parameter - should reject whitespace-only values
+whitespace_condition_param:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/whitespace_condition.png
+  purpose: exploratory
+  condition_param: "   "
+
+# =============================================================================
+# 4. STYLE PARAMETERS TYPE VALIDATION ERRORS
+# =============================================================================
+
+# Non-dictionary style_params - should reject non-dict types
+string_style_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/string_style_params.png
+  purpose: exploratory
+  style_params: "not_a_dictionary"
+
+# List style_params - should reject list types
+list_style_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/list_style_params.png
+  purpose: presentation
+  style_params: ["color", "linewidth"]
+
+# Numeric style_params - should reject numeric types
+numeric_style_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/numeric_style_params.png
+  purpose: publication
+  style_params: 123
+
+# Non-string keys in style_params - should reject non-string keys
+non_string_keys_style_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/non_string_keys.png
+  purpose: exploratory
+  style_params:
+    123: "value"
+    color: "#FF0000"
+
+# Nested complex objects in style_params - should handle complex nesting appropriately
+complex_nested_style_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/complex_nested.png
+  purpose: presentation
+  style_params:
+    color: "#FF0000"
+    nested_config:
+      deeply:
+        nested:
+          invalid: "configuration"
+
+# Invalid matplotlib parameter names - should validate against known rcParams
+invalid_matplotlib_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/invalid_matplotlib.png
+  purpose: exploratory
+  style_params:
+    invalid_rcparam_name: "value"
+    nonexistent.parameter: "invalid"
+
+# Invalid color values in style_params - should test color validation
+invalid_color_values:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/invalid_colors.png
+  purpose: presentation
+  style_params:
+    color: "not_a_color"
+    facecolor: "#ZZZZZZ"
+    edgecolor: 999999
+
+# =============================================================================
+# 5. SECURITY VULNERABILITY PATTERNS (Section 6.6.8.1)
+# =============================================================================
+
+# Path traversal attempt - should prevent directory traversal attacks
+path_traversal_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "../../../etc/passwd"
+  purpose: exploratory
+
+# Absolute path injection - should validate against unauthorized paths
+absolute_path_injection:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "/etc/shadow"
+  purpose: presentation
+
+# Windows path traversal - should prevent Windows-specific traversal
+windows_path_traversal:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "..\\..\\..\\Windows\\System32\\config\\SAM"
+  purpose: publication
+
+# Null byte injection - should prevent null byte attacks
+null_byte_injection:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "data/figures/safe.png\x00../../malicious"
+  purpose: exploratory
+
+# Parameter injection in condition_param - should prevent code injection
+parameter_injection_condition:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/parameter_injection.png
+  purpose: presentation
+  condition_param: "__import__('os').system('rm -rf /')"
+
+# Command injection in style_params - should prevent command execution
+command_injection_style:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/command_injection.png
+  purpose: exploratory
+  style_params:
+    color: "'; import os; os.system('malicious_command'); '"
+
+# Script injection in format_kwargs - should prevent script execution
+script_injection_format:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/script_injection.png
+  purpose: publication
+  format_kwargs:
+    metadata:
+      Title: "<script>alert('xss')</script>"
+
+# Environment variable injection - should prevent env var manipulation
+env_var_injection:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${HOME}/../../../etc/passwd"
+  purpose: exploratory
+
+# =============================================================================
+# 6. CONFLICTING PARAMETER COMBINATIONS
+# =============================================================================
+
+# Conflicting versioning parameters - should detect version conflicts
+conflicting_versioning:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/conflicting_versioning.png
+  purpose: exploratory
+  versioned: false
+  load_version: "2024-01-15T10-30-45.123Z"
+  save_version: "2024-01-15T10-35-12.456Z"
+
+# Incompatible format and filepath - should validate format consistency
+incompatible_format_filepath:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/incompatible.png
+  purpose: presentation
+  format_kwargs:
+    format: "pdf"  # Conflicts with .png extension
+
+# Contradictory purpose and style_params - should handle purpose conflicts
+contradictory_purpose_style:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/contradictory.png
+  purpose: publication  # High-quality purpose
+  style_params:
+    dpi: 50  # Low-quality setting conflicts with purpose
+
+# Invalid metadata structure - should validate metadata format
+invalid_metadata_structure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/invalid_metadata.png
+  purpose: exploratory
+  metadata: "should_be_dict_not_string"
+
+# =============================================================================
+# 7. FORMAT ARGUMENTS VALIDATION ERRORS
+# =============================================================================
+
+# Invalid DPI value - should reject non-numeric DPI
+invalid_dpi_format:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/invalid_dpi.png
+  purpose: exploratory
+  format_kwargs:
+    dpi: "not_a_number"
+
+# Negative DPI value - should reject negative values
+negative_dpi_format:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/negative_dpi.png
+  purpose: presentation
+  format_kwargs:
+    dpi: -150
+
+# Invalid bbox_inches value - should validate bbox options
+invalid_bbox_format:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/invalid_bbox.png
+  purpose: publication
+  format_kwargs:
+    bbox_inches: "invalid_value"
+
+# Invalid transparent value - should validate boolean parameters
+invalid_transparent_format:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/invalid_transparent.png
+  purpose: exploratory
+  format_kwargs:
+    transparent: "not_a_boolean"
+
+# Unknown format parameter - should reject unknown matplotlib parameters
+unknown_format_parameter:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/unknown_format.png
+  purpose: presentation
+  format_kwargs:
+    nonexistent_parameter: "invalid"
+
+# =============================================================================
+# 8. PATH TRAVERSAL AND INJECTION ATTEMPTS
+# =============================================================================
+
+# Unicode path traversal - should prevent Unicode-based attacks
+unicode_path_traversal:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "data/figures/\u002e\u002e/\u002e\u002e/etc/passwd"
+  purpose: exploratory
+
+# URL-encoded path traversal - should prevent encoded attacks
+url_encoded_traversal:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "data%2F..%2F..%2Fetc%2Fpasswd"
+  purpose: presentation
+
+# Double URL-encoded traversal - should prevent double-encoded attacks
+double_encoded_traversal:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "data%252F..%252F..%252Fetc%252Fpasswd"
+  purpose: publication
+
+# Mixed encoding path traversal - should prevent mixed encoding attacks
+mixed_encoding_traversal:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "data/../%2e%2e/etc/passwd"
+  purpose: exploratory
+
+# Long path injection - should handle extremely long paths
+long_path_injection:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: !str |
+    ${"a" * 1000}/extremely/long/path/that/might/cause/buffer/overflow/or/filesystem/issues/figure.png
+  purpose: presentation
+
+# =============================================================================
+# 9. EDGE CASES AND BOUNDARY CONDITIONS
+# =============================================================================
+
+# Extremely long condition_param - should handle length limits
+long_condition_param:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/long_condition.png
+  purpose: exploratory
+  condition_param: !str |
+    ${"very_long_condition_parameter_name_that_exceeds_reasonable_limits" * 10}
+
+# Binary data in parameters - should reject binary content
+binary_data_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/binary_data.png
+  purpose: presentation
+  condition_param: !!binary |
+    SGVsbG8gV29ybGQ=
+
+# Control characters in filepath - should sanitize control characters
+control_chars_filepath:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "data/08_reporting/control\x00\x01\x02chars.png"
+  purpose: exploratory
+
+# Invalid YAML structure - should handle malformed YAML gracefully
+malformed_yaml_entry:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/malformed.png
+  purpose: exploratory
+  style_params: {unclosed_dict: "value"
+  # Missing closing brace to test YAML parsing
+
+# Circular reference attempt - should prevent infinite recursion
+circular_reference_metadata:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/circular.png
+  purpose: presentation
+  metadata: &circular_ref
+    self_reference: *circular_ref
+
+# =============================================================================
+# 10. TYPE COERCION AND VALIDATION EDGE CASES
+# =============================================================================
+
+# String numbers in numeric fields - should validate type conversion
+string_numbers_format:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/string_numbers.png
+  purpose: exploratory
+  format_kwargs:
+    dpi: "300"  # String instead of int
+    linewidth: "2.5"  # String instead of float
+
+# Boolean strings - should validate boolean conversion
+boolean_strings:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/boolean_strings.png
+  purpose: presentation
+  versioned: "true"  # String instead of boolean
+  format_kwargs:
+    transparent: "false"  # String instead of boolean
+
+# Mixed case boolean values - should handle case sensitivity
+mixed_case_boolean:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/mixed_case.png
+  purpose: publication
+  versioned: True
+  format_kwargs:
+    transparent: TRUE  # Mixed case
+
+# Scientific notation in parameters - should handle scientific notation
+scientific_notation_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/scientific.png
+  purpose: exploratory
+  format_kwargs:
+    dpi: 3e2  # Scientific notation
+  style_params:
+    linewidth: 2.5e0  # Scientific notation
+
+# =============================================================================
+# 11. CATALOG-SPECIFIC VALIDATION ERRORS
+# =============================================================================
+
+# Missing dataset type - should require type specification
+missing_type_entry:
+  filepath: data/08_reporting/missing_type.png
+  purpose: exploratory
+  # type parameter intentionally omitted
+
+# Wrong dataset type - should validate type correctness
+wrong_type_entry:
+  type: pandas.CSVDataSet  # Wrong type for figure data
+  filepath: data/08_reporting/wrong_type.png
+  purpose: exploratory
+
+# Malformed type specification - should handle invalid type strings
+malformed_type_entry:
+  type: "figregistry_kedro.datasets.NonexistentDataSet"
+  filepath: data/08_reporting/malformed_type.png
+  purpose: presentation
+
+# Extra unknown parameters - should handle unknown catalog parameters
+extra_unknown_params:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/extra_params.png
+  purpose: exploratory
+  unknown_parameter: "should_be_ignored_or_rejected"
+  another_unknown: 12345
+
+# Invalid parameter nesting - should validate parameter structure
+invalid_nesting:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath:
+    nested: data/08_reporting/invalid_nesting.png  # Should be string, not dict
+  purpose: presentation
+
+# =============================================================================
+# TESTING NOTES
+# =============================================================================
+#
+# This invalid catalog configuration file provides comprehensive coverage of:
+#
+# 1. Parameter Validation Robustness (F-005-RQ-003):
+#    - Missing required parameters
+#    - Invalid parameter types and values
+#    - Boundary condition testing
+#    - Edge case handling
+#
+# 2. Security Constraint Validation (Section 6.6.8.1):
+#    - Path traversal prevention
+#    - Command injection protection
+#    - Parameter sanitization
+#    - Encoding attack prevention
+#
+# 3. Error Message Quality:
+#    - Each scenario should produce clear, descriptive error messages
+#    - Error messages should include context and remediation guidance
+#    - Security-related errors should not expose system details
+#
+# 4. Graceful Degradation:
+#    - System should handle errors without crashing
+#    - Invalid configurations should be rejected cleanly
+#    - Error recovery should maintain system stability
+#
+# Expected Testing Behavior:
+# - Each entry should trigger specific validation errors
+# - Error messages should be clear and actionable
+# - Security violations should be detected and blocked
+# - System should remain stable despite invalid inputs
+# - No security information should be leaked in error messages
+#
+# Usage in Tests:
+# - Load this catalog in test scenarios to validate error handling
+# - Verify that each invalid entry produces expected error types
+# - Confirm that error messages meet quality standards
+# - Test that security constraints are properly enforced
+# - Validate that system remains stable under error conditions

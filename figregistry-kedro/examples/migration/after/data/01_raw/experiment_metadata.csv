@@ -1,0 +1,27 @@
+experiment_id,experiment_type,treatment_group,research_phase,researcher,protocol,start_date,end_date,sample_size,notes
+EXP001,dose_response,control,discovery,Dr. Sarah Chen,PROTOCOL_DR_001,2024-01-15,2024-02-28,24,Baseline measurements with no intervention - establishes control styling patterns
+EXP002,dose_response,low_dose,discovery,Dr. Sarah Chen,PROTOCOL_DR_001,2024-01-15,2024-02-28,24,Low dose treatment (10mg/kg) - demonstrates automated styling differentiation
+EXP003,dose_response,medium_dose,discovery,Dr. Sarah Chen,PROTOCOL_DR_001,2024-01-15,2024-02-28,24,Medium dose treatment (50mg/kg) - intermediate condition for styling gradients
+EXP004,dose_response,high_dose,discovery,Dr. Sarah Chen,PROTOCOL_DR_001,2024-01-15,2024-02-28,24,High dose treatment (100mg/kg) - maximum dose with distinct visual styling
+EXP005,time_course,treatment,validation,Dr. Michael Rodriguez,PROTOCOL_TC_002,2024-03-01,2024-04-15,36,Time-series analysis at 6h timepoint - validation phase styling
+EXP006,time_course,treatment,validation,Dr. Michael Rodriguez,PROTOCOL_TC_002,2024-03-01,2024-04-15,36,Time-series analysis at 12h timepoint - mid-validation styling
+EXP007,time_course,treatment,validation,Dr. Michael Rodriguez,PROTOCOL_TC_002,2024-03-01,2024-04-15,36,Time-series analysis at 24h timepoint - late validation styling
+EXP008,comparative,novel_compound,discovery,Dr. Lisa Park,PROTOCOL_CP_003,2024-04-16,2024-05-30,30,Novel compound testing - discovery phase with experimental styling
+EXP009,comparative,standard_treatment,discovery,Dr. Lisa Park,PROTOCOL_CP_003,2024-04-16,2024-05-30,30,Standard treatment comparison - reference styling for comparison
+EXP010,biomarker,high_responder,validation,Dr. James Wilson,PROTOCOL_BM_004,2024-06-01,2024-07-15,18,High biomarker expression group - validation with distinct styling
+EXP011,biomarker,low_responder,validation,Dr. James Wilson,PROTOCOL_BM_004,2024-06-01,2024-07-15,18,Low biomarker expression group - contrasting validation styling
+EXP012,longitudinal,baseline,discovery,Dr. Emma Thompson,PROTOCOL_LG_005,2024-07-16,2024-08-30,42,Longitudinal study baseline timepoint - temporal styling differentiation
+EXP013,longitudinal,week_4,discovery,Dr. Emma Thompson,PROTOCOL_LG_005,2024-07-16,2024-08-30,42,Longitudinal study 4-week followup - progressive styling changes
+EXP014,longitudinal,week_8,discovery,Dr. Emma Thompson,PROTOCOL_LG_005,2024-07-16,2024-08-30,42,Longitudinal study 8-week followup - final timepoint styling
+EXP015,mechanistic,pathway_a,validation,Dr. Robert Kim,PROTOCOL_MC_006,2024-09-01,2024-10-15,28,Pathway A investigation - mechanistic validation styling
+EXP016,mechanistic,pathway_b,validation,Dr. Robert Kim,PROTOCOL_MC_006,2024-09-01,2024-10-15,28,Pathway B investigation - alternative pathway styling
+EXP017,safety,vehicle_control,regulatory,Dr. Angela Foster,PROTOCOL_SF_007,2024-10-16,2024-11-30,48,Vehicle control group - regulatory phase with safety styling
+EXP018,safety,treatment_low,regulatory,Dr. Angela Foster,PROTOCOL_SF_007,2024-10-16,2024-11-30,48,Low dose safety assessment - regulatory safety styling
+EXP019,safety,treatment_high,regulatory,Dr. Angela Foster,PROTOCOL_SF_007,2024-10-16,2024-11-30,48,High dose safety assessment - maximum safety dose styling
+EXP020,efficacy,placebo,regulatory,Dr. David Martinez,PROTOCOL_EF_008,2024-12-01,2025-01-15,60,Placebo control for efficacy - regulatory placebo styling
+EXP021,efficacy,active_treatment,regulatory,Dr. David Martinez,PROTOCOL_EF_008,2024-12-01,2025-01-15,60,Active treatment efficacy - regulatory treatment styling
+EXP022,bioequivalence,reference,regulatory,Dr. Jennifer Liu,PROTOCOL_BE_009,2025-01-16,2025-02-28,72,Reference formulation - bioequivalence reference styling
+EXP023,bioequivalence,test_formulation,regulatory,Dr. Jennifer Liu,PROTOCOL_BE_009,2025-01-16,2025-02-28,72,Test formulation - bioequivalence test styling
+EXP024,combination,monotherapy_a,discovery,Dr. Thomas Anderson,PROTOCOL_CB_010,2025-03-01,2025-04-15,32,Single agent A therapy - combination baseline styling
+EXP025,combination,monotherapy_b,discovery,Dr. Thomas Anderson,PROTOCOL_CB_010,2025-03-01,2025-04-15,32,Single agent B therapy - combination comparator styling
+EXP026,combination,combination_therapy,discovery,Dr. Thomas Anderson,PROTOCOL_CB_010,2025-03-01,2025-04-15,32,Combined A+B therapy - synergistic combination styling

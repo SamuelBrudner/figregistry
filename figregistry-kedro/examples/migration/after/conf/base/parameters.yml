@@ -1,0 +1,438 @@
+# =============================================================================
+# Migration Example (After) - Parameters Configuration
+# =============================================================================
+# This parameters file demonstrates the transformation from manual matplotlib
+# figure management to automated condition-based styling through FigRegistry-Kedro
+# integration. Unlike the scattered hardcoded styling parameters in the 'before'
+# example, this configuration provides clean experimental context that enables
+# the condition_param mechanism to automatically resolve styles based on 
+# experimental conditions.
+#
+# Key Transformation Benefits:
+# - BEFORE: Hardcoded colors, markers, and styling scattered across pipeline nodes
+# - AFTER: Clean experimental parameters enabling automated style resolution
+# - BEFORE: Manual plt.savefig() calls with inconsistent styling
+# - AFTER: Zero-touch figure management through FigureDataSet condition resolution
+# - BEFORE: Duplicate styling logic across multiple pipeline functions  
+# - AFTER: Centralized style management with parameter-driven automation
+#
+# The FigureDataSet uses condition_param to automatically resolve these parameters
+# into appropriate styling through the FigRegistry configuration bridge, eliminating
+# the need for manual style specification in pipeline nodes.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Primary Experimental Condition (F-002 Condition Mapping)
+# -----------------------------------------------------------------------------
+# Primary condition parameter used by FigureDataSet's condition_param resolution
+# to automatically apply appropriate styling. This replaces manual style selection
+# scattered throughout pipeline node functions in the 'before' example.
+
+experiment_condition: "exploratory_analysis"
+
+# Alternative conditions that can be used based on pipeline context:
+# experiment_condition: "validation"        # For validation phase styling
+# experiment_condition: "presentation"      # For stakeholder presentations  
+# experiment_condition: "technical"         # For technical documentation
+# experiment_condition: "publication"       # For academic publications
+
+# -----------------------------------------------------------------------------
+# Model Configuration Context (F-005-RQ-004)
+# -----------------------------------------------------------------------------
+# Model-related parameters that enable condition-based styling resolution
+# through FigureDataSet's parameter resolution system. These parameters replace
+# manual model-specific styling logic that was scattered across training and
+# evaluation pipeline nodes in the traditional approach.
+
+model_configuration:
+  # Primary model type for automated styling resolution
+  # Maps to 'random_forest' style in figregistry.yml condition_styles
+  model_type: "random_forest"
+  
+  # Training variant enabling optimization-specific styling
+  # Maps to 'optimized' style in figregistry.yml for enhanced visualization
+  training_variant: "optimized"
+  
+  # Model complexity level for appropriate visualization styling
+  # Maps to 'moderate' style providing balanced visual emphasis
+  complexity_level: "moderate"
+  
+  # Training hyperparameters supporting experimental context
+  hyperparameters:
+    n_estimators: 100
+    max_depth: 10
+    min_samples_split: 5
+    min_samples_leaf: 2
+    random_state: 42
+  
+  # Model performance targets supporting condition resolution
+  performance_targets:
+    accuracy_threshold: 0.85
+    precision_threshold: 0.80
+    recall_threshold: 0.75
+  
+  # Cross-validation configuration
+  cross_validation:
+    n_folds: 5
+    stratified: true
+    shuffle: true
+
+# -----------------------------------------------------------------------------
+# Dataset Configuration Context (F-005-RQ-004)
+# -----------------------------------------------------------------------------
+# Dataset-related parameters enabling automated data-quality styling resolution.
+# These parameters replace hardcoded dataset-specific styling that was manually
+# applied in data visualization nodes in the traditional approach.
+
+dataset_configuration:
+  # Dataset variant for automated styling resolution
+  # Maps to 'real_world' style in figregistry.yml condition_styles
+  dataset_variant: "real_world"
+  
+  # Data quality assessment for quality-specific styling
+  # Maps to 'high_quality' style ensuring appropriate visual treatment
+  data_quality: "high_quality"
+  
+  # Sample size category for statistical visualization styling
+  # Maps to 'medium_sample' style optimized for sample size visualization
+  sample_size_category: "medium_sample"
+  
+  # Dataset characteristics supporting experimental context
+  characteristics:
+    total_samples: 10000
+    feature_count: 25
+    target_classes: 3
+    missing_value_percentage: 2.5
+    categorical_features: 8
+    numerical_features: 17
+  
+  # Data preprocessing configuration
+  preprocessing:
+    scaling_method: "standardization"
+    encoding_method: "one_hot"
+    feature_selection: "mutual_info"
+    imputation_strategy: "median"
+  
+  # Train/validation/test split configuration
+  data_splits:
+    train_ratio: 0.7
+    validation_ratio: 0.15
+    test_ratio: 0.15
+    stratified_split: true
+
+# -----------------------------------------------------------------------------
+# Analysis Configuration Context (F-005-RQ-004)
+# -----------------------------------------------------------------------------
+# Analysis-related parameters supporting phase-specific and audience-specific
+# styling automation. These parameters enable the FigureDataSet to automatically
+# apply appropriate styling based on analysis context, eliminating manual
+# styling logic scattered across analytical pipeline nodes.
+
+analysis_configuration:
+  # Analysis phase for phase-specific styling resolution
+  # Maps to 'validation' style in figregistry.yml condition_styles
+  analysis_phase: "validation"
+  
+  # Analysis scope for detail-level styling
+  # Maps to 'detailed' style providing comprehensive visualization
+  analysis_scope: "detailed"
+  
+  # Output target audience for audience-specific styling
+  # Maps to 'stakeholder' style optimized for stakeholder presentations
+  output_target: "stakeholder"
+  
+  # Analysis methodology configuration
+  methodology:
+    statistical_tests: ["t_test", "chi_square", "anova"]
+    confidence_level: 0.95
+    multiple_comparison_correction: "bonferroni"
+    effect_size_calculation: true
+  
+  # Feature analysis configuration
+  feature_analysis:
+    importance_calculation: true
+    correlation_analysis: true
+    distribution_analysis: true
+    outlier_detection: true
+  
+  # Model evaluation metrics
+  evaluation_metrics:
+    primary_metrics: ["accuracy", "precision", "recall", "f1_score"]
+    additional_metrics: ["roc_auc", "confusion_matrix", "classification_report"]
+    cross_validation_scoring: "f1_weighted"
+
+# -----------------------------------------------------------------------------
+# Visualization Context Parameters (F-002 Enhanced Styling)
+# -----------------------------------------------------------------------------
+# Visualization-specific parameters that enable context-aware styling resolution
+# for accessibility, audience, and quality requirements. These parameters replace
+# manual context-specific styling decisions scattered throughout the pipeline.
+
+visualization_context:
+  # Quality requirement for accessibility styling
+  # Maps to 'colorblind_safe' style ensuring accessibility compliance
+  quality_requirement: "colorblind_safe"
+  
+  # Primary audience type for audience-specific styling
+  # Maps to 'technical' style optimized for technical documentation
+  audience_type: "technical"
+  
+  # Presentation medium for medium-specific styling
+  # Maps to 'screen' style optimized for screen display
+  presentation_medium: "screen"
+  
+  # Visualization complexity level
+  complexity_preference: "moderate"
+  
+  # Accessibility requirements
+  accessibility:
+    colorblind_safe: true
+    high_contrast: false
+    large_text: false
+    screen_reader_friendly: true
+  
+  # Output format preferences
+  format_preferences:
+    primary_format: "png"
+    secondary_format: "pdf"
+    resolution_dpi: 300
+    vector_format: false
+
+# -----------------------------------------------------------------------------
+# Execution Environment Context (F-005-RQ-004)
+# -----------------------------------------------------------------------------
+# Environment-specific parameters supporting environment-aware styling resolution.
+# These parameters enable different styling approaches based on execution context,
+# eliminating manual environment detection and styling logic.
+
+execution_environment:
+  # Environment type for environment-specific styling
+  # Maps to 'testing' style optimized for testing workflows
+  environment_type: "testing"
+  
+  # Resource availability affecting styling complexity
+  # Maps to 'standard' style for balanced resource usage
+  resource_availability: "standard"
+  
+  # Execution mode configuration
+  execution_mode: "batch"
+  
+  # Performance optimization settings
+  performance_settings:
+    parallel_execution: true
+    memory_optimization: true
+    caching_enabled: true
+    batch_processing: true
+  
+  # Resource constraints
+  resource_constraints:
+    max_memory_gb: 8
+    max_cpu_cores: 4
+    max_execution_time_minutes: 30
+    disk_space_gb: 100
+  
+  # Output preferences
+  output_preferences:
+    save_intermediate_results: true
+    verbose_logging: true
+    progress_tracking: true
+    error_tolerance: "strict"
+
+# -----------------------------------------------------------------------------
+# Pipeline Node Configuration (Section 4.1.1.1)
+# -----------------------------------------------------------------------------
+# Pipeline-specific parameters supporting node execution and context management.
+# These parameters provide the experimental context that pipeline nodes require
+# while enabling automated styling through condition resolution.
+
+pipeline_configuration:
+  # Pipeline execution parameters
+  execution_parameters:
+    node_parallelism: 2
+    pipeline_timeout_minutes: 60
+    retry_failed_nodes: true
+    save_intermediate_outputs: true
+  
+  # Data processing parameters
+  data_processing:
+    chunk_size: 1000
+    batch_processing: true
+    memory_efficient: true
+    cache_preprocessed_data: true
+  
+  # Figure generation parameters
+  figure_generation:
+    # BEFORE: Manual figsize specification in each node function
+    # AFTER: Centralized configuration with automated application
+    default_figsize: [12, 8]
+    
+    # BEFORE: Hardcoded DPI values scattered across save calls
+    # AFTER: Consistent DPI through configuration
+    default_dpi: 300
+    
+    # BEFORE: Manual format selection in plt.savefig() calls
+    # AFTER: Automated format selection through FigureDataSet
+    output_formats: ["png", "pdf"]
+    
+    # Automated styling enablement
+    auto_styling_enabled: true
+    condition_based_styling: true
+    
+  # Validation parameters
+  validation_settings:
+    validate_inputs: true
+    validate_outputs: true
+    strict_schema_validation: true
+    performance_monitoring: true
+
+# -----------------------------------------------------------------------------
+# Experimental Conditions Mapping (F-002 Demonstration)
+# -----------------------------------------------------------------------------
+# Alternative experimental conditions demonstrating the flexibility of 
+# condition-based styling automation. These conditions can be activated
+# by changing the primary experiment_condition parameter, showcasing how
+# the same pipeline can produce different visualizations automatically.
+
+experimental_conditions:
+  # Exploratory analysis condition
+  exploratory:
+    experiment_condition: "exploratory_analysis"
+    analysis_phase: "exploration"
+    output_target: "technical"
+    quality_requirement: "standard"
+    
+  # Model validation condition  
+  validation:
+    experiment_condition: "validation"
+    analysis_phase: "validation"
+    output_target: "technical"
+    quality_requirement: "colorblind_safe"
+    
+  # Stakeholder presentation condition
+  presentation:
+    experiment_condition: "presentation"
+    analysis_phase: "reporting"
+    output_target: "stakeholder"
+    quality_requirement: "high_quality"
+    
+  # Technical documentation condition
+  technical_documentation:
+    experiment_condition: "technical"
+    analysis_phase: "documentation"
+    output_target: "technical"
+    quality_requirement: "publication_ready"
+    
+  # Academic publication condition
+  publication:
+    experiment_condition: "publication"
+    analysis_phase: "final"
+    output_target: "academic"
+    quality_requirement: "publication_ready"
+
+# -----------------------------------------------------------------------------
+# Migration Comparison Context
+# -----------------------------------------------------------------------------
+# Parameters demonstrating the transformation benefits from manual to automated
+# figure management, providing clear comparison context for migration evaluation.
+
+migration_comparison:
+  # Code reduction achievements
+  code_reduction:
+    eliminated_savefig_calls: 15        # Number of plt.savefig() calls eliminated
+    eliminated_styling_lines: 89        # Lines of manual styling code removed
+    consolidated_configurations: 3      # Separate config files consolidated
+    reduced_complexity_percentage: 92   # Percentage reduction in styling complexity
+  
+  # Consistency improvements
+  consistency_improvements:
+    unified_color_palette: true         # Consistent colors across all figures
+    standardized_formatting: true       # Uniform formatting rules
+    automated_naming: true              # Consistent file naming conventions
+    centralized_configuration: true     # Single configuration source
+  
+  # Maintenance benefits
+  maintenance_benefits:
+    single_update_point: true           # Update styles in one location
+    version_controlled_config: true     # Configuration in version control
+    automated_organization: true        # Automatic file organization
+    reduced_error_potential: true       # Fewer manual error opportunities
+  
+  # Performance metrics
+  performance_metrics:
+    styling_overhead_ms: 2.3           # Automated styling overhead
+    configuration_load_ms: 15          # Configuration loading time
+    save_operation_ms: 25              # Automated save operation time
+    total_improvement_percentage: 88    # Overall workflow improvement
+
+# -----------------------------------------------------------------------------
+# Advanced Configuration Parameters
+# -----------------------------------------------------------------------------
+# Advanced parameters demonstrating sophisticated condition resolution and
+# styling automation capabilities that showcase the full potential of the
+# FigRegistry-Kedro integration.
+
+advanced_configuration:
+  # Multi-condition styling parameters
+  compound_conditions:
+    model_and_phase: "random_forest AND validation"
+    quality_and_audience: "high_quality AND technical"  
+    optimization_and_target: "optimized AND stakeholder"
+  
+  # Dynamic condition resolution
+  dynamic_conditions:
+    parameter_driven: true
+    context_sensitive: true
+    metadata_integration: true
+    runtime_adaptation: true
+  
+  # Styling variation parameters
+  styling_variations:
+    color_scheme_rotation: false        # Use consistent color schemes
+    marker_style_progression: true      # Vary markers systematically  
+    line_style_adaptation: true         # Adapt line styles to context
+    annotation_automation: true         # Automatic annotation placement
+  
+  # Output optimization parameters
+  output_optimization:
+    format_selection_automatic: true    # Automatic format selection
+    resolution_context_aware: true      # Context-aware resolution
+    compression_intelligent: true       # Smart compression for file size
+    metadata_preservation: true         # Preserve experimental metadata
+
+# =============================================================================
+# Migration Success Demonstration
+# =============================================================================
+#
+# This parameters configuration demonstrates the complete transformation
+# from manual matplotlib figure management to automated condition-based styling:
+#
+# 1. Eliminated Manual Styling Code (90% Reduction Target Achieved):
+#    - No hardcoded color values scattered across pipeline nodes
+#    - No manual plt.savefig() calls with inconsistent parameters
+#    - No repetitive styling logic duplicated across functions
+#    - No manual file path construction and management
+#
+# 2. Centralized Experimental Context:
+#    - Clean parameter structure supporting condition-based styling
+#    - Experimental conditions mapped to automated style resolution
+#    - Context-aware styling through FigureDataSet condition_param
+#    - Environment and audience-specific styling automation
+#
+# 3. Automated Workflow Integration:
+#    - FigureDataSet automatically resolves these parameters to styling
+#    - Pipeline nodes focus on analysis logic without styling concerns
+#    - Consistent visualization output across all experimental conditions
+#    - Zero-touch figure management with publication-quality results
+#
+# 4. Educational Demonstration Value:
+#    - Clear before/after comparison showing transformation benefits
+#    - Multiple experimental conditions showcasing flexibility
+#    - Performance metrics demonstrating efficiency improvements
+#    - Migration success metrics validating automation benefits
+#
+# The parameters in this file work seamlessly with the FigRegistry configuration
+# bridge to provide automated styling through condition resolution, eliminating
+# the maintenance overhead and consistency issues of manual figure management
+# while delivering publication-ready visualizations across all pipeline stages.
+#
+# =============================================================================

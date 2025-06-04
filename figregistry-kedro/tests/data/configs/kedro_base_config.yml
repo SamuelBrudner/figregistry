@@ -1,0 +1,574 @@
+# Kedro-Compatible Base FigRegistry Configuration for Multi-Environment Testing
+# ============================================================================
+# This configuration file serves as the organization-wide base for FigRegistry 
+# integration with Kedro projects, supporting environment-specific overrides
+# and Kedro ConfigLoader variable substitution patterns per F-007.2 requirements.
+#
+# Configuration Hierarchy (per Section 5.2.5):
+# 1. Override parameters (highest precedence)
+# 2. Kedro environment-specific config (conf/local, conf/staging, conf/production)
+# 3. Kedro base configuration (this file: conf/base/figregistry.yml)
+# 4. FigRegistry defaults (lowest precedence)
+#
+# Template Variables:
+# - ${project_name} - Project identifier for output paths
+# - ${environment} - Environment name (local, staging, production)
+# - ${user} - Current user for local development overrides
+# - ${timestamp} - ISO timestamp for versioning
+
+# =============================================================================
+# CONFIGURATION METADATA
+# =============================================================================
+figregistry_version: ">=0.3.0"
+
+metadata:
+  config_version: "1.0.0"
+  created_by: "figregistry-kedro-base-template"
+  description: "Organization-wide base configuration for Kedro FigRegistry integration"
+  project_name: "${project_name:figregistry-kedro-test}"
+  environment: "${environment:base}"
+  created_at: "${timestamp:2024-01-15T10:30:00Z}"
+  config_level: "baseline"
+  supports_environments: ["local", "staging", "production"]
+
+# =============================================================================
+# EXPERIMENTAL CONDITION STYLING
+# =============================================================================
+# Base condition mappings that support environment-specific extensions
+# These styles provide organization-wide consistency while allowing
+# environment-specific customization through config overrides
+styles:
+  # Core experimental conditions - consistent across all environments
+  baseline:
+    color: "#2E86AB"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.9
+    label: "Baseline Condition"
+    markersize: 8
+    markeredgewidth: 0.5
+    markeredgecolor: "#1A5276"
+  
+  treatment:
+    color: "#F24236"
+    marker: "D"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.9
+    label: "Treatment Condition"
+    markersize: 8
+    markeredgewidth: 0.5
+    markeredgecolor: "#A93226"
+  
+  control:
+    color: "#A8E6CF"
+    marker: "s"
+    linestyle: "--"
+    linewidth: 1.8
+    alpha: 0.8
+    label: "Control Group"
+    markersize: 7
+    markeredgewidth: 0.5
+    markeredgecolor: "#239B56"
+  
+  # Analysis stage conditions for pipeline workflow integration
+  exploratory:
+    color: "#FFB6C1"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Exploratory Analysis"
+    markersize: 6
+    markeredgewidth: 0.3
+    markeredgecolor: "#C0392B"
+  
+  presentation:
+    color: "#DDA0DD"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.8
+    label: "Presentation Ready"
+    markersize: 8
+    markeredgewidth: 0.4
+    markeredgecolor: "#7D3C98"
+  
+  publication:
+    color: "#1A1A1A"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 1.0
+    label: "Publication Quality"
+    markersize: 10
+    markeredgewidth: 0.6
+    markeredgecolor: "#000000"
+  
+  # Model performance conditions for ML pipeline integration
+  training:
+    color: "#3498DB"
+    marker: "v"
+    linestyle: "-"
+    linewidth: 1.8
+    alpha: 0.8
+    label: "Training Phase"
+    markersize: 7
+    markeredgewidth: 0.4
+    markeredgecolor: "#2874A6"
+  
+  validation:
+    color: "#E67E22"
+    marker: "<"
+    linestyle: "-"
+    linewidth: 1.8
+    alpha: 0.8
+    label: "Validation Phase"
+    markersize: 7
+    markeredgewidth: 0.4
+    markeredgecolor: "#D35400"
+  
+  testing:
+    color: "#27AE60"
+    marker: ">"
+    linestyle: "-"
+    linewidth: 1.8
+    alpha: 0.8
+    label: "Testing Phase"
+    markersize: 7
+    markeredgewidth: 0.4
+    markeredgecolor: "#1E8449"
+
+# =============================================================================
+# COLOR PALETTES
+# =============================================================================
+# Organization-wide color palettes supporting consistent theming
+palettes:
+  # Default organizational color scheme
+  organizational:
+    - "#2E86AB"  # Primary blue
+    - "#F24236"  # Accent red
+    - "#A8E6CF"  # Secondary green
+    - "#FFB6C1"  # Tertiary pink
+    - "#DDA0DD"  # Quaternary purple
+    - "#3498DB"  # Light blue
+    - "#E67E22"  # Orange
+    - "#27AE60"  # Dark green
+
+  # Colorblind-safe palette for accessibility compliance
+  colorblind_safe:
+    - "#1f77b4"  # Blue
+    - "#ff7f0e"  # Orange
+    - "#2ca02c"  # Green
+    - "#d62728"  # Red
+    - "#9467bd"  # Purple
+    - "#8c564b"  # Brown
+    - "#e377c2"  # Pink
+    - "#7f7f7f"  # Gray
+
+  # High-contrast palette for presentation contexts
+  presentation:
+    primary: "#000000"    # Black for high contrast
+    secondary: "#444444"  # Dark gray
+    accent: "#2E86AB"     # Organizational blue
+    highlight: "#F24236"  # Organizational red
+    background: "#FFFFFF" # White background
+    grid: "#CCCCCC"       # Light gray for grids
+
+  # Publication-ready grayscale palette
+  publication:
+    - "#000000"  # Black
+    - "#333333"  # Dark gray
+    - "#666666"  # Medium gray
+    - "#999999"  # Light gray
+    - "#CCCCCC"  # Very light gray
+
+# =============================================================================
+# DEFAULT STYLING PARAMETERS
+# =============================================================================
+# Organization-wide default styling that can be overridden by environment configs
+defaults:
+  # Figure-level defaults compatible with Kedro data layers
+  figure:
+    figsize: [10, 8]
+    dpi: 150
+    facecolor: "white"
+    edgecolor: "none"
+    tight_layout: true
+    constrained_layout: false
+  
+  # Line plot defaults for consistent scientific visualization
+  line:
+    color: "#2E86AB"
+    linewidth: 2.0
+    alpha: 0.8
+    linestyle: "-"
+    antialiased: true
+  
+  # Scatter plot defaults for data exploration
+  scatter:
+    s: 50
+    alpha: 0.7
+    edgecolors: "black"
+    linewidth: 0.5
+    marker: "o"
+  
+  # Bar plot defaults for categorical data
+  bar:
+    color: "#2E86AB"
+    alpha: 0.8
+    edgecolor: "black"
+    linewidth: 0.5
+    width: 0.8
+  
+  # Histogram defaults for distribution analysis
+  histogram:
+    bins: 30
+    alpha: 0.7
+    color: "#2E86AB"
+    edgecolor: "black"
+    linewidth: 0.5
+    density: false
+  
+  # Text and labeling defaults
+  text:
+    fontsize: 12
+    fontfamily: "sans-serif"
+    color: "black"
+    weight: "normal"
+  
+  # Axis configuration defaults
+  axes:
+    titlesize: 14
+    labelsize: 12
+    labelcolor: "black"
+    spines_linewidth: 1.0
+    grid: true
+    grid_alpha: 0.3
+    grid_linewidth: 0.5
+  
+  # Legend configuration defaults
+  legend:
+    fontsize: 10
+    frameon: true
+    fancybox: true
+    shadow: false
+    framealpha: 0.8
+    edgecolor: "black"
+  
+  # Fallback style for undefined conditions
+  fallback_style:
+    color: "#95A5A6"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Unknown Condition"
+    markersize: 6
+
+# =============================================================================
+# OUTPUT MANAGEMENT CONFIGURATION
+# =============================================================================
+# Kedro-compatible output configuration supporting data layer organization
+outputs:
+  # Base output path supporting Kedro data layer structure
+  # Template variable allows environment-specific override
+  base_path: "${output_base_path:data/08_reporting}"
+  
+  # Automated filename generation with Kedro-compatible templating
+  naming:
+    template: "${project_name}_${name}_{condition}_{ts}"
+    timestamp_format: "%Y%m%d_%H%M%S"
+    slug_separator: "_"
+    max_length: 255
+    sanitize_names: true
+  
+  # Format specifications supporting different output purposes
+  formats:
+    defaults:
+      exploratory: ["png"]
+      presentation: ["png", "pdf"]
+      publication: ["pdf", "svg"]
+    
+    # Resolution settings optimized for different use cases
+    resolution:
+      png:
+        dpi: 300
+        transparent: false
+        bbox_inches: "tight"
+        pad_inches: 0.1
+      pdf:
+        dpi: 300
+        transparent: false
+        bbox_inches: "tight"
+        pad_inches: 0.1
+      svg:
+        dpi: 300
+        transparent: false
+        bbox_inches: "tight"
+        pad_inches: 0.1
+        format: "svg"
+      eps:
+        dpi: 300
+        transparent: false
+        bbox_inches: "tight"
+        pad_inches: 0.1
+  
+  # Kedro data layer path mappings
+  paths:
+    exploratory: "${exploratory_path:exploratory}"
+    presentation: "${presentation_path:presentation}"
+    publication: "${publication_path:publication}"
+    
+  # Directory creation and permission settings
+  directory_creation:
+    create_missing: true
+    permissions: 0o755
+    recursive: true
+
+# =============================================================================
+# KEDRO-SPECIFIC INTEGRATION SETTINGS
+# =============================================================================
+# Configuration bridge settings for Kedro integration per Section 5.2.5
+kedro:
+  # Configuration bridge behavior
+  config_bridge:
+    enabled: true
+    merge_strategy: "override"  # Kedro config overrides FigRegistry defaults
+    validation_strict: true
+    cache_enabled: true
+    performance_target_ms: 10.0
+  
+  # Dataset-specific configuration
+  datasets:
+    default_purpose: "exploratory"
+    auto_versioning: true
+    inherit_catalog_versioning: true
+    
+    # Parameter resolution for condition-based styling
+    parameter_resolution:
+      condition_param: "experiment_condition"
+      fallback_condition: "exploratory"
+      parameter_sources: ["run_params", "catalog_context", "global_params"]
+  
+  # Environment-specific behavior
+  environments:
+    base:
+      validation_level: "standard"
+      performance_monitoring: false
+      cache_size: 100
+    local:
+      validation_level: "relaxed"
+      performance_monitoring: true
+      cache_size: 50
+    staging:
+      validation_level: "strict"
+      performance_monitoring: true
+      cache_size: 200
+    production:
+      validation_level: "strict"
+      performance_monitoring: true
+      cache_size: 1000
+  
+  # Hook configuration
+  hooks:
+    initialization_timeout_ms: 5000
+    config_validation_on_startup: true
+    auto_register_datasets: true
+    cleanup_on_pipeline_end: true
+
+# =============================================================================
+# ADVANCED CONFIGURATION FEATURES
+# =============================================================================
+
+# Style inheritance and composition rules
+style_inheritance:
+  enabled: true
+  hierarchy: ["specific", "category", "defaults"]
+  merge_strategy: "deep"
+  override_protection: ["color", "label"]
+
+# Conditional styling rules for pattern matching
+conditional_rules:
+  wildcard_patterns: 
+    - "*_baseline"
+    - "*_treatment" 
+    - "*_control"
+    - "train_*"
+    - "val_*"
+    - "test_*"
+  partial_matching: true
+  case_sensitive: false
+  regex_enabled: false
+
+# Performance optimization settings
+performance:
+  cache_enabled: true
+  max_cache_size: 1000
+  target_merge_time_ms: 10.0
+  style_resolution_timeout_ms: 100
+  concurrent_access_limit: 10
+  memory_limit_mb: 100
+
+# Configuration validation settings
+validation:
+  strict_mode: true
+  required_fields: ["styles", "defaults", "outputs"]
+  schema_version: "1.0"
+  warning_level: "default"
+  error_aggregation: true
+
+# =============================================================================
+# CONFIGURATION EXAMPLES AND DOCUMENTATION
+# =============================================================================
+# Examples section for user guidance and testing validation
+examples:
+  basic_usage:
+    description: "Basic condition-based styling example"
+    code: |
+      # In Kedro pipeline node:
+      def create_plot(data: pd.DataFrame) -> matplotlib.figure.Figure:
+          fig, ax = plt.subplots()
+          ax.plot(data['x'], data['y'])
+          return fig  # FigureDataSet handles styling automatically
+  
+  advanced_configuration:
+    description: "Environment-specific configuration override"
+    kedro_catalog_example: |
+      outputs.training_plot:
+        type: figregistry_kedro.datasets.FigureDataSet
+        purpose: exploratory
+        condition_param: experiment_condition
+        versioned: true
+  
+  template_variables:
+    description: "Kedro ConfigLoader template variable usage"
+    examples:
+      project_name: "${oc.env:PROJECT_NAME,figregistry-kedro-project}"
+      environment: "${oc.env:KEDRO_ENV,local}"
+      output_base_path: "${oc.env:FIGURE_OUTPUT_PATH,data/08_reporting}"
+      user: "${oc.env:USER,kedro-user}"
+
+# =============================================================================
+# ORGANIZATION-WIDE rcParams CONFIGURATION
+# =============================================================================
+# Matplotlib rcParams for consistent cross-environment styling
+rcParams:
+  # Font configuration for consistent text rendering
+  font.family: "sans-serif"
+  font.size: 12
+  font.weight: "normal"
+  
+  # Figure configuration for publication quality
+  figure.dpi: 150
+  figure.figsize: [10, 8]
+  figure.facecolor: "white"
+  figure.edgecolor: "none"
+  figure.titlesize: "large"
+  figure.titleweight: "bold"
+  
+  # Axes configuration for scientific plots
+  axes.labelsize: 12
+  axes.titlesize: 14
+  axes.titleweight: "bold"
+  axes.labelcolor: "black"
+  axes.edgecolor: "black"
+  axes.linewidth: 1.0
+  axes.spines.top: false
+  axes.spines.right: false
+  axes.grid: true
+  axes.grid.alpha: 0.3
+  
+  # Grid configuration for data visualization
+  grid.color: "#CCCCCC"
+  grid.linestyle: "-"
+  grid.linewidth: 0.5
+  grid.alpha: 0.3
+  
+  # Legend configuration for clarity
+  legend.fontsize: 10
+  legend.frameon: true
+  legend.fancybox: true
+  legend.shadow: false
+  legend.framealpha: 0.8
+  
+  # Line and marker defaults
+  lines.linewidth: 2.0
+  lines.markersize: 8
+  lines.markeredgewidth: 0.5
+  
+  # Color and style settings
+  axes.prop_cycle: "cycler('color', ['2E86AB', 'F24236', 'A8E6CF', 'FFB6C1', 'DDA0DD', '3498DB', 'E67E22', '27AE60'])"
+  
+  # Save configuration for consistent output
+  savefig.dpi: 300
+  savefig.bbox: "tight"
+  savefig.pad_inches: 0.1
+  savefig.transparent: false
+  savefig.format: "png"
+
+# =============================================================================
+# MULTI-ENVIRONMENT TESTING CONFIGURATION
+# =============================================================================
+# Testing-specific configuration supporting F-007.2 requirements
+testing:
+  environments: ["base", "local", "staging", "production"]
+  
+  validation_scenarios:
+    config_merging:
+      - scenario: "base_only"
+        description: "Test base configuration without environment overrides"
+        expected_sections: ["styles", "defaults", "outputs", "kedro"]
+      
+      - scenario: "environment_override"
+        description: "Test environment-specific configuration override precedence"
+        test_environments: ["local", "staging", "production"]
+        override_fields: ["outputs.base_path", "defaults.figure.dpi", "performance.target_merge_time_ms"]
+      
+      - scenario: "template_substitution"
+        description: "Test Kedro ConfigLoader variable substitution"
+        template_variables: ["project_name", "environment", "output_base_path", "user"]
+        expected_resolution: true
+  
+  performance_benchmarks:
+    config_load_time_ms: 25
+    config_merge_time_ms: 10
+    style_resolution_time_ms: 1
+    memory_usage_mb: 2
+  
+  compatibility_matrix:
+    kedro_versions: ["0.18.0", "0.18.14", "0.19.0"]
+    pydantic_versions: ["2.9.0", "2.10.0"]
+    python_versions: ["3.10", "3.11", "3.12"]
+
+# =============================================================================
+# CACHE AND OPTIMIZATION SETTINGS
+# =============================================================================
+# Performance settings optimized for production Kedro pipeline execution
+cache:
+  enabled: true
+  max_size: 1000
+  ttl_seconds: 3600
+  eviction_policy: "lru"
+  memory_threshold_mb: 50
+  
+  # Cache keys for different configuration contexts
+  key_strategies:
+    environment_based: true
+    parameter_based: true
+    timestamp_based: false
+    user_based: false
+
+optimization:
+  lazy_loading: true
+  async_operations: false
+  batch_processing: false
+  compression: false
+  
+  # Performance monitoring and SLA targets
+  sla_targets:
+    config_merge_time_ms: 10
+    style_resolution_time_ms: 1
+    file_save_time_ms: 100
+    memory_overhead_percent: 5

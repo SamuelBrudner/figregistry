@@ -1,0 +1,189 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "figregistry-kedro-basic-example"
+version = "0.1.0"
+description = "Basic example demonstrating FigRegistry integration with Kedro pipelines"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "FigRegistry Contributors", email = "contributors@figregistry.org"}
+]
+keywords = ["kedro", "figregistry", "visualization", "data-science", "example"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+# Core runtime dependencies for the basic example
+dependencies = [
+    # Core FigRegistry and Kedro integration
+    "figregistry>=0.3.0",
+    "figregistry-kedro>=0.1.0",
+    
+    # Kedro framework with version constraints per Section 3.2.1.3
+    "kedro>=0.18.0,<0.20.0",
+    "kedro-datasets>=1.0.0",
+    
+    # Visualization framework per Section 3.2.1.2
+    "matplotlib>=3.9.0",
+    
+    # Data processing stack per Section 3.2.2.1
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "scipy>=1.10.0",
+    
+    # Configuration management per Section 3.2.2.2
+    "pydantic>=2.9.0",
+    "pyyaml>=6.0.1",
+]
+
+[project.optional-dependencies]
+# Development dependencies for testing and validation
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.14.0",
+    "hypothesis>=6.0.0",
+    "black>=23.0.0",
+    "isort>=5.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+]
+
+# Documentation dependencies
+docs = [
+    "mkdocs>=1.4.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings>=0.20.0",
+]
+
+# All optional dependencies combined
+all = [
+    "figregistry-kedro-basic-example[dev,docs]"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/figregistry/figregistry-kedro"
+"Repository" = "https://github.com/figregistry/figregistry-kedro"
+"Documentation" = "https://figregistry-kedro.readthedocs.io/"
+"Bug Reports" = "https://github.com/figregistry/figregistry-kedro/issues"
+
+[project.entry-points."kedro.project_commands"]
+# Enable Kedro project discovery and command execution
+example = "figregistry_kedro_basic_example.cli:commands"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["figregistry_kedro_basic_example*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"figregistry_kedro_basic_example" = ["conf/**/*", "data/**/*"]
+
+# Black configuration for code formatting
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# isort configuration for import sorting
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["figregistry_kedro_basic_example"]
+known_third_party = ["kedro", "figregistry", "matplotlib", "pandas", "numpy"]
+
+# MyPy configuration for type checking
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "kedro.*",
+    "figregistry.*",
+    "matplotlib.*",
+    "scipy.*",
+]
+ignore_missing_imports = true
+
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=figregistry_kedro_basic_example",
+    "--cov-report=html",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-fail-under=80",
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+branch = true
+source = ["src/figregistry_kedro_basic_example"]
+omit = [
+    "tests/*",
+    "*/test_*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

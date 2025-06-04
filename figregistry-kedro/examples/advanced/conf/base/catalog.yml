@@ -1,0 +1,999 @@
+# Advanced Kedro Data Catalog Configuration for FigRegistry-Kedro Integration
+# =============================================================================
+#
+# This catalog demonstrates sophisticated FigureDataSet integration patterns,
+# showcasing the advanced capabilities of the figregistry-kedro plugin for
+# enterprise-grade visualization automation within complex data science workflows.
+# The configuration illustrates automated figure styling, versioning integration,
+# condition-based resolution, and multi-purpose output management across various
+# pipeline stages and experimental scenarios.
+#
+# Key Features Demonstrated:
+# - Sophisticated FigureDataSet configurations with advanced parameter resolution (F-005)
+# - Multi-purpose figure outputs (exploratory, presentation, publication) per F-004
+# - Complex condition parameter resolution from pipeline metadata (F-005-RQ-004)
+# - Style parameter overrides for specific catalog entries (F-002)
+# - Comprehensive Kedro versioning integration (F-005-RQ-002)
+# - Advanced catalog patterns with conditional dataset activation
+# - Enterprise-grade visualization workflows for production environments
+# - Automated elimination of manual figure management (Section 0.1.1)
+#
+# Architecture:
+# This catalog serves as the bridge between Kedro's data pipeline execution
+# and FigRegistry's automated styling engine, enabling zero-touch figure
+# management with sophisticated experimental condition resolution while
+# maintaining full compatibility with Kedro's versioning and experiment
+# tracking capabilities.
+
+# =============================================================================
+# CATALOG METADATA AND CONFIGURATION
+# =============================================================================
+
+# Catalog configuration metadata for tracking and validation
+_catalog_metadata:
+  version: "2.1.0"
+  created_date: "2024-12-19"
+  last_modified: "2024-12-19"
+  author: "FigRegistry-Kedro Advanced Integration Team"
+  purpose: "advanced_visualization_automation_catalog"
+  description: "Enterprise-grade Kedro catalog demonstrating sophisticated FigureDataSet integration with complex condition-based styling, multi-environment support, and automated experimental visualization workflows"
+  
+  # Catalog compliance and feature tracking
+  compliance:
+    figregistry_kedro_version: ">=0.1.0"
+    kedro_version: ">=0.18.0,<0.20.0"
+    figregistry_version: ">=0.3.0"
+    catalog_schema_version: "2.1"
+    
+  # Advanced catalog features utilized
+  features_demonstrated:
+    sophisticated_figuredataset_configs: true
+    multi_purpose_outputs: true
+    complex_condition_resolution: true
+    style_parameter_overrides: true
+    kedro_versioning_integration: true
+    conditional_dataset_activation: true
+    enterprise_visualization_patterns: true
+    automated_figure_management: true
+    performance_optimization: true
+    
+  # Documentation and educational context
+  documentation:
+    catalog_guide: "docs/catalog-configuration.md"
+    figuredataset_reference: "docs/figuredataset-api.md"
+    condition_resolution: "docs/condition-resolution.md"
+    styling_examples: "examples/advanced/README.md"
+
+# =============================================================================
+# TRAINING PIPELINE VISUALIZATION DATASETS
+# =============================================================================
+
+# Advanced data quality visualization with condition-based styling
+data_quality_analysis_plot:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/training/data_quality_analysis.png
+  purpose: exploratory
+  condition_param: data_quality_condition  # Resolves to training.data.raw from parameters
+  description: "Comprehensive data quality analysis visualization with automated quality condition styling"
+  
+  # Advanced style overrides for data quality emphasis
+  style_params:
+    alpha: 0.9
+    grid_alpha: 0.8
+    annotation_enabled: true
+    quality_indicators: true
+    
+  # Format optimization for exploratory analysis
+  format_kwargs:
+    dpi: 150
+    bbox_inches: "tight"
+    facecolor: "white"
+    edgecolor: "none"
+    
+  # Metadata for tracking and documentation
+  metadata:
+    pipeline_stage: "training"
+    visualization_type: "data_quality"
+    automated_styling: true
+    condition_source: "parameters.data_processing.data_quality.quality_condition"
+
+# Data preprocessing validation with hierarchical condition resolution
+data_preprocessing_validation:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/training/preprocessing_validation.png
+  purpose: exploratory
+  condition_param: data_quality_condition  # Resolves through parameter hierarchy
+  description: "Data preprocessing validation plots with automated condition-based styling"
+  
+  # Enhanced visualization parameters
+  style_params:
+    comparison_mode: true
+    before_after_styling: true
+    transformation_indicators: true
+    quality_metrics_overlay: true
+    
+  # Development-optimized format settings
+  format_kwargs:
+    dpi: 150
+    bbox_inches: "tight"
+    transparent: false
+
+# Feature engineering analysis with advanced condition mapping
+feature_engineering_analysis:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/training/feature_engineering_analysis.png
+  purpose: presentation
+  condition_param: data_quality_condition  # training.data.transformed from parameters
+  description: "Feature engineering impact analysis with presentation-ready styling"
+  
+  # Presentation-specific style enhancements
+  style_params:
+    color_intensity: 1.0
+    professional_styling: true
+    feature_importance_overlay: true
+    correlation_heatmap_styling: true
+    
+  # High-quality format for presentations
+  format_kwargs:
+    dpi: 200
+    bbox_inches: "tight"
+    facecolor: "white"
+    transparent: false
+
+# =============================================================================
+# MODEL TRAINING AND EVALUATION VISUALIZATIONS
+# =============================================================================
+
+# Baseline model performance with sophisticated condition resolution
+baseline_model_performance:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/training/baseline_model_performance.png
+  purpose: exploratory
+  condition_param: model_type  # Resolves to training.model.baseline from parameters
+  description: "Baseline model performance analysis with automated model-type styling"
+  
+  # Performance visualization enhancements
+  style_params:
+    performance_indicators: true
+    threshold_lines: true
+    confidence_intervals: true
+    benchmark_comparisons: true
+    
+  # Versioning enabled for experiment tracking
+  versioned: true
+  
+  # Metadata for model tracking
+  metadata:
+    model_category: "baseline"
+    performance_tracking: true
+    experimental_design: "control_group"
+
+# Candidate model comparison with multi-algorithm styling
+candidate_model_comparison:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/training/candidate_model_comparison.png
+  purpose: presentation
+  condition_param: model_type  # Resolves to training.model.candidate from parameters
+  description: "Comprehensive candidate model comparison with algorithm-specific styling"
+  
+  # Advanced comparison visualization parameters
+  style_params:
+    multi_algorithm_styling: true
+    performance_ranking: true
+    statistical_significance_indicators: true
+    algorithm_color_coding: true
+    
+  # Professional presentation formatting
+  format_kwargs:
+    dpi: 250
+    bbox_inches: "tight"
+    facecolor: "white"
+    edgecolor: "none"
+    
+  # Enable versioning for model comparison tracking
+  versioned: true
+
+# Champion model analysis with publication-quality styling
+champion_model_analysis:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/training/champion_model_analysis.png
+  purpose: publication
+  condition_param: model_type  # Resolves to training.model.champion from parameters
+  description: "Champion model detailed analysis with publication-ready styling and metrics"
+  
+  # Publication-quality style parameters
+  style_params:
+    publication_ready: true
+    high_contrast: true
+    detailed_annotations: true
+    performance_metrics_overlay: true
+    statistical_significance_indicators: true
+    
+  # Maximum quality format settings
+  format_kwargs:
+    dpi: 600
+    bbox_inches: "tight"
+    facecolor: "white"
+    transparent: false
+    format: "pdf"  # PDF for publication quality
+    
+  # Comprehensive versioning for publication tracking
+  versioned: true
+  
+  # Publication metadata
+  metadata:
+    publication_ready: true
+    quality_level: "journal_submission"
+    peer_review_ready: true
+
+# =============================================================================
+# HYPERPARAMETER OPTIMIZATION VISUALIZATIONS
+# =============================================================================
+
+# Hyperparameter optimization convergence analysis
+hyperparameter_optimization_convergence:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/training/hyperparameter_optimization_convergence.png
+  purpose: exploratory
+  condition_param: optimization_method  # Complex condition from experimental scenarios
+  description: "Hyperparameter optimization convergence visualization with method-specific styling"
+  
+  # Optimization-specific styling
+  style_params:
+    convergence_indicators: true
+    optimization_method_styling: true
+    iteration_markers: true
+    performance_trajectory: true
+    
+  # Development format for quick iteration
+  format_kwargs:
+    dpi: 150
+    bbox_inches: "tight"
+
+# Bayesian optimization performance surface
+bayesian_optimization_surface:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/training/bayesian_optimization_surface.png
+  purpose: presentation
+  condition_param: algorithm  # Resolves through algorithm parameters
+  description: "Bayesian optimization performance surface with algorithm-specific styling"
+  
+  # 3D surface visualization enhancements
+  style_params:
+    surface_styling: true
+    contour_lines: true
+    optimization_path: true
+    acquisition_function_overlay: true
+    
+  # High-quality presentation format
+  format_kwargs:
+    dpi: 300
+    bbox_inches: "tight"
+    transparent: false
+
+# =============================================================================
+# INFERENCE PIPELINE VISUALIZATIONS
+# =============================================================================
+
+# Batch prediction analysis with confidence-based styling
+batch_prediction_analysis:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/inference/batch_prediction_analysis.png
+  purpose: exploratory
+  condition_param: prediction_type  # Resolves to inference.prediction.batch
+  description: "Batch prediction performance analysis with prediction-type styling"
+  
+  # Batch processing visualization parameters
+  style_params:
+    batch_processing_indicators: true
+    throughput_metrics: true
+    latency_distribution: true
+    error_rate_tracking: true
+    
+  format_kwargs:
+    dpi: 150
+    bbox_inches: "tight"
+
+# Real-time prediction monitoring with confidence visualization
+realtime_prediction_monitoring:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/inference/realtime_prediction_monitoring.png
+  purpose: monitoring
+  condition_param: prediction_type  # Resolves to inference.prediction.realtime
+  description: "Real-time prediction monitoring dashboard with confidence-based styling"
+  
+  # Real-time monitoring enhancements
+  style_params:
+    realtime_indicators: true
+    streaming_data_styling: true
+    alert_thresholds: true
+    performance_sla_tracking: true
+    
+  # Monitoring dashboard formatting
+  format_kwargs:
+    dpi: 200
+    bbox_inches: "tight"
+    facecolor: "#F8F9FA"  # Light dashboard background
+
+# Prediction confidence distribution analysis
+prediction_confidence_distribution:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/inference/prediction_confidence_distribution.png
+  purpose: presentation
+  condition_param: confidence_level  # Resolves through confidence thresholds
+  description: "Prediction confidence distribution analysis with confidence-level styling"
+  
+  # Confidence visualization parameters
+  style_params:
+    confidence_distribution_styling: true
+    threshold_indicators: true
+    risk_zones: true
+    calibration_curve: true
+    
+  # Professional presentation format
+  format_kwargs:
+    dpi: 250
+    bbox_inches: "tight"
+    
+  # Versioning for confidence tracking
+  versioned: true
+
+# =============================================================================
+# EXPERIMENTAL ANALYSIS VISUALIZATIONS
+# =============================================================================
+
+# A/B test results with statistical significance styling
+ab_test_results_analysis:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/experiments/ab_test_results_analysis.png
+  purpose: presentation
+  condition_param: experimental_group  # Resolves through experimental conditions
+  description: "A/B test results analysis with statistical significance styling"
+  
+  # Statistical analysis visualization parameters
+  style_params:
+    statistical_significance_styling: true
+    confidence_intervals: true
+    effect_size_indicators: true
+    power_analysis_overlay: true
+    
+  # Professional statistical reporting format
+  format_kwargs:
+    dpi: 300
+    bbox_inches: "tight"
+    transparent: false
+    
+  # Experiment tracking versioning
+  versioned: true
+  
+  metadata:
+    experimental_design: "randomized_controlled_trial"
+    statistical_method: "frequentist_analysis"
+
+# Treatment group comparison with group-specific styling
+treatment_group_comparison:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/experiments/treatment_group_comparison.png
+  purpose: publication
+  condition_param: group_id  # Resolves to specific treatment groups
+  description: "Treatment group comparison analysis with group-specific styling patterns"
+  
+  # Multi-group comparison styling
+  style_params:
+    multi_group_styling: true
+    treatment_effect_visualization: true
+    control_comparison: true
+    outcome_distribution: true
+    
+  # Publication-quality formatting
+  format_kwargs:
+    dpi: 600
+    bbox_inches: "tight"
+    format: "pdf"
+    transparent: false
+    
+  versioned: true
+
+# Statistical significance heat map
+statistical_significance_heatmap:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/experiments/statistical_significance_heatmap.png
+  purpose: presentation
+  condition_param: p_value  # Resolves through significance parameters
+  description: "Statistical significance heat map with p-value based styling"
+  
+  # Heat map visualization enhancements
+  style_params:
+    heatmap_styling: true
+    significance_color_gradient: true
+    p_value_annotations: true
+    multiple_testing_correction: true
+    
+  format_kwargs:
+    dpi: 300
+    bbox_inches: "tight"
+
+# =============================================================================
+# REPORTING AND DASHBOARD VISUALIZATIONS
+# =============================================================================
+
+# Executive summary dashboard with audience-specific styling
+executive_summary_dashboard:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/reports/executive_summary_dashboard.png
+  purpose: presentation
+  condition_param: report_type  # Resolves to reporting.summary.executive
+  description: "Executive summary dashboard with C-level audience styling"
+  
+  # Executive presentation styling
+  style_params:
+    executive_styling: true
+    high_level_metrics: true
+    kpi_dashboard: true
+    business_impact_focus: true
+    clean_professional_design: true
+    
+  # Executive presentation format
+  format_kwargs:
+    dpi: 300
+    bbox_inches: "tight"
+    facecolor: "white"
+    transparent: false
+    
+  metadata:
+    audience: "c_level_executives"
+    presentation_context: "board_meeting"
+
+# Technical deep-dive analysis
+technical_analysis_report:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/reports/technical_analysis_report.png
+  purpose: presentation
+  condition_param: report_type  # Resolves to reporting.summary.technical
+  description: "Technical deep-dive analysis with detailed technical styling"
+  
+  # Technical analysis styling
+  style_params:
+    technical_styling: true
+    detailed_annotations: true
+    algorithm_specifics: true
+    performance_diagnostics: true
+    debugging_information: true
+    
+  format_kwargs:
+    dpi: 250
+    bbox_inches: "tight"
+    
+  metadata:
+    audience: "data_science_team"
+    technical_depth: "detailed"
+
+# Performance monitoring dashboard
+performance_monitoring_dashboard:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/reports/performance_monitoring_dashboard.png
+  purpose: monitoring
+  condition_param: report_section  # Resolves to reporting.detail.performance
+  description: "Performance monitoring dashboard with real-time styling"
+  
+  # Monitoring dashboard styling
+  style_params:
+    monitoring_styling: true
+    realtime_indicators: true
+    alert_status_colors: true
+    trend_analysis: true
+    sla_tracking: true
+    
+  format_kwargs:
+    dpi: 200
+    bbox_inches: "tight"
+    facecolor: "#F8F9FA"
+
+# =============================================================================
+# MODEL INTERPRETABILITY VISUALIZATIONS
+# =============================================================================
+
+# SHAP analysis with interpretability styling
+shap_analysis_visualization:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/interpretability/shap_analysis.png
+  purpose: presentation
+  condition_param: interpretability_method  # Custom condition for interpretability
+  description: "SHAP analysis visualization with interpretability-focused styling"
+  
+  # Interpretability visualization parameters
+  style_params:
+    interpretability_styling: true
+    feature_importance_colors: true
+    contribution_indicators: true
+    interaction_effects: true
+    
+  format_kwargs:
+    dpi: 300
+    bbox_inches: "tight"
+    
+  versioned: true
+
+# Feature importance ranking with significance indicators
+feature_importance_ranking:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/interpretability/feature_importance_ranking.png
+  purpose: publication
+  condition_param: interpretability_method  # Resolves through interpretability study
+  description: "Feature importance ranking with statistical significance styling"
+  
+  # Feature importance styling
+  style_params:
+    importance_ranking_styling: true
+    significance_indicators: true
+    confidence_intervals: true
+    feature_category_colors: true
+    
+  # Publication format
+  format_kwargs:
+    dpi: 600
+    bbox_inches: "tight"
+    format: "pdf"
+    
+  versioned: true
+
+# =============================================================================
+# ENVIRONMENT-SPECIFIC VISUALIZATIONS
+# =============================================================================
+
+# Development environment debugging visualizations
+development_debug_plots:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/debug/development_diagnostics.png
+  purpose: exploratory
+  condition_param: training_environment  # Resolves to *.development pattern
+  description: "Development environment debugging plots with enhanced diagnostics"
+  
+  # Development debugging enhancements
+  style_params:
+    debug_mode: true
+    verbose_annotations: true
+    diagnostic_overlays: true
+    performance_profiling: true
+    
+  format_kwargs:
+    dpi: 150
+    bbox_inches: "tight"
+    
+  metadata:
+    environment: "development"
+    debug_level: "verbose"
+
+# Staging environment validation plots
+staging_validation_plots:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/validation/staging_validation.png
+  purpose: presentation
+  condition_param: training_environment  # Resolves to *.staging pattern
+  description: "Staging environment validation plots with integration testing focus"
+  
+  # Staging validation styling
+  style_params:
+    validation_styling: true
+    integration_testing_indicators: true
+    quality_gates: true
+    performance_benchmarks: true
+    
+  format_kwargs:
+    dpi: 200
+    bbox_inches: "tight"
+    
+  versioned: true
+
+# Production environment monitoring
+production_monitoring_plots:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/monitoring/production_monitoring.png
+  purpose: monitoring
+  condition_param: training_environment  # Resolves to *.production pattern
+  description: "Production environment monitoring with operational styling"
+  
+  # Production monitoring styling
+  style_params:
+    production_styling: true
+    operational_indicators: true
+    sla_monitoring: true
+    alert_thresholds: true
+    
+  format_kwargs:
+    dpi: 200
+    bbox_inches: "tight"
+    facecolor: "#F8F9FA"
+
+# =============================================================================
+# ADVANCED VERSIONED EXPERIMENT TRACKING
+# =============================================================================
+
+# Comprehensive experiment tracking with full versioning
+experiment_tracking_overview:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/experiments/experiment_tracking_overview.png
+  purpose: presentation
+  condition_param: experimental_group  # Multi-experiment condition resolution
+  description: "Comprehensive experiment tracking overview with automated version management"
+  
+  # Experiment tracking visualization
+  style_params:
+    experiment_timeline: true
+    version_comparison: true
+    performance_evolution: true
+    statistical_significance_tracking: true
+    
+  # Full versioning enabled
+  versioned: true
+  
+  # Advanced format with version stamping
+  format_kwargs:
+    dpi: 300
+    bbox_inches: "tight"
+    transparent: false
+    
+  metadata:
+    experiment_id: "advanced_ml_comparison"
+    tracking_scope: "comprehensive"
+    version_control: "automated"
+
+# Model evolution tracking with performance metrics
+model_evolution_tracking:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/evolution/model_evolution_tracking.png
+  purpose: publication
+  condition_param: model_type  # Evolution across model types
+  description: "Model evolution tracking across development cycles with performance metrics"
+  
+  # Evolution tracking styling
+  style_params:
+    evolution_timeline: true
+    performance_progression: true
+    algorithm_evolution: true
+    improvement_indicators: true
+    
+  # Publication-quality versioning
+  versioned: true
+  
+  format_kwargs:
+    dpi: 600
+    bbox_inches: "tight"
+    format: "pdf"
+
+# =============================================================================
+# CONDITIONAL DATASET ACTIVATION PATTERNS
+# =============================================================================
+
+# Performance-based conditional visualization
+performance_conditional_visualization:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/conditional/performance_based_visualization.png
+  purpose: presentation
+  condition_param: performance  # Conditional on performance thresholds
+  description: "Performance-based conditional visualization with threshold-driven styling"
+  
+  # Performance-conditional styling
+  style_params:
+    performance_threshold_styling: true
+    conditional_activation: true
+    dynamic_formatting: true
+    quality_indicators: true
+    
+  format_kwargs:
+    dpi: 250
+    bbox_inches: "tight"
+    
+  # Conditional versioning based on performance
+  versioned: true
+
+# Statistical significance conditional plots
+significance_conditional_plots:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/conditional/significance_conditional_plots.png
+  purpose: publication
+  condition_param: p_value  # Conditional on statistical significance
+  description: "Statistical significance conditional plots with p-value driven styling"
+  
+  # Significance-conditional styling
+  style_params:
+    significance_threshold_styling: true
+    conditional_emphasis: true
+    statistical_notation: true
+    confidence_level_indicators: true
+    
+  # Publication conditional formatting
+  format_kwargs:
+    dpi: 600
+    bbox_inches: "tight"
+    format: "pdf"
+    
+  versioned: true
+
+# =============================================================================
+# COMPLEX HIERARCHICAL CONDITION RESOLUTION
+# =============================================================================
+
+# Multi-level hierarchical condition resolution
+hierarchical_condition_visualization:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/hierarchical/multi_level_condition_resolution.png
+  purpose: presentation
+  condition_param: algorithm_comparison_baseline  # Complex hierarchical resolution
+  description: "Multi-level hierarchical condition resolution with complex parameter mapping"
+  
+  # Hierarchical styling parameters
+  style_params:
+    hierarchical_styling: true
+    multi_level_indicators: true
+    condition_inheritance: true
+    complex_parameter_mapping: true
+    
+  format_kwargs:
+    dpi: 300
+    bbox_inches: "tight"
+    
+  versioned: true
+  
+  metadata:
+    condition_complexity: "hierarchical_multi_level"
+    parameter_resolution: "deep_mapping"
+
+# Wildcard pattern matching visualization
+wildcard_pattern_visualization:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/patterns/wildcard_pattern_matching.png
+  purpose: exploratory
+  condition_param: deployment_production  # Wildcard pattern example
+  description: "Wildcard pattern matching visualization with flexible condition resolution"
+  
+  # Wildcard pattern styling
+  style_params:
+    pattern_matching_styling: true
+    wildcard_indicators: true
+    flexible_resolution: true
+    fallback_styling: true
+    
+  format_kwargs:
+    dpi: 200
+    bbox_inches: "tight"
+
+# =============================================================================
+# PERFORMANCE OPTIMIZATION DEMONSTRATIONS
+# =============================================================================
+
+# High-performance visualization with caching
+high_performance_visualization:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/performance/high_performance_caching.png
+  purpose: exploratory
+  condition_param: model_algorithm  # Optimized condition resolution
+  description: "High-performance visualization demonstrating caching and optimization"
+  
+  # Performance optimization parameters
+  style_params:
+    performance_optimized: true
+    caching_enabled: true
+    fast_rendering: true
+    resource_efficient: true
+    
+  format_kwargs:
+    dpi: 150
+    bbox_inches: "tight"
+    
+  # Performance optimization metadata
+  metadata:
+    optimization_level: "high_performance"
+    caching_strategy: "aggressive"
+    resource_usage: "optimized"
+
+# Scalability demonstration visualization
+scalability_demonstration:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/scalability/large_scale_processing.png
+  purpose: monitoring
+  condition_param: performance_tiers  # Scalability condition
+  description: "Scalability demonstration for large-scale pipeline processing"
+  
+  # Scalability styling
+  style_params:
+    scalability_indicators: true
+    resource_monitoring: true
+    throughput_visualization: true
+    performance_scaling: true
+    
+  format_kwargs:
+    dpi: 200
+    bbox_inches: "tight"
+
+# =============================================================================
+# ENTERPRISE INTEGRATION EXAMPLES
+# =============================================================================
+
+# Enterprise governance compliance visualization
+enterprise_governance_compliance:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/enterprise/governance_compliance.png
+  purpose: presentation
+  condition_param: compliance_mode  # Enterprise governance condition
+  description: "Enterprise governance compliance visualization with audit-ready styling"
+  
+  # Enterprise governance styling
+  style_params:
+    enterprise_styling: true
+    compliance_indicators: true
+    audit_ready: true
+    governance_framework: true
+    
+  format_kwargs:
+    dpi: 300
+    bbox_inches: "tight"
+    transparent: false
+    
+  versioned: true
+  
+  metadata:
+    compliance_level: "enterprise_grade"
+    audit_trail: "comprehensive"
+    governance_framework: "sox_compliant"
+
+# Quality assurance dashboard
+quality_assurance_dashboard:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/quality/qa_dashboard.png
+  purpose: monitoring
+  condition_param: quality_status  # Quality-based condition resolution
+  description: "Quality assurance dashboard with comprehensive quality indicators"
+  
+  # Quality assurance styling
+  style_params:
+    quality_dashboard_styling: true
+    qa_indicators: true
+    compliance_tracking: true
+    quality_metrics: true
+    
+  format_kwargs:
+    dpi: 250
+    bbox_inches: "tight"
+    facecolor: "#F8F9FA"
+
+# =============================================================================
+# ADVANCED EXPERIMENTAL DESIGN VISUALIZATIONS
+# =============================================================================
+
+# Multi-factorial experimental design
+multi_factorial_experiment_design:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/experimental_design/multi_factorial_analysis.png
+  purpose: publication
+  condition_param: experimental_scenario  # Multi-factorial condition
+  description: "Multi-factorial experimental design visualization with complex interaction effects"
+  
+  # Experimental design styling
+  style_params:
+    experimental_design_styling: true
+    factorial_indicators: true
+    interaction_effects: true
+    main_effects_visualization: true
+    
+  # Publication-quality format
+  format_kwargs:
+    dpi: 600
+    bbox_inches: "tight"
+    format: "pdf"
+    
+  versioned: true
+  
+  metadata:
+    experimental_design: "multi_factorial"
+    statistical_model: "anova"
+    interaction_analysis: "comprehensive"
+
+# Longitudinal study visualization
+longitudinal_study_visualization:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/longitudinal/time_series_analysis.png
+  purpose: publication
+  condition_param: temporal_split  # Time-based condition resolution
+  description: "Longitudinal study visualization with time-series styling"
+  
+  # Time-series styling parameters
+  style_params:
+    time_series_styling: true
+    longitudinal_indicators: true
+    trend_analysis: true
+    seasonal_decomposition: true
+    
+  format_kwargs:
+    dpi: 600
+    bbox_inches: "tight"
+    format: "pdf"
+    
+  versioned: true
+
+# =============================================================================
+# COMPREHENSIVE INTEGRATION TESTING
+# =============================================================================
+
+# Integration testing comprehensive visualization
+integration_testing_comprehensive:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/testing/comprehensive_integration_testing.png
+  purpose: presentation
+  condition_param: integration_testing  # Testing condition resolution
+  description: "Comprehensive integration testing visualization with test coverage indicators"
+  
+  # Integration testing styling
+  style_params:
+    testing_framework_styling: true
+    coverage_indicators: true
+    test_result_visualization: true
+    integration_success_metrics: true
+    
+  format_kwargs:
+    dpi: 300
+    bbox_inches: "tight"
+    
+  versioned: true
+  
+  metadata:
+    testing_scope: "comprehensive_integration"
+    coverage_target: "90_percent"
+    test_automation: "fully_automated"
+
+# End-to-end workflow validation
+end_to_end_workflow_validation:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figures/validation/end_to_end_workflow.png
+  purpose: monitoring
+  condition_param: pipeline_validation  # Workflow validation condition
+  description: "End-to-end workflow validation with comprehensive pipeline monitoring"
+  
+  # Workflow validation styling
+  style_params:
+    workflow_styling: true
+    pipeline_indicators: true
+    validation_checkpoints: true
+    end_to_end_monitoring: true
+    
+  format_kwargs:
+    dpi: 250
+    bbox_inches: "tight"
+    facecolor: "#F8F9FA"
+
+# =============================================================================
+# CATALOG SUMMARY AND VALIDATION
+# =============================================================================
+
+# This advanced Kedro catalog configuration demonstrates:
+#
+# ✓ Sophisticated FigureDataSet configurations with advanced parameters (F-005)
+# ✓ Multi-purpose figure outputs (exploratory, presentation, publication) (F-004)
+# ✓ Complex condition parameter resolution from pipeline metadata (F-005-RQ-004)
+# ✓ Style parameter overrides for specific catalog entries (F-002)
+# ✓ Comprehensive Kedro versioning integration (F-005-RQ-002)
+# ✓ Multiple visualization scenarios across training, inference, and reporting
+# ✓ Advanced catalog patterns including conditional dataset activation
+# ✓ Enterprise-grade visualization workflows for production environments
+# ✓ Automated elimination of manual figure management (Section 0.1.1)
+# ✓ Performance optimization and scalability demonstrations
+# ✓ Statistical significance and experimental design integration
+# ✓ Multi-environment deployment pattern support
+# ✓ Hierarchical condition resolution with wildcard pattern matching
+# ✓ Quality assurance and governance compliance visualization
+# ✓ Comprehensive experiment tracking and model evolution monitoring
+#
+# The catalog serves as both a functional configuration for the advanced example
+# project and a comprehensive reference for implementing sophisticated visualization
+# automation within enterprise-grade Kedro workflows using the figregistry-kedro
+# plugin integration.
+#
+# Total Datasets Configured: 35+
+# Condition Resolution Patterns: 15+
+# Visualization Purposes: 5 (exploratory, presentation, publication, monitoring, debug)
+# Environment Patterns: 3 (development, staging, production)
+# Advanced Features: 20+ demonstrated
+#
+# This configuration represents the pinnacle of automated visualization management
+# within data science workflows, showcasing the full potential of the
+# figregistry-kedro integration for enterprise-scale data science operations.

@@ -1,0 +1,554 @@
+# Production-Optimized FigRegistry Configuration
+# ==============================================
+#
+# Enterprise-grade configuration optimized for production deployment scenarios
+# with high-performance styling patterns, automated figure management, and 
+# <5ms configuration bridge resolution SLA compliance per Section 4.5.1.1.
+#
+# Production Performance Targets:
+# - Configuration bridge resolution: <5ms (F-007-RQ-002)
+# - Style lookup operations: <1ms per lookup
+# - Minimal memory overhead: <10MB configuration cache
+# - High-throughput pipeline support: >100 figures/minute
+# - Enterprise compliance: Production audit trails enabled
+#
+# Enterprise Features:
+# - Production-optimized condition style mappings (F-002-RQ-002)
+# - Enterprise output path management (F-004 production requirements)
+# - High-performance configuration bridge operations (F-007-RQ-001/002)
+# - Production-grade palette and styling defaults (Section 0.2.5)
+# - Enterprise compliance with performance optimization (Section 8.6.1.2)
+
+# ==============================================================================
+# PRODUCTION METADATA AND PERFORMANCE CONFIGURATION
+# ==============================================================================
+
+figregistry_version: ">=0.3.0"
+
+# Production metadata with enterprise audit tracking
+metadata:
+  version: "production-1.0.0"
+  environment: "production"
+  deployment_tier: "enterprise"
+  performance_profile: "high_throughput"
+  last_validated: "2024-production-release"
+  compliance_level: "enterprise_grade"
+  
+  # Performance optimization flags
+  performance_optimizations:
+    enable_style_caching: true
+    enable_fast_lookup: true
+    minimize_config_overhead: true
+    streamlined_merge_processing: true
+    optimized_condition_resolution: true
+  
+  # Enterprise audit requirements
+  audit_config:
+    enable_audit_logging: true
+    track_style_usage: true
+    monitor_performance_metrics: true
+    compliance_reporting: true
+
+# ==============================================================================
+# HIGH-PERFORMANCE KEDRO INTEGRATION CONFIGURATION
+# ==============================================================================
+
+# Production-optimized Kedro integration supporting <5ms bridge resolution
+kedro:
+  # High-performance configuration bridge settings (F-007-RQ-002)
+  config_bridge:
+    enable_performance_mode: true
+    cache_configuration: true
+    cache_ttl_seconds: 3600
+    fast_merge_strategy: true
+    minimal_validation: true
+    optimize_lookup_paths: true
+  
+  # Production dataset integration with minimal overhead
+  dataset_integration:
+    enable_context_injection: true
+    enable_parameter_resolution: true
+    disable_debug_metadata: true
+    optimize_save_operations: true
+    minimize_validation_overhead: true
+  
+  # Enterprise performance monitoring
+  performance_monitoring:
+    enable_timing_metrics: true
+    sla_threshold_ms: 5
+    enable_cache_metrics: true
+    performance_alerting: true
+
+# ==============================================================================
+# PRODUCTION-OPTIMIZED PALETTE DEFINITIONS
+# ==============================================================================
+
+# Streamlined palette selection for fast lookup and enterprise presentation
+palettes:
+  # Primary enterprise palette optimized for production workflows
+  enterprise:
+    primary: "#2E86AB"      # Professional blue
+    secondary: "#A23B72"    # Enterprise magenta  
+    accent: "#F18F01"       # Attention orange
+    success: "#27AE60"      # Success green
+    warning: "#F39C12"      # Warning orange
+    error: "#E74C3C"        # Error red
+    neutral: "#6C757D"      # Neutral gray
+    background: "#FFFFFF"   # Clean white
+  
+  # High-contrast palette for production presentations
+  production:
+    primary: "#1B365D"      # Deep navy
+    secondary: "#2A9D8F"    # Professional teal
+    accent: "#E76F51"       # Presentation coral
+    highlight: "#F4A261"    # Attention gold
+    neutral: "#264653"      # Dark slate
+    background: "#F8F9FA"   # Light background
+
+# ==============================================================================
+# STREAMLINED CONDITION-BASED STYLING FOR PRODUCTION
+# ==============================================================================
+
+# Production-optimized styling with minimal complexity for <5ms resolution
+styles:
+  # === PRIMARY PRODUCTION CONDITIONS ===
+  # Essential conditions for enterprise ML workflows
+  
+  # Production baseline styling
+  "production_baseline":
+    color: "palettes.enterprise.primary"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 6
+    alpha: 1.0
+    label: "Production Baseline"
+  
+  # Production optimized model styling  
+  "production_optimized":
+    color: "palettes.enterprise.success"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 3.0
+    markersize: 7
+    alpha: 1.0
+    label: "Production Optimized"
+  
+  # Production critical path styling
+  "production_critical":
+    color: "palettes.enterprise.error"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 3.5
+    markersize: 8
+    alpha: 1.0
+    label: "Production Critical"
+  
+  # === MACHINE LEARNING PIPELINE CONDITIONS ===
+  # Core ML workflow conditions for automated styling
+  
+  # Training pipeline conditions
+  "ml_training":
+    color: "palettes.production.primary"
+    marker: "D"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.9
+    label: "ML Training"
+  
+  # Model validation conditions
+  "ml_validation":
+    color: "palettes.production.secondary"
+    marker: "v"
+    linestyle: "--"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.9
+    label: "ML Validation"
+  
+  # Inference pipeline conditions
+  "ml_inference":
+    color: "palettes.production.accent"
+    marker: "h"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 7
+    alpha: 0.95
+    label: "ML Inference"
+  
+  # === PERFORMANCE MONITORING CONDITIONS ===
+  # Enterprise performance tracking and SLA monitoring
+  
+  # Performance target tracking
+  "performance_target":
+    color: "palettes.enterprise.success"
+    marker: "*"
+    linestyle: "-"
+    linewidth: 3.0
+    markersize: 9
+    alpha: 1.0
+    label: "Performance Target"
+  
+  # Actual performance measurement
+  "performance_actual":
+    color: "palettes.enterprise.secondary"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 7
+    alpha: 0.95
+    label: "Actual Performance"
+  
+  # SLA threshold monitoring
+  "performance_sla":
+    color: "palettes.enterprise.warning"
+    marker: "+"
+    linestyle: "--"
+    linewidth: 3.0
+    markersize: 8
+    alpha: 0.9
+    label: "SLA Threshold"
+  
+  # === ENTERPRISE REPORTING CONDITIONS ===
+  # Executive and stakeholder communication styling
+  
+  # Executive summary presentations
+  "executive_summary":
+    color: "palettes.enterprise.primary"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 3.5
+    markersize: 8
+    alpha: 1.0
+    label: "Executive Summary"
+  
+  # Stakeholder reports
+  "stakeholder_report":
+    color: "palettes.production.highlight"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 3.0
+    markersize: 7
+    alpha: 1.0
+    label: "Stakeholder Report"
+  
+  # Technical analysis documentation
+  "technical_analysis":
+    color: "palettes.production.secondary"
+    marker: "D"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 6
+    alpha: 0.95
+    label: "Technical Analysis"
+
+# ==============================================================================
+# ENTERPRISE OUTPUT MANAGEMENT CONFIGURATION
+# ==============================================================================
+
+# Production-optimized output paths for automated deployment workflows
+outputs:
+  # Enterprise base path structure optimized for production deployments
+  base_path: "data/08_reporting/production_figures"
+  
+  # Production timestamp format for versioning and audit trails
+  timestamp_format: "{name}_prod_{ts:%Y%m%d_%H%M%S}"
+  
+  # Streamlined path aliases for enterprise workflows
+  aliases:
+    # Production workflow aliases
+    prod: "data/08_reporting/production_figures"
+    production: "data/08_reporting/production_figures"
+    enterprise: "data/08_reporting/production_figures/enterprise"
+    
+    # Executive reporting aliases
+    exec: "data/08_reporting/production_figures/executive"
+    stakeholder: "data/08_reporting/production_figures/stakeholders"
+    
+    # Pipeline-specific production aliases  
+    ml_prod: "data/08_reporting/production_figures/ml_pipelines"
+    performance: "data/08_reporting/production_figures/performance"
+    audit: "data/08_reporting/production_figures/audit"
+  
+  # Production-grade format specifications
+  formats:
+    # High-quality PNG for enterprise presentations
+    png:
+      dpi: 300
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      transparent: false
+      optimize: true
+    
+    # Vector PDF for executive documentation
+    pdf:
+      dpi: 300
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      facecolor: "white"
+      edgecolor: "none"
+      backend: "pdf"
+      optimize: true
+  
+  # Enterprise directory management
+  create_directories: true
+  directory_permissions: 0o755
+  
+  # Production metadata and audit configuration
+  include_metadata: true
+  metadata_format: "yaml"
+  
+  # Enterprise versioning with retention policy
+  versioning:
+    enable: true
+    strategy: "timestamp"
+    keep_versions: 30
+  
+  # Production file optimization
+  compression:
+    enable: true
+    level: 6
+
+# ==============================================================================
+# PRODUCTION-GRADE DEFAULT CONFIGURATIONS
+# ==============================================================================
+
+# Enterprise matplotlib defaults optimized for production presentation
+defaults:
+  # Production figure specifications
+  figure:
+    figsize: [12, 8]
+    dpi: 300
+    facecolor: "white"
+    edgecolor: "none"
+    autolayout: true
+  
+  # Enterprise font configuration
+  font:
+    family: ["Arial", "DejaVu Sans", "Helvetica", "sans-serif"]
+    size: 12
+    weight: "normal"
+  
+  # Professional axes configuration
+  axes:
+    linewidth: 1.5
+    edgecolor: "#333333"
+    facecolor: "white"
+    grid: true
+    axisbelow: true
+    labelsize: 12
+    titlesize: 16
+    titleweight: "bold"
+    spines:
+      top: false
+      right: false
+  
+  # Subtle grid for enterprise presentation
+  grid:
+    color: "#E8E8E8"
+    linewidth: 0.5
+    alpha: 0.6
+  
+  # Professional legend configuration
+  legend:
+    frameon: true
+    fancybox: false
+    shadow: false
+    framealpha: 1.0
+    edgecolor: "#CCCCCC"
+    facecolor: "white"
+    fontsize: 11
+  
+  # Production line specifications
+  lines:
+    linewidth: 2.5
+    markersize: 6
+    markeredgewidth: 1.0
+  
+  # Enterprise tick configuration
+  ticks:
+    labelsize: 11
+    direction: "out"
+    major_size: 6
+    minor_size: 4
+  
+  # Production fallback styling with enterprise appearance
+  fallback_style:
+    color: "palettes.enterprise.neutral"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "Production Default"
+  
+  # Performance optimization settings
+  performance:
+    enable_caching: true
+    cache_style_lookups: true
+    optimize_rendering: true
+    minimize_overhead: true
+
+# ==============================================================================
+# PRODUCTION ENVIRONMENT CONFIGURATION OVERRIDES
+# ==============================================================================
+
+# Enterprise environment-specific optimizations
+environment_config:
+  # Production deployment settings
+  deployment:
+    infrastructure: "enterprise_kubernetes"
+    scaling_mode: "horizontal"
+    resource_tier: "production_optimized"
+    monitoring_enabled: true
+    audit_logging: true
+  
+  # Production security configuration
+  security:
+    enable_audit_logging: true
+    log_configuration_access: true
+    track_style_usage: true
+    enterprise_compliance: true
+  
+  # Performance monitoring configuration
+  monitoring:
+    enable_performance_tracking: true
+    sla_monitoring: true
+    alert_on_threshold_breach: true
+    performance_dashboard: true
+  
+  # Enterprise cache configuration
+  caching:
+    enable_production_caching: true
+    cache_size_limit: "50MB"
+    cache_eviction_policy: "lru"
+    cache_warming: true
+
+# ==============================================================================
+# STREAMLINED KEDRO INTEGRATION MAPPINGS
+# ==============================================================================
+
+# Production-optimized dataset mappings for automated condition resolution
+kedro_integration:
+  # Simplified dataset purpose mappings for fast resolution
+  dataset_mappings:
+    # Training pipeline figures with production parameters
+    training_figures:
+      purpose: "ml_training"
+      condition_param: "ml_experiment_conditions.training_phase.baseline"
+      style_override: "production_baseline"
+    
+    # Inference pipeline figures with production optimization
+    inference_figures:
+      purpose: "ml_inference"
+      condition_param: "ml_experiment_conditions.inference_phase.production_inference"
+      style_override: "production_optimized"
+    
+    # Executive reporting figures with enterprise styling
+    reporting_figures:
+      purpose: "executive_summary"
+      condition_param: "reporting_conditions.executive_reporting.summary_view"
+      style_override: "executive_summary"
+    
+    # Performance monitoring figures with SLA tracking
+    performance_figures:
+      purpose: "performance_actual"
+      condition_param: "ml_experiment_conditions.performance_evaluation.actual_performance"
+      style_override: "performance_actual"
+  
+  # Production parameter resolution with minimal overhead
+  parameter_resolution:
+    # Fast condition template resolution
+    condition_templates:
+      production_model: "production_{model_type}"
+      performance_metric: "performance_{metric_type}"
+      enterprise_report: "executive_{report_type}"
+    
+    # Simplified validation for production speed
+    validation_rules:
+      model_type: ["baseline", "optimized", "critical"]
+      metric_type: ["target", "actual", "sla"]
+      report_type: ["summary", "analysis"]
+  
+  # Production performance settings
+  performance_config:
+    enable_fast_resolution: true
+    cache_parameter_lookups: true
+    minimize_validation_overhead: true
+    optimize_merge_operations: true
+
+# ==============================================================================
+# ENTERPRISE COMPLIANCE AND AUDIT CONFIGURATION
+# ==============================================================================
+
+# Production compliance settings per Section 8.6.1.2
+compliance:
+  # Enterprise audit requirements
+  audit_settings:
+    enable_configuration_auditing: true
+    log_style_resolution: true
+    track_performance_metrics: true
+    generate_compliance_reports: true
+  
+  # Production data retention policy
+  retention_policy:
+    configuration_logs_days: 365
+    performance_metrics_days: 90
+    audit_trail_days: 2555  # 7 years enterprise retention
+    figure_metadata_days: 1825  # 5 years production retention
+  
+  # Enterprise security configuration
+  security_settings:
+    validate_configuration_integrity: true
+    enable_access_logging: true
+    secure_audit_trails: true
+    enterprise_compliance_mode: true
+
+# ==============================================================================
+# PRODUCTION PERFORMANCE OPTIMIZATION SETTINGS
+# ==============================================================================
+
+# High-performance configuration optimizations for <5ms SLA compliance
+performance_optimization:
+  # Configuration bridge performance settings (F-007-RQ-002)
+  config_bridge:
+    enable_lazy_loading: true
+    optimize_merge_algorithms: true
+    cache_compiled_styles: true
+    minimize_validation_passes: true
+    fast_lookup_indices: true
+  
+  # Style resolution performance optimization
+  style_resolution:
+    enable_style_caching: true
+    precompile_condition_patterns: true
+    optimize_palette_lookups: true
+    cache_resolved_styles: true
+    minimize_object_creation: true
+  
+  # Memory management for high-throughput scenarios
+  memory_management:
+    enable_aggressive_cleanup: true
+    limit_concurrent_figures: 20
+    optimize_cache_size: true
+    preemptive_garbage_collection: false
+  
+  # Enterprise monitoring thresholds
+  monitoring_thresholds:
+    config_resolution_ms: 5      # <5ms SLA requirement
+    style_lookup_ms: 1           # <1ms style lookup target
+    memory_usage_mb: 50          # <50MB memory target
+    cache_hit_ratio: 0.95        # >95% cache hit rate target
+
+# Production configuration complete - optimized for:
+# - <5ms configuration bridge resolution SLA (Section 4.5.1.1)
+# - High-performance styling patterns with minimal complexity
+# - Enterprise output path management for automated workflows
+# - Production-grade palette and styling defaults (Section 0.2.5)
+# - Streamlined condition mappings for fast lookup performance
+# - Enterprise compliance with audit trails (Section 8.6.1.2)
+# - Memory optimization and high-throughput pipeline support
+# - Automated workflow orchestration per Section 0.2.5 requirements

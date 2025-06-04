@@ -1,0 +1,475 @@
+# Invalid FigRegistry Configuration Schema Test File
+# 
+# This configuration file contains intentionally invalid structures, schema violations,
+# type mismatches, and security vulnerabilities for comprehensive error handling testing
+# of the FigRegistryConfigBridge component per Section 6.6.8.1.
+#
+# Test Categories Covered:
+# 1. Malformed YAML syntax and structure errors
+# 2. Pydantic schema validation failures  
+# 3. Type mismatches and invalid field combinations
+# 4. Security vulnerabilities (path traversal, injection attempts)
+# 5. Invalid rcParams and matplotlib integration errors
+# 6. Configuration conflicts and contradictory settings
+# 7. Performance constraint violations
+#
+# Expected Behavior: All sections below should trigger appropriate validation
+# errors and be gracefully handled without system compromise.
+
+# =============================================================================
+# SECTION 1: MALFORMED YAML SYNTAX ERRORS
+# =============================================================================
+
+# Invalid indentation (should cause YAML parsing error)
+malformed_syntax:
+wrong_indentation:
+  color: "#FF0000"
+    linewidth: 2.0  # Inconsistent indentation
+
+# Unclosed brackets and braces
+unclosed_structures:
+  invalid_list: [
+    "item1",
+    "item2"
+    # Missing closing bracket
+  
+  invalid_dict: {
+    "key1": "value1",
+    "key2": "value2"
+    # Missing closing brace
+
+# Invalid YAML special characters
+special_chars_test:
+  invalid_key_with_@: "value"
+  "key with spaces and: colon": "problematic"
+  key_with_tab	: "tab character in key"
+
+# =============================================================================
+# SECTION 2: PYDANTIC SCHEMA VIOLATIONS
+# =============================================================================
+
+# Invalid version constraint format (violates custom validator)
+figregistry_version: "not_a_valid_version_constraint"
+
+# Invalid metadata section with wrong types
+metadata:
+  config_version: 12345  # Should be string, not number
+  created_by: null  # Invalid null value
+  description: []  # Should be string, not list
+  last_updated: "not-a-valid-date-format"
+  project_name: {"nested": "dict"}  # Should be string, not dict
+
+# =============================================================================
+# SECTION 3: INVALID STYLES CONFIGURATION
+# =============================================================================
+
+styles:
+  # Missing required color field (should trigger custom validator warning)
+  missing_color_style:
+    linewidth: 2.0
+    marker: "o"
+    # No color specified - violates validator
+
+  # Invalid color values
+  invalid_color_formats:
+    color: 123456  # Should be string, not number
+    linewidth: "not_a_number"  # Should be number, not string
+    marker: null  # Invalid null marker
+    alpha: 1.5  # Alpha > 1.0 (matplotlib will accept but should be flagged)
+
+  # Type mismatches in style properties
+  type_mismatch_style:
+    color: "#FF0000"
+    linewidth: [1, 2, 3]  # Should be number, not list
+    marker: {"shape": "circle"}  # Should be string, not dict
+    linestyle: 999  # Should be string, not number
+    alpha: "transparent"  # Should be number, not string
+    label: True  # Should be string, not boolean
+
+  # Invalid matplotlib parameters
+  invalid_matplotlib_params:
+    color: "#GGGGGG"  # Invalid hex color
+    marker: "invalid_marker_type"  # Non-existent matplotlib marker
+    linestyle: "~~~"  # Invalid linestyle
+    linewidth: -5  # Negative linewidth
+    markersize: "huge"  # Should be number, not string
+
+  # Contradictory style settings
+  contradictory_style:
+    color: "#FF0000"
+    visible: false  # Style defines color but is invisible
+    alpha: 0  # Completely transparent but defines visible properties
+    linewidth: 0  # Zero width but other line properties defined
+
+# Styles as wrong type (should be dict, not string)
+invalid_styles_type: "this should be a dictionary not a string"
+
+# =============================================================================
+# SECTION 4: INVALID PALETTES CONFIGURATION  
+# =============================================================================
+
+palettes:
+  # Invalid palette formats
+  invalid_palette_list: "not_a_list_or_dict"  # Should be list or dict
+  
+  empty_palette: []  # Empty palette should be flagged
+  
+  invalid_color_in_palette: ["#FF0000", 123, "#00FF00"]  # Mixed types
+  
+  # Nested palette with wrong structure
+  nested_invalid:
+    primary: {"not": "a_color_value"}  # Should be color string
+    secondary: null  # Invalid null color
+
+  # Circular reference attempt
+  circular_palette:
+    ref1: "circular_palette.ref2"  # Circular reference
+    ref2: "circular_palette.ref1"
+
+# =============================================================================
+# SECTION 5: INVALID DEFAULTS CONFIGURATION
+# =============================================================================
+
+defaults:
+  # Invalid figure size specifications
+  figure:
+    figsize: "10x8"  # Should be list [width, height], not string
+    dpi: "high"  # Should be number, not string
+    facecolor: 12345  # Should be color string, not number
+    edgecolor: []  # Should be color string, not list
+    
+  # Invalid line defaults
+  line:
+    color: null  # Invalid null color
+    linewidth: "thick"  # Should be number, not string
+    alpha: 2.5  # Alpha > 1.0 (invalid range)
+    linestyle: 123  # Should be string, not number
+
+  # Invalid scatter defaults
+  scatter:
+    s: "large"  # Should be number, not string
+    alpha: -0.5  # Negative alpha (invalid)
+    edgecolors: {"invalid": "dict"}  # Should be string, not dict
+    linewidth: [1, 2, 3]  # Should be number, not list
+
+  # Missing required fallback_style
+  # (fallback_style should be required but is missing)
+
+# Defaults as wrong type
+invalid_defaults_structure: "should_be_dict_not_string"
+
+# =============================================================================
+# SECTION 6: INVALID OUTPUTS CONFIGURATION (SECURITY RISKS)
+# =============================================================================
+
+outputs:
+  # Path traversal attempts (security risk)
+  base_path: "../../../etc/passwd"  # Path traversal attempt
+  
+  # Absolute path outside project (security risk)  
+  absolute_path_attempt: "/etc/shadow"
+  
+  # Invalid naming configuration
+  naming:
+    template: null  # Invalid null template
+    timestamp_format: 12345  # Should be string, not number
+    
+  # Invalid formats configuration
+  formats:
+    defaults: "should_be_dict_not_string"  # Type mismatch
+    resolution:
+      png: "invalid_resolution"  # Should be dict with dpi, not string
+      pdf: null  # Invalid null configuration
+      
+  # Invalid paths with security risks
+  paths:
+    exploratory: "../../../../tmp/malicious"  # Path traversal
+    presentation: "/root/.ssh/id_rsa"  # Absolute path to sensitive file
+    publication: null  # Invalid null path
+
+# Missing required base_path (should trigger validator error)
+missing_base_path_outputs:
+  naming:
+    template: "{name}_{ts}"
+  # base_path is missing - should fail validation
+
+# =============================================================================
+# SECTION 7: INVALID KEDRO INTEGRATION CONFIGURATION
+# =============================================================================
+
+kedro:
+  # Invalid config bridge settings
+  config_bridge:
+    enabled: "maybe"  # Should be boolean, not string
+    merge_strategy: 123  # Should be string, not number
+    invalid_option: null  # Invalid null value
+    
+  # Invalid dataset configuration
+  datasets:
+    default_purpose: []  # Should be string, not list
+    invalid_setting: {"nested": "dict"}  # Invalid nested structure
+
+# Kedro section as wrong type
+invalid_kedro_type: 12345  # Should be dict, not number
+
+# =============================================================================
+# SECTION 8: INVALID ADVANCED CONFIGURATION SECTIONS
+# =============================================================================
+
+# Invalid style inheritance
+style_inheritance:
+  enabled: "true_but_string"  # Should be boolean, not string
+  hierarchy: "should_be_list"  # Should be list, not string
+  merge_strategy: null  # Invalid null strategy
+
+# Invalid conditional rules
+conditional_rules:
+  wildcard_patterns: {"should": "be_list"}  # Should be list, not dict
+  partial_matching: "yes"  # Should be boolean, not string
+  case_sensitive: 123  # Should be boolean, not number
+
+# Invalid performance configuration
+performance:
+  cache_enabled: "enabled"  # Should be boolean, not string
+  max_cache_size: -100  # Negative cache size (invalid)
+  target_merge_time_ms: "fast"  # Should be number, not string
+  invalid_metric: null  # Invalid configuration option
+
+# Invalid validation configuration  
+validation:
+  strict_mode: "strict"  # Should be boolean, not string
+  required_fields: "styles,defaults"  # Should be list, not string
+  schema_version: null  # Invalid null version
+
+# =============================================================================
+# SECTION 9: CONFIGURATION INJECTION ATTEMPTS (SECURITY)
+# =============================================================================
+
+# YAML injection attempts
+yaml_injection_attempt: &malicious_anchor
+  command: "rm -rf /"  # Malicious command injection attempt
+  
+reference_injection: *malicious_anchor  # Reference to malicious anchor
+
+# Code injection in string values
+code_injection_strings:
+  malicious_color: "__import__('os').system('rm -rf /')"  # Python code injection
+  script_injection: "<script>alert('xss')</script>"  # Script injection
+  command_substitution: "$(rm -rf /)"  # Command substitution attempt
+
+# Environment variable injection
+env_injection:
+  base_path: "${HOME}/../../../etc"  # Environment variable with path traversal
+  malicious_env: "${PATH};rm -rf /"  # Command injection via env vars
+
+# =============================================================================
+# SECTION 10: MATPLOTLIB INTEGRATION ERRORS
+# =============================================================================
+
+# Invalid rcParams that would break matplotlib
+invalid_rcparams:
+  figure.figsize: "not_a_tuple"  # Should be numeric tuple
+  font.size: "huge"  # Should be number, not string
+  axes.linewidth: null  # Invalid null linewidth
+  legend.numpoints: "many"  # Should be integer, not string
+
+# Conflicting matplotlib settings
+conflicting_rcparams:
+  figure.figsize: [10, 8]
+  figure.autolayout: true
+  tight_layout.pad: 2.0
+  # These settings can conflict in matplotlib
+
+# Invalid color specifications for matplotlib
+invalid_matplotlib_colors:
+  axes.prop_cycle: "not_a_cycle"  # Should be cycler object
+  axes.facecolor: 12345  # Should be color string
+  figure.facecolor: []  # Should be color string, not list
+
+# =============================================================================
+# SECTION 11: RESOURCE EXHAUSTION ATTEMPTS
+# =============================================================================
+
+# Extremely large configuration that could cause memory issues
+large_config_test:
+  massive_styles: 
+    # This would be expanded to thousands of styles in real test
+    style_count_warning: "In real test, this would contain 10000+ styles"
+    
+  recursive_reference:
+    level1:
+      level2:
+        level3: "deeply_nested_structure"
+        # In real test, this would be much deeper
+
+# =============================================================================
+# SECTION 12: TYPE COERCION EDGE CASES
+# =============================================================================
+
+type_coercion_edge_cases:
+  # Edge cases for Pydantic type coercion
+  boolean_edge_cases:
+    should_be_bool1: "True"  # String that might be coerced
+    should_be_bool2: 1  # Number that might be coerced
+    should_be_bool3: []  # Empty list (should fail)
+    
+  numeric_edge_cases:
+    should_be_float1: "3.14159"  # String number
+    should_be_float2: true  # Boolean (might coerce to 1.0)
+    should_be_float3: "not_a_number"  # Invalid number string
+    
+  list_edge_cases:
+    should_be_list1: "single_item"  # Single item (might wrap in list)
+    should_be_list2: null  # Null value
+    should_be_list3: 12345  # Number instead of list
+
+# =============================================================================
+# SECTION 13: CONFIGURATION CONFLICTS AND CONTRADICTIONS
+# =============================================================================
+
+# Contradictory settings that should be detected
+contradictory_settings:
+  # Performance vs Quality conflicts
+  performance:
+    target_merge_time_ms: 1.0  # Very fast target
+  validation:
+    strict_mode: true  # But strict validation (slow)
+    
+  # Output format conflicts
+  outputs:
+    formats:
+      defaults:
+        exploratory: ["png", "pdf", "svg", "eps"]  # Many formats
+      resolution:
+        png: {dpi: 50}  # But very low resolution
+        
+  # Style conflicts
+  styles:
+    conflicted_style:
+      color: "#FF0000"  # Red color
+      alpha: 0.0  # But completely transparent
+      visible: true  # Claims to be visible
+      linewidth: 0  # But zero width
+
+# Duplicate keys at same level (YAML parser should catch)
+duplicate_key_test:
+  same_key: "value1"
+  same_key: "value2"  # Duplicate key
+
+# =============================================================================
+# SECTION 14: MISSING REQUIRED FIELDS
+# =============================================================================
+
+# Configuration missing critical required fields
+incomplete_configuration:
+  # Missing styles section entirely
+  defaults:
+    figure:
+      figsize: [10, 8]
+  # Missing outputs section entirely
+  # Missing other required sections
+
+# Partially missing required nested fields
+partial_missing_fields:
+  outputs:
+    # Missing required base_path
+    naming:
+      template: "{name}_{ts}"
+  styles:
+    incomplete_style:
+      # Missing required color field
+      linewidth: 2.0
+
+# =============================================================================
+# SECTION 15: UNICODE AND ENCODING ISSUES
+# =============================================================================
+
+unicode_edge_cases:
+  # Unicode characters that might cause issues
+  unicode_style_name_测试: 
+    color: "#FF0000"
+  unicode_color_name: "颜色"  # Non-ASCII color name
+  emoji_in_config: "🎨"  # Emoji in configuration
+  
+  # Potential encoding issues
+  latin1_chars: "café"
+  mixed_encoding: "Test with ñ and ü characters"
+  
+  # Control characters (should be rejected)
+  control_chars: "\x00\x01\x02"  # Null and control characters
+
+# =============================================================================
+# SECTION 16: CIRCULAR REFERENCES AND INFINITE LOOPS
+# =============================================================================
+
+# YAML anchors and references that could cause issues
+circular_refs: &circular
+  self_reference: *circular  # Self-referencing anchor
+  
+nested_circular:
+  ref1: &ref1
+    points_to_ref2: *ref2
+  ref2: &ref2  
+    points_to_ref1: *ref1  # Circular reference
+
+# =============================================================================
+# SECTION 17: BOUNDARY VALUE TESTING
+# =============================================================================
+
+boundary_values:
+  # Extreme numeric values
+  extreme_numbers:
+    very_large_number: 999999999999999999999999999999
+    very_small_number: 0.000000000000000000001
+    negative_extreme: -999999999999999999999999999999
+    
+  # String length boundaries  
+  empty_string: ""
+  very_long_string: "a" * 10000  # Extremely long string
+  
+  # List/Dict size boundaries
+  empty_dict: {}
+  empty_list: []
+  
+# =============================================================================
+# SECTION 18: PLATFORM-SPECIFIC ISSUES
+# =============================================================================
+
+platform_issues:
+  # Windows path issues
+  windows_paths:
+    invalid_chars: "path\\with\\backslashes\\and:colons"
+    reserved_names: "CON"  # Windows reserved name
+    
+  # Unix path issues  
+  unix_paths:
+    hidden_file_attempt: "/.hidden_config"
+    dev_path_attempt: "/dev/null"
+    
+  # Cross-platform issues
+  path_separators:
+    mixed_separators: "path/with\\mixed/separators"
+    double_separators: "path//with//double//separators"
+
+# =============================================================================
+# END OF INVALID CONFIGURATION FILE
+# =============================================================================
+
+# This configuration file should never validate successfully. Every section
+# above contains intentional errors designed to test specific error handling
+# scenarios in the FigRegistryConfigBridge component.
+#
+# Expected test outcomes:
+# 1. YAML parsing should catch syntax errors in Section 1
+# 2. Pydantic validation should catch schema violations in Sections 2-18
+# 3. Custom validators should catch domain-specific errors
+# 4. Security checks should catch injection attempts and path traversal
+# 5. Error aggregation should collect and report all validation failures
+# 6. System should remain stable and secure despite malformed input
+#
+# Test verification requirements:
+# - Verify each error type is properly detected and reported
+# - Ensure no security vulnerabilities are exploited
+# - Confirm graceful degradation without system compromise
+# - Validate error messages are informative and actionable
+# - Check that performance remains acceptable even with invalid input

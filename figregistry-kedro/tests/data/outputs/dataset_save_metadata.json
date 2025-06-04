@@ -1,0 +1,662 @@
+{
+  "_metadata": {
+    "description": "Expected FigureDataSet save operation results including catalog parameter extraction, condition resolution outcomes, styling application confirmations, and versioning metadata for AbstractDataSet interface compliance validation",
+    "purpose": "Validates that AbstractDataSet interface compliance produces correct save behaviors and integrates properly with Kedro's catalog versioning system",
+    "created_for": "F-005 Kedro FigureDataSet Integration testing",
+    "validation_targets": [
+      "AbstractDataSet interface compliance per F-005",
+      "Condition parameter extraction and automated styling application per F-005.2",
+      "Versioning compatibility testing ensuring no conflicts between versioning systems",
+      "Performance validation targeting <200ms FigureDataSet save overhead per Section 6.6.4.3"
+    ],
+    "last_updated": "2024-01-15T10:30:45.123Z",
+    "schema_version": "1.0.0"
+  },
+  
+  "save_operations": {
+    "basic_save_operation": {
+      "description": "Basic FigureDataSet save operation with minimal configuration",
+      "catalog_config": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/basic_figure.png",
+        "purpose": "exploratory"
+      },
+      "expected_metadata": {
+        "catalog_parameter_extraction": {
+          "filepath": "data/08_reporting/basic_figure.png",
+          "purpose": "exploratory",
+          "condition_param": null,
+          "style_params": {},
+          "format_kwargs": {},
+          "versioned": false,
+          "extraction_success": true,
+          "validation_errors": []
+        },
+        "condition_resolution": {
+          "resolved_condition": "exploratory",
+          "condition_source": "purpose_fallback",
+          "resolution_method": "default_to_purpose",
+          "resolution_time_ms": 0.5,
+          "context_params_accessed": [],
+          "fallback_applied": true
+        },
+        "styling_application": {
+          "style_config_applied": {
+            "color": "#A8E6CF",
+            "marker": "o",
+            "linestyle": "-",
+            "linewidth": 1.5,
+            "alpha": 0.7
+          },
+          "style_source": "figregistry_purpose_defaults",
+          "style_merge_operations": [],
+          "rcParams_modified": ["color", "linewidth", "linestyle", "marker", "alpha"],
+          "styling_time_ms": 2.3,
+          "styling_success": true,
+          "styling_warnings": []
+        },
+        "save_execution": {
+          "file_path_resolved": "data/08_reporting/basic_figure.png",
+          "directory_created": true,
+          "save_kwargs_applied": {
+            "dpi": 150,
+            "bbox_inches": "tight",
+            "facecolor": "white",
+            "edgecolor": "none"
+          },
+          "matplotlib_save_success": true,
+          "file_size_bytes": 45328,
+          "save_time_ms": 67.8
+        },
+        "performance_metrics": {
+          "total_operation_time_ms": 72.1,
+          "overhead_vs_manual_save_ms": 4.3,
+          "overhead_percentage": 6.3,
+          "within_target_threshold": true,
+          "performance_breakdown": {
+            "parameter_extraction_ms": 0.8,
+            "condition_resolution_ms": 0.5,
+            "styling_application_ms": 2.3,
+            "file_save_operation_ms": 67.8,
+            "cleanup_operations_ms": 0.7
+          }
+        }
+      }
+    },
+    
+    "condition_parameter_save": {
+      "description": "Save operation with condition parameter extraction from pipeline context",
+      "catalog_config": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/analysis_figure.png",
+        "purpose": "presentation",
+        "condition_param": "experiment_condition"
+      },
+      "mock_pipeline_context": {
+        "experiment_condition": "baseline_model",
+        "model_type": "random_forest",
+        "dataset_version": "v1.2.3"
+      },
+      "expected_metadata": {
+        "catalog_parameter_extraction": {
+          "filepath": "data/08_reporting/analysis_figure.png",
+          "purpose": "presentation",
+          "condition_param": "experiment_condition",
+          "style_params": {},
+          "format_kwargs": {},
+          "versioned": false,
+          "extraction_success": true,
+          "validation_errors": []
+        },
+        "condition_resolution": {
+          "resolved_condition": "baseline_model",
+          "condition_source": "pipeline_context",
+          "resolution_method": "context_parameter_lookup",
+          "parameter_name": "experiment_condition",
+          "parameter_value": "baseline_model",
+          "resolution_time_ms": 1.2,
+          "context_params_accessed": ["experiment_condition"],
+          "fallback_applied": false
+        },
+        "styling_application": {
+          "style_config_applied": {
+            "color": "#FFB6C1",
+            "marker": "s",
+            "linestyle": "-",
+            "linewidth": 2.0,
+            "alpha": 0.8
+          },
+          "style_source": "figregistry_condition_mapping",
+          "condition_matched": "baseline_model",
+          "style_merge_operations": [
+            {
+              "operation": "base_style_load",
+              "source": "presentation_defaults"
+            },
+            {
+              "operation": "condition_style_merge",
+              "source": "baseline_model_overrides"
+            }
+          ],
+          "rcParams_modified": ["color", "linewidth", "linestyle", "marker", "alpha"],
+          "styling_time_ms": 3.7,
+          "styling_success": true,
+          "styling_warnings": []
+        },
+        "save_execution": {
+          "file_path_resolved": "data/08_reporting/analysis_figure.png",
+          "directory_created": true,
+          "save_kwargs_applied": {
+            "dpi": 200,
+            "bbox_inches": "tight",
+            "facecolor": "white",
+            "edgecolor": "none",
+            "transparent": false
+          },
+          "matplotlib_save_success": true,
+          "file_size_bytes": 78256,
+          "save_time_ms": 89.4
+        },
+        "performance_metrics": {
+          "total_operation_time_ms": 96.8,
+          "overhead_vs_manual_save_ms": 7.4,
+          "overhead_percentage": 8.3,
+          "within_target_threshold": true,
+          "performance_breakdown": {
+            "parameter_extraction_ms": 1.1,
+            "condition_resolution_ms": 1.2,
+            "styling_application_ms": 3.7,
+            "file_save_operation_ms": 89.4,
+            "cleanup_operations_ms": 1.4
+          }
+        }
+      }
+    },
+    
+    "advanced_styling_save": {
+      "description": "Save operation with style parameter overrides and complex configuration",
+      "catalog_config": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/publication_figure.pdf",
+        "purpose": "publication",
+        "condition_param": "model_type",
+        "style_params": {
+          "font.size": 14,
+          "axes.linewidth": 1.5,
+          "color": "#2E86AB",
+          "linewidth": 2.8
+        },
+        "format_kwargs": {
+          "dpi": 300,
+          "bbox_inches": "tight",
+          "transparent": false,
+          "metadata": {
+            "Title": "Publication Figure",
+            "Creator": "FigRegistry-Kedro Plugin"
+          }
+        }
+      },
+      "mock_pipeline_context": {
+        "model_type": "gradient_boosting",
+        "experiment_condition": "optimized",
+        "dataset_version": "v2.1.0"
+      },
+      "expected_metadata": {
+        "catalog_parameter_extraction": {
+          "filepath": "data/08_reporting/publication_figure.pdf",
+          "purpose": "publication",
+          "condition_param": "model_type",
+          "style_params": {
+            "font.size": 14,
+            "axes.linewidth": 1.5,
+            "color": "#2E86AB",
+            "linewidth": 2.8
+          },
+          "format_kwargs": {
+            "dpi": 300,
+            "bbox_inches": "tight",
+            "transparent": false,
+            "metadata": {
+              "Title": "Publication Figure",
+              "Creator": "FigRegistry-Kedro Plugin"
+            }
+          },
+          "extraction_success": true,
+          "validation_errors": []
+        },
+        "condition_resolution": {
+          "resolved_condition": "gradient_boosting",
+          "condition_source": "pipeline_context",
+          "resolution_method": "context_parameter_lookup",
+          "parameter_name": "model_type",
+          "parameter_value": "gradient_boosting",
+          "resolution_time_ms": 1.1,
+          "context_params_accessed": ["model_type"],
+          "fallback_applied": false
+        },
+        "styling_application": {
+          "style_config_applied": {
+            "color": "#2E86AB",
+            "marker": "^",
+            "linestyle": "-",
+            "linewidth": 2.8,
+            "alpha": 1.0,
+            "font.size": 14,
+            "axes.linewidth": 1.5
+          },
+          "style_source": "merged_configuration",
+          "condition_matched": "gradient_boosting",
+          "style_merge_operations": [
+            {
+              "operation": "base_style_load",
+              "source": "publication_defaults"
+            },
+            {
+              "operation": "condition_style_merge",
+              "source": "gradient_boosting_overrides"
+            },
+            {
+              "operation": "dataset_override_merge",
+              "source": "catalog_style_params",
+              "overrides_applied": ["color", "linewidth", "font.size", "axes.linewidth"]
+            }
+          ],
+          "rcParams_modified": [
+            "color", "linewidth", "linestyle", "marker", "alpha",
+            "font.size", "axes.linewidth"
+          ],
+          "styling_time_ms": 5.2,
+          "styling_success": true,
+          "styling_warnings": []
+        },
+        "save_execution": {
+          "file_path_resolved": "data/08_reporting/publication_figure.pdf",
+          "directory_created": true,
+          "save_kwargs_applied": {
+            "dpi": 300,
+            "bbox_inches": "tight",
+            "transparent": false,
+            "metadata": {
+              "Title": "Publication Figure",
+              "Creator": "FigRegistry-Kedro Plugin"
+            }
+          },
+          "matplotlib_save_success": true,
+          "file_size_bytes": 156432,
+          "save_time_ms": 145.7
+        },
+        "performance_metrics": {
+          "total_operation_time_ms": 154.2,
+          "overhead_vs_manual_save_ms": 8.5,
+          "overhead_percentage": 5.8,
+          "within_target_threshold": true,
+          "performance_breakdown": {
+            "parameter_extraction_ms": 1.3,
+            "condition_resolution_ms": 1.1,
+            "styling_application_ms": 5.2,
+            "file_save_operation_ms": 145.7,
+            "cleanup_operations_ms": 0.9
+          }
+        }
+      }
+    },
+    
+    "versioned_save_operation": {
+      "description": "Save operation with Kedro versioning enabled to test versioning compatibility",
+      "catalog_config": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/versioned_figure.png",
+        "purpose": "exploratory",
+        "condition_param": "dataset_version",
+        "versioned": true,
+        "save_version": "2024-01-15T10-35-12.456Z"
+      },
+      "mock_pipeline_context": {
+        "dataset_version": "v1.5.2",
+        "experiment_condition": "baseline"
+      },
+      "expected_metadata": {
+        "catalog_parameter_extraction": {
+          "filepath": "data/08_reporting/versioned_figure.png",
+          "purpose": "exploratory",
+          "condition_param": "dataset_version",
+          "versioned": true,
+          "save_version": "2024-01-15T10-35-12.456Z",
+          "extraction_success": true,
+          "validation_errors": []
+        },
+        "versioning_integration": {
+          "kedro_versioning_enabled": true,
+          "save_version_specified": "2024-01-15T10-35-12.456Z",
+          "figregistry_timestamp_versioning": "2024-01-15T10:35:12.456",
+          "versioning_conflict_detected": false,
+          "versioned_file_path": "data/08_reporting/versioned_figure_2024-01-15T10-35-12.456Z.png",
+          "versioning_compatibility": "seamless",
+          "version_resolution_time_ms": 2.1
+        },
+        "condition_resolution": {
+          "resolved_condition": "v1.5.2",
+          "condition_source": "pipeline_context",
+          "resolution_method": "context_parameter_lookup",
+          "parameter_name": "dataset_version",
+          "parameter_value": "v1.5.2",
+          "resolution_time_ms": 0.9,
+          "context_params_accessed": ["dataset_version"],
+          "fallback_applied": false
+        },
+        "styling_application": {
+          "style_config_applied": {
+            "color": "#A8E6CF",
+            "marker": "o",
+            "linestyle": "-",
+            "linewidth": 1.5,
+            "alpha": 0.7
+          },
+          "style_source": "figregistry_condition_mapping",
+          "condition_matched": "v1.5.2",
+          "rcParams_modified": ["color", "linewidth", "linestyle", "marker", "alpha"],
+          "styling_time_ms": 2.8,
+          "styling_success": true,
+          "styling_warnings": []
+        },
+        "save_execution": {
+          "file_path_resolved": "data/08_reporting/versioned_figure_2024-01-15T10-35-12.456Z.png",
+          "directory_created": true,
+          "save_kwargs_applied": {
+            "dpi": 150,
+            "bbox_inches": "tight",
+            "facecolor": "white",
+            "edgecolor": "none"
+          },
+          "matplotlib_save_success": true,
+          "file_size_bytes": 52184,
+          "save_time_ms": 73.6
+        },
+        "performance_metrics": {
+          "total_operation_time_ms": 81.7,
+          "overhead_vs_manual_save_ms": 8.1,
+          "overhead_percentage": 11.0,
+          "within_target_threshold": true,
+          "performance_breakdown": {
+            "parameter_extraction_ms": 1.2,
+            "version_resolution_ms": 2.1,
+            "condition_resolution_ms": 0.9,
+            "styling_application_ms": 2.8,
+            "file_save_operation_ms": 73.6,
+            "cleanup_operations_ms": 1.1
+          }
+        }
+      }
+    }
+  },
+  
+  "error_scenarios": {
+    "invalid_figure_object": {
+      "description": "Save operation with invalid figure object to test error handling",
+      "catalog_config": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/error_test.png",
+        "purpose": "exploratory"
+      },
+      "invalid_input": "not_a_figure_object",
+      "expected_metadata": {
+        "error_handling": {
+          "error_type": "FigureDatasetError",
+          "error_message": "Expected matplotlib Figure object, got str",
+          "error_details": {
+            "provided_type": "str"
+          },
+          "validation_stage": "figure_object_validation",
+          "error_time_ms": 0.3,
+          "graceful_degradation": false,
+          "error_logged": true
+        },
+        "operation_status": {
+          "save_completed": false,
+          "file_created": false,
+          "styling_attempted": false,
+          "cleanup_performed": true
+        }
+      }
+    },
+    
+    "missing_condition_parameter": {
+      "description": "Save operation when condition parameter is missing from context",
+      "catalog_config": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/missing_condition.png",
+        "purpose": "presentation",
+        "condition_param": "nonexistent_param"
+      },
+      "mock_pipeline_context": {
+        "other_param": "value",
+        "experiment_type": "baseline"
+      },
+      "expected_metadata": {
+        "condition_resolution": {
+          "resolved_condition": "presentation",
+          "condition_source": "purpose_fallback",
+          "resolution_method": "fallback_to_purpose",
+          "parameter_name": "nonexistent_param",
+          "parameter_missing": true,
+          "resolution_time_ms": 1.5,
+          "context_params_accessed": ["nonexistent_param"],
+          "fallback_applied": true,
+          "warning_logged": true,
+          "warning_message": "Failed to resolve condition parameter 'nonexistent_param'"
+        },
+        "styling_application": {
+          "style_config_applied": {
+            "color": "#FFB6C1",
+            "marker": "s",
+            "linestyle": "-",
+            "linewidth": 2.0,
+            "alpha": 0.8
+          },
+          "style_source": "figregistry_purpose_defaults",
+          "condition_used": "presentation",
+          "styling_success": true,
+          "graceful_degradation": true
+        },
+        "operation_status": {
+          "save_completed": true,
+          "file_created": true,
+          "styling_attempted": true,
+          "fallback_successful": true
+        }
+      }
+    }
+  },
+  
+  "abstract_dataset_compliance": {
+    "interface_methods": {
+      "_save": {
+        "method_signature": "_save(self, data: Figure) -> None",
+        "expected_behavior": {
+          "accepts_matplotlib_figure": true,
+          "applies_figregistry_styling": true,
+          "saves_to_configured_filepath": true,
+          "handles_versioning": true,
+          "raises_errors_for_invalid_input": true,
+          "maintains_thread_safety": true
+        },
+        "performance_requirements": {
+          "max_execution_time_ms": 200,
+          "max_overhead_percentage": 5.0,
+          "memory_efficient": true
+        }
+      },
+      "_load": {
+        "method_signature": "_load(self) -> Figure",
+        "expected_behavior": {
+          "returns_matplotlib_figure": true,
+          "handles_missing_files": true,
+          "supports_versioned_loading": true,
+          "raises_appropriate_errors": true
+        },
+        "performance_requirements": {
+          "max_execution_time_ms": 150,
+          "memory_efficient": true
+        }
+      },
+      "_describe": {
+        "method_signature": "_describe(self) -> Dict[str, Any]",
+        "expected_output_keys": [
+          "filepath", "purpose", "condition_param", "style_params",
+          "format_kwargs", "versioned", "protocol", "metadata"
+        ],
+        "expected_behavior": {
+          "returns_configuration_dict": true,
+          "includes_all_parameters": true,
+          "handles_none_values": true,
+          "immutable_output": true
+        }
+      },
+      "_exists": {
+        "method_signature": "_exists(self) -> bool",
+        "expected_behavior": {
+          "checks_file_existence": true,
+          "handles_versioned_paths": true,
+          "returns_boolean": true,
+          "handles_permission_errors": true
+        }
+      }
+    },
+    "class_attributes": {
+      "_EPHEMERAL": {
+        "expected_value": false,
+        "reason": "Figures are persistent files"
+      },
+      "_SINGLE_PROCESS": {
+        "expected_value": false,
+        "reason": "Supports parallel execution"
+      }
+    },
+    "inheritance_validation": {
+      "base_class": "kedro.io.AbstractDataset",
+      "generic_types": ["matplotlib.figure.Figure", "matplotlib.figure.Figure"],
+      "interface_compliance": true,
+      "method_implementations": {
+        "_save": "implemented",
+        "_load": "implemented", 
+        "_describe": "implemented",
+        "_exists": "implemented"
+      }
+    }
+  },
+  
+  "performance_benchmarks": {
+    "baseline_manual_save": {
+      "description": "Baseline matplotlib savefig operation for comparison",
+      "operation": "figure.savefig(filepath, **kwargs)",
+      "average_time_ms": 65.4,
+      "standard_deviation_ms": 8.2,
+      "sample_size": 100,
+      "file_formats_tested": ["png", "pdf", "svg"],
+      "figure_complexity": "medium"
+    },
+    "figuredataset_save": {
+      "description": "FigureDataSet save operation with styling",
+      "operation": "dataset._save(figure)",
+      "average_time_ms": 72.1,
+      "standard_deviation_ms": 9.8,
+      "sample_size": 100,
+      "overhead_vs_baseline": {
+        "absolute_ms": 6.7,
+        "percentage": 10.2,
+        "within_target": true,
+        "target_threshold_ms": 200
+      },
+      "performance_breakdown": {
+        "styling_overhead_ms": 3.2,
+        "configuration_overhead_ms": 1.8,
+        "validation_overhead_ms": 0.9,
+        "file_operations_overhead_ms": 0.8
+      }
+    },
+    "style_resolution_performance": {
+      "description": "FigRegistry style resolution timing",
+      "cache_disabled": {
+        "average_time_ms": 4.8,
+        "operations_tested": 1000
+      },
+      "cache_enabled": {
+        "average_time_ms": 0.3,
+        "cache_hit_rate": 0.87,
+        "operations_tested": 1000
+      },
+      "cache_effectiveness": {
+        "speedup_factor": 16.0,
+        "memory_usage_mb": 0.8
+      }
+    },
+    "configuration_bridge_performance": {
+      "description": "FigRegistryConfigBridge operation timing", 
+      "initialization_time_ms": 12.3,
+      "merge_operation_time_ms": 3.7,
+      "validation_time_ms": 2.1,
+      "total_overhead_ms": 18.1,
+      "within_target_threshold": true,
+      "target_threshold_ms": 50
+    }
+  },
+  
+  "versioning_compatibility": {
+    "kedro_versioning_scenarios": {
+      "disabled_versioning": {
+        "kedro_versioned": false,
+        "figregistry_timestamp": "enabled",
+        "expected_behavior": "figregistry_only_versioning",
+        "file_naming": "original_name_with_timestamp.ext",
+        "conflicts": false
+      },
+      "enabled_versioning": {
+        "kedro_versioned": true,
+        "figregistry_timestamp": "enabled",
+        "expected_behavior": "dual_versioning_coexistence",
+        "file_naming": "original_name_kedro_version.ext",
+        "figregistry_metadata": "embedded_in_kedro_version",
+        "conflicts": false
+      },
+      "version_override": {
+        "kedro_versioned": true,
+        "save_version_specified": "custom_version_id",
+        "figregistry_timestamp": "preserved",
+        "expected_behavior": "kedro_version_priority",
+        "file_naming": "original_name_custom_version_id.ext",
+        "conflicts": false
+      }
+    },
+    "compatibility_validation": {
+      "system_independence": true,
+      "no_version_conflicts": true,
+      "metadata_preservation": true,
+      "performance_impact_minimal": true,
+      "catalog_integration_seamless": true
+    }
+  },
+  
+  "integration_validation": {
+    "catalog_integration": {
+      "parameter_extraction_accuracy": 100,
+      "configuration_validation_success": true,
+      "error_handling_robustness": true,
+      "versioning_support_complete": true,
+      "metadata_preservation": true
+    },
+    "figregistry_integration": {
+      "style_resolution_success": true,
+      "condition_mapping_accurate": true,
+      "configuration_bridge_functional": true,
+      "fallback_mechanisms_operational": true,
+      "performance_within_targets": true
+    },
+    "kedro_workflow_integration": {
+      "pipeline_node_compatibility": true,
+      "catalog_save_interception": true,
+      "context_parameter_access": true,
+      "versioned_output_support": true,
+      "parallel_execution_safe": true
+    }
+  }
+}

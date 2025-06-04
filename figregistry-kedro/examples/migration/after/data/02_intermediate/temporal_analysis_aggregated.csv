@@ -1,0 +1,79 @@
+time_window,experimental_condition,mean_measurement,std_measurement,trend_direction,seasonal_component,data_quality,rolling_mean_5pt,rolling_std_5pt,measurement_count,quality_score_avg,coefficient_variation,temporal_stability,change_rate_per_hour,baseline_deviation,significance_level,analysis_phase,output_target,notes
+00:00-00:15,control,12.45,0.0,stable,none,high_quality,12.45,0.0,1,0.98,0.00,1.00,0.0,0.0,ns,exploration,technical,Initial baseline measurement - automated control styling via condition_param
+00:15-00:30,control,12.485,0.021,stable,none,high_quality,12.468,0.021,2,0.975,0.17,0.99,0.28,0.035,ns,exploration,technical,Early temporal stability demonstration - condition-based styling active
+00:30-00:45,control,12.48,0.028,stable,none,high_quality,12.472,0.024,3,0.98,0.19,0.98,0.24,0.03,ns,exploration,technical,Stable control pattern emerging - FigureDataSet styling automation
+00:45-01:00,control,12.445,0.032,stable,none,high_quality,12.465,0.026,4,0.9775,0.21,0.97,0.2,-0.005,ns,exploration,technical,Sustained control stability - eliminates manual plt.savefig() styling
+01:00-01:15,control,12.42,0.045,stable,none,high_quality,12.456,0.029,5,0.976,0.23,0.96,0.16,-0.03,ns,exploration,technical,Control group consistency - automated line plot styling through F-005
+01:15-01:30,control,12.44,0.048,stable,none,high_quality,12.446,0.031,6,0.97,0.25,0.95,0.13,-0.005,ns,exploration,technical,Temporal pattern established - condition_param resolution success
+01:30-01:45,control,12.465,0.049,stable,none,high_quality,12.444,0.032,7,0.973,0.26,0.94,0.11,0.02,ns,exploration,technical,Control stability confirmed - FigRegistry styling engine active
+01:45-02:00,control,12.46,0.051,stable,none,high_quality,12.446,0.032,8,0.975,0.26,0.93,0.09,0.015,ns,exploration,technical,Baseline pattern complete - automated temporal visualization ready
+02:00-02:15,control,12.445,0.049,stable,none,high_quality,12.448,0.031,9,0.974,0.25,0.92,0.08,0.0,ns,exploration,technical,Extended control validation - zero manual styling overhead
+02:15-02:30,control,12.455,0.050,stable,none,high_quality,12.451,0.030,10,0.973,0.24,0.91,0.07,0.01,ns,validation,technical,Control pattern validated - transition to validation phase styling
+00:00-00:15,treatment_A,13.12,0.0,increasing,none,high_quality,13.12,0.0,1,0.98,0.00,1.00,0.0,0.67,ns,exploration,technical,Treatment A initial response - distinct styling from control condition
+00:15-00:30,treatment_A,13.285,0.233,increasing,none,high_quality,13.203,0.233,2,0.985,1.76,0.99,1.65,0.935,*,exploration,technical,Treatment A effect emerging - automated differentiation via condition mapping
+00:30-00:45,treatment_A,13.615,0.284,increasing,none,high_quality,13.34,0.317,3,0.98,2.32,0.98,2.2,1.165,**,exploration,technical,Treatment A response building - FigRegistry styling eliminates manual formatting
+00:45-01:00,treatment_A,13.95,0.314,increasing,none,high_quality,13.493,0.419,4,0.98,3.10,0.97,2.47,1.5,**,exploration,technical,Treatment A sustained increase - condition-based line styling active
+01:00-01:15,treatment_A,14.34,0.348,increasing,none,high_quality,13.66,0.550,5,0.984,4.02,0.96,2.6,1.89,***,exploration,technical,Treatment A peak response - automated styling through condition_param
+01:15-01:30,treatment_A,14.685,0.372,increasing,none,high_quality,13.84,0.687,6,0.98,4.96,0.95,2.64,2.235,***,exploration,technical,Treatment A plateau approaching - F-002 condition mapping success
+01:30-01:45,treatment_A,14.98,0.386,stable,none,high_quality,14.025,0.826,7,0.983,5.89,0.94,2.56,2.53,***,exploration,technical,Treatment A plateau reached - trend direction change detected
+01:45-02:00,treatment_A,15.205,0.392,stable,none,high_quality,14.218,0.965,8,0.985,6.79,0.93,2.44,2.755,***,exploration,technical,Treatment A stable high level - automated stability analysis
+02:00-02:15,treatment_A,15.27,0.395,stable,none,high_quality,14.415,1.104,9,0.982,7.66,0.92,2.29,2.82,***,exploration,technical,Treatment A maintained effect - temporal pattern recognition
+02:15-02:30,treatment_A,15.325,0.398,stable,none,high_quality,14.613,1.242,10,0.981,8.49,0.91,2.13,2.875,***,validation,technical,Treatment A stable response - validation phase styling transition
+00:00-00:15,treatment_B,11.98,0.0,increasing,none,high_quality,11.98,0.0,1,0.97,0.00,1.00,0.0,-0.47,ns,exploration,technical,Treatment B baseline - intermediate response pattern initialization
+00:15-00:30,treatment_B,12.105,0.177,increasing,none,high_quality,12.043,0.177,2,0.975,1.46,0.99,1.0,-0.345,ns,exploration,technical,Treatment B modest response - automated intermediate styling
+00:30-00:45,treatment_B,12.395,0.233,increasing,none,high_quality,12.16,0.274,3,0.98,2.25,0.98,1.94,-0.05,ns,exploration,technical,Treatment B gradual increase - condition-specific styling active
+00:45-01:00,treatment_B,12.725,0.269,increasing,none,high_quality,12.301,0.388,4,0.975,3.15,0.97,2.2,0.275,*,exploration,technical,Treatment B intermediate response - distinct from treatments A and C
+01:00-01:15,treatment_B,13.005,0.295,increasing,none,high_quality,12.442,0.507,5,0.98,4.08,0.96,2.25,0.555,*,exploration,technical,Treatment B building effect - automated style variation demonstration
+01:15-01:30,treatment_B,13.255,0.312,increasing,none,high_quality,12.593,0.622,6,0.985,4.94,0.95,2.21,0.805,**,exploration,technical,Treatment B sustained response - F-005 integration effectiveness
+01:30-01:45,treatment_B,13.56,0.322,increasing,none,high_quality,12.76,0.735,7,0.975,5.76,0.94,2.11,1.11,**,exploration,technical,Treatment B continued effect - automated workflow demonstration
+01:45-02:00,treatment_B,13.825,0.328,stable,none,high_quality,12.941,0.846,8,0.98,6.54,0.93,1.96,1.375,**,exploration,technical,Treatment B peak reached - trend transition detected
+02:00-02:15,treatment_B,13.975,0.331,stable,none,high_quality,13.129,0.954,9,0.985,7.27,0.92,1.78,1.525,**,exploration,technical,Treatment B plateau - eliminates manual temporal styling
+02:15-02:30,treatment_B,14.025,0.332,stable,none,high_quality,13.319,1.059,10,0.976,7.95,0.91,1.58,1.575,**,validation,technical,Treatment B stable effect - pandas DataFrame processing compatibility
+00:00-00:15,treatment_C,10.23,0.0,decreasing,none,high_quality,10.23,0.0,1,0.98,0.00,1.00,0.0,-2.22,ns,exploration,technical,Treatment C baseline - negative response pattern initiation
+00:15-00:30,treatment_C,10.06,0.241,decreasing,none,high_quality,10.145,0.241,2,0.975,2.38,0.99,-1.7,-2.385,*,exploration,technical,Treatment C initial decrease - distinct styling for negative effects
+00:30-00:45,treatment_C,9.795,0.316,decreasing,none,high_quality,10.028,0.292,3,0.985,2.91,0.98,-2.12,-2.65,**,exploration,technical,Treatment C suppression - automated negative response styling
+00:45-01:00,treatment_C,9.545,0.365,decreasing,none,high_quality,9.908,0.365,4,0.98,3.68,0.97,-2.5,-2.9,**,exploration,technical,Treatment C continued decrease - condition_param properly resolved
+01:00-01:15,treatment_C,9.33,0.403,decreasing,none,high_quality,9.792,0.436,5,0.975,4.45,0.96,-2.5,-3.12,***,exploration,technical,Treatment C minimum approaching - dynamic styling demonstration
+01:15-01:30,treatment_C,9.375,0.416,stable,none,high_quality,9.695,0.466,6,0.98,4.81,0.95,-2.08,-3.07,***,exploration,technical,Treatment C recovery start - trend direction change detected
+01:30-01:45,treatment_C,9.52,0.419,increasing,none,high_quality,9.598,0.462,7,0.985,4.81,0.94,-1.55,-2.925,**,exploration,technical,Treatment C gradual recovery - automated figure management
+01:45-02:00,treatment_C,9.735,0.417,increasing,none,high_quality,9.516,0.449,8,0.975,4.72,0.93,-0.86,-2.71,**,exploration,technical,Treatment C continued recovery - FigureDataSet save operations
+02:00-02:15,treatment_C,9.945,0.413,increasing,none,high_quality,9.454,0.432,9,0.98,4.57,0.92,-0.14,-2.5,*,exploration,technical,Treatment C approaching baseline - catalog integration success
+02:15-02:30,treatment_C,10.115,0.407,increasing,none,high_quality,9.412,0.414,10,0.985,4.40,0.91,0.51,-2.33,*,validation,technical,Treatment C near baseline - automated workflow complete
+00:00-00:15,treatment_D,8.45,0.0,stable,none,medium_quality,8.45,0.0,1,0.91,0.00,1.00,0.0,-4.0,ns,exploration,technical,Treatment D baseline - extreme response condition for styling range
+00:15-00:30,treatment_D,8.125,0.459,decreasing,none,medium_quality,8.288,0.459,2,0.905,5.53,0.99,-2.6,-4.325,*,exploration,technical,Treatment D strong decrease - tests styling robustness
+00:30-00:45,treatment_D,7.685,0.572,decreasing,none,medium_quality,8.087,0.541,3,0.915,6.69,0.98,-3.52,-4.765,**,exploration,technical,Treatment D severe suppression - extreme condition styling
+00:45-01:00,treatment_D,7.245,0.639,decreasing,none,medium_quality,7.876,0.640,4,0.91,8.13,0.97,-4.12,-5.205,***,exploration,technical,Treatment D maximum suppression - robust styling system
+01:00-01:15,treatment_D,7.12,0.666,stable,none,medium_quality,7.721,0.710,5,0.915,9.19,0.96,-4.5,-5.33,***,exploration,technical,Treatment D nadir reached - minimum response detected
+01:15-01:30,treatment_D,7.385,0.673,increasing,none,medium_quality,7.576,0.719,6,0.92,9.49,0.95,-3.62,-5.065,***,exploration,technical,Treatment D recovery initiation - rebound pattern styling
+01:30-01:45,treatment_D,7.815,0.665,increasing,none,medium_quality,7.458,0.697,7,0.925,9.35,0.94,-2.42,-4.635,**,exploration,technical,Treatment D strong recovery - recovery pattern recognition
+01:45-02:00,treatment_D,8.345,0.639,increasing,none,medium_quality,7.378,0.656,8,0.93,8.89,0.93,-1.06,-4.105,**,exploration,technical,Treatment D approaching baseline - recovery trend confirmed
+02:00-02:15,treatment_D,8.755,0.599,increasing,none,medium_quality,7.33,0.601,9,0.935,8.20,0.92,0.38,-3.695,*,exploration,technical,Treatment D baseline recovery - complete response cycle
+02:15-02:30,treatment_D,9.025,0.551,increasing,none,medium_quality,7.309,0.540,10,0.94,7.39,0.91,1.62,-3.425,*,validation,technical,Treatment D overcorrection - rebound effect demonstration
+00:00-00:30,combined_A_B,12.815,0.887,increasing,none,high_quality,12.815,0.887,2,0.98,6.92,0.99,1.0,0.365,*,exploration,stakeholder,Combined A+B initial synergy - stakeholder-focused styling
+00:30-01:00,combined_A_B,13.175,0.919,increasing,none,high_quality,12.995,0.905,4,0.979,6.96,0.98,1.44,0.725,**,exploration,stakeholder,Combined A+B building effect - presentation styling active
+01:00-01:30,combined_A_B,13.585,0.942,increasing,none,high_quality,13.192,0.918,6,0.983,6.96,0.97,1.64,1.135,**,exploration,stakeholder,Combined A+B synergistic response - stakeholder visualization
+01:30-02:00,combined_A_B,13.925,0.958,stable,none,high_quality,13.375,0.937,8,0.981,7.01,0.96,1.48,1.475,***,exploration,stakeholder,Combined A+B plateau - combination effect demonstration
+02:00-02:30,combined_A_B,14.125,0.967,stable,none,high_quality,13.521,0.956,10,0.982,7.07,0.95,1.2,1.675,***,validation,stakeholder,Combined A+B stable synergy - stakeholder reporting ready
+00:00-00:30,novel_compound,16.45,0.456,increasing,none,high_quality,16.45,0.456,2,0.985,2.77,0.99,2.5,3.995,**,discovery,academic,Novel compound initial response - discovery phase styling
+00:30-01:00,novel_compound,17.125,0.523,increasing,none,high_quality,16.788,0.491,4,0.981,2.92,0.98,2.7,4.675,***,discovery,academic,Novel compound strong effect - academic publication styling
+01:00-01:30,novel_compound,17.675,0.576,increasing,none,high_quality,17.083,0.612,6,0.983,3.58,0.97,2.46,5.225,***,discovery,academic,Novel compound peak response - publication-ready formatting
+01:30-02:00,novel_compound,18.025,0.612,stable,none,high_quality,17.319,0.731,8,0.984,4.22,0.96,2.0,5.575,***,discovery,academic,Novel compound plateau - discovery significance demonstrated
+02:00-02:30,novel_compound,18.175,0.632,stable,none,high_quality,17.506,0.847,10,0.983,4.84,0.95,1.5,5.725,***,validation,academic,Novel compound stable efficacy - validation phase transition
+00:00-00:30,placebo,12.505,0.329,stable,none,high_quality,12.505,0.329,2,0.985,2.63,0.99,0.11,0.055,ns,regulatory,publication,Placebo baseline - regulatory phase publication styling
+00:30-01:00,placebo,12.525,0.341,stable,none,high_quality,12.515,0.335,4,0.983,2.68,0.98,0.08,0.075,ns,regulatory,publication,Placebo stability - regulatory standard styling active
+01:00-01:30,placebo,12.535,0.348,stable,none,high_quality,12.522,0.340,6,0.984,2.71,0.97,0.06,0.085,ns,regulatory,publication,Placebo consistency - publication-quality regulatory styling
+01:30-02:00,placebo,12.545,0.352,stable,none,high_quality,12.528,0.343,8,0.985,2.74,0.96,0.05,0.095,ns,regulatory,publication,Placebo validation - regulatory compliance demonstration
+02:00-02:30,placebo,12.555,0.355,stable,none,high_quality,12.533,0.345,10,0.984,2.75,0.95,0.04,0.105,ns,regulatory,publication,Placebo stable control - regulatory documentation ready
+05:45-06:00,time_course_6h,16.78,0.0,stable,none,high_quality,16.78,0.0,1,0.98,0.00,1.00,0.0,4.33,***,validation,technical,6-hour timepoint - validation phase styling demonstration
+11:45-12:00,time_course_12h,18.12,0.0,stable,none,high_quality,18.12,0.0,1,0.97,0.00,1.00,0.0,5.67,***,validation,technical,12-hour timepoint - mid-validation styling pattern
+23:45-24:00,time_course_24h,19.45,0.0,stable,none,high_quality,19.45,0.0,1,0.99,0.00,1.00,0.0,6.995,***,validation,technical,24-hour timepoint - late validation styling application
+00:00-00:30,high_responder,22.395,1.456,increasing,none,excellent_quality,22.395,1.456,2,0.985,6.50,0.99,6.5,9.945,***,validation,academic,High responder pattern - validation with distinct styling
+00:30-01:00,high_responder,23.125,1.523,increasing,none,excellent_quality,22.76,1.491,4,0.982,6.55,0.98,5.84,10.675,***,validation,academic,High responder peak - exceptional response styling
+01:00-01:30,high_responder,23.565,1.578,stable,none,excellent_quality,23.028,1.519,6,0.984,6.60,0.97,4.88,11.115,***,validation,academic,High responder plateau - academic validation styling
+01:30-02:00,high_responder,23.785,1.612,stable,none,excellent_quality,23.218,1.542,8,0.985,6.64,0.96,3.76,11.335,***,validation,academic,High responder stable - validation excellence demonstrated
+02:00-02:30,high_responder,23.895,1.634,stable,none,excellent_quality,23.354,1.561,10,0.984,6.68,0.95,2.64,11.445,***,validation,academic,High responder maximum - exceptional efficacy confirmed
+00:00-00:30,low_responder,8.115,0.632,stable,none,good_quality,8.115,0.632,2,0.98,7.79,0.99,-0.3,-4.335,ns,validation,technical,Low responder baseline - contrasting validation styling
+00:30-01:00,low_responder,8.025,0.641,stable,none,good_quality,8.07,0.637,4,0.975,7.89,0.98,-0.36,-4.425,ns,validation,technical,Low responder minimal change - technical documentation styling
+01:00-01:30,low_responder,7.985,0.646,stable,none,good_quality,8.042,0.640,6,0.977,7.96,0.97,-0.32,-4.465,ns,validation,technical,Low responder stability - low-response pattern styling
+01:30-02:00,low_responder,7.965,0.648,stable,none,good_quality,8.023,0.641,8,0.978,7.99,0.96,-0.28,-4.485,ns,validation,technical,Low responder consistent - minimal effect confirmation
+02:00-02:30,low_responder,7.955,0.649,stable,none,good_quality,8.009,0.642,10,0.977,8.02,0.95,-0.24,-4.495,ns,validation,technical,Low responder final - non-responder pattern confirmed

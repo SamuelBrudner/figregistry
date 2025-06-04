@@ -1,0 +1,352 @@
+# =============================================================================
+# MALFORMED YAML CONFIGURATION FILE FOR FIGREGISTRY-KEDRO TESTING
+# =============================================================================
+#
+# This file intentionally contains various YAML syntax errors, structural problems,
+# parsing edge cases, and potential security vulnerabilities for comprehensive
+# testing of the FigRegistryConfigBridge error handling capabilities.
+#
+# Per Section 6.6.8.1 of the technical specification, this file tests:
+# - YAML parser error handling and robustness validation
+# - Security vulnerability prevention for YAML injection attacks  
+# - Configuration validation error aggregation and reporting
+# - Edge case handling for malformed configuration structures
+#
+# WARNING: This file is INTENTIONALLY MALFORMED and will cause parsing errors.
+# It should NEVER be used as a real configuration file.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# SECTION 1: BASIC YAML SYNTAX ERRORS
+# -----------------------------------------------------------------------------
+
+# 1.1: Invalid indentation (mixing tabs and spaces)
+figregistry_version: ">=0.3.0"
+metadata:
+  config_version: "1.0.0"
+	created_by: "malformed_test"  # TAB character instead of spaces
+    description: "Malformed YAML for testing"  # Wrong indentation level
+
+# 1.2: Missing colon in key-value pair
+styles
+  invalid_no_colon_style  # Missing colon after key
+    color: "#FF0000"
+    linewidth: 2.0
+
+# 1.3: Unclosed quotes and brackets
+styles:
+  unclosed_quote_style:
+    color: "#FF0000  # Missing closing quote
+    label: "Unclosed string
+  
+  unclosed_bracket_style:
+    properties: [color, linewidth, alpha  # Missing closing bracket
+    
+# 1.4: Invalid YAML structure with mismatched brackets
+defaults:
+  figure: {
+    figsize: [10, 8],
+    dpi: 150
+    # Missing closing brace
+
+# 1.5: Duplicate keys (should trigger constructor error)
+outputs:
+  base_path: "data/08_reporting"
+  naming:
+    template: "{name}_{condition}_{ts}"
+outputs:  # Duplicate key - YAML spec violation
+  base_path: "duplicate/path"
+
+# -----------------------------------------------------------------------------
+# SECTION 2: SECURITY VULNERABILITY TESTING 
+# -----------------------------------------------------------------------------
+
+# 2.1: YAML deserialization injection attempts (should be blocked by safe_load)
+malicious_code_execution: !!python/object/apply:os.system
+  - "rm -rf /"  # Attempted command injection
+
+# 2.2: Python object instantiation attempt (unsafe deserialization)
+dangerous_object: !!python/object:subprocess.Popen
+  args: [["echo", "pwned"]]
+
+# 2.3: File inclusion attempts 
+file_inclusion_attack: !!python/object/apply:builtins.open
+  - "/etc/passwd"
+  - "r"
+
+# 2.4: Module import injection
+module_injection: !!python/module:os
+
+# 2.5: Arbitrary code execution via eval
+eval_injection: !!python/object/apply:builtins.eval
+  - "__import__('os').system('echo vulnerable')"
+
+# 2.6: Environment variable exposure attempt
+env_exposure: !!python/object/apply:os.getenv
+  - "PATH"
+
+# -----------------------------------------------------------------------------
+# SECTION 3: STRUCTURAL AND PARSING EDGE CASES
+# -----------------------------------------------------------------------------
+
+# 3.1: Invalid Unicode characters and encoding issues
+unicode_issues:
+  invalid_utf8: "\xff\xfe\x00\x00"  # Invalid UTF-8 sequence
+  null_bytes: "config\x00injection"  # Null byte injection
+  control_chars: "test\x1b[31mred\x1b[0m"  # ANSI escape sequences
+
+# 3.2: Extremely deep nesting (parser stress test)
+deep_nesting:
+  level1:
+    level2:
+      level3:
+        level4:
+          level5:
+            level6:
+              level7:
+                level8:
+                  level9:
+                    level10:
+                      deeply_nested_value: "stress_test"
+                      # Missing proper closure for deep nesting
+
+# 3.3: Invalid data types and type coercion edge cases
+type_confusion:
+  invalid_number: "not_a_number_but_looks_like_one: 123abc"
+  boolean_confusion: yessir  # Not a valid boolean
+  null_confusion: ~null  # Invalid null representation
+  infinity_test: .inf  # Special float values
+  nan_test: .nan
+
+# 3.4: Very long strings and memory exhaustion attempts
+memory_exhaustion:
+  very_long_string: "A" * 1000000  # This would create a 1MB string
+  recursive_reference: &recursive_ref
+    - *recursive_ref  # Circular reference attempt
+
+# 3.5: Invalid character sequences in keys
+"invalid\nkey\rwith\twhitespace": "value"
+"key with spaces and special chars!@#$%^&*()": "another_value"
+
+# -----------------------------------------------------------------------------
+# SECTION 4: MALFORMED FIGREGISTRY-SPECIFIC STRUCTURES
+# -----------------------------------------------------------------------------
+
+# 4.1: Invalid style definitions
+styles:
+  malformed_style_1:
+    # Missing required color field
+    linewidth: 2.0
+    alpha: 0.8
+  
+  malformed_style_2:
+    color: invalid_color_format  # Not a valid color
+    marker: 999  # Invalid marker type
+    linewidth: "not_a_number"  # Invalid numeric value
+    alpha: 1.5  # Alpha value outside valid range [0,1]
+    
+  # Style with invalid nested structure
+  malformed_style_3: "should_be_dict_not_string"
+
+# 4.2: Invalid output configuration
+outputs:
+  # Missing required base_path
+  naming:
+    template: "invalid_{undefined_variable}_{ts}"
+  formats:
+    defaults:
+      invalid_purpose: ["invalid_format_type"]
+    resolution:
+      png: "should_be_dict_not_string"
+      
+# 4.3: Invalid defaults section
+defaults:
+  figure:
+    figsize: "invalid_size_format"  # Should be [width, height]
+    dpi: -150  # Negative DPI value
+    facecolor: 123  # Invalid color type
+  line:
+    linewidth: null  # Null value where number expected
+    alpha: "transparent"  # Invalid alpha value
+
+# 4.4: Malformed kedro integration section
+kedro:
+  config_bridge:
+    enabled: "maybe"  # Invalid boolean value
+    merge_strategy: "invalid_strategy"  # Unknown strategy
+  datasets:
+    default_purpose: 42  # Invalid purpose type
+
+# -----------------------------------------------------------------------------
+# SECTION 5: YAML PARSER BOUNDARY CONDITIONS
+# -----------------------------------------------------------------------------
+
+# 5.1: Comments in problematic locations
+styles: # Comment after colon but before value
+# Comment interrupting a flow
+  style_with_comment: {color: "#FF0000" # Comment in flow sequence, linewidth: 2.0}
+
+# 5.2: Invalid anchor and alias usage
+styles:
+  anchor_style: &broken_anchor
+    color: "#FF0000"
+    linewidth: 2.0
+  
+  # Reference to non-existent anchor
+  alias_style: *non_existent_anchor
+
+# 5.3: Invalid multiline strings
+multiline_issue: |
+  This is a multiline string
+    with inconsistent indentation
+  and missing proper structure
+    that should cause parsing issues
+
+# 5.4: Invalid flow sequence syntax
+invalid_flow: [item1, item2, , item4]  # Empty item in flow sequence
+another_invalid_flow: [item1 item2]  # Missing comma separator
+
+# 5.5: Document separator issues
+---  # Valid document separator
+styles:
+  valid_style:
+    color: "#00FF00"
+---  # Another document separator  
+invalid_document_structure_here
+  should_cause_error: true
+
+# -----------------------------------------------------------------------------
+# SECTION 6: ENCODING AND CHARACTER SET ISSUES
+# -----------------------------------------------------------------------------
+
+# 6.1: Non-ASCII characters in problematic contexts
+styles:
+  style_with_émojis🚀: 
+    color: "#FF0000"
+    label: "Style with émojis 🎨 and unicode ∞"
+    
+# 6.2: Byte order mark (BOM) simulation
+# Note: Actual BOM would be at file start, this simulates embedded issues
+bom_simulation: "﻿problematic_character_sequence"
+
+# 6.3: Various problematic character combinations
+character_edge_cases:
+  backslash_issues: "path\\with\\backslashes\\"
+  quote_nesting: 'single quotes with "double quotes" inside'
+  escape_sequences: "newline\n\ttab\rcarriage\return"
+
+# -----------------------------------------------------------------------------
+# SECTION 7: CONFIGURATION MERGE CONFLICT SCENARIOS
+# -----------------------------------------------------------------------------
+
+# 7.1: Type conflicts for merging
+defaults:
+  figure: "should_be_dict_not_string"  # Type conflict with base config
+
+# 7.2: Circular dependency simulation
+circular_ref_1: &ref1
+  depends_on: *ref2
+circular_ref_2: &ref2  
+  depends_on: *ref1
+
+# 7.3: Invalid nested merging scenarios
+styles:
+  merge_conflict_style:
+    color: "#FF0000"
+    properties:
+      - linewidth: 2.0  # List instead of dict
+        alpha: 0.8      # This creates invalid structure
+
+# -----------------------------------------------------------------------------
+# SECTION 8: PERFORMANCE AND RESOURCE EXHAUSTION TESTS
+# -----------------------------------------------------------------------------
+
+# 8.1: Deeply nested structure for parser stress testing
+stress_test:
+  level_1: { level_2: { level_3: { level_4: { level_5: { level_6: { level_7: { level_8: { level_9: { level_10: { deeply_nested: "value" } } } } } } } } } }
+
+# 8.2: Large array for memory testing
+large_array: [
+  # This would normally contain thousands of items
+  "item_1", "item_2", "item_3",
+  # ... truncated for file size
+]
+
+# 8.3: Complex recursive structures
+recursive_config: &recursive
+  self_reference: *recursive
+  nested_refs:
+    - *recursive
+    - another: *recursive
+
+# -----------------------------------------------------------------------------
+# SECTION 9: YAML INJECTION AND SECURITY EDGE CASES
+# -----------------------------------------------------------------------------
+
+# 9.1: Path traversal attempts in configuration values
+security_test_paths:
+  base_path: "../../../etc/passwd"  # Path traversal attempt
+  output_dir: "data/../../sensitive_files"
+  config_file: "/etc/shadow"  # Absolute path to sensitive file
+
+# 9.2: Command injection in string values
+command_injection_attempts:
+  dangerous_template: "{name}; rm -rf /; echo {condition}"
+  shell_injection: "$(whoami)"
+  backtick_injection: "`ls -la`"
+
+# 9.3: Format string injection attempts
+format_injection:
+  template: "{name.__globals__}"  # Python format string injection
+  evil_format: "{condition.__class__.__mro__[1].__subclasses__()}"
+
+# -----------------------------------------------------------------------------
+# SECTION 10: VALIDATION BOUNDARY TESTING
+# -----------------------------------------------------------------------------
+
+# 10.1: Extreme values for numeric fields
+extreme_values:
+  very_large_dpi: 999999999999999  # Extremely large number
+  negative_linewidth: -99999  # Large negative number
+  zero_figsize: [0, 0]  # Zero dimensions
+  float_overflow: 1.7976931348623157e+308  # Near float max
+
+# 10.2: Empty and null value edge cases
+empty_values:
+  empty_string: ""
+  null_value: null
+  undefined_value: ~
+  empty_dict: {}
+  empty_list: []
+
+# 10.3: Invalid version constraint formats
+version_edge_cases:
+  invalid_version_1: "not_a_version"
+  invalid_version_2: ">>1.0.0"  # Invalid operator
+  invalid_version_3: ">=1.0.0.0.0"  # Too many version parts
+
+# =============================================================================
+# END OF MALFORMED YAML TEST FILE
+# =============================================================================
+#
+# This file intentionally contains numerous YAML syntax errors, security
+# vulnerabilities, and edge cases for comprehensive testing of:
+#
+# 1. YAML parser error detection and reporting
+# 2. Security vulnerability prevention (injection attacks)
+# 3. Configuration validation robustness
+# 4. Error handling and recovery mechanisms
+# 5. Memory and performance boundary testing
+# 6. Character encoding and Unicode handling
+# 7. Structural validation of FigRegistry configurations
+#
+# Any system parsing this file should:
+# - Detect and report syntax errors safely
+# - Prevent security vulnerabilities from being executed
+# - Provide clear error messages for debugging
+# - Maintain system stability despite malformed input
+# - Validate data types and constraints properly
+#
+# Per Section 6.6.8.1: "YAML Security Validation" and security requirements,
+# this file enables comprehensive testing of configuration security controls.
+# =============================================================================

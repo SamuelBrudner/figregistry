@@ -1,0 +1,85 @@
+# Traditional Kedro Project Logging Configuration
+# This represents basic logging patterns before FigRegistry integration
+# 
+# This configuration demonstrates the standard logging approach used in
+# traditional Kedro projects that rely on manual figure management.
+# It lacks the specialized logging capabilities for automated figure
+# styling, condition-based resolution, and integration events that
+# figregistry-kedro provides.
+
+version: 1
+disable_existing_loggers: false
+
+formatters:
+  simple:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  detailed:
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
+
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: simple
+    stream: ext://sys.stdout
+
+  info_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: detailed
+    filename: logs/info.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    encoding: utf8
+
+  error_file_handler:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: detailed
+    filename: logs/errors.log
+    maxBytes: 10485760 # 10MB
+    backupCount: 20
+    encoding: utf8
+
+loggers:
+  kedro:
+    level: INFO
+    handlers: [console, info_file_handler, error_file_handler]
+    propagate: false
+
+  kedro.io:
+    level: INFO
+    handlers: [console, info_file_handler, error_file_handler]
+    propagate: false
+
+  kedro.pipeline:
+    level: INFO
+    handlers: [console, info_file_handler, error_file_handler]
+    propagate: false
+
+  kedro.runner:
+    level: INFO
+    handlers: [console, info_file_handler, error_file_handler]
+    propagate: false
+
+  # Basic matplotlib logging for figure operations
+  matplotlib:
+    level: WARNING
+    handlers: [console, error_file_handler]
+    propagate: false
+
+  # Standard data science library logging
+  pandas:
+    level: WARNING
+    handlers: [console, error_file_handler]
+    propagate: false
+
+  # Application-specific logging for manual pipeline nodes
+  kedro_manual_example:
+    level: INFO
+    handlers: [console, info_file_handler, error_file_handler]
+    propagate: false
+
+root:
+  level: INFO
+  handlers: [console, info_file_handler, error_file_handler]

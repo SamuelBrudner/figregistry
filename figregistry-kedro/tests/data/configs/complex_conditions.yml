@@ -1,0 +1,646 @@
+# Complex Conditions Configuration for FigRegistry-Kedro Testing
+# 
+# This configuration file provides sophisticated condition mappings, nested condition
+# hierarchies, and advanced styling patterns for comprehensive testing of FigRegistry's
+# condition-based styling system as specified in F-002. The configuration tests:
+#
+# - Advanced pattern matching and wildcard condition resolution capabilities
+# - Nested style inheritance and hierarchical condition mapping per F-002-RQ-002
+# - Multi-dimensional experimental condition testing scenarios per F-002-RQ-004
+# - Performance-optimized condition caching for complex condition resolution
+# - Advanced output configurations with conditional path generation
+#
+# Key Testing Scenarios:
+# - Wildcard patterns (*_control, *_treatment, baseline_*)
+# - Regular expression-based condition matching
+# - Hierarchical style inheritance with precedence rules
+# - Complex rcParams combinations with conditional application
+# - Multi-dimensional parameter combinations (experiment_phase + model_type + dataset)
+# - Performance stress testing with large condition spaces
+# - Edge cases for condition resolution and fallback behavior
+
+figregistry_version: ">=0.3.0"
+
+metadata:
+  config_version: "2.0.0"
+  created_by: "figregistry-kedro test suite"
+  description: "Complex conditions configuration for comprehensive F-002 testing"
+  last_updated: "2024-01-15T15:45:00Z"
+  project_name: "figregistry-kedro-complex-conditions-test"
+  test_scenarios:
+    - "wildcard_pattern_matching"
+    - "nested_style_inheritance"
+    - "multi_dimensional_conditions"
+    - "performance_stress_testing"
+    - "edge_case_resolution"
+
+# Complex condition-based styles with hierarchical inheritance and pattern matching
+styles:
+  # === BASE EXPERIMENTAL CONDITIONS ===
+  # Simple baseline conditions for foundational testing
+  baseline:
+    color: "#2E86AB"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.9
+    label: "Baseline Condition"
+    markersize: 8
+    markeredgecolor: "#1A5276"
+    markeredgewidth: 1.0
+    
+  control:
+    color: "#85C1E9"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.8
+    label: "Control Group"
+    markersize: 7
+    markeredgecolor: "#2874A6"
+    markeredgewidth: 0.8
+    
+  treatment:
+    color: "#F24236"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.9
+    label: "Treatment Group"
+    markersize: 9
+    markeredgecolor: "#A93226"
+    markeredgewidth: 1.2
+
+  # === WILDCARD PATTERN MATCHING CONDITIONS ===
+  # Test patterns ending with specific suffixes
+  "*_control":
+    color: "#A8CCE8"
+    marker: "o"
+    linestyle: "--"
+    linewidth: 1.8
+    alpha: 0.7
+    label: "Control Variant"
+    markersize: 6
+    markeredgecolor: "#5499C7"
+    markeredgewidth: 0.6
+    
+  "*_treatment": 
+    color: "#F1948A"
+    marker: "D"
+    linestyle: "--"
+    linewidth: 1.8
+    alpha: 0.7
+    label: "Treatment Variant"
+    markersize: 6
+    markeredgecolor: "#E74C3C"
+    markeredgewidth: 0.6
+    
+  "*_baseline":
+    color: "#AED6F1"
+    marker: "v"
+    linestyle: "-."
+    linewidth: 1.5
+    alpha: 0.6
+    label: "Baseline Variant"
+    markersize: 5
+    markeredgecolor: "#3498DB"
+    markeredgewidth: 0.5
+
+  # Test patterns starting with specific prefixes
+  "baseline_*":
+    color: "#85C1E9"
+    marker: "P"
+    linestyle: ":"
+    linewidth: 2.2
+    alpha: 0.8
+    label: "Baseline Series"
+    markersize: 8
+    markeredgecolor: "#2E86AB"
+    markeredgewidth: 1.0
+    
+  "phase1_*":
+    color: "#A569BD"
+    marker: "X"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.85
+    label: "Phase 1 Series"
+    markersize: 10
+    markeredgecolor: "#7D3C98"
+    markeredgewidth: 1.1
+    
+  "phase2_*":
+    color: "#58D68D"
+    marker: "+"
+    linestyle: "-"
+    linewidth: 2.3
+    alpha: 0.9
+    label: "Phase 2 Series"
+    markersize: 12
+    markeredgecolor: "#27AE60"
+    markeredgewidth: 1.3
+
+  # === MULTI-DIMENSIONAL CONDITIONS ===
+  # Complex conditions combining multiple experimental parameters
+  "neural_network_training_large":
+    color: "#FF6B35"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 3.0
+    alpha: 1.0
+    label: "NN Training (Large Dataset)"
+    markersize: 10
+    markeredgecolor: "#D84315"
+    markeredgewidth: 1.5
+    fillstyle: "full"
+    
+  "neural_network_validation_large":
+    color: "#FF8A50"
+    marker: "o"
+    linestyle: "--"
+    linewidth: 2.5
+    alpha: 0.9
+    label: "NN Validation (Large Dataset)"
+    markersize: 8
+    markeredgecolor: "#E64A19"
+    markeredgewidth: 1.2
+    fillstyle: "left"
+    
+  "linear_regression_training_medium":
+    color: "#4ECDC4"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.8
+    alpha: 0.95
+    label: "LR Training (Medium Dataset)"
+    markersize: 9
+    markeredgecolor: "#26A69A"
+    markeredgewidth: 1.3
+    fillstyle: "full"
+    
+  "random_forest_inference_small":
+    color: "#45B7D1"
+    marker: "^"
+    linestyle: "-."
+    linewidth: 2.2
+    alpha: 0.8
+    label: "RF Inference (Small Dataset)"
+    markersize: 7
+    markeredgecolor: "#1976D2"
+    markeredgewidth: 1.0
+    fillstyle: "right"
+
+  # === NESTED HIERARCHICAL CONDITIONS ===
+  # Test complex inheritance chains
+  "experiment.control.batch_a":
+    color: "#B8860B"
+    marker: "h"
+    linestyle: "-"
+    linewidth: 2.4
+    alpha: 0.9
+    label: "Control Batch A"
+    markersize: 11
+    markeredgecolor: "#8B6914"
+    markeredgewidth: 1.4
+    
+  "experiment.control.batch_b":
+    color: "#DAA520"
+    marker: "H"
+    linestyle: "-"
+    linewidth: 2.4
+    alpha: 0.9
+    label: "Control Batch B"
+    markersize: 11
+    markeredgecolor: "#B8860B"
+    markeredgewidth: 1.4
+    
+  "experiment.treatment.high_dose":
+    color: "#DC143C"
+    marker: "*"
+    linestyle: "-"
+    linewidth: 2.8
+    alpha: 1.0
+    label: "Treatment High Dose"
+    markersize: 13
+    markeredgecolor: "#B22222"
+    markeredgewidth: 1.6
+    
+  "experiment.treatment.low_dose":
+    color: "#FF69B4"
+    marker: "p"
+    linestyle: "-"
+    linewidth: 2.6
+    alpha: 0.95
+    label: "Treatment Low Dose"
+    markersize: 12
+    markeredgecolor: "#C71585"
+    markeredgewidth: 1.5
+
+  # === PERFORMANCE STRESS TEST CONDITIONS ===
+  # Large number of conditions for cache performance testing
+  "stress_test_001": {color: "#FF0000", marker: "o", linewidth: 1.0, alpha: 0.5}
+  "stress_test_002": {color: "#FF1100", marker: "s", linewidth: 1.1, alpha: 0.51}
+  "stress_test_003": {color: "#FF2200", marker: "^", linewidth: 1.2, alpha: 0.52}
+  "stress_test_004": {color: "#FF3300", marker: "D", linewidth: 1.3, alpha: 0.53}
+  "stress_test_005": {color: "#FF4400", marker: "v", linewidth: 1.4, alpha: 0.54}
+  "stress_test_006": {color: "#FF5500", marker: "<", linewidth: 1.5, alpha: 0.55}
+  "stress_test_007": {color: "#FF6600", marker: ">", linewidth: 1.6, alpha: 0.56}
+  "stress_test_008": {color: "#FF7700", marker: "p", linewidth: 1.7, alpha: 0.57}
+  "stress_test_009": {color: "#FF8800", marker: "*", linewidth: 1.8, alpha: 0.58}
+  "stress_test_010": {color: "#FF9900", marker: "h", linewidth: 1.9, alpha: 0.59}
+
+  # === EDGE CASE CONDITIONS ===
+  # Test edge cases and special characters
+  "condition-with-dashes":
+    color: "#8E44AD"
+    marker: "."
+    linestyle: "-"
+    linewidth: 1.0
+    alpha: 0.6
+    label: "Dashed Condition"
+    
+  "condition_with_numbers_123":
+    color: "#E67E22"
+    marker: ","
+    linestyle: "-"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Numbered Condition"
+    
+  "UPPERCASE_CONDITION":
+    color: "#2ECC71"
+    marker: "1"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.8
+    label: "Uppercase Condition"
+    
+  "MixedCase_Condition":
+    color: "#9B59B6"
+    marker: "2"
+    linestyle: "-"
+    linewidth: 2.2
+    alpha: 0.85
+    label: "Mixed Case Condition"
+
+# Complex palette definitions for multi-condition scenarios
+palettes:
+  experiment_phases:
+    phase1: "#E74C3C"
+    phase2: "#F39C12" 
+    phase3: "#27AE60"
+    phase4: "#3498DB"
+    phase5: "#9B59B6"
+    
+  model_types:
+    neural_network: "#FF6B35"
+    linear_regression: "#4ECDC4"
+    random_forest: "#45B7D1"
+    support_vector_machine: "#96CEB4"
+    gradient_boosting: "#FFEAA7"
+    
+  dataset_sizes:
+    small: "#DDA0DD"
+    medium: "#9370DB"
+    large: "#8A2BE2"
+    extra_large: "#4B0082"
+    
+  experimental_conditions:
+    baseline: "#2E86AB"
+    control: "#85C1E9"
+    treatment_low: "#F1948A"
+    treatment_medium: "#F24236"
+    treatment_high: "#A93226"
+    
+  publication_quality:
+    primary: "#000000"
+    secondary: "#333333"
+    tertiary: "#666666"
+    accent: "#2E86AB"
+    highlight: "#F24236"
+    background: "#F8F9FA"
+    
+  colorblind_accessible:
+    - "#1f77b4"  # Blue
+    - "#ff7f0e"  # Orange
+    - "#2ca02c"  # Green
+    - "#d62728"  # Red
+    - "#9467bd"  # Purple
+    - "#8c564b"  # Brown
+    - "#e377c2"  # Pink
+    - "#7f7f7f"  # Gray
+    - "#bcbd22"  # Olive
+    - "#17becf"  # Cyan
+
+# Advanced default styling with conditional rcParams
+defaults:
+  figure:
+    figsize: [12, 8]
+    dpi: 200
+    facecolor: "white"
+    edgecolor: "none"
+    tight_layout: true
+    constrained_layout: false
+    
+  line:
+    color: "#2E86AB"
+    linewidth: 2.0
+    alpha: 0.8
+    solid_capstyle: "round"
+    solid_joinstyle: "round"
+    dash_capstyle: "round"
+    dash_joinstyle: "round"
+    
+  scatter:
+    s: 64
+    alpha: 0.7
+    edgecolors: "#2C3E50"
+    linewidth: 0.8
+    marker: "o"
+    
+  bar:
+    alpha: 0.8
+    edgecolor: "#2C3E50"
+    linewidth: 0.5
+    align: "center"
+    
+  histogram:
+    alpha: 0.7
+    edgecolor: "#2C3E50"
+    linewidth: 0.8
+    bins: 30
+    density: false
+    
+  errorbar:
+    elinewidth: 1.5
+    capsize: 4
+    capthick: 1.5
+    alpha: 0.8
+    
+  fallback_style:
+    color: "#95A5A6"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    alpha: 0.6
+    label: "Unknown Condition"
+    markersize: 6
+    markeredgecolor: "#7F8C8D"
+    markeredgewidth: 0.5
+
+# Complex output configuration with conditional path generation
+outputs:
+  base_path: "data/08_reporting/complex_conditions"
+  
+  naming:
+    template: "{purpose}_{condition}_{experiment_phase}_{model_type}_{ts}"
+    timestamp_format: "%Y%m%d_%H%M%S"
+    slug_separator: "_"
+    max_filename_length: 255
+    
+  formats:
+    defaults:
+      exploratory: ["png"]
+      presentation: ["png", "pdf"]
+      publication: ["pdf", "svg", "eps"]
+      
+    resolution:
+      png: {dpi: 300, bbox_inches: "tight", facecolor: "white"}
+      pdf: {dpi: 300, bbox_inches: "tight", facecolor: "white"}
+      svg: {dpi: 300, bbox_inches: "tight", facecolor: "white"}
+      eps: {dpi: 300, bbox_inches: "tight", facecolor: "white"}
+      
+    quality_presets:
+      draft: {dpi: 150, quality: 75}
+      standard: {dpi: 200, quality: 85}
+      high: {dpi: 300, quality: 95}
+      publication: {dpi: 600, quality: 100}
+      
+  paths:
+    exploratory: "exploratory/{experiment_phase}/{model_type}"
+    presentation: "presentation/{experiment_phase}"
+    publication: "publication/final"
+    archive: "archive/{year}/{month}"
+    
+  conditional_paths:
+    # Path generation based on condition patterns
+    "*_control": "controls/{experiment_phase}"
+    "*_treatment": "treatments/{experiment_phase}"
+    "baseline_*": "baselines/{model_type}"
+    "phase1_*": "phase1_results/{dataset_size}"
+    "phase2_*": "phase2_results/{dataset_size}"
+    "neural_network_*": "ml_models/neural_networks"
+    "linear_regression_*": "ml_models/linear_models"
+    "stress_test_*": "performance_tests/stress"
+
+# Advanced style inheritance configuration
+style_inheritance:
+  enabled: true
+  hierarchy: ["specific", "wildcard", "category", "defaults"]
+  merge_strategy: "deep_merge"
+  
+  inheritance_rules:
+    # Specific conditions override wildcards
+    specific_precedence: true
+    # Wildcard patterns are processed in order of specificity
+    wildcard_ordering: ["longest_match", "most_specific", "first_defined"]
+    # Category fallbacks for unmatched conditions
+    category_fallback: true
+    # Default style application for complete misses
+    defaults_fallback: true
+    
+  conflict_resolution:
+    # How to handle conflicting style properties
+    strategy: "last_wins"  # Options: "first_wins", "last_wins", "merge_deep"
+    # Whether to warn about conflicts
+    warn_conflicts: true
+    # Log level for conflict warnings
+    conflict_log_level: "warning"
+
+# Sophisticated conditional rules for pattern matching
+conditional_rules:
+  # Wildcard pattern matching configuration
+  wildcard_patterns:
+    enabled: true
+    patterns:
+      - "*_control"
+      - "*_treatment" 
+      - "*_baseline"
+      - "baseline_*"
+      - "phase1_*"
+      - "phase2_*"
+      - "neural_network_*"
+      - "linear_regression_*"
+      - "random_forest_*"
+      - "stress_test_*"
+    # Processing order for wildcard matches
+    precedence_order: "longest_match_first"
+    
+  # Partial string matching
+  partial_matching:
+    enabled: true
+    # Match substrings within condition names
+    substring_matching: true
+    # Case sensitivity for matching
+    case_sensitive: false
+    # Fuzzy matching threshold (0.0 to 1.0)
+    fuzzy_threshold: 0.8
+    
+  # Regular expression patterns for advanced matching
+  regex_patterns:
+    enabled: true
+    patterns:
+      # Match conditions with numeric suffixes
+      numeric_suffix: ".*_\\d{3}$"  # e.g., stress_test_001
+      # Match hierarchical dot notation
+      hierarchical: "^\\w+\\.\\w+\\.\\w+$"  # e.g., experiment.control.batch_a
+      # Match complex multi-part conditions
+      multi_dimensional: "^\\w+_\\w+_\\w+_\\w+$"  # e.g., neural_network_training_large
+      
+  # Condition transformation rules
+  transformations:
+    # Normalize condition names before matching
+    normalize_case: true
+    # Replace characters for consistency
+    character_replacement:
+      "-": "_"
+      " ": "_"
+      ".": "_"
+    # Remove invalid characters
+    strip_invalid: true
+    
+  # Cache configuration for condition resolution
+  caching:
+    enabled: true
+    # Maximum number of cached condition resolutions
+    max_cache_size: 10000
+    # Cache timeout in seconds (0 = no timeout)
+    cache_timeout: 3600
+    # Enable cache statistics tracking
+    track_statistics: true
+    
+  # Performance optimization settings
+  performance:
+    # Enable parallel condition processing
+    parallel_processing: true
+    # Maximum number of worker threads
+    max_workers: 4
+    # Batch size for parallel processing
+    batch_size: 100
+    # Enable condition pre-compilation
+    precompile_patterns: true
+
+# Advanced performance configuration for complex condition resolution
+performance:
+  cache_enabled: true
+  max_cache_size: 50000
+  cache_timeout_seconds: 7200
+  
+  # Target performance metrics (per F-002 requirements)
+  target_resolution_time_ms: 1.0  # <1ms for style lookup requirement
+  target_merge_time_ms: 10.0
+  max_acceptable_time_ms: 50.0
+  
+  # Memory management
+  memory_limits:
+    max_style_cache_mb: 100
+    max_pattern_cache_mb: 50
+    gc_threshold: 1000
+    
+  # Optimization strategies
+  optimizations:
+    enable_condition_indexing: true
+    enable_pattern_compilation: true
+    enable_result_memoization: true
+    enable_lazy_evaluation: true
+    
+  # Performance monitoring
+  monitoring:
+    enable_metrics_collection: true
+    log_slow_operations: true
+    slow_operation_threshold_ms: 10.0
+    track_cache_hit_ratio: true
+    
+  # Stress testing configuration
+  stress_testing:
+    max_concurrent_requests: 1000
+    test_condition_count: 10000
+    pattern_complexity_levels: [1, 5, 10, 20, 50]
+
+# Comprehensive validation configuration
+validation:
+  # Schema validation strictness
+  strict_mode: true
+  
+  # Required configuration sections
+  required_fields:
+    - "styles"
+    - "defaults"
+    - "outputs"
+    - "style_inheritance"
+    - "conditional_rules"
+    
+  # Style definition validation
+  style_validation:
+    require_color: true
+    require_marker: false
+    require_linewidth: false
+    allow_custom_properties: true
+    validate_color_format: true
+    validate_marker_symbols: true
+    
+  # Pattern validation
+  pattern_validation:
+    validate_regex_syntax: true
+    warn_overlapping_patterns: true
+    check_pattern_coverage: true
+    validate_wildcard_syntax: true
+    
+  # Performance validation
+  performance_validation:
+    enforce_cache_limits: true
+    warn_expensive_patterns: true
+    validate_timeout_settings: true
+    check_memory_constraints: true
+    
+  # Error handling configuration
+  error_handling:
+    fail_on_invalid_patterns: false
+    warn_on_condition_misses: true
+    log_validation_errors: true
+    aggregate_error_reporting: true
+
+# Metadata for condition mapping and testing
+condition_metadata:
+  # Test scenario categorization
+  test_categories:
+    basic_conditions: ["baseline", "control", "treatment"]
+    wildcard_patterns: ["*_control", "*_treatment", "*_baseline", "baseline_*", "phase1_*", "phase2_*"]
+    multi_dimensional: ["neural_network_training_large", "linear_regression_training_medium", "random_forest_inference_small"]
+    hierarchical: ["experiment.control.batch_a", "experiment.treatment.high_dose"]
+    stress_test: ["stress_test_001", "stress_test_002", "stress_test_003", "stress_test_004", "stress_test_005"]
+    edge_cases: ["condition-with-dashes", "condition_with_numbers_123", "UPPERCASE_CONDITION", "MixedCase_Condition"]
+    
+  # Expected resolution patterns for testing
+  resolution_expectations:
+    "drug_trial_control": "should_match_*_control"
+    "baseline_experiment": "should_match_baseline_*"
+    "phase1_training": "should_match_phase1_*"
+    "neural_network_training_large": "should_match_exact"
+    "experiment.control.batch_a": "should_match_exact"
+    "unknown_condition": "should_fallback_to_defaults"
+    
+  # Performance benchmarks
+  performance_benchmarks:
+    simple_lookup_max_ms: 0.5
+    wildcard_resolution_max_ms: 2.0
+    complex_pattern_max_ms: 5.0
+    cache_hit_max_ms: 0.1
+    full_resolution_max_ms: 10.0
+    
+  # Coverage requirements
+  coverage_requirements:
+    condition_types_covered: 6  # basic, wildcard, multi-dimensional, hierarchical, stress, edge
+    pattern_types_tested: 4    # exact, wildcard, regex, fuzzy
+    inheritance_levels_tested: 4  # specific, wildcard, category, defaults
+    performance_scenarios: 5   # cache hit, cache miss, stress, concurrent, timeout

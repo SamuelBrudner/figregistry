@@ -1,0 +1,669 @@
+# =============================================================================
+# Local Development Parameters Configuration - Advanced Example
+# =============================================================================
+#
+# Development-optimized parameters configuration providing simplified experimental
+# conditions, reduced computational complexity, and rapid iteration capabilities
+# for local FigRegistry-Kedro integration development. This configuration maintains
+# the sophisticated parameter structure of the advanced example while optimizing
+# for development speed, debugging efficiency, and quick plugin validation.
+#
+# Key Development Optimizations:
+# - Simplified experimental condition parameters for rapid testing (F-002)
+# - Reduced model complexity for faster pipeline execution per Section 3.6.1
+# - Development-specific parameter values for quick plugin validation (F-005-RQ-004)
+# - Minimal representative scenarios for efficient condition_param resolution
+# - Lightweight parameter sets enabling fast iteration workflows
+# - Debug-friendly parameter hierarchies with clear naming conventions
+# - Development parameter overrides supporting rapid prototyping scenarios
+#
+# This configuration enables efficient testing of:
+# - FigureDataSet condition_param resolution mechanisms
+# - Configuration bridge parameter merging (F-007-RQ-002)
+# - Complex condition-based styling patterns in simplified scenarios
+# - Multi-environment parameter management without production overhead
+# - Advanced parameter-driven styling with rapid feedback cycles
+# =============================================================================
+
+# ==============================================================================
+# SIMPLIFIED EXPERIMENTAL DESIGN PARAMETERS
+# ==============================================================================
+
+# Streamlined experimental framework for rapid development testing
+experimental_design:
+  # Primary experiment configuration - simplified for development
+  experiment_id: "dev_figregistry_quick_test"
+  experiment_type: "development_validation"
+  experiment_phase: "local_testing"
+  
+  # Simplified experimental conditions for rapid condition-based styling testing
+  experimental_conditions:
+    # Single control group for quick testing
+    control:
+      condition_id: "dev_test_basic"
+      group_name: "control"
+      sample_size: 100               # Reduced from 1000 for speed
+      random_seed: 42
+      description: "Development control group for quick testing"
+      
+    # Two treatment groups for essential A/B testing
+    treatment_groups:
+      group_a:
+        condition_id: "dev_test_advanced"
+        group_name: "treatment_a"
+        treatment_type: "algorithm_enhancement"
+        sample_size: 100             # Reduced from 1000 for speed
+        random_seed: 43
+        description: "Development treatment A for quick validation"
+        
+      group_b:
+        condition_id: "dev_test_debug"
+        group_name: "treatment_b"
+        treatment_type: "hyperparameter_optimization"
+        sample_size: 100             # Reduced from 1000 for speed
+        random_seed: 44
+        description: "Development treatment B for debug testing"
+  
+  # Simplified significance levels for rapid testing
+  significance_levels:
+    significant:
+      condition_id: "quick_treatment_a"
+      threshold: 0.05
+      symbol: "*"
+      description: "Development significant results"
+      
+    not_significant:
+      condition_id: "quick_control"
+      threshold: 1.0
+      symbol: "ns"
+      description: "Development non-significant results"
+
+# ==============================================================================
+# LIGHTWEIGHT TRAINING PIPELINE PARAMETERS
+# ==============================================================================
+
+# Simplified training configuration for rapid development iteration
+training_pipeline:
+  # Streamlined data processing for development speed
+  data_processing:
+    # Development data configuration with minimal overhead
+    raw_data:
+      condition_id: "dev_training"
+      data_source: "sample_dataset_small"
+      data_version: "dev-1.0"
+      quality_score: 0.8
+      sample_size_limit: 1000        # Small sample for development
+      
+    # Quick data processing for development
+    cleaned_data:
+      condition_id: "dev_validation"
+      cleaning_strategy: "basic_cleanup"
+      missing_value_strategy: "simple_fill"
+      quality_score: 0.85
+      sample_size_limit: 1000        # Small sample for development
+      
+    # Minimal transformation for development speed
+    transformed_data:
+      condition_id: "dev_testing"
+      transformation_pipeline: "StandardScaler"  # Simplified from complex pipeline
+      feature_count: 20               # Reduced from 157 for speed
+      dimensionality_reduction_ratio: 0.5  # Less aggressive for speed
+      quality_score: 0.9
+  
+  # Simplified model configuration for development testing
+  model_configurations:
+    # Basic development model only
+    development_model:
+      model_type: "development"
+      model_name: "logistic_regression_dev"
+      condition_id: "dev_exploratory"
+      algorithm: "LogisticRegression"
+      hyperparameters:
+        C: 1.0
+        max_iter: 100               # Reduced from 1000 for speed
+        random_state: 42
+        solver: "liblinear"
+      expected_performance:
+        accuracy: 0.75              # Relaxed expectations for development
+        f1_score: 0.70
+        
+    # Quick candidate model for testing
+    quick_candidate:
+      model_type: "candidate"
+      model_name: "random_forest_quick"
+      condition_id: "dev_presentation"
+      algorithm: "RandomForestClassifier"
+      hyperparameters:
+        n_estimators: 10            # Reduced from 200 for speed
+        max_depth: 5                # Reduced from 15 for speed
+        random_state: 42
+      expected_performance:
+        accuracy: 0.78              # Relaxed expectations for development
+        f1_score: 0.75
+  
+  # Simplified training configuration for development
+  training_configuration:
+    # Quick cross-validation for development
+    cross_validation:
+      strategy: "k_fold"            # Simplified from stratified
+      n_splits: 3                   # Reduced from 5 for speed
+      shuffle: true
+      random_state: 42
+      
+    # Essential metrics only for development
+    evaluation_metrics:
+      primary_metric: "accuracy"    # Simplified from f1_score
+      secondary_metrics:
+        - "precision"
+        - "recall"
+      
+    # Simplified optimization for development
+    optimization:
+      early_stopping:
+        enabled: true
+        patience: 3                 # Reduced from 10 for speed
+        min_delta: 0.01             # Relaxed from 0.001 for speed
+      
+      hyperparameter_tuning:
+        method: "grid_search"       # Simplified from bayesian
+        n_trials: 10                # Reduced from 100 for speed
+        timeout_minutes: 5          # Reduced from 60 for speed
+
+# ==============================================================================
+# SIMPLIFIED INFERENCE PIPELINE PARAMETERS
+# ==============================================================================
+
+# Streamlined inference configuration for development testing
+inference_pipeline:
+  # Simplified prediction types for development
+  prediction_types:
+    # Development batch prediction only
+    development_batch:
+      prediction_type: "development"
+      condition_id: "dev_publication"
+      batch_size: 100               # Reduced from 10000 for speed
+      processing_frequency: "on_demand"  # On-demand for development
+      output_format: "csv"          # Simplified from parquet
+      quality_threshold: 0.8        # Relaxed for development
+  
+  # Simplified confidence levels for development testing
+  confidence_levels:
+    # High confidence for development testing
+    dev_high_confidence:
+      confidence_level: "high"
+      condition_id: "quick_treatment_b"
+      threshold: 0.8                # Relaxed from 0.85
+      auto_approve: true
+      review_required: false
+      
+    # Medium confidence for development testing
+    dev_medium_confidence:
+      confidence_level: "medium"
+      condition_id: "quick_control"
+      threshold: 0.6                # Relaxed from 0.65
+      auto_approve: false
+      review_required: true
+  
+  # Simplified model serving for development
+  model_serving:
+    # Development model configuration
+    development_model:
+      model_version: "dev-1.0"
+      serving_endpoint: "/dev/predict"
+      max_concurrent_requests: 10   # Reduced from 500
+      model_warming_enabled: false  # Disabled for development
+      
+    # Simplified A/B testing for development
+    ab_testing:
+      enabled: false                # Disabled for development simplicity
+      traffic_split:
+        champion_model: 1.0         # Single model for development
+  
+  # Basic monitoring for development
+  monitoring:
+    # Simplified drift detection
+    drift_detection:
+      enabled: false                # Disabled for development
+      
+    # Basic data quality monitoring
+    data_quality:
+      completeness_threshold: 0.8   # Relaxed for development
+      consistency_threshold: 0.85   # Relaxed for development
+      validity_threshold: 0.8       # Relaxed for development
+      freshness_threshold_hours: 168 # Relaxed to 1 week for development
+
+# ==============================================================================
+# STREAMLINED REPORTING PIPELINE PARAMETERS
+# ==============================================================================
+
+# Simplified reporting configuration for development testing
+reporting_pipeline:
+  # Essential report types for development
+  report_types:
+    # Development summary only
+    development_summary:
+      report_type: "development"
+      condition_id: "dev_exploratory"
+      target_audience: "developers"
+      format: "quick_overview"
+      page_limit: 1                 # Single page for development
+      chart_complexity: "simple"    # Simplified for development
+      technical_detail_level: "basic"
+  
+  # Essential reporting sections for development
+  report_sections:
+    # Performance overview only
+    quick_performance:
+      section_name: "performance"
+      condition_id: "dev_presentation"
+      content_type: "quick_analysis"
+      visualizations:
+        - "basic_comparison_charts"
+        - "simple_performance_plots"
+      metrics_included:
+        - "accuracy_scores"
+        - "basic_performance_metrics"
+  
+  # Simplified output specifications for development
+  output_specifications:
+    # Development format only
+    development_output:
+      format: "simple_plots"
+      template: "development_standard"
+      chart_style: "debug_friendly"
+      color_scheme: "high_contrast"
+      animation_enabled: false
+
+# ==============================================================================
+# DEVELOPMENT ENVIRONMENT PARAMETERS
+# ==============================================================================
+
+# Development-specific environment configuration
+environment_configuration:
+  # Local development environment only
+  local_development:
+    environment_name: "local"
+    debug_mode: true
+    verbose_logging: true
+    performance_monitoring: true
+    
+    # Development-optimized model parameters
+    model_parameters:
+      training_iterations: 5         # Reduced from 10 for speed
+      cross_validation_folds: 2      # Reduced from 3 for speed
+      hyperparameter_search_trials: 5  # Reduced from 20 for speed
+      early_stopping_patience: 2    # Reduced from 5 for speed
+      
+    # Development data configuration
+    data_configuration:
+      sample_size_limit: 500         # Small sample for development
+      enable_data_caching: false     # Disabled for hot reload
+      fast_preprocessing: true
+      skip_validation: true          # Skip for development speed
+      
+    # Development output settings
+    output_settings:
+      save_intermediate_results: true
+      generate_debug_plots: true
+      create_model_artifacts: false
+      enable_experiment_tracking: false
+
+# ==============================================================================
+# SIMPLIFIED CONDITION PARAMETER MAPPING
+# ==============================================================================
+
+# Streamlined parameter mapping for efficient FigureDataSet testing
+condition_parameter_mapping:
+  # Development training conditions
+  training_conditions:
+    # Simple data condition mapping
+    data_quality_condition: "dev_training"  # Maps to local dev styles
+    
+    # Simple model condition mapping
+    model_type: "development"        # Resolves to dev_exploratory condition
+    model_name: "logistic_regression_dev"
+    model_algorithm: "logistic"
+    
+    # Simple performance mapping
+    performance_level: "basic"       # Development performance level
+    validation_score: 0.75          # Relaxed validation score
+    
+    # Development environment
+    training_environment: "local"    # Maps to local development styles
+  
+  # Development inference conditions
+  inference_conditions:
+    # Simple prediction mapping
+    prediction_type: "development"   # Resolves to dev_publication
+    
+    # Simple confidence mapping
+    confidence_level: "high"         # Resolves to quick_treatment_b
+    confidence_threshold: 0.8        # Relaxed threshold
+    
+    # Development environment
+    inference_environment: "local"   # Maps to local development styles
+  
+  # Development reporting conditions
+  reporting_conditions:
+    # Simple report mapping
+    report_type: "development"       # Resolves to dev_exploratory
+    
+    # Simple section mapping
+    report_section: "performance"    # Resolves to dev_presentation
+    section_name: "performance"
+    
+    # Development environment
+    reporting_environment: "local"   # Maps to local development styles
+  
+  # Development experimental conditions - simplified for testing
+  experimental_conditions:
+    # Simple experimental group mapping
+    experimental_group: "treatment_a"  # Resolves to dev_test_advanced
+    group_id: "treatment_a"
+    
+    # Simple significance mapping
+    significance_level: "significant"  # Resolves to quick_treatment_a
+    p_value: 0.03                    # Simple significant result
+    
+    # Simple control mapping
+    control_group: "control"         # Resolves to dev_test_basic
+
+# ==============================================================================
+# DEVELOPMENT PERFORMANCE PARAMETERS
+# ==============================================================================
+
+# Simplified performance monitoring for development
+performance_monitoring:
+  # Relaxed performance targets for development
+  benchmarking:
+    target_metrics:
+      style_lookup_time_ms: 5.0      # Relaxed from 1.0ms for development
+      figure_save_overhead_percent: 15.0  # Relaxed from 5.0% for development
+      config_merge_time_ms: 50.0     # Relaxed from 10.0ms for development
+      
+    measurement_intervals:
+      real_time_monitoring: false    # Disabled for development
+      batch_reporting_frequency: "daily"  # Less frequent for development
+      detailed_analysis_frequency: "weekly"  # Less frequent for development
+      
+  # Simplified quality assurance
+  quality_assurance:
+    validation_levels:
+      configuration_validation: "basic"  # Relaxed for development
+      parameter_validation: "minimal"    # Minimal for development speed
+      output_validation: "disabled"      # Disabled for development speed
+      
+    error_handling:
+      fallback_strategy: "permissive"    # Permissive for development
+      error_logging: "basic"             # Basic for development
+      retry_mechanisms: "disabled"       # Disabled for development
+      
+  # Simplified caching for development
+  caching:
+    style_cache_size: 100            # Reduced from 1000 for development
+    configuration_cache_ttl_seconds: 60  # Reduced from 300 for development
+    enable_cache_warming: false      # Disabled for development
+    cache_hit_rate_target: 0.5       # Relaxed from 0.85 for development
+
+# ==============================================================================
+# SIMPLIFIED EXPERIMENTAL SCENARIOS
+# ==============================================================================
+
+# Essential experimental scenarios for development testing
+experimental_scenarios:
+  # Basic comparison scenario for development
+  simple_comparison_study:
+    scenario_name: "dev_basic_comparison"
+    scenario_type: "development_test"
+    
+    # Essential conditions for testing
+    conditions:
+      control_test:
+        condition_id: "dev_test_basic"
+        algorithm: "logistic_regression"
+        performance_tier: "basic"
+        
+      treatment_test:
+        condition_id: "dev_test_advanced"
+        algorithm: "random_forest"
+        performance_tier: "enhanced"
+    
+    # Simple visualization requirements
+    visualization_requirements:
+      chart_types: ["basic_comparison", "simple_performance"]
+      styling_complexity: "simple"
+      condition_resolution: "direct"
+  
+  # Quick A/B testing scenario
+  quick_ab_test:
+    scenario_name: "dev_quick_ab_test"
+    scenario_type: "ab_testing"
+    
+    # Simple A/B conditions
+    ab_conditions:
+      variant_a:
+        condition_id: "quick_treatment_a"
+        effect_size: "medium"
+        
+      variant_b:
+        condition_id: "quick_treatment_b"
+        effect_size: "small"
+        
+      control:
+        condition_id: "quick_control"
+        effect_size: "none"
+    
+    # Simple styling requirements
+    styling_requirements:
+      significance_indicators: "basic_symbols"
+      confidence_intervals: "simple_lines"
+      effect_size_encoding: "color_intensity"
+
+# ==============================================================================
+# DEVELOPMENT METADATA AND TRACKING
+# ==============================================================================
+
+# Simplified metadata for development tracking
+metadata:
+  # Development configuration metadata
+  example_metadata:
+    version: "1.0.0-dev-local"
+    created_date: "2024-12-19"
+    last_modified: "2024-12-19"
+    author: "FigRegistry-Kedro Local Development"
+    purpose: "rapid_development_testing"
+    
+  # Development compliance settings
+  compliance:
+    figregistry_version: ">=0.3.0"
+    kedro_version: ">=0.18.0,<0.20.0"
+    python_version: ">=3.10"
+    optimization_level: "development"
+    
+  # Essential feature demonstrations for development
+  feature_demonstrations:
+    f_002_condition_based_styling: true
+    f_005_figuredataset_integration: true
+    f_005_rq_004_context_injection: true
+    f_007_configuration_bridge: true
+    rapid_iteration_support: true
+    development_debugging: true
+    simplified_parameter_resolution: true
+    
+  # Development documentation
+  documentation:
+    configuration_guide: "docs/development/local-config.md"
+    development_examples: "examples/advanced/local-development.md"
+    debugging_guide: "docs/development/debugging.md"
+    
+  # Development quality metrics
+  quality_metrics:
+    parameter_coverage: "essential"
+    condition_complexity: "simplified"
+    styling_demonstration: "basic"
+    integration_completeness: "development"
+    
+  # Development objectives
+  educational_objectives:
+    - "Enable rapid condition-based styling testing"
+    - "Support quick FigureDataSet validation"
+    - "Facilitate efficient parameter resolution debugging"
+    - "Provide fast feedback cycles for plugin development"
+    - "Enable simplified experimental design validation"
+    - "Support efficient configuration bridge testing"
+    - "Optimize for development speed and debugging"
+
+# ==============================================================================
+# DEVELOPMENT-SPECIFIC PARAMETER SHORTCUTS
+# ==============================================================================
+
+# Quick parameter shortcuts for common development scenarios
+dev_shortcuts:
+  # Condition parameter shortcuts for rapid testing
+  condition_params:
+    # Basic development test conditions
+    dev_condition: "dev_test_basic"          # -> Bright red styling
+    experiment_condition: "dev_test_advanced" # -> Bright green styling
+    debug_condition: "dev_test_debug"        # -> Bright blue styling
+    
+    # Quick experimental conditions  
+    quick_condition: "quick_treatment_a"     # -> Simple experimental styling
+    control_condition: "quick_control"      # -> Simple control styling
+    
+    # Pipeline stage conditions
+    stage_condition: "dev_training"          # -> Development pipeline styling
+    
+  # Model parameter shortcuts for development
+  model_params:
+    # Quick model configurations
+    dev_model_type: "development"
+    quick_model_type: "candidate"
+    test_model_type: "baseline"
+    
+    # Simple performance levels
+    performance_level: "basic"
+    validation_level: "minimal"
+    
+  # Environment shortcuts for development
+  environment_params:
+    # Development environment settings
+    env_type: "local"
+    debug_mode: true
+    verbose_output: true
+    
+    # Performance optimization settings
+    optimize_for_speed: true
+    enable_caching: false
+    hot_reload_compatible: true
+    
+  # Output shortcuts for development
+  output_params:
+    # Development output settings
+    output_quality: "development"
+    save_format: "png"
+    resolution: "standard"
+    
+    # Debug output settings
+    debug_output: true
+    intermediate_saves: true
+    validation_plots: true
+
+# ==============================================================================
+# DEVELOPMENT VALIDATION AND TESTING PARAMETERS
+# ==============================================================================
+
+# Parameters specifically for validating FigRegistry-Kedro integration
+integration_validation:
+  # FigureDataSet validation parameters
+  figuredataset_tests:
+    # Basic save/load testing
+    basic_operations:
+      test_condition: "dev_test_basic"
+      expected_style_color: "#FF0000"    # From local figregistry.yml development palette
+      expected_marker: "o"
+      
+    # Advanced parameter resolution testing
+    parameter_resolution:
+      condition_param_test: "dev_condition"
+      resolved_condition: "dev_test_basic"
+      style_lookup_expected: true
+      
+    # Configuration bridge testing
+    config_bridge_tests:
+      merge_test_condition: "experiment_condition"
+      expected_precedence: "local_overrides_base"
+      validation_enabled: true
+      
+  # Performance validation for development
+  performance_tests:
+    # Speed benchmarks for development
+    speed_benchmarks:
+      max_style_lookup_ms: 10.0      # Relaxed for development
+      max_save_overhead_percent: 20.0 # Relaxed for development
+      max_config_merge_ms: 100.0     # Relaxed for development
+      
+    # Memory usage for development
+    memory_tests:
+      enable_memory_tracking: false   # Disabled for development speed
+      max_memory_overhead_mb: 50.0    # Relaxed for development
+      
+  # Error handling validation
+  error_handling_tests:
+    # Invalid condition testing
+    invalid_conditions:
+      test_invalid_condition: "nonexistent_condition"
+      expected_fallback: "debug_fallback"
+      
+    # Missing parameter testing
+    missing_parameters:
+      test_missing_condition_param: null
+      expected_behavior: "use_defaults"
+      
+    # Configuration error testing
+    config_errors:
+      test_invalid_config: "malformed_yaml"
+      expected_behavior: "graceful_degradation"
+
+# ==============================================================================
+# DEVELOPMENT USAGE NOTES AND EXAMPLES
+# ==============================================================================
+#
+# Quick Development Usage:
+# 
+# 1. Basic FigureDataSet Testing:
+#    - condition_param: "dev_condition" -> Uses "dev_test_basic" -> Bright red circles
+#    - condition_param: "experiment_condition" -> Uses "dev_test_advanced" -> Bright green squares
+#    - condition_param: "debug_condition" -> Uses "dev_test_debug" -> Bright blue triangles
+#
+# 2. A/B Testing Scenarios:
+#    - condition_param: "quick_condition" -> Uses "quick_treatment_a" -> Light red styling
+#    - condition_param: "control_condition" -> Uses "quick_control" -> Light blue styling
+#
+# 3. Pipeline Stage Testing:
+#    - condition_param: "stage_condition" -> Uses "dev_training" -> Development pipeline styling
+#
+# 4. Model Performance Testing:
+#    - model_type: "development" -> Uses basic development model with fast training
+#    - performance_level: "basic" -> Uses relaxed performance expectations
+#
+# 5. Environment Testing:
+#    - env_type: "local" -> Enables development debugging features
+#    - debug_mode: true -> Enables verbose logging and detailed error messages
+#
+# 6. Output Testing:
+#    - All figures saved to: data/08_reporting/figures/development/
+#    - PNG format with 150 DPI for development speed
+#    - Enhanced debugging metadata included
+#
+# 7. Configuration Bridge Testing:
+#    - Local parameters override base parameters
+#    - FigRegistry styles merge with Kedro configuration
+#    - Enhanced logging for debugging configuration issues
+#
+# 8. Performance Optimization for Development:
+#    - Reduced sample sizes (100-1000 vs production 10000+)
+#    - Simplified models (LogisticRegression vs complex ensembles)
+#    - Fast hyperparameter tuning (5-10 trials vs production 100+)
+#    - Relaxed performance targets for development speed
+#
+# =============================================================================

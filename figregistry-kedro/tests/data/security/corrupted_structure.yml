@@ -1,0 +1,287 @@
+# Systematically Corrupted YAML Configuration for Parser Resilience Testing
+# 
+# This file contains intentionally malformed YAML structures designed to test
+# the FigRegistryConfigBridge parser's resilience against systematic corruption,
+# encoding issues, and parsing edge cases per Section 6.6.8.1 of the technical
+# specification. The corruption scenarios validate comprehensive error recovery
+# and security boundary maintenance under adverse conditions.
+#
+# TEST CATEGORIES COVERED:
+# 1. Structural corruption and indentation violations
+# 2. Encoding corruption and character sequence manipulation
+# 3. Memory exhaustion attacks through malformed structures
+# 4. Unicode manipulation vectors targeting parser vulnerabilities
+# 5. Nested corruption and recursive structure damage
+# 6. Parser exploitation attempts and security boundary testing
+#
+# SECURITY VALIDATION FOCUS:
+# - Configuration parser resilience against systematic damage
+# - Error handling robustness and graceful degradation
+# - Protection against parser exploitation and memory exhaustion
+# - Security boundary maintenance during error recovery scenarios
+
+# Section 1: Basic Structural Corruption - Tests basic parser resilience
+figregistry_version: ">=0.3.0"
+metadata:
+  config_version: "corrupted_test_1.0.0"
+  description: "Corrupted configuration for security testing"
+  
+# Corruption Vector 1: Malformed Indentation Patterns
+styles:
+  # Correct indentation baseline
+  baseline:
+    color: "#FF0000"
+    linewidth: 2.0
+    
+  # Inconsistent indentation - should cause parsing errors
+    inconsistent_indent:
+      color: "#00FF00"
+        linewidth: 1.5  # Wrong indentation level
+    marker: "o"  # Back to wrong level
+    
+  # Mixed tabs and spaces (invisible corruption)
+  tab_space_mix:
+    color: "#0000FF"
+	linewidth: 2.0  # Tab character instead of spaces
+    alpha: 0.8
+    
+  # Zero-width character injection (U+200B)
+  ​zero_width_injection:  # Zero-width space in key name
+    color: "#FF00FF"
+    linewidth: 2.0​  # Zero-width space at end of value
+
+# Corruption Vector 2: Syntax Corruption and Structural Violations
+defaults:
+  figure:
+    figsize: [10, 8
+    # Missing closing bracket - syntax error
+    dpi: 150
+    facecolor: "white"
+    
+  line:
+    color: "#2E86AB"
+    linewidth: 2.0
+    alpha: 0.8}  # Unmatched closing brace
+    
+  # Duplicate key corruption
+  figure:  # Duplicate key should cause issues
+    figsize: [8, 6]
+    dpi: 300
+
+# Corruption Vector 3: Character Encoding Attacks and Unicode Manipulation
+outputs:
+  base_path: "data/08_reporting"
+  naming:
+    # Unicode normalization attack - visually identical but different bytes
+    template: "{name}_{condition}_{ts}"  # Normal ASCII
+    templаte: "{name}_{condition}_{ts}"  # Cyrillic 'а' instead of 'a'
+    
+  # Unicode control character injection
+  formats:
+    defaults:
+      # Bidirectional text attack (RTL override)
+      exploratory: ["png", "pdf‮gpj"]  # RTL override character
+      
+      # Null byte injection attempt
+      presentation: ["png\x00", "pdf"]
+      
+      # Unicode confusable attack
+      publicatiοn: ["pdf", "svg"]  # Greek omicron instead of 'o'
+
+# Corruption Vector 4: Memory Exhaustion Through Malformed Structure
+# Deep nesting attack - attempt to exhaust parser memory
+deeply_nested_corruption:
+  level1:
+    level2:
+      level3:
+        level4:
+          level5:
+            level6:
+              level7:
+                level8:
+                  level9:
+                    level10:
+                      level11:
+                        level12:
+                          level13:
+                            level14:
+                              level15:
+                                # Extremely deep nesting continues...
+                                level16: {level17: {level18: {level19: {level20: "deep_value"}}}}
+
+# Corruption Vector 5: Recursive Structure Damage
+recursive_reference_attack:
+  # YAML anchor/alias abuse for potential infinite loops
+  anchor_definition: &corrupt_anchor
+    self_reference: *corrupt_anchor  # Self-referential structure
+    data: "corrupted"
+    
+  # Circular reference attempt
+  circular_a: &circular_a
+    ref_to_b: *circular_b
+    
+  circular_b: &circular_b
+    ref_to_a: *circular_a
+
+# Corruption Vector 6: Parser Stress Testing with Complex Malformed Data
+parser_stress_test:
+  # Extremely long key name (>10KB) to test key parsing limits
+  this_is_an_extremely_long_key_name_designed_to_test_parser_limits_and_potentially_cause_buffer_overflow_or_memory_exhaustion_issues_by_creating_keys_that_exceed_reasonable_length_expectations_and_continue_for_many_characters_to_validate_robust_parsing_behavior_under_adversarial_conditions_that_might_be_encountered_in_real_world_scenarios_where_malicious_actors_attempt_to_exploit_configuration_parsers_through_various_attack_vectors_including_but_not_limited_to_buffer_overflow_attacks_memory_exhaustion_denial_of_service_attempts_and_other_security_vulnerabilities_that_could_compromise_system_integrity_and_application_security_posture_through_carefully_crafted_malicious_input_data_structures_designed_to_exploit_implementation_weaknesses_in_yaml_parsing_libraries_and_configuration_processing_systems: "stress_test_value"
+  
+  # Extremely long string value (>100KB)
+  long_string_attack: "This is an extremely long string value designed to test string parsing limits and memory allocation behavior under stress conditions. The string continues for many kilobytes to validate that the parser can handle large string values without memory exhaustion or buffer overflow vulnerabilities. This type of attack vector tests the robustness of string handling in YAML parsers and configuration processing systems by providing input that exceeds typical usage patterns and approaches system resource limits through carefully crafted input data designed to stress test memory allocation string processing and buffer management capabilities of the underlying parsing infrastructure while maintaining valid YAML syntax to ensure the attack vector focuses specifically on resource exhaustion rather than syntax errors or parsing failures due to malformed markup structures that would be caught by standard validation routines and error handling mechanisms implemented in production parsing systems and configuration management frameworks used in enterprise software deployment scenarios where security and reliability are critical operational requirements for maintaining system availability and preventing denial of service conditions caused by malicious input processing failures or resource exhaustion attacks targeting configuration loading and validation subsystems."
+  
+  # Array with excessive element count
+  massive_array: [
+    "element_1", "element_2", "element_3", "element_4", "element_5",
+    "element_6", "element_7", "element_8", "element_9", "element_10",
+    # ... continuing with many elements to test array parsing limits
+    "element_100", "element_200", "element_300", "element_400", "element_500"
+  ]
+
+# Corruption Vector 7: Byte-Level Manipulation and Encoding Issues
+encoding_corruption_tests:
+  # Invalid UTF-8 sequences (represented as hex in comments)
+  # Actual bytes: \xFF\xFE (invalid UTF-8 start)
+  invalid_utf8_key: "test_value"
+  
+  # BOM injection attempts
+  # UTF-8 BOM in middle of string
+  bom_injection: "normal_string\xEF\xBB\xBFwith_bom"
+  
+  # Mixed encoding attack (UTF-8 with Latin-1 bytes)
+  mixed_encoding: "UTF-8_string_with_latin1_bytes_\xFF\x80"
+  
+  # Overlong UTF-8 encoding attempt
+  overlong_encoding: "test_\xC0\x80_value"  # Overlong null encoding
+
+# Corruption Vector 8: YAML Specific Exploitation Attempts
+yaml_exploitation:
+  # YAML bomb - exponential expansion attack
+  yaml_bomb: &bomb
+    - <<: *bomb
+    - <<: *bomb
+    - <<: *bomb
+    
+  # Tag manipulation attempt
+  !!python/object/apply:os.system: ["echo 'code injection attempt'"]
+  
+  # Document separator injection
+  document_separator_injection: |
+    ---
+    malicious_document: true
+    ---
+    
+  # Comment injection with control characters
+  comment_injection: "value"  # Comment with \r\n\x00 control chars
+
+# Corruption Vector 9: Configuration Bridge Specific Attacks
+kedro_bridge_corruption:
+  # Kedro parameter injection attempt
+  _kedro_context:
+    parameters:
+      __import__: "os"  # Attempt to inject dangerous imports
+      experiment_condition: "'; rm -rf /; echo '"  # Shell injection attempt
+      
+  # Configuration merge pollution
+  __proto__:  # Prototype pollution attempt
+    polluted: true
+    
+  # Path traversal in configuration paths
+  malicious_path: "../../../../../../etc/passwd"
+  
+  # Environment variable injection
+  env_injection: "${USER:-malicious_default}"
+
+# Corruption Vector 10: Nested Corruption with Valid Wrapper
+valid_wrapper_malformed_content:
+  # Valid outer structure with corrupted inner content
+  styles:
+    # Valid style definition
+    valid_style:
+      color: "#FF0000"
+      linewidth: 2.0
+      
+    # Corrupted style definition within valid structure  
+    corrupted_style:
+      color: "#00FF00"
+      linewidth: "invalid_float_value"
+      marker: 123.456  # Type confusion
+      alpha: "not_a_number"
+      
+    # Binary data injection
+    binary_injection:
+      color: "#0000FF"
+      data: !!binary |
+        R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5
+        OTk6enp56enmlpaWNjY6Ojo4SEhP/++f/++f/++f/++f/++f/++f/++f/++f/+
+        +f/++f/++f/++f/++f/++SH+Dk1hZGUgd2l0aCBHSU1QACwAAAAADAAMAAAFLC
+        AgjoEwnuNAFOhpEMTRiggcz4BNJHrv/zCFcLiwMWYNG84BwwEeECcgggoBADs=
+
+# Corruption Vector 11: Error Cascade Amplification
+error_cascade_test:
+  # Multiple simultaneous error conditions
+  cascade_errors:
+    syntax_error: {malformed: "missing_close"  # Missing }
+    type_error: [1, 2, "mixed", 4.5, null, true, ]  # Trailing comma
+    reference_error: *nonexistent_anchor
+    encoding_error: "string_with_\xFF_invalid_byte"
+    
+  # Nested error propagation
+  nested_errors:
+    level1:
+      level2:
+        level3: "valid"
+        level3_error: {broken: "structure"  # Malformed at depth
+        level4:
+          level5: *another_nonexistent_anchor
+
+# Corruption Vector 12: Performance Degradation Attacks
+performance_attacks:
+  # Catastrophic backtracking in string parsing
+  regex_bomb: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaX"
+  
+  # Hash collision attack (if parser uses hash tables)
+  hash_collision_keys:
+    "Aa": "value1"  # These strings may hash to same value
+    "BB": "value2"  # depending on hash function implementation
+    "CC": "value3"
+    "DD": "value4"
+    
+  # Memory fragmentation attack
+  fragmentation_test:
+    small_1: "a"
+    large_1: "very_long_string_to_fragment_memory_allocation_patterns_and_potentially_cause_heap_fragmentation_issues"
+    small_2: "b"
+    large_2: "another_very_long_string_designed_to_create_memory_allocation_pressure_and_fragmentation"
+    small_3: "c"
+
+# Corruption Vector 13: Security Boundary Testing
+security_boundary_validation:
+  # File system access attempts
+  file_access_attempt: "file:///etc/passwd"
+  network_access_attempt: "http://malicious.example.com/payload"
+  
+  # Command injection vectors
+  command_injection:
+    - "$(whoami)"
+    - "`id`"
+    - "&& rm -rf /"
+    - "; cat /etc/passwd"
+    
+  # SQL injection patterns (if configuration is used in database queries)
+  sql_injection:
+    malicious_value: "'; DROP TABLE users; --"
+    union_attack: "' UNION SELECT * FROM secrets --"
+    
+  # LDAP injection patterns
+  ldap_injection: "admin)(|(password=*))"
+  
+  # XXE (XML External Entity) equivalent for YAML
+  external_reference: "!!include /etc/passwd"
+
+# Final corruption: Unterminated structure to test EOF handling
+unterminated_final_section:
+  incomplete_structure:
+    missing_closing_bracket: [1, 2, 3, 4, 5
+    # File ends abruptly without proper closure

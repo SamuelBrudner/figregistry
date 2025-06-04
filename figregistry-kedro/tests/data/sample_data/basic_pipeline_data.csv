@@ -1,0 +1,78 @@
+# Basic Pipeline Test Data for FigRegistry-Kedro Plugin
+# This dataset provides simple, well-structured experimental data for testing
+# fundamental plugin functionality including FigureDataSet operations, basic
+# styling automation, and single-node pipeline validation per Section 6.6.4.5
+#
+# Data Structure:
+# - experiment_id: Unique identifier for each experimental run
+# - condition: Experimental condition mapping to figregistry styling rules
+# - measurement: Primary dependent variable (continuous)
+# - measurement_error: Standard error for error bar testing
+# - category: Grouping variable for multi-series plots
+# - time_point: Temporal dimension for time-series analysis
+# - sample_size: Sample size for statistical validation
+# - p_value: Statistical significance for publication-quality plots
+# - effect_size: Effect magnitude for presentation scenarios
+# - purpose: Analysis purpose mapping to FigRegistry path aliases
+#
+experiment_id,condition,measurement,measurement_error,category,time_point,sample_size,p_value,effect_size,purpose
+exp_001,control,12.5,0.8,group_a,0,30,0.45,0.15,exploratory
+exp_002,treatment,15.2,1.1,group_a,0,28,0.02,0.62,exploratory
+exp_003,control,11.9,0.7,group_b,0,32,0.38,0.22,exploratory
+exp_004,treatment,16.8,1.3,group_b,0,29,0.008,0.78,exploratory
+exp_005,baseline,10.1,0.6,group_a,0,35,0.92,0.05,exploratory
+exp_006,baseline,9.8,0.5,group_b,0,33,0.88,0.08,exploratory
+exp_007,control,13.1,0.9,group_a,1,30,0.41,0.18,presentation
+exp_008,treatment,17.3,1.2,group_a,1,28,0.015,0.68,presentation
+exp_009,control,12.2,0.8,group_b,1,32,0.43,0.19,presentation
+exp_010,treatment,18.1,1.4,group_b,1,29,0.006,0.82,presentation
+exp_011,baseline,10.3,0.7,group_a,1,35,0.89,0.07,presentation
+exp_012,baseline,9.9,0.6,group_b,1,33,0.91,0.06,presentation
+exp_013,control,13.8,1.0,group_a,2,30,0.37,0.21,publication
+exp_014,treatment,19.5,1.5,group_a,2,28,0.003,0.89,publication
+exp_015,control,12.9,0.9,group_b,2,32,0.39,0.20,publication
+exp_016,treatment,20.2,1.6,group_b,2,29,0.001,0.95,publication
+exp_017,baseline,10.6,0.8,group_a,2,35,0.86,0.09,publication
+exp_018,baseline,10.1,0.7,group_b,2,33,0.90,0.06,publication
+exp_019,treatment_b,14.7,1.0,group_a,0,27,0.08,0.45,exploratory
+exp_020,treatment_b,16.2,1.2,group_b,0,26,0.04,0.58,exploratory
+exp_021,treatment_b,15.8,1.1,group_a,1,27,0.06,0.51,presentation
+exp_022,treatment_b,17.9,1.3,group_b,1,26,0.02,0.71,presentation
+exp_023,treatment_b,18.4,1.4,group_a,2,27,0.02,0.75,publication
+exp_024,treatment_b,19.8,1.5,group_b,2,26,0.009,0.86,publication
+exp_025,intervention_high,22.1,1.8,group_a,0,25,0.001,1.12,exploratory
+exp_026,intervention_high,24.3,2.0,group_b,0,24,0.0008,1.28,exploratory
+exp_027,intervention_high,23.7,1.9,group_a,1,25,0.0009,1.21,presentation
+exp_028,intervention_high,26.1,2.1,group_b,1,24,0.0003,1.45,presentation
+exp_029,intervention_high,25.8,2.0,group_a,2,25,0.0004,1.38,publication
+exp_030,intervention_high,28.2,2.2,group_b,2,24,0.0001,1.62,publication
+exp_031,intervention_low,13.9,1.0,group_a,0,31,0.18,0.35,exploratory
+exp_032,intervention_low,15.1,1.1,group_b,0,30,0.12,0.41,exploratory
+exp_033,intervention_low,14.6,1.0,group_a,1,31,0.15,0.38,presentation
+exp_034,intervention_low,16.3,1.2,group_b,1,30,0.09,0.48,presentation
+exp_035,intervention_low,15.2,1.1,group_a,2,31,0.13,0.42,publication
+exp_036,intervention_low,17.1,1.3,group_b,2,30,0.07,0.52,publication
+exp_037,control,11.8,0.7,group_c,0,28,0.47,0.16,validation
+exp_038,treatment,15.9,1.2,group_c,0,27,0.03,0.65,validation
+exp_039,baseline,9.7,0.5,group_c,0,31,0.94,0.04,validation
+exp_040,control,12.6,0.8,group_c,1,28,0.42,0.19,validation
+exp_041,treatment,17.8,1.3,group_c,1,27,0.01,0.76,validation
+exp_042,baseline,10.0,0.6,group_c,1,31,0.92,0.05,validation
+exp_043,control,13.3,0.9,group_c,2,28,0.38,0.22,validation
+exp_044,treatment,19.2,1.4,group_c,2,27,0.005,0.87,validation
+exp_045,baseline,10.4,0.7,group_c,2,31,0.87,0.08,validation
+exp_046,exploratory_pilot,8.9,0.4,group_a,0,15,0.68,0.12,temp
+exp_047,exploratory_pilot,9.2,0.5,group_b,0,14,0.71,0.10,temp
+exp_048,exploratory_initial,11.3,0.6,group_a,0,20,0.52,0.18,temp
+exp_049,exploratory_initial,11.7,0.7,group_b,0,19,0.48,0.21,temp
+exp_050,presentation_draft,14.1,1.0,group_a,1,25,0.25,0.32,debug
+exp_051,presentation_draft,14.8,1.1,group_b,1,24,0.21,0.36,debug
+exp_052,presentation_final,16.9,1.2,group_a,2,30,0.08,0.48,debug
+exp_053,presentation_final,17.6,1.3,group_b,2,29,0.06,0.53,debug
+exp_054,publication_ready,20.8,1.6,group_a,2,35,0.002,0.93,debug
+exp_055,publication_ready,21.5,1.7,group_b,2,34,0.001,0.98,debug
+exp_056,validation_check,13.0,0.9,group_a,1,22,0.35,0.24,temp
+exp_057,validation_check,13.6,1.0,group_b,1,21,0.31,0.28,temp
+exp_058,control,12.0,0.8,group_a,3,30,0.46,0.17,exploratory
+exp_059,treatment,21.1,1.7,group_a,3,28,0.002,1.02,exploratory
+exp_060,baseline,10.8,0.7,group_a,3,35,0.85,0.10,exploratory

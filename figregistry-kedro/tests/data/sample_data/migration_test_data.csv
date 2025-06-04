@@ -1,0 +1,145 @@
+# Migration Test Data for FigRegistry-Kedro Plugin Validation
+# This dataset supports testing migration scenarios from manual figure management to automated plugin integration
+# per Section 6.6.4.5 Migration Testing Requirements and baseline_figregistry.yml configuration
+#
+# Data patterns designed to trigger various styling conditions and validate that FigureDataSet automation
+# produces identical results to previous manual plt.savefig() workflows across diverse experimental scenarios
+#
+# Column Descriptions:
+# - experiment_id: Unique identifier for experimental run (supports legacy naming patterns)
+# - condition: Experimental condition triggering automatic styling (maps to baseline_figregistry.yml styles)
+# - purpose: Analysis stage determining output directory and styling approach
+# - dose_level: Dosage amount for intervention studies (numeric data for plotting)
+# - response_value: Primary outcome measurement (dependent variable)
+# - time_point: Temporal measurement point (independent variable) 
+# - participant_id: Subject identifier (grouping variable for multi-subject studies)
+# - measurement_error: Standard error for error bar validation
+# - legacy_filename: Historical filename pattern used in manual workflows
+# - expected_style: Expected automated styling application for validation
+# - migration_scenario: Test scenario category for migration validation
+# - edge_case_flag: Identifies challenging scenarios that historically caused manual workflow issues
+# - validation_reference: Reference value for comparing manual vs automated output consistency
+
+experiment_id,condition,purpose,dose_level,response_value,time_point,participant_id,measurement_error,legacy_filename,expected_style,migration_scenario,edge_case_flag,validation_reference
+EXP001_CTRL,control,expl,0.0,12.5,1,P001,0.8,ctrl_pilot_exp001_20240115.png,control_style,basic_condition_mapping,FALSE,12.5_control_baseline
+EXP001_TRT,treatment,expl,10.0,18.2,1,P001,1.1,trt_pilot_exp001_20240115.png,treatment_style,basic_condition_mapping,FALSE,18.2_treatment_baseline
+EXP001_CTRL,control,expl,0.0,11.8,2,P001,0.9,ctrl_pilot_exp001_t2_20240116.png,control_style,basic_condition_mapping,FALSE,11.8_control_followup
+EXP001_TRT,treatment,expl,10.0,22.1,2,P001,1.3,trt_pilot_exp001_t2_20240116.png,treatment_style,basic_condition_mapping,FALSE,22.1_treatment_followup
+
+# Treatment comparison scenarios with multiple dosing levels
+EXP002_BASE,baseline,pres,0.0,15.3,1,P002,0.7,baseline_dose_response_presentation.png,baseline_style,dose_response_validation,FALSE,15.3_baseline_reference
+EXP002_LOW,intervention_low,pres,5.0,19.1,1,P002,0.9,low_dose_presentation_figure.png,intervention_low_style,dose_response_validation,FALSE,19.1_low_dose_effect
+EXP002_HIGH,intervention_high,pres,20.0,28.4,1,P002,1.5,high_dose_presentation_final.png,intervention_high_style,dose_response_validation,FALSE,28.4_high_dose_effect
+EXP002_BASE,baseline,pres,0.0,14.9,2,P002,0.8,baseline_dose_response_presentation_t2.png,baseline_style,dose_response_validation,FALSE,14.9_baseline_followup
+EXP002_LOW,intervention_low,pres,5.0,20.8,2,P002,1.0,low_dose_presentation_figure_t2.png,intervention_low_style,dose_response_validation,FALSE,20.8_low_dose_followup
+EXP002_HIGH,intervention_high,pres,20.0,31.2,2,P002,1.7,high_dose_presentation_final_t2.png,intervention_high_style,dose_response_validation,FALSE,31.2_high_dose_followup
+
+# Multiple treatment arm study with complex condition mapping
+EXP003_CTRL,control,pub,0.0,8.7,1,P003,0.6,publication_ctrl_arm_figure1.pdf,control_style,multi_arm_comparison,FALSE,8.7_control_publication
+EXP003_TRTA,treatment,pub,15.0,16.5,1,P003,1.2,publication_trtA_arm_figure1.pdf,treatment_style,multi_arm_comparison,FALSE,16.5_treatmentA_publication
+EXP003_TRTB,treatment_b,pub,15.0,14.3,1,P003,1.1,publication_trtB_arm_figure1.pdf,treatment_b_style,multi_arm_comparison,FALSE,14.3_treatmentB_publication
+EXP003_CTRL,control,pub,0.0,9.1,2,P003,0.7,publication_ctrl_arm_figure1_followup.pdf,control_style,multi_arm_comparison,FALSE,9.1_control_publication_t2
+EXP003_TRTA,treatment,pub,15.0,19.8,2,P003,1.4,publication_trtA_arm_figure1_followup.pdf,treatment_style,multi_arm_comparison,FALSE,19.8_treatmentA_publication_t2
+EXP003_TRTB,treatment_b,pub,15.0,17.2,2,P003,1.3,publication_trtB_arm_figure1_followup.pdf,treatment_b_style,multi_arm_comparison,FALSE,17.2_treatmentB_publication_t2
+
+# Exploratory analysis scenarios with wildcard pattern matching
+EXP004_PILOT,exploratory_pilot,expl,2.5,13.6,1,P004,1.0,exploratory_pilot_analysis_raw.png,exploratory_style,wildcard_pattern_mapping,FALSE,13.6_exploratory_pilot
+EXP004_SCREEN,exploratory_screening,expl,7.5,21.3,1,P004,1.4,exploratory_screening_analysis_raw.png,exploratory_style,wildcard_pattern_mapping,FALSE,21.3_exploratory_screening
+EXP004_VALID,exploratory_validation,expl,12.5,25.7,1,P004,1.6,exploratory_validation_analysis_raw.png,exploratory_style,wildcard_pattern_mapping,FALSE,25.7_exploratory_validation
+
+# Presentation scenarios with wildcard patterns
+EXP005_GRANT,presentation_grant,pres,10.0,24.8,1,P005,1.3,grant_presentation_fig_draft1.png,presentation_style,presentation_wildcard_mapping,FALSE,24.8_presentation_grant
+EXP005_CONF,presentation_conference,pres,10.0,24.8,1,P005,1.3,conference_presentation_slide5.png,presentation_style,presentation_wildcard_mapping,FALSE,24.8_presentation_conference
+EXP005_MEET,presentation_meeting,pres,10.0,24.8,1,P005,1.3,team_meeting_results_overview.png,presentation_style,presentation_wildcard_mapping,FALSE,24.8_presentation_meeting
+
+# Publication scenarios with wildcard patterns
+EXP006_MAIN,publication_main,pub,8.0,17.9,1,P006,1.1,main_manuscript_figure2.pdf,publication_style,publication_wildcard_mapping,FALSE,17.9_publication_main
+EXP006_SUPP,publication_supplement,pub,8.0,17.9,1,P006,1.1,supplementary_figure_S2.pdf,publication_style,publication_wildcard_mapping,FALSE,17.9_publication_supplement
+EXP006_REPLY,publication_reply,pub,8.0,17.9,1,P006,1.1,reviewer_response_additional_analysis.pdf,publication_style,publication_wildcard_mapping,FALSE,17.9_publication_reply
+
+# Validation scenarios with complex patterns
+EXP007_CROSS,validation_crosscheck,valid,12.0,20.4,1,P007,1.2,validation_crosscheck_independent.png,validation_style,validation_pattern_mapping,FALSE,20.4_validation_crosscheck
+EXP007_REPRO,validation_reproducibility,valid,12.0,20.1,1,P007,1.1,validation_reproducibility_test.png,validation_style,validation_pattern_mapping,FALSE,20.1_validation_reproducibility
+EXP007_QC,validation_quality_control,valid,12.0,20.6,1,P007,1.3,validation_qc_metrics_summary.png,validation_style,validation_pattern_mapping,FALSE,20.6_validation_quality_control
+
+# Edge cases: Missing condition patterns that should fall back to defaults
+EXP008_UNKNOWN,unknown_condition,expl,5.0,16.2,1,P008,1.0,unknown_condition_fallback_test.png,default_fallback,edge_case_fallback,TRUE,16.2_unknown_fallback
+EXP008_TYPO,contrl,expl,0.0,12.0,1,P008,0.8,typo_condition_manual_save.png,default_fallback,edge_case_fallback,TRUE,12.0_typo_fallback
+EXP008_EMPTY,,expl,7.5,18.9,1,P008,1.2,empty_condition_manual_override.png,default_fallback,edge_case_fallback,TRUE,18.9_empty_fallback
+
+# Edge cases: Special characters and problematic naming patterns that historically caused issues
+EXP009_SPECIAL,control-special,expl,0.0,14.5,1,P009,0.9,"special_chars_figure[1].png",control_style,special_character_handling,TRUE,14.5_special_chars
+EXP009_SPACE,control space,expl,0.0,14.2,1,P009,0.8,"figure with spaces.png",control_style,special_character_handling,TRUE,14.2_space_handling
+EXP009_UNICODE,control_β,expl,0.0,14.8,1,P009,1.0,unicode_condition_β_test.png,control_style,special_character_handling,TRUE,14.8_unicode_handling
+
+# Edge cases: Extremely long condition names that test string handling limits
+EXP010_LONG,treatment_very_long_condition_name_that_exceeds_normal_limits_and_tests_string_handling,expl,10.0,19.5,1,P010,1.2,very_long_filename_manual_generation_test.png,treatment_style,long_string_handling,TRUE,19.5_long_condition
+EXP010_NUMERIC,treatment_123,expl,10.0,19.3,1,P010,1.1,numeric_condition_123_manual.png,treatment_style,numeric_condition_handling,TRUE,19.3_numeric_condition
+
+# Legacy file format testing scenarios
+EXP011_PDF,control,pub,0.0,11.7,1,P011,0.7,legacy_manual_save_figure.pdf,control_style,legacy_format_testing,FALSE,11.7_pdf_format
+EXP011_SVG,treatment,pub,10.0,18.9,1,P011,1.2,legacy_manual_save_figure.svg,treatment_style,legacy_format_testing,FALSE,18.9_svg_format
+EXP011_PNG,baseline,pub,0.0,15.1,1,P011,0.9,legacy_manual_save_figure.png,baseline_style,legacy_format_testing,FALSE,15.1_png_format
+
+# High-frequency data patterns that test performance under load
+EXP012_PERF1,control,expl,0.0,10.1,1,P012,0.5,performance_test_ctrl_001.png,control_style,performance_validation,FALSE,10.1_performance_ctrl_1
+EXP012_PERF1,control,expl,0.0,10.3,2,P012,0.6,performance_test_ctrl_002.png,control_style,performance_validation,FALSE,10.3_performance_ctrl_2
+EXP012_PERF1,control,expl,0.0,10.0,3,P012,0.5,performance_test_ctrl_003.png,control_style,performance_validation,FALSE,10.0_performance_ctrl_3
+EXP012_PERF2,treatment,expl,10.0,16.8,1,P012,0.9,performance_test_trt_001.png,treatment_style,performance_validation,FALSE,16.8_performance_trt_1
+EXP012_PERF2,treatment,expl,10.0,17.1,2,P012,1.0,performance_test_trt_002.png,treatment_style,performance_validation,FALSE,17.1_performance_trt_2
+EXP012_PERF2,treatment,expl,10.0,16.5,3,P012,0.8,performance_test_trt_003.png,treatment_style,performance_validation,FALSE,16.5_performance_trt_3
+
+# Multi-participant longitudinal study with complex temporal patterns
+EXP013_LONG,control,expl,0.0,12.8,1,P013_A,0.8,longitudinal_ctrl_p013a_baseline.png,control_style,longitudinal_validation,FALSE,12.8_longitudinal_ctrl_t1
+EXP013_LONG,control,expl,0.0,12.1,2,P013_A,0.9,longitudinal_ctrl_p013a_week2.png,control_style,longitudinal_validation,FALSE,12.1_longitudinal_ctrl_t2
+EXP013_LONG,control,expl,0.0,11.9,3,P013_A,0.7,longitudinal_ctrl_p013a_week4.png,control_style,longitudinal_validation,FALSE,11.9_longitudinal_ctrl_t3
+EXP013_LONG,treatment,expl,10.0,18.6,1,P013_A,1.1,longitudinal_trt_p013a_baseline.png,treatment_style,longitudinal_validation,FALSE,18.6_longitudinal_trt_t1
+EXP013_LONG,treatment,expl,10.0,21.3,2,P013_A,1.4,longitudinal_trt_p013a_week2.png,treatment_style,longitudinal_validation,FALSE,21.3_longitudinal_trt_t2
+EXP013_LONG,treatment,expl,10.0,23.7,3,P013_A,1.6,longitudinal_trt_p013a_week4.png,treatment_style,longitudinal_validation,FALSE,23.7_longitudinal_trt_t3
+
+# Different participants in same longitudinal study
+EXP013_LONG,control,expl,0.0,13.2,1,P013_B,0.9,longitudinal_ctrl_p013b_baseline.png,control_style,longitudinal_validation,FALSE,13.2_longitudinal_ctrl_p2_t1
+EXP013_LONG,control,expl,0.0,12.8,2,P013_B,0.8,longitudinal_ctrl_p013b_week2.png,control_style,longitudinal_validation,FALSE,12.8_longitudinal_ctrl_p2_t2
+EXP013_LONG,control,expl,0.0,12.5,3,P013_B,0.7,longitudinal_ctrl_p013b_week4.png,control_style,longitudinal_validation,FALSE,12.5_longitudinal_ctrl_p2_t3
+EXP013_LONG,treatment,expl,10.0,17.9,1,P013_B,1.0,longitudinal_trt_p013b_baseline.png,treatment_style,longitudinal_validation,FALSE,17.9_longitudinal_trt_p2_t1
+EXP013_LONG,treatment,expl,10.0,20.8,2,P013_B,1.3,longitudinal_trt_p013b_week2.png,treatment_style,longitudinal_validation,FALSE,20.8_longitudinal_trt_p2_t2
+EXP013_LONG,treatment,expl,10.0,22.9,3,P013_B,1.5,longitudinal_trt_p013b_week4.png,treatment_style,longitudinal_validation,FALSE,22.9_longitudinal_trt_p2_t3
+
+# Cross-platform testing scenarios with OS-specific path patterns (historically problematic)
+EXP014_WIN,control,expl,0.0,13.5,1,P014,0.8,"windows\\path\\manual_save_ctrl.png",control_style,cross_platform_validation,TRUE,13.5_windows_path
+EXP014_MAC,treatment,expl,10.0,19.7,1,P014,1.2,mac/path/manual_save_trt.png,treatment_style,cross_platform_validation,TRUE,19.7_mac_path
+EXP014_LINUX,baseline,expl,0.0,15.8,1,P014,1.0,linux/path/manual_save_base.png,baseline_style,cross_platform_validation,TRUE,15.8_linux_path
+
+# Version control scenario testing (files that would conflict in git)
+EXP015_V1,control,expl,0.0,12.3,1,P015,0.7,figure_version1_manual.png,control_style,version_control_testing,TRUE,12.3_version_conflict_1
+EXP015_V2,control,expl,0.0,12.4,1,P015,0.8,figure_version2_manual.png,control_style,version_control_testing,TRUE,12.4_version_conflict_2
+EXP015_FINAL,control,expl,0.0,12.6,1,P015,0.7,figure_FINAL_manual.png,control_style,version_control_testing,TRUE,12.6_version_final
+EXP015_FINAL2,control,expl,0.0,12.5,1,P015,0.8,figure_FINAL_v2_manual.png,control_style,version_control_testing,TRUE,12.5_version_final_v2
+
+# Batch processing scenarios that test concurrent figure generation
+EXP016_BATCH,control,expl,0.0,11.9,1,P016_batch1,0.6,batch_ctrl_001_manual_save.png,control_style,batch_processing_validation,FALSE,11.9_batch_ctrl_1
+EXP016_BATCH,control,expl,0.0,12.2,1,P016_batch2,0.7,batch_ctrl_002_manual_save.png,control_style,batch_processing_validation,FALSE,12.2_batch_ctrl_2
+EXP016_BATCH,control,expl,0.0,11.8,1,P016_batch3,0.6,batch_ctrl_003_manual_save.png,control_style,batch_processing_validation,FALSE,11.8_batch_ctrl_3
+EXP016_BATCH,treatment,expl,10.0,18.3,1,P016_batch1,1.0,batch_trt_001_manual_save.png,treatment_style,batch_processing_validation,FALSE,18.3_batch_trt_1
+EXP016_BATCH,treatment,expl,10.0,18.8,1,P016_batch2,1.1,batch_trt_002_manual_save.png,treatment_style,batch_processing_validation,FALSE,18.8_batch_trt_2
+EXP016_BATCH,treatment,expl,10.0,18.1,1,P016_batch3,0.9,batch_trt_003_manual_save.png,treatment_style,batch_processing_validation,FALSE,18.1_batch_trt_3
+
+# Memory stress testing with large dataset patterns
+EXP017_STRESS,control,expl,0.0,10.5,1,P017_stress,0.5,memory_stress_ctrl_manual.png,control_style,memory_stress_testing,TRUE,10.5_memory_stress_ctrl
+EXP017_STRESS,treatment,expl,10.0,17.2,1,P017_stress,1.0,memory_stress_trt_manual.png,treatment_style,memory_stress_testing,TRUE,17.2_memory_stress_trt
+EXP017_STRESS,baseline,expl,0.0,14.8,1,P017_stress,0.8,memory_stress_base_manual.png,baseline_style,memory_stress_testing,TRUE,14.8_memory_stress_base
+
+# Complex nested experimental design that historically required manual organization
+EXP018_NESTED,control_outer_inner,expl,0.0,13.1,1,P018_nested,0.8,nested_ctrl_outer_inner_manual.png,control_style,nested_design_validation,TRUE,13.1_nested_control
+EXP018_NESTED,treatment_outer_inner,expl,10.0,19.4,1,P018_nested,1.2,nested_trt_outer_inner_manual.png,treatment_style,nested_design_validation,TRUE,19.4_nested_treatment
+EXP018_NESTED,control_outer_outer,expl,0.0,12.9,1,P018_nested,0.7,nested_ctrl_outer_outer_manual.png,control_style,nested_design_validation,TRUE,12.9_nested_control_alt
+
+# Data quality edge cases with missing values and outliers
+EXP019_QUALITY,control,expl,0.0,999.0,1,P019_outlier,99.0,outlier_data_manual_handling.png,control_style,data_quality_testing,TRUE,999.0_outlier_detection
+EXP019_QUALITY,treatment,expl,10.0,-1.5,1,P019_negative,0.1,negative_value_manual_handling.png,treatment_style,data_quality_testing,TRUE,-1.5_negative_value
+EXP019_QUALITY,baseline,expl,0.0,0.0001,1,P019_tiny,0.0001,tiny_value_manual_precision.png,baseline_style,data_quality_testing,TRUE,0.0001_precision_test
+
+# Final migration validation scenarios combining multiple edge cases
+EXP020_COMBINED,control,expl,0.0,12.7,1,P020_final,0.8,"complex file name (1).png",control_style,comprehensive_migration_test,TRUE,12.7_comprehensive_ctrl
+EXP020_COMBINED,treatment_final_test,expl,10.0,19.1,1,P020_final,1.2,complex_condition_final_test.png,treatment_style,comprehensive_migration_test,TRUE,19.1_comprehensive_trt
+EXP020_COMBINED,baseline,expl,0.0,15.4,1,P020_final,0.9,comprehensive_migration_validation.png,baseline_style,comprehensive_migration_test,TRUE,15.4_comprehensive_base

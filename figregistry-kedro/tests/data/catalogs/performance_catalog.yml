@@ -1,0 +1,816 @@
+# Performance-Optimized Kedro Catalog Configuration for FigRegistry-Kedro Plugin Benchmarking
+# 
+# This catalog provides comprehensive FigureDataSet entries designed for systematic performance 
+# validation and benchmarking of plugin operations per Section 6.6.4.3 requirements:
+#
+# Performance Targets:
+# - FigureDataSet save operations: <200ms overhead
+# - Style resolution performance: <1ms lookup  
+# - Hook initialization latency: <25ms per project startup
+# - Configuration bridge resolution: <50ms per pipeline run
+# - Plugin memory footprint: <5MB overhead
+#
+# The catalog entries are organized by performance testing scenarios, from minimal baseline
+# configurations to complex stress-testing scenarios that validate plugin performance under
+# scientific computing workloads.
+
+# =============================================================================
+# BASELINE PERFORMANCE MEASUREMENTS
+# =============================================================================
+
+# Minimal configuration for baseline performance measurement
+performance_baseline_minimal:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/baseline_minimal.png
+  purpose: exploratory
+  style_params:
+    color: "#1f77b4"
+    marker: "o"
+    linewidth: 1.5
+  save_args:
+    dpi: 150
+    bbox_inches: tight
+  metadata:
+    test_category: baseline
+    complexity_level: minimal
+    expected_save_time_ms: 20
+    memory_target_mb: 0.5
+
+# Simple configuration with basic condition parameter
+performance_baseline_simple:
+  type: figregistry_kedro.datasets.FigureDataSet  
+  filepath: data/08_reporting/performance/baseline_simple.png
+  purpose: exploratory
+  condition_param: experiment_type
+  style_params:
+    color: "#ff7f0e"
+    marker: "s"
+    linewidth: 2.0
+    alpha: 0.8
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+    facecolor: white
+  metadata:
+    test_category: baseline
+    complexity_level: simple
+    expected_save_time_ms: 30
+    memory_target_mb: 1.0
+
+# Standard configuration for typical usage patterns
+performance_baseline_standard:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/baseline_standard.png
+  purpose: presentation
+  condition_param: model_condition
+  style_params:
+    color: "#2ca02c"
+    marker: "^"
+    linestyle: "--"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 0.9
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.1
+    transparent: false
+    format: png
+  versioned: true
+  metadata:
+    test_category: baseline
+    complexity_level: standard
+    expected_save_time_ms: 50
+    memory_target_mb: 2.0
+
+# =============================================================================
+# STYLE RESOLUTION PERFORMANCE TESTING
+# =============================================================================
+
+# Fast style resolution - targeting <1ms lookup
+performance_style_fast:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/style_fast_{condition}.png
+  purpose: exploratory
+  condition_param: fast_condition
+  style_params:
+    # Minimal style parameters for fast resolution
+    color: "#e74c3c"
+    marker: "o"
+  save_args:
+    dpi: 150
+    bbox_inches: tight
+  enable_caching: true
+  metadata:
+    test_category: style_resolution
+    complexity_level: fast
+    expected_resolution_ms: 0.5
+    cache_enabled: true
+
+# Medium complexity style resolution
+performance_style_medium:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/style_medium_{condition}.png
+  purpose: presentation  
+  condition_param: medium_condition
+  style_params:
+    # Medium complexity styling
+    color: "#9b59b6"
+    marker: "D"
+    linestyle: "-."
+    linewidth: 2.2
+    markersize: 6
+    alpha: 0.7
+    markerfacecolor: "#e67e22"
+    markeredgecolor: "#34495e"
+    markeredgewidth: 1.0
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+    pad_inches: 0.05
+  metadata:
+    test_category: style_resolution
+    complexity_level: medium
+    expected_resolution_ms: 1.0
+    style_param_count: 8
+
+# Complex style resolution stress test
+performance_style_complex:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/style_complex_{condition}_{variant}.png
+  purpose: publication
+  condition_param: complex_condition
+  style_params:
+    # Complex matplotlib rcParams for resolution stress testing
+    figure.figsize: [12, 9]
+    figure.dpi: 300
+    figure.facecolor: "#ffffff"
+    figure.edgecolor: "#000000"
+    axes.linewidth: 1.5
+    axes.spines.left: true
+    axes.spines.bottom: true
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.facecolor: "#f8f9fa"
+    axes.edgecolor: "#dee2e6"
+    axes.labelsize: 12
+    axes.titlesize: 14
+    xtick.labelsize: 10
+    ytick.labelsize: 10
+    legend.fontsize: 11
+    font.family: sans-serif
+    font.size: 11
+    lines.linewidth: 2.5
+    lines.markersize: 8
+    grid.alpha: 0.4
+    grid.linewidth: 0.8
+    color: "#3498db"
+    marker: "*"
+    linestyle: "-"
+    alpha: 0.9
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.1
+    transparent: false
+    facecolor: auto
+    edgecolor: auto
+  metadata:
+    test_category: style_resolution
+    complexity_level: complex
+    expected_resolution_ms: 2.0
+    rcparams_count: 25
+
+# =============================================================================
+# SAVE OPERATION PERFORMANCE TESTING
+# =============================================================================
+
+# PNG format save performance - targeting <200ms
+performance_save_png_fast:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/save_png_fast.png
+  purpose: exploratory
+  style_params:
+    color: "#16a085"
+    marker: "o"
+    linewidth: 1.8
+  save_args:
+    format: png
+    dpi: 150
+    bbox_inches: tight
+    optimize: true
+  metadata:
+    test_category: save_performance
+    format: png
+    expected_save_time_ms: 50
+    optimization_enabled: true
+
+# PDF format save performance
+performance_save_pdf_medium:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/save_pdf_medium.pdf
+  purpose: presentation
+  condition_param: pdf_condition
+  style_params:
+    color: "#8e44ad"
+    marker: "s"
+    linewidth: 2.0
+    alpha: 0.8
+  save_args:
+    format: pdf
+    dpi: 200
+    bbox_inches: tight
+    pad_inches: 0.1
+  metadata:
+    test_category: save_performance
+    format: pdf
+    expected_save_time_ms: 100
+    vector_format: true
+
+# High-DPI save performance stress test
+performance_save_highdpi:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/save_highdpi.png
+  purpose: publication
+  condition_param: highdpi_condition
+  style_params:
+    color: "#d35400"
+    marker: "^"
+    linewidth: 3.0
+    markersize: 10
+  save_args:
+    format: png
+    dpi: 600
+    bbox_inches: tight
+    pad_inches: 0.2
+    transparent: false
+  metadata:
+    test_category: save_performance
+    format: png_highdpi
+    expected_save_time_ms: 180
+    stress_level: high
+
+# SVG vector format performance
+performance_save_svg:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/save_svg.svg
+  purpose: publication
+  style_params:
+    color: "#27ae60"
+    marker: "v"
+    linewidth: 2.2
+    alpha: 0.9
+  save_args:
+    format: svg
+    bbox_inches: tight
+    transparent: true
+  metadata:
+    test_category: save_performance
+    format: svg
+    expected_save_time_ms: 120
+    vector_format: true
+
+# =============================================================================
+# PARALLEL EXECUTION PERFORMANCE TESTING
+# =============================================================================
+
+# Concurrent execution set - small load (5 concurrent operations)
+performance_concurrent_small_01:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/concurrent/small/figure_01.png
+  purpose: exploratory
+  condition_param: concurrent_condition_a
+  style_params:
+    color: "#1abc9c"
+    marker: "o"
+    linewidth: 1.5
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+  versioned: true
+  metadata:
+    test_category: concurrent_execution
+    load_level: small
+    concurrent_index: 1
+    expected_save_time_ms: 60
+
+performance_concurrent_small_02:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/concurrent/small/figure_02.png
+  purpose: exploratory
+  condition_param: concurrent_condition_b
+  style_params:
+    color: "#e67e22"
+    marker: "s"
+    linewidth: 1.8
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+  versioned: true
+  metadata:
+    test_category: concurrent_execution
+    load_level: small
+    concurrent_index: 2
+    expected_save_time_ms: 60
+
+performance_concurrent_small_03:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/concurrent/small/figure_03.png
+  purpose: presentation
+  condition_param: concurrent_condition_c
+  style_params:
+    color: "#9b59b6"
+    marker: "^"
+    linewidth: 2.0
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+  versioned: true
+  metadata:
+    test_category: concurrent_execution
+    load_level: small
+    concurrent_index: 3
+    expected_save_time_ms: 60
+
+performance_concurrent_small_04:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/concurrent/small/figure_04.png
+  purpose: presentation
+  condition_param: concurrent_condition_d
+  style_params:
+    color: "#e74c3c"
+    marker: "v"
+    linewidth: 2.2
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+  versioned: true
+  metadata:
+    test_category: concurrent_execution
+    load_level: small
+    concurrent_index: 4
+    expected_save_time_ms: 60
+
+performance_concurrent_small_05:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/concurrent/small/figure_05.png
+  purpose: publication
+  condition_param: concurrent_condition_e
+  style_params:
+    color: "#34495e"
+    marker: "D"
+    linewidth: 2.5
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+  metadata:
+    test_category: concurrent_execution
+    load_level: small
+    concurrent_index: 5
+    expected_save_time_ms: 80
+
+# Medium concurrent load testing (10 operations)
+performance_concurrent_medium_01:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/concurrent/medium/exp_a/figure_01.png
+  purpose: exploratory
+  condition_param: medium_concurrent_exp_a
+  style_params:
+    color: "#f39c12"
+    marker: "o"
+    linewidth: 1.6
+    alpha: 0.8
+  save_args:
+    dpi: 250
+    bbox_inches: tight
+    pad_inches: 0.05
+  versioned: true
+  metadata:
+    test_category: concurrent_execution
+    load_level: medium
+    experiment: exp_a
+    concurrent_index: 1
+    expected_save_time_ms: 100
+
+performance_concurrent_medium_02:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/concurrent/medium/exp_b/figure_02.png
+  purpose: presentation
+  condition_param: medium_concurrent_exp_b
+  style_params:
+    color: "#2980b9"
+    marker: "s"
+    linewidth: 1.9
+    alpha: 0.9
+  save_args:
+    dpi: 250
+    bbox_inches: tight
+    pad_inches: 0.05
+  versioned: true
+  metadata:
+    test_category: concurrent_execution
+    load_level: medium
+    experiment: exp_b
+    concurrent_index: 2
+    expected_save_time_ms: 100
+
+performance_concurrent_medium_03:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/concurrent/medium/exp_c/figure_03.png
+  purpose: publication
+  condition_param: medium_concurrent_exp_c
+  style_params:
+    color: "#c0392b"
+    marker: "^"
+    linewidth: 2.3
+    alpha: 1.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.1
+  versioned: true
+  metadata:
+    test_category: concurrent_execution
+    load_level: medium
+    experiment: exp_c
+    concurrent_index: 3
+    expected_save_time_ms: 120
+
+# =============================================================================
+# MEMORY EFFICIENCY TESTING
+# =============================================================================
+
+# Minimal memory footprint test
+performance_memory_minimal:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/memory_minimal.png
+  purpose: exploratory
+  style_params:
+    color: "#95a5a6"
+    marker: "o"
+  save_args:
+    dpi: 100
+    bbox_inches: tight
+  enable_caching: false
+  metadata:
+    test_category: memory_efficiency
+    memory_level: minimal
+    expected_memory_mb: 0.3
+    caching_disabled: true
+
+# Standard memory usage
+performance_memory_standard:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/memory_standard.png
+  purpose: presentation
+  condition_param: memory_condition
+  style_params:
+    color: "#7f8c8d"
+    marker: "s"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+    pad_inches: 0.1
+  enable_caching: true
+  metadata:
+    test_category: memory_efficiency
+    memory_level: standard
+    expected_memory_mb: 1.5
+    caching_enabled: true
+
+# Memory stress test with complex styling
+performance_memory_stress:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/memory_stress.png
+  purpose: publication
+  condition_param: memory_stress_condition
+  style_params:
+    # Large style configuration for memory testing
+    figure.figsize: [16, 12]
+    figure.dpi: 300
+    axes.linewidth: 2.0
+    lines.linewidth: 3.0
+    lines.markersize: 10
+    font.size: 14
+    color: "#2c3e50"
+    marker: "D"
+    linestyle: "-"
+    alpha: 0.9
+    markerfacecolor: "#ecf0f1"
+    markeredgecolor: "#2c3e50"
+    markeredgewidth: 1.5
+  save_args:
+    dpi: 600
+    bbox_inches: tight
+    pad_inches: 0.2
+    transparent: false
+  enable_caching: true
+  metadata:
+    test_category: memory_efficiency
+    memory_level: stress
+    expected_memory_mb: 4.5
+    style_complexity: high
+
+# =============================================================================
+# VERSIONING PERFORMANCE TESTING
+# =============================================================================
+
+# Kedro versioning performance test
+performance_versioning_enabled:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/versioned/figure.png
+  purpose: publication
+  condition_param: versioning_condition
+  style_params:
+    color: "#16537e"
+    marker: "o"
+    linewidth: 2.0
+    markersize: 7
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: true
+  metadata:
+    test_category: versioning_performance
+    versioning_enabled: true
+    expected_save_time_ms: 70
+    versioning_overhead_ms: 20
+
+# Non-versioned comparison
+performance_versioning_disabled:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/non_versioned/figure.png
+  purpose: publication
+  condition_param: versioning_condition
+  style_params:
+    color: "#16537e"
+    marker: "o"
+    linewidth: 2.0
+    markersize: 7
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  versioned: false
+  metadata:
+    test_category: versioning_performance
+    versioning_enabled: false
+    expected_save_time_ms: 50
+    versioning_overhead_ms: 0
+
+# =============================================================================
+# PATH RESOLUTION PERFORMANCE TESTING
+# =============================================================================
+
+# Simple path resolution
+performance_path_simple:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/paths/simple.png
+  purpose: exploratory
+  style_params:
+    color: "#148f77"
+    marker: "o"
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+  metadata:
+    test_category: path_resolution
+    path_complexity: simple
+    expected_resolution_ms: 1.0
+
+# Complex nested path resolution
+performance_path_complex:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/paths/deep/nested/structure/complex.png
+  purpose: presentation
+  condition_param: path_condition
+  style_params:
+    color: "#af7ac5"
+    marker: "s"
+    linewidth: 1.8
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+  metadata:
+    test_category: path_resolution
+    path_complexity: complex
+    path_depth: 5
+    expected_resolution_ms: 5.0
+
+# Dynamic path with condition parameters
+performance_path_dynamic:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/paths/{condition}/dynamic_{variant}.png
+  purpose: publication
+  condition_param: dynamic_path_condition
+  style_params:
+    color: "#d68910"
+    marker: "^"
+    linewidth: 2.5
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+  metadata:
+    test_category: path_resolution
+    path_complexity: dynamic
+    parameter_substitution: true
+    expected_resolution_ms: 3.0
+
+# =============================================================================
+# CONFIGURATION BRIDGE PERFORMANCE TESTING
+# =============================================================================
+
+# Fast configuration bridge resolution
+performance_bridge_fast:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/bridge/fast.png
+  purpose: exploratory
+  condition_param: bridge_fast_condition
+  style_params:
+    color: "#28b463"
+    marker: "o"
+    linewidth: 1.5
+  save_args:
+    dpi: 150
+    bbox_inches: tight
+  metadata:
+    test_category: config_bridge
+    bridge_complexity: fast
+    expected_bridge_resolution_ms: 10.0
+    config_merge_required: true
+
+# Medium complexity bridge resolution
+performance_bridge_medium:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/bridge/medium.png
+  purpose: presentation
+  condition_param: bridge_medium_condition
+  style_params:
+    color: "#a569bd"
+    marker: "s"
+    linewidth: 2.0
+    alpha: 0.8
+    markersize: 6
+  save_args:
+    dpi: 200
+    bbox_inches: tight
+    pad_inches: 0.05
+  metadata:
+    test_category: config_bridge
+    bridge_complexity: medium
+    expected_bridge_resolution_ms: 25.0
+    environment_specific: true
+
+# Complex configuration bridge stress test
+performance_bridge_complex:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/bridge/complex.png
+  purpose: publication
+  condition_param: bridge_complex_condition
+  style_params:
+    color: "#dc7633"
+    marker: "D"
+    linewidth: 2.8
+    alpha: 0.9
+    markersize: 8
+    markerfacecolor: "#f8c471"
+    markeredgecolor: "#dc7633"
+    markeredgewidth: 1.2
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.1
+    transparent: false
+  metadata:
+    test_category: config_bridge
+    bridge_complexity: complex
+    expected_bridge_resolution_ms: 45.0
+    multiple_environments: true
+    parameter_substitution: true
+
+# =============================================================================
+# COMPREHENSIVE STRESS TESTING
+# =============================================================================
+
+# Maximum complexity stress test
+performance_stress_maximum:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/stress/maximum_{condition}_{experiment}.png
+  purpose: publication
+  condition_param: stress_maximum_condition
+  style_params:
+    # Maximum complexity rcParams for comprehensive stress testing
+    figure.figsize: [20, 15]
+    figure.dpi: 600
+    figure.facecolor: "#ffffff"
+    figure.edgecolor: "#000000"
+    axes.linewidth: 2.5
+    axes.spines.left: true
+    axes.spines.bottom: true
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.facecolor: "#fdfefe"
+    axes.edgecolor: "#d5dbdb"
+    axes.labelsize: 16
+    axes.titlesize: 20
+    xtick.labelsize: 14
+    ytick.labelsize: 14
+    legend.fontsize: 14
+    font.family: serif
+    font.size: 14
+    lines.linewidth: 3.5
+    lines.markersize: 12
+    grid.alpha: 0.5
+    grid.linewidth: 1.0
+    color: "#1a5490"
+    marker: "*"
+    linestyle: "-"
+    alpha: 1.0
+    markerfacecolor: "#85c1e9"
+    markeredgecolor: "#1a5490"
+    markeredgewidth: 2.0
+  save_args:
+    format: png
+    dpi: 600
+    bbox_inches: tight
+    pad_inches: 0.2
+    transparent: false
+    facecolor: white
+    edgecolor: none
+  versioned: true
+  enable_caching: true
+  metadata:
+    test_category: stress_testing
+    complexity_level: maximum
+    expected_save_time_ms: 190
+    expected_memory_mb: 4.8
+    stress_factors:
+      - high_dpi
+      - complex_styling
+      - large_figure_size
+      - versioning_enabled
+      - caching_enabled
+
+# Concurrent stress test entry
+performance_stress_concurrent:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/performance/stress/concurrent_{thread_id}.png
+  purpose: presentation
+  condition_param: stress_concurrent_condition
+  style_params:
+    color: "#641e16"
+    marker: "h"
+    linewidth: 2.0
+    alpha: 0.8
+    markersize: 7
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.1
+  versioned: true
+  metadata:
+    test_category: stress_testing
+    stress_type: concurrent
+    expected_save_time_ms: 150
+    thread_safety_test: true
+
+# =============================================================================
+# BENCHMARKING UTILITIES CONFIGURATION
+# =============================================================================
+
+# Performance measurement configuration
+performance_measurement_config:
+  # This is not a dataset, but configuration for performance testing utilities
+  type: __performance_config__
+  measurement_targets:
+    figuredataset_save_overhead_ms: 200
+    config_bridge_resolution_ms: 50
+    hook_initialization_ms: 25
+    style_resolution_ms: 1
+    memory_overhead_mb: 5
+  
+  test_categories:
+    - baseline
+    - style_resolution
+    - save_performance
+    - concurrent_execution
+    - memory_efficiency
+    - versioning_performance
+    - path_resolution
+    - config_bridge
+    - stress_testing
+  
+  reporting:
+    generate_timing_reports: true
+    track_memory_usage: true
+    monitor_cpu_usage: true
+    enable_sla_validation: true
+    
+  optimization_settings:
+    enable_caching: true
+    parallel_execution: true
+    memory_monitoring: true
+    performance_profiling: true

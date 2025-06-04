@@ -1,0 +1,298 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "setuptools-scm>=6.2"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "figregistry-kedro"
+dynamic = ["version"]
+description = "A Kedro plugin for automated figure styling and management through FigRegistry integration"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "FigRegistry Team", email = "figregistry@example.com"}
+]
+maintainers = [
+    {name = "FigRegistry Team", email = "figregistry@example.com"}
+]
+keywords = [
+    "kedro",
+    "plugin",
+    "visualization",
+    "matplotlib",
+    "figures",
+    "data-science",
+    "machine-learning",
+    "pipeline"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: Kedro"
+]
+requires-python = ">=3.10"
+dependencies = [
+    "figregistry>=0.3.0",
+    "kedro>=0.18.0,<0.20.0",
+    "pydantic>=2.9.0",
+    "matplotlib>=3.9.0",
+    "pyyaml>=6.0.1",
+    "numpy>=1.24.0",
+    "pandas>=2.0.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/figregistry/figregistry-kedro"
+Documentation = "https://figregistry-kedro.readthedocs.io"
+Repository = "https://github.com/figregistry/figregistry-kedro"
+"Bug Tracker" = "https://github.com/figregistry/figregistry-kedro/issues"
+Changelog = "https://github.com/figregistry/figregistry-kedro/blob/main/CHANGELOG.md"
+
+[project.entry-points."kedro.hooks"]
+figregistry_hooks = "figregistry_kedro.hooks:hooks"
+
+[project.entry-points."kedro.datasets"]
+FigureDataSet = "figregistry_kedro.datasets:FigureDataSet"
+
+[project.optional-dependencies]
+dev = [
+    # Testing framework
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.14.0",
+    "pytest-xdist>=3.0.0",
+    "hypothesis>=6.0.0",
+    "kedro-datasets>=1.0.0",
+    
+    # Code quality
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "mypy>=1.0.0",
+    "ruff>=0.1.0",
+    "pre-commit>=3.0.0",
+    
+    # Documentation
+    "mkdocs>=1.4.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.20.0",
+    
+    # Build and packaging
+    "build>=0.7.0",
+    "twine>=4.0.0",
+    "setuptools-scm>=6.2",
+    
+    # Development utilities
+    "jupyter>=1.0.0",
+    "ipykernel>=6.0.0"
+]
+
+test = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.14.0",
+    "pytest-xdist>=3.0.0",
+    "hypothesis>=6.0.0",
+    "kedro-datasets>=1.0.0"
+]
+
+docs = [
+    "mkdocs>=1.4.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.20.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["figregistry_kedro*"]
+
+[tool.setuptools_scm]
+write_to = "src/figregistry_kedro/_version.py"
+version_scheme = "guess-next-dev"
+local_scheme = "dirty-tag"
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "src/figregistry_kedro/tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=figregistry_kedro",
+    "--cov=figregistry",
+    "--cov-report=term-missing",
+    "--cov-report=html:coverage_html_report",
+    "--cov-report=xml:coverage.xml",
+    "--cov-fail-under=90"
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "kedro: marks tests that require Kedro context",
+    "security: marks tests for security validation"
+]
+filterwarnings = [
+    "error",
+    "ignore::UserWarning",
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
+
+[tool.coverage.run]
+source = ["figregistry_kedro", "figregistry"]
+parallel = true
+branch = true
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__init__.py",
+    "*/conftest.py",
+    "examples/*/conftest.py",
+    "src/figregistry_kedro/_version.py"
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+precision = 2
+fail_under = 90.0
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:"
+]
+
+[tool.coverage.html]
+directory = "coverage_html_report"
+title = "FigRegistry Kedro Plugin Coverage Report"
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
+[tool.black]
+line-length = 88
+target-version = ["py310", "py311", "py312", "py313"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | examples
+)/
+'''
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["figregistry_kedro", "figregistry"]
+known_third_party = ["kedro", "matplotlib", "numpy", "pandas", "pydantic", "pytest", "yaml"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]
+skip_glob = ["examples/*"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "matplotlib.*",
+    "pytest.*",
+    "hypothesis.*",
+    "kedro.*",
+    "scipy.*"
+]
+ignore_missing_imports = true
+
+[tool.ruff]
+target-version = "py310"
+line-length = 88
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+    "ARG001", # unused-function-args
+    "SIM101", # duplicate-isinstance-call
+    "SIM102", # collapsible-if
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "C901",  # too complex
+    "W191",  # indentation contains tabs
+]
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+    "examples"
+]
+
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/*" = ["ARG001", "S101"]
+"src/figregistry_kedro/tests/*" = ["ARG001", "S101"]

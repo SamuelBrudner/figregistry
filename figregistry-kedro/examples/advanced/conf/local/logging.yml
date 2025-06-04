@@ -1,0 +1,499 @@
+# Local Development Logging Configuration for Advanced FigRegistry-Kedro Integration
+# 
+# This logging configuration provides enhanced debug visibility, verbose FigRegistry
+# integration logging, and developer-friendly console output optimized for rapid
+# development iteration and debugging workflows in the advanced example environment.
+#
+# Key Features:
+# - Enhanced debug logging for all figregistry_kedro plugin components
+# - Developer-friendly console output with immediate feedback
+# - Comprehensive visibility into configuration bridge, dataset, and hook operations
+# - Simplified file handling focused on essential debugging needs
+# - Performance monitoring optimized for development workflows
+# - Rapid feedback loops for iterative development and testing
+
+version: 1
+disable_existing_loggers: false
+
+# =============================================================================
+# FORMATTERS - Development-Optimized Logging Formats
+# =============================================================================
+
+formatters:
+  # Primary console formatter with enhanced readability for development
+  console_dev:
+    format: "\033[36m[{asctime}]\033[0m \033[1m{levelname:8}\033[0m | \033[35m{name:45}\033[0m | \033[33m{funcName:25}\033[0m | {message}"
+    style: "{"
+    datefmt: "%H:%M:%S"
+
+  # Detailed debug formatter with comprehensive context and color coding
+  console_debug:
+    format: "\033[36m[{asctime}]\033[0m \033[1m{levelname:8}\033[0m | \033[35m{name:45}\033[0m | \033[90m{pathname}:{lineno:4}\033[0m | \033[33m{funcName:25}\033[0m | \033[32mP:{process:5}\033[0m | \033[94mT:{thread:10}\033[0m | {message}"
+    style: "{"
+    datefmt: "%H:%M:%S.%f"
+
+  # Simple console formatter for reduced noise from third-party libraries
+  console_simple:
+    format: "\033[90m[{asctime}]\033[0m {levelname:5} | \033[90m{name:30}\033[0m | {message}"
+    style: "{"
+    datefmt: "%H:%M:%S"
+
+  # Performance monitoring formatter with timing and SLA tracking
+  console_perf:
+    format: "\033[32m[{asctime}]\033[0m \033[1;32mPERF\033[0m | \033[35m{name:40}\033[0m | \033[33mOP:{operation:20}\033[0m | \033[36mDURATION:{duration_ms:6.2f}ms\033[0m | \033[93mSLA:{sla_target_ms:6}ms\033[0m | \033[1m{sla_status}\033[0m | {message}"
+    style: "{"
+    datefmt: "%H:%M:%S"
+
+  # Error formatter with enhanced visibility and stack trace formatting
+  console_error:
+    format: "\033[31m[{asctime}]\033[0m \033[1;31m{levelname:8}\033[0m | \033[1;35m{name:45}\033[0m | \033[1;33m{funcName:25}\033[0m | \033[1;31m{message}\033[0m"
+    style: "{"
+    datefmt: "%H:%M:%S"
+
+  # Development file formatter for essential debugging information
+  file_dev:
+    format: "[{asctime}] {levelname:8} | {name:50} | {pathname}:{lineno:4} | {funcName:25} | PID:{process:5} | TID:{thread:10} | {message}"
+    style: "{"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+
+  # JSON formatter for structured development logs and tooling integration
+  json_dev:
+    format: '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "logger": "%(name)s", "module": "%(module)s", "function": "%(funcName)s", "line": %(lineno)d, "process": %(process)d, "thread": %(thread)d, "message": "%(message)s", "environment": "local", "debug": true}'
+    datefmt: "%Y-%m-%dT%H:%M:%S.%fZ"
+
+# =============================================================================
+# HANDLERS - Development-Focused Output Configuration
+# =============================================================================
+
+handlers:
+  # Primary console handler for immediate development feedback
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: console_dev
+    stream: ext://sys.stdout
+
+  # Enhanced debug console handler for detailed troubleshooting
+  console_debug:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: console_debug
+    stream: ext://sys.stdout
+
+  # Performance monitoring console handler for SLA tracking
+  console_perf:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: console_perf
+    stream: ext://sys.stdout
+
+  # Error-focused console handler with enhanced visibility
+  console_error:
+    class: logging.StreamHandler
+    level: ERROR
+    formatter: console_error
+    stream: ext://sys.stderr
+
+  # Simplified console handler for third-party library noise reduction
+  console_simple:
+    class: logging.StreamHandler
+    level: WARNING
+    formatter: console_simple
+    stream: ext://sys.stdout
+
+  # Development debug file handler for comprehensive troubleshooting
+  file_debug:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: file_dev
+    filename: logs/local_debug.log
+    maxBytes: 52428800  # 50MB
+    backupCount: 3
+    encoding: utf8
+
+  # FigRegistry-specific development file handler
+  file_figregistry_dev:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: file_dev
+    filename: logs/figregistry_local.log
+    maxBytes: 26214400  # 25MB
+    backupCount: 5
+    encoding: utf8
+
+  # Performance metrics file handler for development profiling
+  file_perf_dev:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: console_perf
+    filename: logs/performance_local.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 3
+    encoding: utf8
+
+  # Error tracking file handler for issue analysis
+  file_errors_dev:
+    class: logging.handlers.RotatingFileHandler
+    level: ERROR
+    formatter: file_dev
+    filename: logs/errors_local.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 10
+    encoding: utf8
+
+  # Structured JSON handler for development tooling integration
+  file_json_dev:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: json_dev
+    filename: logs/structured_local.json
+    maxBytes: 26214400  # 25MB
+    backupCount: 3
+    encoding: utf8
+
+# =============================================================================
+# LOGGERS - Enhanced Debug Visibility Configuration
+# =============================================================================
+
+loggers:
+  # ==========================================================================
+  # KEDRO FRAMEWORK LOGGERS - DEVELOPMENT OPTIMIZED
+  # ==========================================================================
+  
+  # Root Kedro logger with enhanced development visibility
+  kedro:
+    level: INFO
+    handlers: [console, file_debug]
+    propagate: false
+
+  # Kedro I/O operations with detailed dataset tracking
+  kedro.io:
+    level: DEBUG
+    handlers: [console_debug, file_debug, file_figregistry_dev]
+    propagate: false
+
+  # Kedro pipeline execution with enhanced timing visibility
+  kedro.pipeline:
+    level: DEBUG
+    handlers: [console, file_debug, file_perf_dev]
+    propagate: false
+
+  # Kedro configuration management with comprehensive audit trails
+  kedro.config:
+    level: DEBUG
+    handlers: [console_debug, file_debug, file_figregistry_dev]
+    propagate: false
+
+  # Kedro runner execution with detailed performance monitoring
+  kedro.runner:
+    level: DEBUG
+    handlers: [console, file_debug, file_perf_dev]
+    propagate: false
+
+  # Kedro framework hooks with lifecycle event tracking
+  kedro.framework.hooks:
+    level: DEBUG
+    handlers: [console_debug, file_debug, file_figregistry_dev]
+    propagate: false
+
+  # ==========================================================================
+  # FIGREGISTRY CORE LOGGERS - ENHANCED DEBUG VISIBILITY
+  # ==========================================================================
+
+  # Root FigRegistry logger with comprehensive development coverage
+  figregistry:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_debug]
+    propagate: false
+
+  # FigRegistry configuration with detailed validation and merge tracking
+  figregistry.config:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_debug]
+    propagate: false
+
+  # FigRegistry style management with condition resolution visibility
+  figregistry.style:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # FigRegistry output management with file operation monitoring
+  figregistry.output:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # ==========================================================================
+  # FIGREGISTRY-KEDRO PLUGIN LOGGERS - COMPREHENSIVE DEBUG VISIBILITY
+  # ==========================================================================
+
+  # Root plugin logger with maximum development visibility
+  figregistry_kedro:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_debug, file_json_dev]
+    propagate: false
+
+  # Configuration bridge with detailed merge operation tracking and timing
+  figregistry_kedro.config:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_debug, file_perf_dev]
+    propagate: false
+    
+  # FigRegistryConfigBridge specific operations with comprehensive tracing
+  figregistry_kedro.config.bridge:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # Configuration validation with detailed error reporting
+  figregistry_kedro.config.validation:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_errors_dev]
+    propagate: false
+
+  # Configuration merge operations with detailed state tracking
+  figregistry_kedro.config.merge:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # Lifecycle hooks with comprehensive initialization and context tracking
+  figregistry_kedro.hooks:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_debug, file_perf_dev]
+    propagate: false
+
+  # Hook registration and discovery with detailed validation tracking
+  figregistry_kedro.hooks.registration:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev]
+    propagate: false
+
+  # Hook lifecycle event processing with timing and context information
+  figregistry_kedro.hooks.lifecycle:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # Hook initialization with detailed timing and error tracking
+  figregistry_kedro.hooks.init:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev, file_errors_dev]
+    propagate: false
+
+  # Dataset operations with comprehensive save/load/styling tracking
+  figregistry_kedro.datasets:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_debug, file_perf_dev]
+    propagate: false
+
+  # FigureDataSet specific operations with detailed styling and persistence tracking
+  figregistry_kedro.datasets.figure:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # Dataset styling operations with condition resolution and application tracking
+  figregistry_kedro.datasets.styling:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # Dataset save operations with detailed timing and error tracking
+  figregistry_kedro.datasets.save:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev, file_errors_dev]
+    propagate: false
+
+  # Dataset load operations with caching and validation tracking
+  figregistry_kedro.datasets.load:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # Performance monitoring with comprehensive SLA and timing tracking
+  figregistry_kedro.performance:
+    level: DEBUG
+    handlers: [console_perf, file_perf_dev, file_json_dev]
+    propagate: false
+
+  # Performance timing with detailed operation breakdown
+  figregistry_kedro.performance.timing:
+    level: DEBUG
+    handlers: [console_perf, file_perf_dev]
+    propagate: false
+
+  # SLA monitoring with threshold alerts and compliance tracking
+  figregistry_kedro.performance.sla:
+    level: DEBUG
+    handlers: [console_perf, console_error, file_perf_dev, file_errors_dev]
+    propagate: false
+
+  # Cache operations with hit/miss tracking and performance monitoring
+  figregistry_kedro.performance.cache:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # ==========================================================================
+  # DEVELOPMENT-SPECIFIC DEBUGGING LOGGERS
+  # ==========================================================================
+
+  # Condition resolution debugging with parameter tracking
+  debug.condition_resolution:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev]
+    propagate: false
+
+  # Style application debugging with before/after state tracking
+  debug.style_application:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev]
+    propagate: false
+
+  # Figure persistence debugging with file operation details
+  debug.figure_persistence:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # Configuration merging debugging with detailed state transitions
+  debug.config_merging:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev]
+    propagate: false
+
+  # Hook lifecycle debugging with event timing and context
+  debug.hook_lifecycle:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_perf_dev]
+    propagate: false
+
+  # Pipeline integration debugging with data flow tracking
+  debug.pipeline_integration:
+    level: DEBUG
+    handlers: [console_debug, file_figregistry_dev, file_debug]
+    propagate: false
+
+  # ==========================================================================
+  # THIRD-PARTY LIBRARY LOGGERS - NOISE REDUCTION
+  # ==========================================================================
+
+  # Matplotlib with reduced noise but error visibility
+  matplotlib:
+    level: ERROR
+    handlers: [console_simple, file_errors_dev]
+    propagate: false
+
+  # Pydantic with validation error tracking
+  pydantic:
+    level: WARNING
+    handlers: [console_simple, file_figregistry_dev]
+    propagate: false
+
+  # YAML parsing with error tracking only
+  yaml:
+    level: ERROR
+    handlers: [console_simple, file_errors_dev]
+    propagate: false
+
+  # File system operations with error tracking
+  fsspec:
+    level: ERROR
+    handlers: [console_simple, file_errors_dev]
+    propagate: false
+
+  # NumPy with minimal logging
+  numpy:
+    level: ERROR
+    handlers: [file_errors_dev]
+    propagate: false
+
+  # Pandas with warning level for development
+  pandas:
+    level: WARNING
+    handlers: [console_simple]
+    propagate: false
+
+  # SciPy with error tracking only
+  scipy:
+    level: ERROR
+    handlers: [file_errors_dev]
+    propagate: false
+
+# =============================================================================
+# ROOT LOGGER - Development Default Configuration
+# =============================================================================
+
+root:
+  level: DEBUG
+  handlers: [console, file_debug, file_errors_dev]
+
+# =============================================================================
+# LOCAL DEVELOPMENT CONFIGURATION NOTES
+# =============================================================================
+
+# Development Optimization Guidelines:
+# 
+# 1. ENHANCED DEBUG VISIBILITY:
+#    - All figregistry_kedro components set to DEBUG level for comprehensive tracing
+#    - Color-coded console output for immediate visual feedback
+#    - Detailed function and line number tracking for rapid issue identification
+#    - Enhanced error visibility with stack traces and context
+#
+# 2. RAPID DEVELOPMENT ITERATION:
+#    - Immediate console feedback for all plugin operations
+#    - Simplified file handling focused on essential debugging needs
+#    - Performance monitoring optimized for development workflows
+#    - Reduced log noise from third-party libraries
+#
+# 3. COMPREHENSIVE PLUGIN VISIBILITY:
+#    - Detailed tracing of configuration bridge merge operations
+#    - Comprehensive hook lifecycle event tracking with timing
+#    - Complete dataset styling and persistence operation logging
+#    - Condition resolution debugging with parameter state tracking
+#
+# 4. DEVELOPER-FRIENDLY FEATURES:
+#    - Color-coded console output for visual debugging
+#    - Shortened timestamp format for immediate feedback
+#    - Enhanced error formatting with increased visibility
+#    - Performance metrics with SLA status indicators
+#
+# 5. PERFORMANCE DEBUGGING:
+#    - Hook initialization timing with <150ms SLA tracking
+#    - Configuration bridge operations with <5ms SLA monitoring
+#    - FigureDataSet save overhead with <20ms SLA validation
+#    - Cache hit/miss tracking for optimization insights
+#
+# 6. LOCAL ENVIRONMENT OPTIMIZATIONS:
+#    - Reduced file retention for development cycles (3-5 backup files)
+#    - Smaller file sizes optimized for local development (10-50MB)
+#    - JSON structured logs for development tooling integration
+#    - Error logs with extended retention for issue analysis
+#
+# 7. FIGREGISTRY-KEDRO SPECIFIC DEBUG FEATURES:
+#    - Configuration merge state transitions with before/after tracking
+#    - Style application debugging with condition evaluation details
+#    - Hook registration and discovery validation with detailed feedback
+#    - Dataset operations with comprehensive context and timing information
+#
+# 8. INTEGRATION DEBUGGING WORKFLOWS:
+#    - Enable specific debug.* loggers for targeted troubleshooting
+#    - Use console_debug handler for interactive debugging sessions
+#    - Review logs/figregistry_local.log for plugin-specific issues
+#    - Monitor logs/performance_local.log for SLA compliance during development
+#
+# Environment Variable Overrides for Development:
+# - FIGREGISTRY_KEDRO_DEBUG=1: Enable maximum debug output
+# - KEDRO_DEBUG=1: Enable Kedro framework debugging
+# - FIGREGISTRY_DEBUG=1: Enable FigRegistry core debugging
+# - LOG_COLORS=0: Disable color output for non-terminal environments
+# - LOG_PERFORMANCE=1: Enable performance monitoring output
+# - LOG_CACHE_DEBUG=1: Enable detailed cache operation logging
+#
+# Development Workflow Integration:
+# - Pre-commit hooks can validate logging configuration syntax
+# - IDE integration supports log level adjustment through environment variables
+# - Docker development environments inherit logging configuration automatically
+# - Test suites can override specific loggers for isolated testing scenarios

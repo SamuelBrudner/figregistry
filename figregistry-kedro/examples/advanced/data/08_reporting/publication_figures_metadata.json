@@ -1,0 +1,1131 @@
+{
+  "_metadata": {
+    "schema_version": "2.1.0",
+    "created_date": "2024-12-19",
+    "last_modified": "2024-12-19",
+    "author": "FigRegistry-Kedro Advanced Integration Team",
+    "purpose": "publication_ready_figure_metadata_catalog",
+    "description": "Comprehensive metadata catalog for publication-ready figure generation through FigureDataSet with advanced styling configurations, demonstrating sophisticated integration between FigRegistry's condition-based styling and Kedro's catalog system",
+    "compliance": {
+      "figregistry_kedro_version": ">=0.1.0",
+      "kedro_version": ">=0.18.0,<0.20.0",
+      "figregistry_version": ">=0.3.0",
+      "feature_requirements": [
+        "F-005-RQ-001",
+        "F-005-RQ-003",
+        "F-005-RQ-004",
+        "F-004",
+        "F-007"
+      ]
+    },
+    "documentation": {
+      "figuredataset_guide": "docs/figuredataset-api.md",
+      "condition_resolution": "docs/condition-resolution.md",
+      "publication_standards": "docs/publication-guidelines.md",
+      "metadata_schema": "docs/metadata-schema.md"
+    }
+  },
+
+  "training_pipeline_figures": {
+    "data_quality_analysis": {
+      "catalog_reference": "data_quality_analysis_plot",
+      "figure_specification": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/figures/training/data_quality_analysis.png",
+        "purpose": "exploratory",
+        "condition_param": "data_quality_condition",
+        "description": "Comprehensive data quality analysis visualization with automated quality condition styling"
+      },
+      "publication_metadata": {
+        "title": "Data Quality Assessment and Validation",
+        "subtitle": "Automated quality indicator analysis with condition-based styling",
+        "author": "Advanced ML Pipeline Team",
+        "publication_context": "exploratory_analysis",
+        "target_audience": "data_engineering_team",
+        "quality_level": "development_grade",
+        "statistical_rigor": "descriptive_analysis"
+      },
+      "styling_configuration": {
+        "condition_resolution": {
+          "parameter_source": "data_quality_condition",
+          "resolution_pattern": "training.data.{condition_value}",
+          "fallback_condition": "training.data.raw",
+          "environment_suffix": true
+        },
+        "style_overrides": {
+          "alpha": 0.9,
+          "grid_alpha": 0.8,
+          "annotation_enabled": true,
+          "quality_indicators": true,
+          "color_intensity": 0.8
+        },
+        "conditional_styling": {
+          "high_quality": {
+            "condition": "data_quality_score >= 0.85",
+            "style_adjustments": {
+              "color": "#27AE60",
+              "linewidth": 3.0,
+              "marker": "o",
+              "alpha": 1.0
+            }
+          },
+          "medium_quality": {
+            "condition": "data_quality_score >= 0.70 and data_quality_score < 0.85",
+            "style_adjustments": {
+              "color": "#F39C12",
+              "linewidth": 2.5,
+              "marker": "s",
+              "alpha": 0.8
+            }
+          },
+          "low_quality": {
+            "condition": "data_quality_score < 0.70",
+            "style_adjustments": {
+              "color": "#E74C3C",
+              "linewidth": 2.0,
+              "marker": "x",
+              "alpha": 0.6
+            }
+          }
+        }
+      },
+      "format_configuration": {
+        "development": {
+          "dpi": 150,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "edgecolor": "none",
+          "format": "png"
+        },
+        "staging": {
+          "dpi": 200,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": "png"
+        },
+        "production": {
+          "dpi": 300,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": "png"
+        }
+      },
+      "context_injection": {
+        "parameter_mapping": {
+          "data_quality_condition": "parameters.data_processing.data_quality.quality_condition",
+          "data_quality_score": "parameters.data_processing.data_quality.quality_score",
+          "environment": "run_environment"
+        },
+        "dynamic_resolution": true,
+        "cache_enabled": true
+      }
+    },
+
+    "feature_engineering_analysis": {
+      "catalog_reference": "feature_engineering_analysis",
+      "figure_specification": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/figures/training/feature_engineering_analysis.png",
+        "purpose": "presentation",
+        "condition_param": "data_quality_condition",
+        "description": "Feature engineering impact analysis with presentation-ready styling"
+      },
+      "publication_metadata": {
+        "title": "Feature Engineering Impact Analysis",
+        "subtitle": "Transformation effectiveness and feature importance assessment",
+        "author": "Feature Engineering Team",
+        "publication_context": "stakeholder_presentation",
+        "target_audience": "technical_leadership",
+        "quality_level": "presentation_grade",
+        "statistical_rigor": "inferential_analysis"
+      },
+      "styling_configuration": {
+        "condition_resolution": {
+          "parameter_source": "data_quality_condition",
+          "resolution_pattern": "training.data.{condition_value}",
+          "fallback_condition": "training.data.transformed",
+          "environment_suffix": true
+        },
+        "style_overrides": {
+          "color_intensity": 1.0,
+          "professional_styling": true,
+          "feature_importance_overlay": true,
+          "correlation_heatmap_styling": true,
+          "high_contrast": true
+        },
+        "presentation_enhancements": {
+          "title_prominence": true,
+          "legend_optimization": true,
+          "axis_label_clarity": true,
+          "color_accessibility": true
+        }
+      },
+      "format_configuration": {
+        "development": {
+          "dpi": 200,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "png"
+        },
+        "staging": {
+          "dpi": 250,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": "png"
+        },
+        "production": {
+          "dpi": 300,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": ["png", "pdf"]
+        }
+      },
+      "context_injection": {
+        "parameter_mapping": {
+          "data_quality_condition": "parameters.feature_engineering.transformation_quality",
+          "feature_importance": "parameters.feature_engineering.importance_scores",
+          "environment": "run_environment"
+        },
+        "dynamic_resolution": true,
+        "cache_enabled": true
+      }
+    },
+
+    "champion_model_analysis": {
+      "catalog_reference": "champion_model_analysis",
+      "figure_specification": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/figures/training/champion_model_analysis.png",
+        "purpose": "publication",
+        "condition_param": "model_type",
+        "description": "Champion model detailed analysis with publication-ready styling and metrics"
+      },
+      "publication_metadata": {
+        "title": "Champion Model Performance Analysis",
+        "subtitle": "Comprehensive evaluation with statistical significance testing",
+        "author": "Machine Learning Research Team",
+        "publication_context": "journal_submission",
+        "target_audience": "peer_review_committee",
+        "quality_level": "journal_submission_grade",
+        "statistical_rigor": "publication_standard",
+        "peer_review_ready": true
+      },
+      "styling_configuration": {
+        "condition_resolution": {
+          "parameter_source": "model_type",
+          "resolution_pattern": "training.model.{condition_value}",
+          "fallback_condition": "training.model.champion",
+          "environment_suffix": true
+        },
+        "style_overrides": {
+          "publication_ready": true,
+          "high_contrast": true,
+          "detailed_annotations": true,
+          "performance_metrics_overlay": true,
+          "statistical_significance_indicators": true,
+          "color_intensity": 1.0
+        },
+        "publication_standards": {
+          "figure_quality": "journal_grade",
+          "statistical_notation": "apa_standard",
+          "error_bars": "confidence_intervals",
+          "significance_markers": true,
+          "reproducibility_metadata": true
+        }
+      },
+      "format_configuration": {
+        "development": {
+          "dpi": 300,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "png"
+        },
+        "staging": {
+          "dpi": 400,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": "pdf"
+        },
+        "production": {
+          "dpi": 600,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": "pdf"
+        }
+      },
+      "context_injection": {
+        "parameter_mapping": {
+          "model_type": "parameters.model_training.champion_model.algorithm_type",
+          "performance_metrics": "parameters.model_training.champion_model.performance",
+          "statistical_significance": "parameters.model_training.champion_model.significance_tests",
+          "environment": "run_environment"
+        },
+        "dynamic_resolution": true,
+        "cache_enabled": true,
+        "validation_enabled": true
+      },
+      "versioning_configuration": {
+        "kedro_versioned": true,
+        "version_tracking": "comprehensive",
+        "experiment_metadata": true,
+        "performance_tracking": true
+      }
+    }
+  },
+
+  "inference_pipeline_figures": {
+    "prediction_confidence_distribution": {
+      "catalog_reference": "prediction_confidence_distribution",
+      "figure_specification": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/figures/inference/prediction_confidence_distribution.png",
+        "purpose": "presentation",
+        "condition_param": "confidence_level",
+        "description": "Prediction confidence distribution analysis with confidence-level styling"
+      },
+      "publication_metadata": {
+        "title": "Prediction Confidence Distribution Analysis",
+        "subtitle": "Model uncertainty quantification and calibration assessment",
+        "author": "Model Inference Team",
+        "publication_context": "operational_monitoring",
+        "target_audience": "model_operations_team",
+        "quality_level": "operational_grade",
+        "statistical_rigor": "monitoring_standard"
+      },
+      "styling_configuration": {
+        "condition_resolution": {
+          "parameter_source": "confidence_level",
+          "resolution_pattern": "inference.confidence.{condition_value}",
+          "fallback_condition": "inference.confidence.medium",
+          "environment_suffix": true
+        },
+        "style_overrides": {
+          "confidence_distribution_styling": true,
+          "threshold_indicators": true,
+          "risk_zones": true,
+          "calibration_curve": true,
+          "uncertainty_visualization": true
+        },
+        "confidence_specific_styling": {
+          "high_confidence": {
+            "condition": "confidence_threshold >= 0.85",
+            "style_adjustments": {
+              "color": "#27AE60",
+              "fill_alpha": 0.5,
+              "confidence_indicator": "solid_fill"
+            }
+          },
+          "medium_confidence": {
+            "condition": "confidence_threshold >= 0.65 and confidence_threshold < 0.85",
+            "style_adjustments": {
+              "color": "#F39C12",
+              "fill_alpha": 0.3,
+              "confidence_indicator": "pattern_fill"
+            }
+          },
+          "low_confidence": {
+            "condition": "confidence_threshold < 0.65",
+            "style_adjustments": {
+              "color": "#E74C3C",
+              "fill_alpha": 0.2,
+              "confidence_indicator": "outline_only"
+            }
+          }
+        }
+      },
+      "format_configuration": {
+        "development": {
+          "dpi": 200,
+          "bbox_inches": "tight",
+          "facecolor": "#F8F9FA",
+          "format": "png"
+        },
+        "staging": {
+          "dpi": 250,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "png"
+        },
+        "production": {
+          "dpi": 300,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "png"
+        }
+      },
+      "context_injection": {
+        "parameter_mapping": {
+          "confidence_level": "parameters.inference.confidence.threshold_level",
+          "confidence_threshold": "parameters.inference.confidence.threshold_value",
+          "calibration_metrics": "parameters.inference.confidence.calibration",
+          "environment": "run_environment"
+        },
+        "dynamic_resolution": true,
+        "cache_enabled": true
+      },
+      "versioning_configuration": {
+        "kedro_versioned": true,
+        "version_tracking": "performance_focused",
+        "monitoring_enabled": true
+      }
+    }
+  },
+
+  "experimental_analysis_figures": {
+    "ab_test_results_analysis": {
+      "catalog_reference": "ab_test_results_analysis",
+      "figure_specification": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/figures/experiments/ab_test_results_analysis.png",
+        "purpose": "presentation",
+        "condition_param": "experimental_group",
+        "description": "A/B test results analysis with statistical significance styling"
+      },
+      "publication_metadata": {
+        "title": "A/B Test Statistical Analysis",
+        "subtitle": "Randomized controlled trial results with significance testing",
+        "author": "Experimental Design Team",
+        "publication_context": "experimental_report",
+        "target_audience": "research_committee",
+        "quality_level": "research_grade",
+        "statistical_rigor": "randomized_controlled_trial",
+        "experimental_design": "AB_testing"
+      },
+      "styling_configuration": {
+        "condition_resolution": {
+          "parameter_source": "experimental_group",
+          "resolution_pattern": "experiment.{condition_value}",
+          "fallback_condition": "experiment.control",
+          "environment_suffix": true
+        },
+        "style_overrides": {
+          "statistical_significance_styling": true,
+          "confidence_intervals": true,
+          "effect_size_indicators": true,
+          "power_analysis_overlay": true,
+          "experimental_design_notation": true
+        },
+        "significance_styling": {
+          "highly_significant": {
+            "condition": "p_value < 0.001",
+            "style_adjustments": {
+              "color": "#1E8449",
+              "significance_symbol": "***",
+              "border_style": "double",
+              "emphasis": "high"
+            }
+          },
+          "significant": {
+            "condition": "p_value < 0.05",
+            "style_adjustments": {
+              "color": "#58D68D",
+              "significance_symbol": "*",
+              "border_style": "solid",
+              "emphasis": "medium"
+            }
+          },
+          "not_significant": {
+            "condition": "p_value >= 0.05",
+            "style_adjustments": {
+              "color": "#BDC3C7",
+              "significance_symbol": "ns",
+              "emphasis": "low"
+            }
+          }
+        }
+      },
+      "format_configuration": {
+        "development": {
+          "dpi": 250,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "png"
+        },
+        "staging": {
+          "dpi": 300,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "png"
+        },
+        "production": {
+          "dpi": 400,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": ["png", "pdf"]
+        }
+      },
+      "context_injection": {
+        "parameter_mapping": {
+          "experimental_group": "parameters.experiment.group_assignment",
+          "p_value": "parameters.experiment.statistical_tests.p_value",
+          "effect_size": "parameters.experiment.statistical_tests.effect_size",
+          "confidence_level": "parameters.experiment.statistical_tests.confidence_level",
+          "environment": "run_environment"
+        },
+        "dynamic_resolution": true,
+        "cache_enabled": true,
+        "statistical_validation": true
+      },
+      "versioning_configuration": {
+        "kedro_versioned": true,
+        "version_tracking": "experimental_design",
+        "experiment_metadata": true,
+        "statistical_tracking": true
+      },
+      "experimental_metadata": {
+        "design_type": "randomized_controlled_trial",
+        "randomization_method": "block_randomization",
+        "power_analysis": true,
+        "effect_size_calculation": "cohen_d",
+        "multiple_testing_correction": "bonferroni"
+      }
+    },
+
+    "treatment_group_comparison": {
+      "catalog_reference": "treatment_group_comparison",
+      "figure_specification": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/figures/experiments/treatment_group_comparison.png",
+        "purpose": "publication",
+        "condition_param": "group_id",
+        "description": "Treatment group comparison analysis with group-specific styling patterns"
+      },
+      "publication_metadata": {
+        "title": "Multi-Group Treatment Comparison Analysis",
+        "subtitle": "Comprehensive comparative analysis with statistical testing",
+        "author": "Clinical Research Team",
+        "publication_context": "peer_reviewed_journal",
+        "target_audience": "scientific_community",
+        "quality_level": "journal_publication_grade",
+        "statistical_rigor": "clinical_trial_standard",
+        "regulatory_compliance": true
+      },
+      "styling_configuration": {
+        "condition_resolution": {
+          "parameter_source": "group_id",
+          "resolution_pattern": "experiment.treatment.{condition_value}",
+          "fallback_condition": "experiment.control",
+          "environment_suffix": true
+        },
+        "style_overrides": {
+          "multi_group_styling": true,
+          "treatment_effect_visualization": true,
+          "control_comparison": true,
+          "outcome_distribution": true,
+          "publication_quality": true
+        },
+        "group_specific_styling": {
+          "control": {
+            "style_adjustments": {
+              "color": "#95A5A6",
+              "marker": "o",
+              "label": "Control Group",
+              "fill_alpha": 0.4
+            }
+          },
+          "treatment_a": {
+            "style_adjustments": {
+              "color": "#3498DB",
+              "marker": "s",
+              "label": "Treatment A (Algorithm Enhancement)",
+              "fill_alpha": 0.4
+            }
+          },
+          "treatment_b": {
+            "style_adjustments": {
+              "color": "#E74C3C",
+              "marker": "^",
+              "label": "Treatment B (Hyperparameter Optimization)",
+              "fill_alpha": 0.4
+            }
+          },
+          "treatment_c": {
+            "style_adjustments": {
+              "color": "#27AE60",
+              "marker": "D",
+              "label": "Treatment C (Ensemble Method)",
+              "fill_alpha": 0.4
+            }
+          }
+        }
+      },
+      "format_configuration": {
+        "development": {
+          "dpi": 400,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "pdf"
+        },
+        "staging": {
+          "dpi": 500,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": "pdf"
+        },
+        "production": {
+          "dpi": 600,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": "pdf"
+        }
+      },
+      "context_injection": {
+        "parameter_mapping": {
+          "group_id": "parameters.experiment.multi_group.group_assignment",
+          "treatment_effects": "parameters.experiment.multi_group.treatment_effects",
+          "statistical_tests": "parameters.experiment.multi_group.anova_results",
+          "multiple_comparisons": "parameters.experiment.multi_group.post_hoc_tests",
+          "environment": "run_environment"
+        },
+        "dynamic_resolution": true,
+        "cache_enabled": true,
+        "validation_enabled": true
+      },
+      "versioning_configuration": {
+        "kedro_versioned": true,
+        "version_tracking": "comprehensive",
+        "experiment_metadata": true,
+        "regulatory_tracking": true
+      },
+      "regulatory_metadata": {
+        "compliance_framework": "clinical_trial_standards",
+        "statistical_plan": "pre_registered",
+        "data_integrity": "gcp_compliant",
+        "audit_trail": "comprehensive"
+      }
+    }
+  },
+
+  "reporting_dashboard_figures": {
+    "executive_summary_dashboard": {
+      "catalog_reference": "executive_summary_dashboard",
+      "figure_specification": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/figures/reports/executive_summary_dashboard.png",
+        "purpose": "presentation",
+        "condition_param": "report_type",
+        "description": "Executive summary dashboard with C-level audience styling"
+      },
+      "publication_metadata": {
+        "title": "Executive Performance Dashboard",
+        "subtitle": "High-level KPI summary for strategic decision making",
+        "author": "Business Intelligence Team",
+        "publication_context": "board_presentation",
+        "target_audience": "c_level_executives",
+        "quality_level": "executive_presentation_grade",
+        "business_focus": true
+      },
+      "styling_configuration": {
+        "condition_resolution": {
+          "parameter_source": "report_type",
+          "resolution_pattern": "reporting.summary.{condition_value}",
+          "fallback_condition": "reporting.summary.executive",
+          "environment_suffix": true
+        },
+        "style_overrides": {
+          "executive_styling": true,
+          "high_level_metrics": true,
+          "kpi_dashboard": true,
+          "business_impact_focus": true,
+          "clean_professional_design": true
+        },
+        "executive_presentation_styling": {
+          "color_palette": "professional_corporate",
+          "font_style": "executive_preferred",
+          "chart_complexity": "simplified",
+          "narrative_focus": "business_outcomes"
+        }
+      },
+      "format_configuration": {
+        "development": {
+          "dpi": 250,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "png"
+        },
+        "staging": {
+          "dpi": 300,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": "png"
+        },
+        "production": {
+          "dpi": 400,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": ["png", "pdf"]
+        }
+      },
+      "context_injection": {
+        "parameter_mapping": {
+          "report_type": "parameters.reporting.dashboard.report_type",
+          "kpi_metrics": "parameters.reporting.dashboard.key_metrics",
+          "business_context": "parameters.reporting.dashboard.business_context",
+          "environment": "run_environment"
+        },
+        "dynamic_resolution": true,
+        "cache_enabled": true
+      },
+      "business_metadata": {
+        "audience": "c_level_executives",
+        "presentation_context": "board_meeting",
+        "decision_support": true,
+        "strategic_focus": true
+      }
+    },
+
+    "performance_monitoring_dashboard": {
+      "catalog_reference": "performance_monitoring_dashboard",
+      "figure_specification": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/figures/reports/performance_monitoring_dashboard.png",
+        "purpose": "monitoring",
+        "condition_param": "report_section",
+        "description": "Performance monitoring dashboard with real-time styling"
+      },
+      "publication_metadata": {
+        "title": "Real-time Performance Monitoring Dashboard",
+        "subtitle": "Operational metrics and SLA tracking",
+        "author": "Operations Team",
+        "publication_context": "operational_monitoring",
+        "target_audience": "operations_team",
+        "quality_level": "operational_grade",
+        "real_time_focus": true
+      },
+      "styling_configuration": {
+        "condition_resolution": {
+          "parameter_source": "report_section",
+          "resolution_pattern": "reporting.detail.{condition_value}",
+          "fallback_condition": "reporting.detail.performance",
+          "environment_suffix": true
+        },
+        "style_overrides": {
+          "monitoring_styling": true,
+          "realtime_indicators": true,
+          "alert_status_colors": true,
+          "trend_analysis": true,
+          "sla_tracking": true
+        },
+        "monitoring_specific_styling": {
+          "alert_levels": {
+            "critical": {
+              "color": "#E74C3C",
+              "urgency": "high",
+              "notification": "immediate"
+            },
+            "warning": {
+              "color": "#F39C12",
+              "urgency": "medium",
+              "notification": "scheduled"
+            },
+            "normal": {
+              "color": "#27AE60",
+              "urgency": "low",
+              "notification": "routine"
+            }
+          }
+        }
+      },
+      "format_configuration": {
+        "development": {
+          "dpi": 150,
+          "bbox_inches": "tight",
+          "facecolor": "#F8F9FA",
+          "format": "png"
+        },
+        "staging": {
+          "dpi": 200,
+          "bbox_inches": "tight",
+          "facecolor": "#F8F9FA",
+          "format": "png"
+        },
+        "production": {
+          "dpi": 250,
+          "bbox_inches": "tight",
+          "facecolor": "#F8F9FA",
+          "format": "png"
+        }
+      },
+      "context_injection": {
+        "parameter_mapping": {
+          "report_section": "parameters.monitoring.dashboard.section_focus",
+          "performance_metrics": "parameters.monitoring.dashboard.performance_kpis",
+          "alert_status": "parameters.monitoring.dashboard.alert_levels",
+          "sla_targets": "parameters.monitoring.dashboard.sla_thresholds",
+          "environment": "run_environment"
+        },
+        "dynamic_resolution": true,
+        "cache_enabled": true,
+        "real_time_updates": true
+      },
+      "operational_metadata": {
+        "monitoring_frequency": "real_time",
+        "alert_integration": true,
+        "sla_compliance": true,
+        "performance_tracking": "comprehensive"
+      }
+    }
+  },
+
+  "advanced_analytics_figures": {
+    "multi_factorial_experiment_design": {
+      "catalog_reference": "multi_factorial_experiment_design",
+      "figure_specification": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/figures/experimental_design/multi_factorial_analysis.png",
+        "purpose": "publication",
+        "condition_param": "experimental_scenario",
+        "description": "Multi-factorial experimental design visualization with complex interaction effects"
+      },
+      "publication_metadata": {
+        "title": "Multi-Factorial Experimental Design Analysis",
+        "subtitle": "Complex interaction effects and main effects decomposition",
+        "author": "Statistical Design Team",
+        "publication_context": "methodological_publication",
+        "target_audience": "statistical_research_community",
+        "quality_level": "methodological_publication_grade",
+        "statistical_rigor": "advanced_statistical_methods"
+      },
+      "styling_configuration": {
+        "condition_resolution": {
+          "parameter_source": "experimental_scenario",
+          "resolution_pattern": "experiment.factorial.{condition_value}",
+          "fallback_condition": "experiment.factorial.baseline",
+          "environment_suffix": true
+        },
+        "style_overrides": {
+          "experimental_design_styling": true,
+          "factorial_indicators": true,
+          "interaction_effects": true,
+          "main_effects_visualization": true,
+          "statistical_notation": true
+        },
+        "factorial_design_styling": {
+          "factor_visualization": {
+            "main_effects": {
+              "color_scheme": "distinct_primary",
+              "emphasis": "high",
+              "statistical_markers": true
+            },
+            "interaction_effects": {
+              "color_scheme": "interaction_gradient",
+              "emphasis": "moderate",
+              "cross_hatching": true
+            },
+            "error_components": {
+              "color_scheme": "neutral_gray",
+              "emphasis": "low",
+              "transparency": 0.3
+            }
+          }
+        }
+      },
+      "format_configuration": {
+        "development": {
+          "dpi": 400,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "pdf"
+        },
+        "staging": {
+          "dpi": 500,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": "pdf"
+        },
+        "production": {
+          "dpi": 600,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": "pdf"
+        }
+      },
+      "context_injection": {
+        "parameter_mapping": {
+          "experimental_scenario": "parameters.experimental_design.factorial.scenario_type",
+          "factor_levels": "parameters.experimental_design.factorial.factor_specifications",
+          "interaction_terms": "parameters.experimental_design.factorial.interaction_model",
+          "statistical_model": "parameters.experimental_design.factorial.anova_specifications",
+          "environment": "run_environment"
+        },
+        "dynamic_resolution": true,
+        "cache_enabled": true,
+        "statistical_validation": true
+      },
+      "versioning_configuration": {
+        "kedro_versioned": true,
+        "version_tracking": "methodological",
+        "experiment_metadata": true,
+        "statistical_model_tracking": true
+      },
+      "statistical_metadata": {
+        "experimental_design": "multi_factorial",
+        "statistical_model": "anova",
+        "interaction_analysis": "comprehensive",
+        "effect_size_reporting": "eta_squared",
+        "power_analysis": "post_hoc"
+      }
+    },
+
+    "hierarchical_condition_visualization": {
+      "catalog_reference": "hierarchical_condition_visualization",
+      "figure_specification": {
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/figures/hierarchical/multi_level_condition_resolution.png",
+        "purpose": "presentation",
+        "condition_param": "algorithm_comparison_baseline",
+        "description": "Multi-level hierarchical condition resolution with complex parameter mapping"
+      },
+      "publication_metadata": {
+        "title": "Hierarchical Condition Resolution Demonstration",
+        "subtitle": "Complex parameter mapping and condition inheritance patterns",
+        "author": "Integration Architecture Team",
+        "publication_context": "technical_documentation",
+        "target_audience": "software_architects",
+        "quality_level": "technical_documentation_grade",
+        "architectural_focus": true
+      },
+      "styling_configuration": {
+        "condition_resolution": {
+          "parameter_source": "algorithm_comparison_baseline",
+          "resolution_pattern": "training.model.{algorithm_type}.{comparison_baseline}",
+          "hierarchical_fallback": [
+            "training.model.{algorithm_type}.baseline",
+            "training.model.baseline",
+            "training.model.*"
+          ],
+          "environment_suffix": true,
+          "complex_resolution": true
+        },
+        "style_overrides": {
+          "hierarchical_styling": true,
+          "multi_level_indicators": true,
+          "condition_inheritance": true,
+          "complex_parameter_mapping": true,
+          "architectural_visualization": true
+        },
+        "hierarchical_visualization": {
+          "level_1": {
+            "style_base": "primary_algorithm",
+            "visual_emphasis": "high",
+            "hierarchy_indicator": "solid_border"
+          },
+          "level_2": {
+            "style_base": "secondary_comparison",
+            "visual_emphasis": "medium",
+            "hierarchy_indicator": "dashed_border"
+          },
+          "level_3": {
+            "style_base": "tertiary_fallback",
+            "visual_emphasis": "low",
+            "hierarchy_indicator": "dotted_border"
+          }
+        }
+      },
+      "format_configuration": {
+        "development": {
+          "dpi": 250,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "png"
+        },
+        "staging": {
+          "dpi": 300,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "format": "png"
+        },
+        "production": {
+          "dpi": 350,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "transparent": false,
+          "format": ["png", "svg"]
+        }
+      },
+      "context_injection": {
+        "parameter_mapping": {
+          "algorithm_comparison_baseline": "parameters.model_comparison.hierarchical.baseline_algorithm",
+          "algorithm_type": "parameters.model_comparison.hierarchical.primary_algorithm",
+          "comparison_baseline": "parameters.model_comparison.hierarchical.comparison_reference",
+          "hierarchy_depth": "parameters.model_comparison.hierarchical.resolution_depth",
+          "environment": "run_environment"
+        },
+        "dynamic_resolution": true,
+        "cache_enabled": true,
+        "hierarchical_validation": true
+      },
+      "architectural_metadata": {
+        "condition_complexity": "hierarchical_multi_level",
+        "parameter_resolution": "deep_mapping",
+        "inheritance_strategy": "cascading_fallback",
+        "performance_optimization": "cached_resolution"
+      }
+    }
+  },
+
+  "environment_specific_configurations": {
+    "development_environment": {
+      "configuration_overrides": {
+        "performance_optimization": "development_speed",
+        "validation_level": "relaxed",
+        "error_handling": "verbose_debugging",
+        "cache_strategy": "disabled_for_testing"
+      },
+      "styling_adjustments": {
+        "debug_mode": true,
+        "verbose_annotations": true,
+        "diagnostic_overlays": true,
+        "performance_profiling": true
+      },
+      "format_preferences": {
+        "default_dpi": 150,
+        "default_format": "png",
+        "optimization": "speed_over_quality"
+      }
+    },
+    "staging_environment": {
+      "configuration_overrides": {
+        "performance_optimization": "balanced",
+        "validation_level": "strict",
+        "error_handling": "production_ready",
+        "cache_strategy": "performance_optimized"
+      },
+      "styling_adjustments": {
+        "validation_styling": true,
+        "integration_testing_indicators": true,
+        "quality_gates": true,
+        "performance_benchmarks": true
+      },
+      "format_preferences": {
+        "default_dpi": 250,
+        "default_format": "png",
+        "optimization": "quality_balanced"
+      }
+    },
+    "production_environment": {
+      "configuration_overrides": {
+        "performance_optimization": "maximum_efficiency",
+        "validation_level": "strict",
+        "error_handling": "fault_tolerant",
+        "cache_strategy": "aggressive_optimization"
+      },
+      "styling_adjustments": {
+        "production_styling": true,
+        "operational_indicators": true,
+        "sla_monitoring": true,
+        "alert_thresholds": true
+      },
+      "format_preferences": {
+        "default_dpi": 300,
+        "default_format": "pdf",
+        "optimization": "quality_over_speed"
+      }
+    }
+  },
+
+  "integration_validation": {
+    "figregistry_hooks_integration": {
+      "lifecycle_management": {
+        "before_pipeline_run": {
+          "figregistry_initialization": true,
+          "configuration_validation": true,
+          "context_preparation": true
+        },
+        "after_pipeline_run": {
+          "cleanup_operations": true,
+          "performance_logging": true,
+          "metadata_finalization": true
+        }
+      },
+      "context_injection": {
+        "parameter_resolution": "dynamic",
+        "cache_management": "automated",
+        "validation_checks": "comprehensive"
+      }
+    },
+    "configuration_bridge_integration": {
+      "merge_strategy": "hierarchical_precedence",
+      "validation_framework": "pydantic_schema",
+      "environment_support": "multi_tier",
+      "performance_targets": {
+        "merge_time_ms": 25,
+        "validation_time_ms": 10,
+        "cache_hit_rate": 0.85
+      }
+    },
+    "figuredataset_integration": {
+      "kedro_compatibility": "full_abstractdataset_compliance",
+      "versioning_support": "native_kedro_versioning",
+      "performance_overhead": "less_than_5_percent",
+      "error_handling": "graceful_fallback_enabled"
+    }
+  },
+
+  "quality_assurance": {
+    "validation_rules": {
+      "metadata_completeness": "all_required_fields_present",
+      "styling_consistency": "cross_figure_consistency_validated",
+      "parameter_resolution": "all_conditions_resolvable",
+      "format_compatibility": "cross_platform_tested"
+    },
+    "performance_benchmarks": {
+      "figure_generation_overhead": "less_than_5_percent",
+      "condition_resolution_time": "less_than_1_ms",
+      "cache_effectiveness": "greater_than_80_percent_hit_rate"
+    },
+    "compliance_verification": {
+      "feature_requirements": [
+        "F-005-RQ-001: FigureDataSet integration validated",
+        "F-005-RQ-003: Parameter validation implemented",
+        "F-005-RQ-004: Context injection demonstrated",
+        "F-004: Purpose-based styling supported",
+        "F-007: Configuration bridge integration verified"
+      ]
+    }
+  },
+
+  "usage_examples": {
+    "basic_usage": {
+      "description": "Simple figure generation with purpose-based styling",
+      "example_parameters": {
+        "purpose": "exploratory",
+        "condition_param": "model_type",
+        "model_type": "baseline"
+      },
+      "expected_behavior": "Automatic styling applied based on training.model.baseline condition"
+    },
+    "advanced_usage": {
+      "description": "Complex hierarchical condition resolution",
+      "example_parameters": {
+        "purpose": "publication",
+        "condition_param": "algorithm_comparison_baseline",
+        "algorithm_type": "neural_network",
+        "comparison_baseline": "champion"
+      },
+      "expected_behavior": "Hierarchical resolution through training.model.neural_network.champion with publication-quality styling"
+    },
+    "environment_specific": {
+      "description": "Environment-aware figure generation",
+      "example_parameters": {
+        "purpose": "monitoring",
+        "condition_param": "training_environment",
+        "environment": "production"
+      },
+      "expected_behavior": "Production-optimized styling with operational indicators applied"
+    }
+  }
+}

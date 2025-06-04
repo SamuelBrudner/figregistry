@@ -1,0 +1,436 @@
+# FigRegistry Kedro Configuration Override - Merge Conflict Testing
+#
+# This configuration file provides systematic conflicts with merge_conflict_base.yml
+# to validate the FigRegistryConfigBridge's configuration precedence resolution 
+# and merging behavior. It implements deliberate conflicts across all configuration 
+# sections to ensure that override configurations correctly take precedence during 
+# the merging process per F-007 requirements.
+#
+# Purpose: Establish override values that systematically conflict with base 
+# configuration to test precedence rules defined in Section 5.2.5:
+# 1. Environment-specific overrides take precedence over base configurations
+# 2. Kedro configurations override standalone figregistry.yaml settings
+# 3. Deep merging behavior for nested dictionaries
+# 4. Complete replacement behavior for lists
+# 5. Type-safe validation across merged configurations
+#
+# Testing Validation: This override configuration validates F-007 Configuration 
+# Bridge Requirements through comprehensive conflict resolution testing
+
+# Override styling conditions - systematically conflicts with base values
+styles:
+  # Override exploratory styling - conflicts with base [10, 6] -> [12, 8]
+  exploratory:
+    figure_size: [12, 8]      # Conflicts with base [10, 6]
+    dpi: 150                  # Conflicts with base 100
+    font_size: 14             # Conflicts with base 12
+    line_width: 2.5           # Conflicts with base 1.5
+    color_palette: "viridis"  # Conflicts with base "Set1"
+    grid: false               # Conflicts with base true
+    spine_visibility:
+      top: true               # Conflicts with base false
+      right: true             # Conflicts with base false
+      bottom: false           # Conflicts with base true
+      left: false             # Conflicts with base true
+  
+  # Override presentation styling - conflicts with base [14, 8] -> [16, 10]
+  presentation:
+    figure_size: [16, 10]     # Conflicts with base [14, 8]
+    dpi: 300                  # Conflicts with base 200
+    font_size: 18             # Conflicts with base 16
+    line_width: 3.0           # Conflicts with base 2.0
+    color_palette: "plasma"   # Conflicts with base "Dark2"
+    background_color: "#f8f8f8"  # Conflicts with base "#ffffff"
+    title_size: 22            # Conflicts with base 20
+    legend_position: "upper right"  # Conflicts with base "upper left"
+  
+  # Override publication styling - conflicts with base rcParams
+  publication:
+    figure_size: [8, 6]       # Conflicts with base [7, 5]
+    dpi: 600                  # Conflicts with base 400
+    font_family: "serif"      # Conflicts with base "sans-serif"
+    font_size: 11             # Conflicts with base 10
+    line_width: 1.0           # Conflicts with base 0.8
+    color_palette: "tab10"    # Conflicts with base "gray"
+    edge_color: "#333333"     # Conflicts with base "#000000"
+    save_transparent: true    # Conflicts with base false
+
+# Override color palette definitions - conflicts with base palette choices
+palettes:
+  # Override default palette - conflicts with base "viridis" -> "plasma"
+  default: "plasma"           # Conflicts with base "viridis"
+  
+  # Override custom palette definitions - completely different colors
+  custom_sequential:
+    - "#440154"               # Conflicts with base "#1f77b4" set
+    - "#31688e"
+    - "#35b779"
+    - "#fde725"
+  
+  custom_diverging:
+    - "#d73027"               # Conflicts with base "#8e0152" set
+    - "#f46d43"
+    - "#fdae61"
+    - "#fee08b"
+    - "#e6f598"
+    - "#abdda4"
+    - "#66c2a5"
+    - "#3288bd"
+    - "#5e4fa2"
+    - "#313695"
+
+# Override output configuration - conflicts with base paths and settings
+outputs:
+  # Override output directory - conflicts with base "/tmp/base_figures"
+  base_path: "/tmp/override_figures"  # Conflicts with base "/tmp/base_figures"
+  
+  # Override path aliases - conflicts with base mappings
+  path_aliases:
+    expl: "exploratory_override"     # Conflicts with base "exploratory_base"
+    pres: "presentation_override"    # Conflicts with base "presentation_base"
+    pub: "publication_override"      # Conflicts with base "publication_base"
+  
+  # Override file naming conventions - conflicts with base pattern
+  naming_convention: "{condition}_{timestamp}_override_{index}.svg"  # Conflicts with base .png pattern
+  
+  # Override save format preferences - conflicts with base formats
+  formats:
+    default: "pdf"            # Conflicts with base "png"
+    high_quality: "svg"       # Conflicts with base "pdf"
+    web_optimized: "png"      # Conflicts with base "jpg"
+  
+  # Override save arguments - conflicts with base compression and transparency
+  save_args:
+    dpi: 300                  # Conflicts with base 150
+    bbox_inches: "standard"   # Conflicts with base "tight"
+    facecolor: "#f0f0f0"      # Conflicts with base "#ffffff"
+    transparent: true         # Conflicts with base false
+    optimize: false           # Conflicts with base true
+
+# Override default rcParams - conflicts with base matplotlib settings
+defaults:
+  # Override figure defaults - conflicts with base dimensions and colors
+  figure:
+    figsize: [10, 8]          # Conflicts with base [8, 6]
+    dpi: 120                  # Conflicts with base 100
+    facecolor: "#fafafa"      # Conflicts with base "#ffffff"
+    edgecolor: "#cccccc"      # Conflicts with base "#000000"
+    autolayout: true          # Conflicts with base false
+  
+  # Override font settings - conflicts with base typography
+  font:
+    family: "serif"           # Conflicts with base "sans-serif"
+    size: 13                  # Conflicts with base 11
+    weight: "bold"            # Conflicts with base "normal"
+    style: "italic"           # Conflicts with base "normal"
+  
+  # Override axes settings - conflicts with base styling
+  axes:
+    linewidth: 2.0            # Conflicts with base 1.0
+    edgecolor: "#666666"      # Conflicts with base "#000000"
+    facecolor: "#f5f5f5"      # Conflicts with base "#ffffff"
+    grid: false               # Conflicts with base true
+    grid_alpha: 0.3           # Conflicts with base 0.5
+    spines_top: true          # Conflicts with base false
+    spines_right: true        # Conflicts with base false
+  
+  # Override line properties - conflicts with base line styling
+  lines:
+    linewidth: 2.5            # Conflicts with base 1.5
+    markersize: 8             # Conflicts with base 6
+    markeredgewidth: 1.5      # Conflicts with base 1.0
+    solid_capstyle: "round"   # Conflicts with base "butt"
+  
+  # Override legend settings - conflicts with base legend appearance
+  legend:
+    frameon: false            # Conflicts with base true
+    fancybox: true            # Conflicts with base false
+    shadow: true              # Conflicts with base false
+    numpoints: 2              # Conflicts with base 1
+    fontsize: "large"         # Conflicts with base "medium"
+
+# Override performance and cache settings - conflicts with base performance values
+performance:
+  # Override caching behavior - conflicts with base cache settings
+  enable_cache: false         # Conflicts with base true
+  cache_max_size: 50          # Conflicts with base 100
+  cache_ttl: 600              # Conflicts with base 3600
+  
+  # Override parallel processing settings - conflicts with base threading
+  max_workers: 2              # Conflicts with base 4
+  batch_size: 5               # Conflicts with base 10
+  timeout: 30                 # Conflicts with base 60
+  
+  # Override memory management - conflicts with base memory limits
+  memory_limit: "256MB"       # Conflicts with base "512MB"
+  gc_threshold: 50            # Conflicts with base 100
+  preload_fonts: false        # Conflicts with base true
+
+# Override Kedro-specific settings - conflicts with base integration values
+kedro:
+  # Override catalog integration settings - conflicts with base automation
+  auto_register_datasets: false       # Conflicts with base true
+  default_dataset_type: "pickle"      # Conflicts with base "json"
+  enable_versioning: false            # Conflicts with base true
+  
+  # Override hook configuration - conflicts with base hook behavior
+  hooks:
+    priority: "low"                    # Conflicts with base "high"
+    auto_init: false                   # Conflicts with base true
+    fail_on_error: true                # Conflicts with base false
+  
+  # Override environment resolution - conflicts with base precedence order
+  environment_precedence:
+    - "override"                       # Conflicts with base order ["local", "base", "override"]
+    - "base"
+    - "local"
+  
+  # Override parameter mapping - conflicts with base parameter names
+  parameter_mapping:
+    condition_param: "override_condition"     # Conflicts with base "experiment_type"
+    style_param: "override_style"             # Conflicts with base "visualization_type"
+    purpose_param: "override_purpose"         # Conflicts with base "output_purpose"
+
+# Override validation settings - conflicts with base strictness levels
+validation:
+  # Override schema validation behavior - conflicts with base validation mode
+  strict_mode: false           # Conflicts with base true
+  allow_extra_fields: true     # Conflicts with base false
+  validate_on_load: false      # Conflicts with base true
+  
+  # Override error handling - conflicts with base error behavior
+  fail_on_invalid: false       # Conflicts with base true
+  log_warnings: false          # Conflicts with base true
+  suppress_errors: true        # Conflicts with base false
+
+# Override experimental condition mappings - conflicts with base pattern matching
+condition_mappings:
+  # Override pattern matching rules - conflicts with base patterns
+  patterns:
+    "exp_*": "experimental_override"       # Conflicts with base "experimental_base"
+    "test_*": "testing_override"           # Conflicts with base "testing_base"
+    "prod_*": "production_override"        # Conflicts with base "production_base"
+  
+  # Override fallback behavior - conflicts with base fallback settings
+  fallback_style: "publication"       # Conflicts with base "exploratory"
+  case_sensitive: true                # Conflicts with base false
+  regex_enabled: false                # Conflicts with base true
+
+# Override logging configuration - conflicts with base verbosity levels
+logging:
+  # Override log levels - conflicts with base "INFO" -> "ERROR"
+  level: "ERROR"                      # Conflicts with base "INFO"
+  format: "%(levelname)s: %(message)s"  # Conflicts with base detailed format
+  
+  # Override output destinations - conflicts with base console/file settings
+  console: false                      # Conflicts with base true
+  file: true                          # Conflicts with base false
+  file_path: "/tmp/override.log"      # Conflicts with base "/tmp/base.log"
+
+# Override metadata - conflicts with base version and environment information
+metadata:
+  # Override configuration metadata - conflicts with base metadata
+  version: "override-2.0.0"          # Conflicts with base "base-1.0.0"
+  environment: "override"             # Conflicts with base "testing"
+  created_by: "override_system"       # Conflicts with base "test_system"
+  priority: 999                       # Conflicts with base 1 (higher priority)
+  
+  # Override feature flags - conflicts with base feature settings
+  features:
+    advanced_styling: false           # Conflicts with base true
+    pattern_matching: false           # Conflicts with base true
+    parallel_processing: false        # Conflicts with base true
+    automatic_cleanup: false          # Conflicts with base true
+
+# Override rcParams values - conflicts with base matplotlib configurations
+rcParams:
+  # Override matplotlib global settings - systematic conflicts with base
+  "figure.figsize": [14, 10]          # Conflicts with base [6, 4]
+  "figure.dpi": 150                   # Conflicts with base 72
+  "font.size": 14                     # Conflicts with base 10
+  "axes.titlesize": "x-large"         # Conflicts with base "large"
+  "axes.labelsize": "large"           # Conflicts with base "medium"
+  "xtick.labelsize": "medium"         # Conflicts with base "small"
+  "ytick.labelsize": "medium"         # Conflicts with base "small"
+  "legend.fontsize": "large"          # Conflicts with base "medium"
+  "lines.linewidth": 2.5              # Conflicts with base 1.0
+  "lines.markersize": 10              # Conflicts with base 5
+  "patch.linewidth": 1.5              # Conflicts with base 0.5
+  "grid.linewidth": 1.2               # Conflicts with base 0.8
+  "axes.grid": true                   # Conflicts with base false
+  "axes.edgecolor": "gray"            # Conflicts with base "black"
+  "axes.facecolor": "#f8f8f8"         # Conflicts with base "white"
+
+# Override cache and performance settings - conflicts with base F-007 precedence
+cache:
+  # Override configuration caching - conflicts with base cache behavior
+  enable_configuration_cache: false   # Conflicts with base true
+  cache_invalidation_time: 900        # Conflicts with base 1800
+  max_cache_entries: 100              # Conflicts with base 200
+  cache_compression: true             # Conflicts with base false
+  
+  # Override style caching - conflicts with base style cache settings
+  enable_style_cache: false           # Conflicts with base true
+  style_cache_size: 250               # Conflicts with base 500
+  style_cache_ttl: 3600               # Conflicts with base 7200
+
+# Override conditional styling conditions - conflicts with base pattern-based conditions
+conditional_styles:
+  # Override pattern-based conditions - conflicts with base condition types
+  "experiment_*":
+    condition_type: "regex"           # Conflicts with base "wildcard"
+    style_inheritance: "replace"      # Conflicts with base "merge"
+    priority: 500                     # Conflicts with base 100
+  
+  "analysis_*":
+    condition_type: "exact"           # Conflicts with base "regex"
+    style_inheritance: "override"     # Conflicts with base "deep_merge"
+    priority: 400                     # Conflicts with base 200
+  
+  "report_*":
+    condition_type: "wildcard"        # Conflicts with base "exact"
+    style_inheritance: "merge"        # Conflicts with base "override"
+    priority: 600                     # Conflicts with base 300
+
+# Override integration testing configuration - conflicts with base validation
+integration:
+  # Override Kedro integration settings - conflicts with base integration behavior
+  dataset_registration: "manual"      # Conflicts with base "automatic"
+  hook_priority: "highest"            # Conflicts with base "normal"
+  context_initialization: "eager"     # Conflicts with base "lazy"
+  error_propagation: "raise"          # Conflicts with base "suppress"
+  
+  # Override configuration merging behavior - conflicts with base merge strategy
+  merge_strategy: "shallow"           # Conflicts with base "deep"
+  conflict_resolution: "merge"        # Conflicts with base "override"
+  validation_level: "permissive"     # Conflicts with base "strict"
+  schema_enforcement: false           # Conflicts with base true
+
+# Override environment-specific configurations - conflicts with base environment settings
+environments:
+  # Override environment configurations - conflicts with base environment behavior
+  development:
+    log_level: "CRITICAL"            # Conflicts with base "DEBUG"
+    cache_enabled: false             # Conflicts with base true
+    validation_strict: true          # Conflicts with base false
+  
+  testing:
+    log_level: "WARNING"             # Conflicts with base "INFO"
+    cache_enabled: true              # Conflicts with base false
+    validation_strict: false         # Conflicts with base true
+  
+  production:
+    log_level: "ERROR"               # Conflicts with base "WARNING"
+    cache_enabled: false             # Conflicts with base true
+    validation_strict: false         # Conflicts with base true
+
+# Override output management configuration - conflicts with base Section 5.2.5 settings
+output_management:
+  # Override versioning strategy - conflicts with base versioning approach
+  versioning_enabled: false          # Conflicts with base true
+  version_format: "semantic"         # Conflicts with base "timestamp"
+  cleanup_policy: "cleanup_old"      # Conflicts with base "retain_all"
+  
+  # Override path resolution - conflicts with base path handling
+  path_resolution: "relative"        # Conflicts with base "absolute"
+  create_directories: false          # Conflicts with base true
+  directory_permissions: "0700"      # Conflicts with base "0755"
+  
+  # Override file operations - conflicts with base file handling
+  overwrite_existing: true           # Conflicts with base false
+  backup_originals: false           # Conflicts with base true
+  atomic_operations: false          # Conflicts with base true
+
+# Additional override sections for comprehensive precedence testing per F-007 requirements
+
+# Override advanced styling configuration - conflicts with base advanced settings
+advanced_styling:
+  # Override theme management - conflicts with base theme system
+  theme_inheritance: "none"          # Conflicts with base inherited themes
+  custom_themes_enabled: false      # Conflicts with base custom theme support
+  theme_validation: "disabled"      # Conflicts with base theme validation
+  
+  # Override color space handling - conflicts with base color management
+  color_space: "srgb"               # Conflicts with base color space settings
+  gamma_correction: false           # Conflicts with base gamma correction
+  color_profile: "override"         # Conflicts with base color profile
+
+# Override data layer mappings - conflicts with base Kedro data layer configuration
+data_layer_mappings:
+  # Override Kedro data layer purposes - conflicts with base layer assignments
+  "01_raw": "validation"            # Conflicts with base raw data purpose
+  "02_intermediate": "override"     # Conflicts with base intermediate purpose
+  "03_primary": "testing"           # Conflicts with base primary purpose
+  "04_feature": "experimental"      # Conflicts with base feature purpose
+  "05_model_input": "override_input"  # Conflicts with base model input purpose
+  "06_models": "override_models"    # Conflicts with base models purpose
+  "07_model_output": "override_output"  # Conflicts with base model output purpose
+  "08_reporting": "override_reporting"  # Conflicts with base reporting purpose
+
+# Override experimental features - conflicts with base experimental configuration
+experimental:
+  # Override beta features - conflicts with base beta feature enablement
+  enable_beta_features: false       # Conflicts with base beta enablement
+  experimental_hooks: false         # Conflicts with base experimental hooks
+  advanced_caching: false          # Conflicts with base advanced caching
+  
+  # Override preview functionality - conflicts with base preview settings
+  preview_mode: "disabled"          # Conflicts with base preview mode
+  preview_timeout: 5                # Conflicts with base preview timeout
+  preview_format: "text"            # Conflicts with base preview format
+
+# Override security configuration - conflicts with base security settings
+security:
+  # Override path validation - conflicts with base path security
+  validate_paths: false             # Conflicts with base path validation
+  allow_absolute_paths: true        # Conflicts with base absolute path restrictions
+  sandbox_mode: false               # Conflicts with base sandbox restrictions
+  
+  # Override input sanitization - conflicts with base input handling
+  sanitize_input: false             # Conflicts with base input sanitization
+  escape_output: false              # Conflicts with base output escaping
+  validate_yaml: false              # Conflicts with base YAML validation
+
+# Override plugin configuration - conflicts with base plugin system settings
+plugins:
+  # Override plugin management - conflicts with base plugin behavior
+  auto_discovery: false             # Conflicts with base auto discovery
+  plugin_validation: "disabled"    # Conflicts with base plugin validation
+  allow_external_plugins: true     # Conflicts with base external plugin restrictions
+  
+  # Override plugin execution - conflicts with base plugin execution settings
+  parallel_execution: false        # Conflicts with base parallel plugin execution
+  plugin_timeout: 10               # Conflicts with base plugin timeout
+  error_handling: "ignore"         # Conflicts with base plugin error handling
+
+# Override monitoring configuration - conflicts with base monitoring and observability
+monitoring:
+  # Override metrics collection - conflicts with base metrics gathering
+  enable_metrics: false            # Conflicts with base metrics enablement
+  metrics_format: "json"           # Conflicts with base metrics format
+  metrics_retention: 1             # Conflicts with base metrics retention
+  
+  # Override performance tracking - conflicts with base performance monitoring
+  track_performance: false         # Conflicts with base performance tracking
+  performance_threshold: 5000      # Conflicts with base performance thresholds
+  alert_on_slow: false             # Conflicts with base slow operation alerts
+
+# Override compatibility configuration - conflicts with base compatibility settings
+compatibility:
+  # Override version compatibility - conflicts with base version handling
+  strict_version_check: false      # Conflicts with base strict version checking
+  allow_deprecated: true           # Conflicts with base deprecated feature restrictions
+  compatibility_mode: "permissive" # Conflicts with base compatibility enforcement
+  
+  # Override API compatibility - conflicts with base API version support
+  api_version: "v2"                # Conflicts with base API version
+  backward_compatibility: false    # Conflicts with base backward compatibility
+  forward_compatibility: true     # Conflicts with base forward compatibility
+
+# Final override validation marker - ensures complete configuration coverage
+override_validation:
+  # Override completion marker - validates comprehensive override coverage
+  complete_override: true          # Confirms all base values have conflicting overrides
+  validation_timestamp: "2024-override"  # Override validation timestamp
+  conflict_count: 150              # Expected number of systematic conflicts
+  precedence_test: "F-007-complete"  # F-007 Configuration Bridge test completion marker

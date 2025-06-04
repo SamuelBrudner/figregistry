@@ -1,0 +1,719 @@
+# Multi-Environment Kedro Catalog Configuration for FigRegistry Testing
+# Purpose: Validates environment-specific FigureDataSet configuration precedence and override scenarios
+# Requirements: F-007-RQ-002 configuration merging with override rules consistency validation
+# Test Coverage: Environment-specific parameter substitution, conf/base and conf/local override patterns
+#
+# This catalog configuration provides comprehensive test scenarios for the FigRegistryConfigBridge
+# to validate configuration precedence rules across multiple deployment environments. It demonstrates
+# environment-specific parameter override patterns, template variable substitution, and catalog
+# entry inheritance scenarios essential for multi-stage deployment pipelines.
+
+# =============================================================================
+# Base Environment FigureDataSet Configurations
+# =============================================================================
+# These entries establish baseline configurations that should be overridden
+# by environment-specific configurations to test F-007-RQ-002 precedence rules
+
+# Standard exploratory data visualization with base configuration
+exploratory_analysis_base:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:BASE_PATH,data/08_reporting}/exploratory/${oc.env:FILENAME_PREFIX,analysis}_exploratory.png"
+  save_args:
+    dpi: "${oc.env:BASE_DPI,150}"
+    bbox_inches: "tight"
+    facecolor: "${oc.env:BASE_FACECOLOR,white}"
+    format: "${oc.env:BASE_FORMAT,png}"
+  purpose: "${oc.env:BASE_PURPOSE,exploratory}"
+  condition_param: "${oc.env:BASE_CONDITION_PARAM,experiment_condition}"
+  style_params:
+    figure_size: "${oc.env:BASE_FIGURE_SIZE,[10, 6]}"
+    title_size: "${oc.env:BASE_TITLE_SIZE,14}"
+    label_size: "${oc.env:BASE_LABEL_SIZE,12}"
+  versioning:
+    enabled: "${oc.env:BASE_VERSIONING,false}"
+
+# Presentation-ready visualization with intermediate configuration complexity
+presentation_report_base:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:BASE_PATH,data/08_reporting}/presentation/${oc.env:FILENAME_PREFIX,report}_presentation.pdf"
+  save_args:
+    dpi: "${oc.env:BASE_DPI,300}"
+    bbox_inches: "tight"
+    pad_inches: "${oc.env:BASE_PAD_INCHES,0.1}"
+    facecolor: "white"
+    edgecolor: "none"
+    format: "pdf"
+    transparent: "${oc.env:BASE_TRANSPARENT,false}"
+  purpose: "presentation"
+  condition_param: "presentation_phase"
+  style_params:
+    figure_size: "${oc.env:BASE_PRESENTATION_SIZE,[12, 8]}"
+    font_family: "${oc.env:BASE_FONT_FAMILY,sans-serif}"
+    title_size: 16
+    label_size: 14
+    legend_size: 12
+    color_palette: "${oc.env:BASE_COLOR_PALETTE,default}"
+  metadata:
+    purpose: "presentation_reporting"
+    stage: "base_configuration"
+    environment: "${oc.env:ENVIRONMENT,base}"
+  versioning:
+    enabled: true
+    format: "${oc.env:VERSION_FORMAT,%Y-%m-%dT%H.%M.%S.%fZ}"
+
+# Publication-quality output with comprehensive styling parameters
+publication_figure_base:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:BASE_PATH,data/08_reporting}/publication/${oc.env:FILENAME_PREFIX,figure}_publication.pdf"
+  save_args:
+    dpi: "${oc.env:BASE_PUBLICATION_DPI,300}"
+    bbox_inches: "tight"
+    pad_inches: 0.05
+    facecolor: "white"
+    edgecolor: "none"
+    format: "pdf"
+    metadata: "${oc.env:SAVE_METADATA,true}"
+  purpose: "publication"
+  condition_param: "experimental_group"
+  style_params:
+    figure_size: "${oc.env:BASE_PUBLICATION_SIZE,[8, 6]}"
+    font_family: "serif"
+    font_size: "${oc.env:BASE_FONT_SIZE,11}"
+    title_size: 13
+    label_size: 11
+    tick_size: 9
+    legend_size: 10
+    line_width: "${oc.env:BASE_LINE_WIDTH,1.5}"
+    marker_size: "${oc.env:BASE_MARKER_SIZE,5}"
+    color_palette: "publication_bw"
+    spine_visibility:
+      top: false
+      right: false
+      bottom: true
+      left: true
+  advanced_options:
+    enable_style_inheritance: "${oc.env:STYLE_INHERITANCE,true}"
+    fallback_style_name: "publication_fallback"
+    validation_strict: "${oc.env:STRICT_VALIDATION,true}"
+  versioning:
+    enabled: true
+    format: "YYYY-MM-DD_HH-mm-ss"
+
+# =============================================================================
+# Local Development Environment Overrides
+# =============================================================================
+# These configurations test environment-specific parameter override behavior
+# per F-007-RQ-002 by overriding base configurations with local development settings
+
+# Local override for exploratory analysis with development-specific settings
+exploratory_analysis_local:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:LOCAL_PATH,./data/08_reporting/local}/exploratory/${oc.env:LOCAL_PREFIX,dev}_exploratory_local.png"
+  save_args:
+    dpi: "${oc.env:LOCAL_DPI,100}"  # Lower DPI for faster development iteration
+    bbox_inches: "tight"
+    facecolor: "${oc.env:LOCAL_FACECOLOR,#FAFAFA}"  # Light gray for development visibility
+    format: "${oc.env:LOCAL_FORMAT,png}"
+    optimize: "${oc.env:LOCAL_OPTIMIZE,false}"  # Faster saves for development
+  purpose: "${oc.env:LOCAL_PURPOSE,exploratory}"
+  condition_param: "${oc.env:LOCAL_CONDITION_PARAM,dev_experiment_condition}"
+  style_params:
+    figure_size: "${oc.env:LOCAL_FIGURE_SIZE,[12, 8]}"  # Larger for development review
+    title_size: "${oc.env:LOCAL_TITLE_SIZE,15}"  # Slightly larger for visibility
+    label_size: "${oc.env:LOCAL_LABEL_SIZE,13}"
+    debug_mode: "${oc.env:LOCAL_DEBUG_MODE,true}"  # Enable development debugging
+    grid_enabled: "${oc.env:LOCAL_GRID,true}"  # Grid for development assistance
+    color_palette: "${oc.env:LOCAL_COLOR_PALETTE,local_dev}"
+  development:
+    enable_debug_info: true
+    show_timestamps: true
+    include_metadata: false  # Reduce clutter in development
+    auto_cleanup: "${oc.env:AUTO_CLEANUP,false}"
+  versioning:
+    enabled: "${oc.env:LOCAL_VERSIONING,false}"  # Disable for rapid iteration
+
+# Local override for presentation with enhanced debugging capabilities
+presentation_report_local:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:LOCAL_PATH,./data/08_reporting/local}/presentation/${oc.env:LOCAL_PREFIX,dev}_presentation_local.svg"
+  save_args:
+    dpi: "${oc.env:LOCAL_PRESENTATION_DPI,150}"  # Moderate quality for development
+    bbox_inches: "tight"
+    pad_inches: "${oc.env:LOCAL_PAD_INCHES,0.2}"  # Extra padding for development
+    facecolor: "#F5F5F5"  # Light background for development
+    edgecolor: "#E0E0E0"  # Visible edge for development
+    format: "svg"  # Vector format for easy inspection
+    transparent: false
+  purpose: "presentation"
+  condition_param: "local_presentation_phase"
+  style_params:
+    figure_size: "${oc.env:LOCAL_PRESENTATION_SIZE,[14, 10]}"  # Larger for development
+    font_family: "${oc.env:LOCAL_FONT_FAMILY,monospace}"  # Monospace for debugging
+    title_size: 18
+    label_size: 16
+    legend_size: 14
+    color_palette: "${oc.env:LOCAL_PRESENTATION_PALETTE,debug_palette}"
+    enable_annotations: "${oc.env:LOCAL_ANNOTATIONS,true}"
+    show_data_points: "${oc.env:LOCAL_SHOW_POINTS,true}"
+  development:
+    debug_styling: true
+    verbose_labels: true
+    include_config_info: true
+    performance_monitoring: "${oc.env:LOCAL_PERF_MONITORING,true}"
+  metadata:
+    purpose: "local_development_presentation"
+    stage: "local_override_configuration"
+    environment: "local"
+    debug_level: "${oc.env:DEBUG_LEVEL,high}"
+  versioning:
+    enabled: "${oc.env:LOCAL_PRES_VERSIONING,true}"
+    format: "dev_%Y%m%d_%H%M%S"
+
+# Local override for publication with development-friendly modifications
+publication_figure_local:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:LOCAL_PATH,./data/08_reporting/local}/publication/${oc.env:LOCAL_PREFIX,dev}_publication_local.png"
+  save_args:
+    dpi: "${oc.env:LOCAL_PUBLICATION_DPI,200}"  # Reduced from production for speed
+    bbox_inches: "tight"
+    pad_inches: 0.1
+    facecolor: "white"
+    edgecolor: "gray"  # Visible edge for development validation
+    format: "png"  # PNG for faster development iteration
+    metadata: false  # Reduced metadata for development
+  purpose: "publication"
+  condition_param: "local_experimental_group"
+  style_params:
+    figure_size: "${oc.env:LOCAL_PUBLICATION_SIZE,[10, 7]}"  # Slightly larger for development
+    font_family: "sans-serif"  # More readable for development
+    font_size: "${oc.env:LOCAL_PUBLICATION_FONT_SIZE,12}"  # Larger for visibility
+    title_size: 15
+    label_size: 13
+    tick_size: 11
+    legend_size: 12
+    line_width: "${oc.env:LOCAL_LINE_WIDTH,2.0}"  # Thicker for visibility
+    marker_size: "${oc.env:LOCAL_MARKER_SIZE,7}"  # Larger for development
+    color_palette: "local_dev"  # High contrast for development
+    spine_visibility:
+      top: false
+      right: false
+      bottom: true
+      left: true
+    grid_config:
+      enabled: true
+      alpha: 0.4
+      style: ":"
+  development:
+    enhance_visibility: true
+    debug_colors: "${oc.env:LOCAL_DEBUG_COLORS,true}"
+    performance_warnings: true
+  advanced_options:
+    enable_style_inheritance: true
+    fallback_style_name: "local_development_fallback"
+    validation_strict: "${oc.env:LOCAL_STRICT_VALIDATION,false}"  # Relaxed for development
+    cache_styles: "${oc.env:LOCAL_CACHE_STYLES,false}"  # Disable for development
+  versioning:
+    enabled: true
+    format: "local_YYYY-MM-DD_HH-mm-ss"
+
+# =============================================================================
+# Staging Environment Configurations
+# =============================================================================
+# Staging environment configurations that test intermediate override scenarios
+# and pre-production validation settings per F-007 environment-specific requirements
+
+# Staging exploratory analysis with pre-production validation
+exploratory_analysis_staging:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:STAGING_PATH,/staging/data/08_reporting}/exploratory/${oc.env:STAGING_PREFIX,stage}_exploratory_staging.png"
+  save_args:
+    dpi: "${oc.env:STAGING_DPI,200}"  # Higher than local, lower than production
+    bbox_inches: "tight"
+    facecolor: "white"
+    format: "png"
+    optimize: "${oc.env:STAGING_OPTIMIZE,true}"
+    quality: "${oc.env:STAGING_QUALITY,95}"
+  purpose: "exploratory"
+  condition_param: "staging_experiment_condition"
+  style_params:
+    figure_size: "${oc.env:STAGING_FIGURE_SIZE,[11, 7]}"
+    title_size: 14
+    label_size: 12
+    color_palette: "${oc.env:STAGING_COLOR_PALETTE,colorblind_safe}"
+    validation_enabled: "${oc.env:STAGING_VALIDATION,true}"
+  environment:
+    stage: "staging"
+    validation_level: "moderate"
+    performance_monitoring: "${oc.env:STAGING_PERF_MONITORING,true}"
+  versioning:
+    enabled: true
+    format: "staging_%Y-%m-%dT%H.%M.%S.%fZ"
+
+# Staging presentation with production-like validation
+presentation_report_staging:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:STAGING_PATH,/staging/data/08_reporting}/presentation/${oc.env:STAGING_PREFIX,stage}_presentation_staging.pdf"
+  save_args:
+    dpi: "${oc.env:STAGING_PRESENTATION_DPI,250}"
+    bbox_inches: "tight"
+    pad_inches: 0.08
+    facecolor: "white"
+    edgecolor: "none"
+    format: "pdf"
+    transparent: false
+  purpose: "presentation"
+  condition_param: "staging_presentation_phase"
+  style_params:
+    figure_size: "${oc.env:STAGING_PRESENTATION_SIZE,[12, 8]}"
+    font_family: "sans-serif"
+    title_size: 16
+    label_size: 14
+    legend_size: 12
+    color_palette: "default"
+  validation:
+    strict_mode: "${oc.env:STAGING_STRICT_MODE,true}"
+    error_on_missing_styles: "${oc.env:STAGING_ERROR_ON_MISSING,false}"
+    warn_on_fallback: true
+  metadata:
+    purpose: "staging_presentation_validation"
+    stage: "staging_environment"
+    environment: "staging"
+  versioning:
+    enabled: true
+    format: "staging_YYYY-MM-DD_HH-mm-ss"
+
+# =============================================================================
+# Production Environment Configurations
+# =============================================================================
+# Production configurations with strict validation and optimized performance
+# testing final override precedence and production-ready parameter sets
+
+# Production exploratory analysis with strict validation
+exploratory_analysis_production:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:PROD_PATH,/prod/data/08_reporting}/exploratory/${oc.env:PROD_PREFIX,prod}_exploratory_production.png"
+  save_args:
+    dpi: "${oc.env:PROD_DPI,300}"  # Full production quality
+    bbox_inches: "tight"
+    facecolor: "white"
+    format: "png"
+    optimize: true
+    quality: 100
+    compression: "${oc.env:PROD_COMPRESSION,6}"
+  purpose: "exploratory"
+  condition_param: "production_experiment_condition"
+  style_params:
+    figure_size: "${oc.env:PROD_FIGURE_SIZE,[10, 6]}"
+    title_size: 14
+    label_size: 12
+    color_palette: "default"
+  production:
+    strict_validation: true
+    performance_monitoring: true
+    error_reporting: "${oc.env:PROD_ERROR_REPORTING,true}"
+    cache_optimization: true
+  versioning:
+    enabled: true
+    format: "prod_%Y-%m-%dT%H.%M.%S.%fZ"
+
+# Production presentation with maximum quality settings
+presentation_report_production:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:PROD_PATH,/prod/data/08_reporting}/presentation/${oc.env:PROD_PREFIX,prod}_presentation_production.pdf"
+  save_args:
+    dpi: "${oc.env:PROD_PRESENTATION_DPI,300}"
+    bbox_inches: "tight"
+    pad_inches: 0.05
+    facecolor: "white"
+    edgecolor: "none"
+    format: "pdf"
+    transparent: false
+    metadata: true
+  purpose: "presentation"
+  condition_param: "production_presentation_phase"
+  style_params:
+    figure_size: "${oc.env:PROD_PRESENTATION_SIZE,[12, 8]}"
+    font_family: "sans-serif"
+    title_size: 16
+    label_size: 14
+    legend_size: 12
+    color_palette: "high_contrast"
+  production:
+    quality_assurance: true
+    strict_validation: true
+    performance_optimization: true
+  metadata:
+    purpose: "production_presentation_final"
+    stage: "production_environment"
+    environment: "production"
+    quality_level: "maximum"
+  versioning:
+    enabled: true
+    format: "prod_YYYY-MM-DD_HH-mm-ss"
+
+# Production publication with comprehensive quality controls
+publication_figure_production:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:PROD_PATH,/prod/data/08_reporting}/publication/${oc.env:PROD_PREFIX,prod}_publication_production.pdf"
+  save_args:
+    dpi: "${oc.env:PROD_PUBLICATION_DPI,600}"  # Highest quality for publication
+    bbox_inches: "tight"
+    pad_inches: 0.02
+    facecolor: "white"
+    edgecolor: "none"
+    format: "pdf"
+    metadata: true
+    compress: true
+  purpose: "publication"
+  condition_param: "production_experimental_group"
+  style_params:
+    figure_size: "${oc.env:PROD_PUBLICATION_SIZE,[8, 6]}"
+    font_family: "serif"
+    font_size: 10
+    title_size: 12
+    label_size: 10
+    tick_size: 8
+    legend_size: 9
+    line_width: 1.0
+    marker_size: 4
+    color_palette: "publication_bw"
+    spine_visibility:
+      top: false
+      right: false
+      bottom: true
+      left: true
+  advanced_options:
+    enable_style_inheritance: true
+    fallback_style_name: "publication_fallback"
+    validation_strict: true
+    cache_styles: true
+    performance_optimization: true
+  production:
+    quality_checks: true
+    compliance_validation: true
+    audit_logging: "${oc.env:PROD_AUDIT_LOGGING,true}"
+    backup_enabled: true
+  versioning:
+    enabled: true
+    format: "publication_YYYY-MM-DD_HH-mm-ss"
+
+# =============================================================================
+# Environment-Conditional Dataset Configurations
+# =============================================================================
+# Test advanced configuration precedence with conditional dataset definitions
+# that demonstrate environment-specific catalog behavior per F-007-RQ-002
+
+# Multi-format output testing environment-specific format preferences
+multi_format_output:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:OUTPUT_PATH,data/08_reporting}/${oc.env:ENV,base}/multi_format.${oc.env:OUTPUT_FORMAT,png}"
+  save_args:
+    dpi: "${oc.env:MULTI_FORMAT_DPI,150}"
+    bbox_inches: "tight"
+    facecolor: "${oc.env:MULTI_FORMAT_FACECOLOR,white}"
+    format: "${oc.env:OUTPUT_FORMAT,png}"
+    quality: "${oc.env:OUTPUT_QUALITY,90}"
+    transparent: "${oc.env:OUTPUT_TRANSPARENT,false}"
+    optimize: "${oc.env:OUTPUT_OPTIMIZE,false}"
+  purpose: "${oc.env:OUTPUT_PURPOSE,exploratory}"
+  condition_param: "${oc.env:MULTI_FORMAT_CONDITION,output_test_condition}"
+  style_params:
+    figure_size: "${oc.env:MULTI_FORMAT_SIZE,[10, 6]}"
+    title_size: "${oc.env:MULTI_FORMAT_TITLE,14}"
+    color_palette: "${oc.env:MULTI_FORMAT_PALETTE,default}"
+  environment_specific:
+    local:
+      format: "png"
+      dpi: 100
+      optimize: false
+    staging:
+      format: "pdf"
+      dpi: 200
+      optimize: true
+    production:
+      format: "pdf"
+      dpi: 300
+      optimize: true
+      compress: true
+  versioning:
+    enabled: "${oc.env:MULTI_FORMAT_VERSIONING,true}"
+
+# Dynamic condition parameter testing environment-specific condition resolution
+dynamic_condition_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:DYNAMIC_PATH,data/08_reporting}/${oc.env:ENV,base}/dynamic_${oc.env:CONDITION_SUFFIX,test}.png"
+  save_args:
+    dpi: "${oc.env:DYNAMIC_DPI,150}"
+    bbox_inches: "tight"
+    format: "png"
+  purpose: "exploratory"
+  condition_param: "${oc.env:DYNAMIC_CONDITION_PARAM,${oc.env:ENV,base}_condition}"
+  style_params:
+    figure_size: "${oc.env:DYNAMIC_FIGURE_SIZE,[10, 6]}"
+    color_palette: "${oc.env:DYNAMIC_PALETTE,${oc.env:ENV,base}_palette}"
+    title_prefix: "${oc.env:DYNAMIC_TITLE_PREFIX,${oc.env:ENV,Base} Environment}"
+  conditional_overrides:
+    local:
+      condition_param: "local_dev_condition"
+      color_palette: "local_dev"
+      title_prefix: "Local Development"
+    staging:
+      condition_param: "staging_validation_condition"
+      color_palette: "colorblind_safe"
+      title_prefix: "Staging Validation"
+    production:
+      condition_param: "production_final_condition"
+      color_palette: "publication_bw"
+      title_prefix: "Production Release"
+  versioning:
+    enabled: true
+    format: "${oc.env:ENV,base}_${oc.env:DYNAMIC_VERSION_FORMAT,%Y%m%d_%H%M%S}"
+
+# =============================================================================
+# Configuration Precedence Testing Entries
+# =============================================================================
+# Specific test configurations for validating F-007-RQ-002 override rule consistency
+
+# Base configuration with all default parameters for precedence testing
+precedence_test_base:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "data/08_reporting/precedence/base_config.png"
+  save_args:
+    dpi: 150
+    bbox_inches: "tight"
+    facecolor: "white"
+    format: "png"
+  purpose: "exploratory"
+  condition_param: "base_condition"
+  style_params:
+    figure_size: [10, 6]
+    title_size: 14
+    label_size: 12
+    color_palette: "default"
+  test_metadata:
+    config_type: "base"
+    precedence_level: 1
+    expected_override: false
+
+# Environment override configuration for precedence validation
+precedence_test_override:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:OVERRIDE_PATH,data/08_reporting/precedence}/${oc.env:ENV,override}_config.png"
+  save_args:
+    dpi: "${oc.env:OVERRIDE_DPI,200}"
+    bbox_inches: "tight"
+    facecolor: "${oc.env:OVERRIDE_FACECOLOR,#F0F0F0}"
+    format: "${oc.env:OVERRIDE_FORMAT,png}"
+  purpose: "${oc.env:OVERRIDE_PURPOSE,presentation}"
+  condition_param: "${oc.env:OVERRIDE_CONDITION_PARAM,override_condition}"
+  style_params:
+    figure_size: "${oc.env:OVERRIDE_FIGURE_SIZE,[12, 8]}"
+    title_size: "${oc.env:OVERRIDE_TITLE_SIZE,16}"
+    label_size: "${oc.env:OVERRIDE_LABEL_SIZE,14}"
+    color_palette: "${oc.env:OVERRIDE_COLOR_PALETTE,high_contrast}"
+  test_metadata:
+    config_type: "override"
+    precedence_level: 2
+    expected_override: true
+    override_params:
+      - "dpi"
+      - "facecolor"
+      - "purpose"
+      - "condition_param"
+      - "figure_size"
+      - "title_size"
+      - "label_size"
+      - "color_palette"
+
+# Deep merge testing configuration for nested parameter override validation
+precedence_test_deep_merge:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:DEEP_MERGE_PATH,data/08_reporting/precedence}/deep_merge_${oc.env:ENV,test}.pdf"
+  save_args:
+    dpi: "${oc.env:DEEP_MERGE_DPI,300}"
+    bbox_inches: "tight"
+    pad_inches: "${oc.env:DEEP_MERGE_PAD,0.1}"
+    facecolor: "white"
+    edgecolor: "${oc.env:DEEP_MERGE_EDGE,none}"
+    format: "pdf"
+    metadata: "${oc.env:DEEP_MERGE_METADATA,true}"
+    compress: "${oc.env:DEEP_MERGE_COMPRESS,true}"
+  purpose: "publication"
+  condition_param: "deep_merge_condition"
+  style_params:
+    figure_size: "${oc.env:DEEP_MERGE_SIZE,[8, 6]}"
+    font_config:
+      family: "${oc.env:DEEP_MERGE_FONT_FAMILY,serif}"
+      size: "${oc.env:DEEP_MERGE_FONT_SIZE,10}"
+      weight: "${oc.env:DEEP_MERGE_FONT_WEIGHT,normal}"
+    title_config:
+      size: "${oc.env:DEEP_MERGE_TITLE_SIZE,12}"
+      weight: "${oc.env:DEEP_MERGE_TITLE_WEIGHT,bold}"
+      color: "${oc.env:DEEP_MERGE_TITLE_COLOR,black}"
+    axis_config:
+      label_size: "${oc.env:DEEP_MERGE_LABEL_SIZE,10}"
+      tick_size: "${oc.env:DEEP_MERGE_TICK_SIZE,8}"
+      spine_width: "${oc.env:DEEP_MERGE_SPINE_WIDTH,1.0}"
+      grid_enabled: "${oc.env:DEEP_MERGE_GRID,false}"
+    legend_config:
+      size: "${oc.env:DEEP_MERGE_LEGEND_SIZE,9}"
+      location: "${oc.env:DEEP_MERGE_LEGEND_LOC,best}"
+      frameon: "${oc.env:DEEP_MERGE_LEGEND_FRAME,true}"
+      shadow: "${oc.env:DEEP_MERGE_LEGEND_SHADOW,false}"
+    color_config:
+      palette: "${oc.env:DEEP_MERGE_PALETTE,publication_bw}"
+      alpha: "${oc.env:DEEP_MERGE_ALPHA,1.0}"
+      line_width: "${oc.env:DEEP_MERGE_LINE_WIDTH,1.0}"
+      marker_size: "${oc.env:DEEP_MERGE_MARKER_SIZE,4}"
+  advanced_options:
+    enable_style_inheritance: "${oc.env:DEEP_MERGE_INHERITANCE,true}"
+    fallback_style_name: "${oc.env:DEEP_MERGE_FALLBACK,publication_fallback}"
+    validation_strict: "${oc.env:DEEP_MERGE_STRICT,true}"
+    cache_styles: "${oc.env:DEEP_MERGE_CACHE,true}"
+    performance_optimization: "${oc.env:DEEP_MERGE_PERFORMANCE,true}"
+  test_metadata:
+    config_type: "deep_merge"
+    precedence_level: 3
+    merge_strategy: "deep"
+    nested_sections:
+      - "font_config"
+      - "title_config"
+      - "axis_config"
+      - "legend_config"
+      - "color_config"
+      - "advanced_options"
+  versioning:
+    enabled: true
+    format: "deep_merge_${oc.env:ENV,test}_%Y-%m-%dT%H.%M.%S.%fZ"
+
+# =============================================================================
+# Environment Variable Template Testing
+# =============================================================================
+# Comprehensive template variable testing for environment-specific substitution
+# validating complex parameter resolution across deployment environments
+
+# Template variable resolution testing with fallback defaults
+template_variable_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: "${oc.env:TEMPLATE_BASE_PATH,data/08_reporting}/templates/${oc.env:TEMPLATE_ENV,default}/${oc.env:TEMPLATE_FILENAME,template_test}.${oc.env:TEMPLATE_EXT,png}"
+  save_args:
+    dpi: "${oc.env:TEMPLATE_DPI,${oc.env:DEFAULT_DPI,150}}"
+    bbox_inches: "${oc.env:TEMPLATE_BBOX,tight}"
+    facecolor: "${oc.env:TEMPLATE_FACECOLOR,${oc.env:DEFAULT_FACECOLOR,white}}"
+    edgecolor: "${oc.env:TEMPLATE_EDGECOLOR,none}"
+    format: "${oc.env:TEMPLATE_FORMAT,${oc.env:DEFAULT_FORMAT,png}}"
+    transparent: "${oc.env:TEMPLATE_TRANSPARENT,${oc.env:DEFAULT_TRANSPARENT,false}}"
+    optimize: "${oc.env:TEMPLATE_OPTIMIZE,${oc.env:DEFAULT_OPTIMIZE,false}}"
+    quality: "${oc.env:TEMPLATE_QUALITY,${oc.env:DEFAULT_QUALITY,90}}"
+  purpose: "${oc.env:TEMPLATE_PURPOSE,${oc.env:DEFAULT_PURPOSE,exploratory}}"
+  condition_param: "${oc.env:TEMPLATE_CONDITION_PARAM,${oc.env:DEFAULT_CONDITION_PARAM,template_condition}}"
+  style_params:
+    figure_size: "${oc.env:TEMPLATE_FIGURE_SIZE,${oc.env:DEFAULT_FIGURE_SIZE,[10, 6]}}"
+    title_size: "${oc.env:TEMPLATE_TITLE_SIZE,${oc.env:DEFAULT_TITLE_SIZE,14}}"
+    label_size: "${oc.env:TEMPLATE_LABEL_SIZE,${oc.env:DEFAULT_LABEL_SIZE,12}}"
+    tick_size: "${oc.env:TEMPLATE_TICK_SIZE,${oc.env:DEFAULT_TICK_SIZE,10}}"
+    legend_size: "${oc.env:TEMPLATE_LEGEND_SIZE,${oc.env:DEFAULT_LEGEND_SIZE,11}}"
+    font_family: "${oc.env:TEMPLATE_FONT_FAMILY,${oc.env:DEFAULT_FONT_FAMILY,sans-serif}}"
+    color_palette: "${oc.env:TEMPLATE_COLOR_PALETTE,${oc.env:DEFAULT_COLOR_PALETTE,default}}"
+    line_width: "${oc.env:TEMPLATE_LINE_WIDTH,${oc.env:DEFAULT_LINE_WIDTH,1.5}}"
+    marker_size: "${oc.env:TEMPLATE_MARKER_SIZE,${oc.env:DEFAULT_MARKER_SIZE,6}}"
+    alpha: "${oc.env:TEMPLATE_ALPHA,${oc.env:DEFAULT_ALPHA,0.8}}"
+  template_metadata:
+    template_variables_count: 20
+    fallback_defaults_count: 10
+    resolution_strategy: "environment_first"
+    validation_enabled: "${oc.env:TEMPLATE_VALIDATION,true}"
+  versioning:
+    enabled: "${oc.env:TEMPLATE_VERSIONING,${oc.env:DEFAULT_VERSIONING,true}}"
+    format: "${oc.env:TEMPLATE_VERSION_FORMAT,${oc.env:DEFAULT_VERSION_FORMAT,template_%Y%m%d_%H%M%S}}"
+
+# =============================================================================
+# Configuration Documentation and Metadata
+# =============================================================================
+
+# Configuration metadata for testing framework validation
+_catalog_metadata:
+  catalog_version: "2.0.0"
+  catalog_type: "multi_environment_test"
+  description: "Multi-environment Kedro catalog configuration for FigRegistry-Kedro integration testing"
+  
+  # F-007-RQ-002 validation requirements
+  test_coverage:
+    environment_specific_precedence: true
+    configuration_merging_behavior: true
+    template_variable_substitution: true
+    deep_merge_validation: true
+    override_rule_consistency: true
+  
+  # Environment test matrix
+  supported_environments:
+    - "base"
+    - "local"
+    - "staging"
+    - "production"
+  
+  # Template variable test coverage
+  template_variables:
+    paths: ["BASE_PATH", "LOCAL_PATH", "STAGING_PATH", "PROD_PATH"]
+    formats: ["BASE_FORMAT", "LOCAL_FORMAT", "OUTPUT_FORMAT"]
+    quality: ["BASE_DPI", "LOCAL_DPI", "STAGING_DPI", "PROD_DPI"]
+    styling: ["BASE_FIGURE_SIZE", "LOCAL_FIGURE_SIZE", "TEMPLATE_FIGURE_SIZE"]
+    conditions: ["BASE_CONDITION_PARAM", "LOCAL_CONDITION_PARAM", "DYNAMIC_CONDITION_PARAM"]
+  
+  # Precedence rule testing matrix
+  precedence_tests:
+    simple_override: "precedence_test_override"
+    deep_merge: "precedence_test_deep_merge"
+    template_resolution: "template_variable_test"
+    environment_conditional: "dynamic_condition_test"
+  
+  # Expected override behaviors per F-007-RQ-002
+  override_expectations:
+    local_overrides_base: true
+    staging_overrides_base: true
+    production_overrides_base: true
+    environment_variables_override_defaults: true
+    nested_configurations_deep_merge: true
+  
+  # Validation checklist for test execution
+  validation_checklist:
+    - "Environment-specific parameters take precedence over base parameters"
+    - "Template variables resolve correctly with environment-specific values"
+    - "Nested configuration sections merge deeply without losing base values"
+    - "Missing environment variables fall back to documented defaults"
+    - "Override rule consistency maintained across all environment combinations"
+    - "Configuration bridge applies precedence rules per F-007-RQ-002 specification"
+
+# Test execution notes for configuration precedence validation
+_test_execution_notes:
+  purpose: "Validates F-007-RQ-002 configuration merging with override rules consistency"
+  usage: "Use with FigRegistryConfigBridge to test environment-specific configuration precedence"
+  validation: "Each environment configuration should override base parameters appropriately"
+  expected_behavior: "Bridge merging should maintain precedence hierarchy consistently"
+  
+  # Test scenarios
+  test_scenarios:
+    scenario_1:
+      description: "Base to Local Override"
+      base_config: "exploratory_analysis_base"
+      override_config: "exploratory_analysis_local"
+      expected_changes: ["filepath", "dpi", "facecolor", "figure_size", "debug_mode"]
+    
+    scenario_2:
+      description: "Template Variable Resolution"
+      config: "template_variable_test"
+      environment_variables: ["TEMPLATE_DPI", "TEMPLATE_FORMAT", "TEMPLATE_PURPOSE"]
+      expected_resolution: "Environment variables should override defaults"
+    
+    scenario_3:
+      description: "Deep Merge Validation"
+      config: "precedence_test_deep_merge"
+      nested_sections: ["font_config", "axis_config", "legend_config"]
+      expected_behavior: "Nested dictionaries should merge deeply with precedence"
+    
+    scenario_4:
+      description: "Multi-Environment Consistency"
+      configs: ["exploratory_analysis_base", "exploratory_analysis_local", "exploratory_analysis_staging", "exploratory_analysis_production"]
+      expected_behavior: "Each environment should consistently override base parameters"
+
+# End of multi-environment catalog configuration

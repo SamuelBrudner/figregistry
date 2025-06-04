@@ -1,0 +1,541 @@
+# FigRegistry Kedro Local Environment Configuration Override
+# This configuration simulates conf/local/figregistry.yml scenarios for development
+# testing and validates configuration precedence rules during bridge merging operations.
+# Designed specifically for development workflow optimization with debugging capabilities.
+#
+# Requirements Coverage:
+# - F-007.2: Local environment override configuration for precedence testing
+# - Section 5.2.5: Configuration bridge requirements and precedence validation
+# - Development workflow optimization with debugging and performance settings
+# - Extended condition mappings for development testing scenarios
+
+# =============================================================================
+# Environment Metadata and Override Markers
+# =============================================================================
+figregistry_version: "0.3.0"
+environment: "local"  # Override base environment marker
+config_type: "local_development_override"
+
+# Override precedence test marker - should take priority over base config
+_override_test_marker: "local_environment_active"
+
+# =============================================================================
+# Development-Specific Style Conditions and Testing Extensions
+# =============================================================================
+# Extended styling conditions for development testing scenarios
+# These override and extend base configuration styles for local development
+styles:
+  # Override base control condition with development styling
+  control:
+    color: "#0066cc"  # Override base blue with brighter development blue
+    marker: "o"
+    linestyle: "-"
+    linewidth: 3.0  # Thicker lines for development visibility
+    markersize: 8  # Larger markers for development
+    alpha: 1.0  # Full opacity for development
+    label: "Control (Dev)"
+    zorder: 5  # Higher z-order for development visibility
+    # Development-specific styling extensions
+    markeredgecolor: "#003d7a"
+    markeredgewidth: 1.5
+    capsize: 4
+    capthick: 2
+
+  # Override treatment conditions with enhanced development visibility
+  treatment_a:
+    color: "#ff6600"  # Brighter orange for development
+    marker: "s"
+    linestyle: "--"
+    linewidth: 3.5  # Extra thick for development visibility
+    markersize: 9
+    alpha: 1.0
+    label: "Treatment A (Dev)"
+    zorder: 6
+    markeredgecolor: "#cc3300"
+    markeredgewidth: 2.0
+    hatch: "///"  # Development pattern for visual distinction
+
+  # Development-specific experimental conditions for testing
+  debug_condition_1:
+    color: "#ff0066"  # Hot pink for debug visibility
+    marker: "*"
+    linestyle: ":"
+    linewidth: 4.0
+    markersize: 12
+    alpha: 0.9
+    label: "Debug Condition 1"
+    zorder: 10
+    markeredgecolor: "#990033"
+    markeredgewidth: 1.0
+
+  debug_condition_2:
+    color: "#00ff66"  # Bright green for debug visibility
+    marker: "X"
+    linestyle: "-."
+    linewidth: 3.5
+    markersize: 10
+    alpha: 0.95
+    label: "Debug Condition 2"
+    zorder: 10
+    markeredgecolor: "#006633"
+    markeredgewidth: 1.5
+
+  # Local development testing patterns with wildcards
+  dev_test_*:
+    color: "#ffcc00"  # Bright yellow for development tests
+    marker: "P"
+    linestyle: "--"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 0.8
+    label: "Dev Test"
+    zorder: 8
+    markerfacecolor: "#ffcc00"
+    markeredgecolor: "#cc9900"
+
+  local_experiment_*:
+    color: "#cc00ff"  # Magenta for local experiments
+    marker: "h"
+    linestyle: "-"
+    linewidth: 2.8
+    markersize: 9
+    alpha: 0.85
+    label: "Local Experiment"
+    zorder: 7
+    hatch: "+++"
+
+  # Performance testing conditions for benchmarking
+  perf_baseline:
+    color: "#666666"  # Gray for performance baseline
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.7
+    label: "Performance Baseline"
+    zorder: 1
+
+  perf_optimized:
+    color: "#00cc66"  # Green for optimized performance
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 7
+    alpha: 0.8
+    label: "Performance Optimized"
+    zorder: 2
+
+  # Condition precedence testing - these should override any base patterns
+  precedence_test_alpha:
+    color: "#ff1493"  # Deep pink for precedence testing
+    marker: "D"
+    linestyle: "-"
+    linewidth: 5.0  # Very thick to ensure visibility
+    markersize: 12
+    alpha: 1.0
+    label: "Precedence Test Alpha"
+    zorder: 15
+    precedence_marker: "local_override_active"
+
+  precedence_test_beta:
+    color: "#1e90ff"  # Dodger blue for precedence testing
+    marker: "8"
+    linestyle: ":"
+    linewidth: 4.5
+    markersize: 11
+    alpha: 0.9
+    label: "Precedence Test Beta"
+    zorder: 14
+    precedence_marker: "local_override_beta"
+
+# =============================================================================
+# Development-Optimized Color Palettes
+# =============================================================================
+# Local development palettes with high contrast and debug-friendly colors
+palettes:
+  # Override default palette with development-optimized colors
+  default: ["#0066cc", "#ff6600", "#00cc66", "#ff0066", "#cc00ff", "#ffcc00"]
+  
+  # High-contrast development palette for debugging
+  development_debug: 
+    - "#ff0000"  # Pure red
+    - "#00ff00"  # Pure green  
+    - "#0000ff"  # Pure blue
+    - "#ffff00"  # Pure yellow
+    - "#ff00ff"  # Pure magenta
+    - "#00ffff"  # Pure cyan
+    - "#000000"  # Pure black
+    - "#ffffff"  # Pure white
+
+  # Local testing palette with distinct colors
+  local_testing:
+    - "#ff1493"  # Deep pink
+    - "#32cd32"  # Lime green
+    - "#1e90ff"  # Dodger blue
+    - "#ffa500"  # Orange
+    - "#9370db"  # Medium purple
+    - "#20b2aa"  # Light sea green
+
+  # Performance testing palette with gradients
+  performance_gradient: 
+    - "#ff4444"  # Red (slow)
+    - "#ff8844"  # Orange-red
+    - "#ffaa44"  # Orange
+    - "#88ff44"  # Yellow-green
+    - "#44ff44"  # Green (fast)
+
+  # Precedence testing palette - should override base configuration
+  precedence_test: ["#ff1493", "#1e90ff", "#00ff7f", "#ffd700", "#da70d6"]
+
+# =============================================================================
+# Local Development Output Configuration
+# =============================================================================
+# Development-specific output paths and settings optimized for rapid iteration
+outputs:
+  # Override base path for local development
+  base_path: "data/dev_outputs/figures"  # Local development path
+  
+  # Development-specific path aliases
+  path_aliases:
+    # Development and debugging paths
+    dev: "dev/figures"
+    debug: "dev/debug"
+    test: "dev/testing"
+    local: "dev/local_experiments"
+    tmp: "dev/temp"
+    cache: "dev/cache"
+    
+    # Override standard paths for development
+    expl: "dev/exploratory"
+    eda: "dev/exploratory" 
+    raw: "dev/raw_outputs"
+    inter: "dev/intermediate"
+    primary: "dev/primary_analysis"
+    report: "dev/reporting"
+    
+    # Performance testing paths
+    perf: "dev/performance"
+    bench: "dev/benchmarks"
+    profile: "dev/profiling"
+    
+    # Precedence testing paths
+    precedence: "dev/precedence_tests"
+    override: "dev/override_tests"
+
+  # Development-optimized file naming
+  timestamp_format: "dev_{name}_{ts:%Y%m%d_%H%M%S_%f}"  # Microsecond precision for dev
+  slug_format: "local_{purpose}_{name}_{condition}_{user}"
+  
+  # Development output format configuration
+  default_format: "png"  # PNG for fast iteration
+  formats: ["png", "svg"]  # Limited formats for development speed
+  
+  # Development quality settings (faster generation)
+  dpi: 150  # Lower DPI for faster development iteration
+  bbox_inches: "tight"
+  pad_inches: 0.05  # Tighter padding for development
+  facecolor: "white"
+  edgecolor: "none"
+  transparent: false
+  
+  # Development metadata settings
+  metadata: true  # Always save metadata in development
+  save_raw_data: true  # Save raw data for debugging
+  include_debug_info: true  # Include debug information in metadata
+
+# =============================================================================
+# Development-Optimized rcParams and Defaults
+# =============================================================================
+# Enhanced defaults for development visibility and debugging
+defaults:
+  # Larger figures for development visibility
+  figure_size: [12, 8]  # Override base size for development
+  figure_dpi: 100  # Lower DPI for faster rendering
+  figure_max_open_warning: 50  # More figures allowed in development
+  
+  # Development font configuration
+  font_family: "DejaVu Sans"  # Specific font for development consistency
+  font_size: 14  # Larger font for development visibility
+  font_weight: "bold"  # Bold for development visibility
+  
+  # Enhanced text sizing for development
+  title_size: 18  # Larger titles for development
+  label_size: 14  # Larger labels for development
+  tick_size: 12  # Larger ticks for development
+  legend_size: 13  # Larger legend for development
+  
+  # Enhanced line and marker defaults for development
+  line_width: 3.0  # Thicker lines for development visibility
+  marker_size: 10  # Larger markers for development
+  
+  # Development color cycle override
+  color_cycle: "development_debug"  # Use debug palette
+  
+  # Enhanced grid for development
+  grid: true
+  grid_alpha: 0.5  # More visible grid for development
+  grid_linewidth: 1.2  # Thicker grid for development
+  grid_linestyle: "--"  # Dashed grid for development
+  grid_color: "#cccccc"  # Light gray grid
+  
+  # Development spine configuration
+  spine_visibility:
+    top: false
+    right: false
+    bottom: true
+    left: true
+  spine_linewidth: 2.0  # Thicker spines for development
+  spine_color: "#333333"  # Darker spines for development
+  
+  # Enhanced tick configuration for development
+  tick_direction: "out"
+  tick_major_size: 6.0  # Larger ticks for development
+  tick_minor_size: 3.0
+  tick_major_width: 1.5  # Thicker ticks for development
+  tick_minor_width: 1.0
+  tick_color: "#333333"  # Darker ticks for development
+  
+  # Development legend configuration
+  legend_frameon: true
+  legend_fancybox: true
+  legend_shadow: true  # Shadow for development visibility
+  legend_numpoints: 1
+  legend_scatterpoints: 1
+  legend_loc: "best"
+  legend_fontsize: 13
+  legend_framealpha: 0.9
+  legend_edgecolor: "#666666"
+  
+  # Development axis formatting
+  axes_linewidth: 2.0  # Thicker axes for development
+  axes_edgecolor: "#333333"  # Darker edges for development
+  axes_labelpad: 6.0  # More padding for development
+  axes_axisbelow: true
+  axes_facecolor: "#fafafa"  # Light gray background for development
+  
+  # Development image handling
+  image_interpolation: "nearest"  # No interpolation for development accuracy
+  image_resample: false  # No resampling for development speed
+  
+  # Development save configuration
+  savefig_dpi: 150  # Lower DPI for faster saves
+  savefig_bbox: "tight"
+  savefig_pad_inches: 0.05
+  savefig_format: "png"
+  savefig_transparent: false
+
+# =============================================================================
+# Development-Specific Kedro Configuration Overrides
+# =============================================================================
+# Local development settings optimized for debugging and rapid iteration
+kedro:
+  # Override versioning for development
+  enable_versioning: false  # Disable versioning for faster development
+  version_format: "dev_%Y%m%d_%H%M%S"  # Development version format
+  
+  # Development execution settings
+  parallel_execution: false  # Disable parallel execution for debugging
+  max_workers: 1  # Single worker for development debugging
+  
+  # Enhanced development and debugging
+  debug_mode: true  # Enable debug mode for development
+  verbose_logging: true  # Enable verbose logging for development
+  log_level: "DEBUG"  # Debug-level logging
+  log_performance: true  # Log performance metrics
+  log_memory_usage: true  # Log memory usage
+  
+  # Development performance optimization
+  cache_styling: false  # Disable caching for development consistency
+  cache_ttl_seconds: 60  # Short cache TTL for development
+  enable_concurrent_access: false  # Disable concurrency for debugging
+  clear_cache_on_start: true  # Clear cache on startup for development
+  
+  # Enhanced validation and error handling for development
+  validation_enabled: true  # Enable validation for development
+  strict_validation: true  # Strict validation for development
+  fail_on_missing_styles: true  # Fail on missing styles for development
+  fail_fast: true  # Fail fast for development debugging
+  detailed_errors: true  # Detailed error messages for development
+  
+  # Development performance monitoring
+  performance_monitoring: true  # Enable performance monitoring
+  timing_threshold_ms: 1  # Lower threshold for development monitoring
+  memory_monitoring: true  # Enable memory monitoring
+  profile_execution: true  # Enable execution profiling
+  save_performance_logs: true  # Save performance logs for analysis
+  
+  # Development integration settings
+  auto_register_datasets: true  # Auto-register for development convenience
+  hook_priority: 50  # Lower priority for development debugging
+  enable_debug_hooks: true  # Enable debug hooks
+  trace_execution: true  # Trace execution for debugging
+  
+  # Development data layer mapping overrides
+  purpose_mapping:
+    "dev": "development"
+    "01_raw": "exploratory"
+    "02_intermediate": "development" 
+    "03_primary": "development"
+    "04_feature": "development"
+    "05_model_input": "development"
+    "06_models": "development"
+    "07_model_output": "development"
+    "08_reporting": "development"
+    "dev/figures": "development"
+    "dev/debug": "debug"
+    "dev/testing": "testing"
+  
+  # Development environment overrides - these should take precedence
+  environment_overrides:
+    local:
+      debug_mode: true  # Override to ensure debug mode is enabled
+      cache_styling: false  # Override to disable caching
+      performance_monitoring: true  # Override to enable monitoring
+      validation_enabled: true  # Override to enable validation
+      parallel_execution: false  # Override to disable parallel execution
+      verbose_logging: true  # Override to enable verbose logging
+      fail_on_missing_styles: true  # Override to fail on missing styles
+      
+      # Additional local development settings
+      auto_reload_config: true  # Reload config on changes
+      watch_config_files: true  # Watch config files for changes
+      enable_hot_reload: true  # Enable hot reload for development
+      save_intermediate_figures: true  # Save intermediate figures
+      preserve_temp_files: true  # Preserve temp files for debugging
+      enable_style_preview: true  # Enable style preview mode
+      
+  # Configuration precedence testing markers
+  precedence_test:
+    local_override_marker: "active"
+    config_merge_order: ["local", "kedro", "figregistry", "defaults"]
+    override_count: 15  # Number of overrides in this config
+    
+  # Development workflow optimization
+  workflow:
+    fast_iteration_mode: true  # Enable fast iteration mode
+    skip_expensive_operations: true  # Skip expensive operations in development
+    use_simplified_styling: false  # Use full styling for testing
+    enable_style_debugging: true  # Enable style debugging
+    show_style_resolution: true  # Show style resolution process
+    
+  # Development testing configuration
+  testing:
+    enable_test_conditions: true  # Enable test conditions
+    generate_test_data: true  # Generate test data for examples
+    validate_test_scenarios: true  # Validate test scenarios
+    preserve_test_outputs: true  # Preserve test outputs
+    test_configuration_precedence: true  # Test configuration precedence
+
+# =============================================================================
+# Development-Specific Performance and Debugging Configuration
+# =============================================================================
+# Advanced settings for development optimization and troubleshooting
+performance:
+  # Development profiling settings
+  enable_profiling: true  # Enable performance profiling
+  profile_detailed: true  # Detailed profiling information
+  profile_memory: true  # Memory profiling
+  profile_io: true  # I/O profiling
+  save_profile_data: true  # Save profiling data to files
+  
+  # Development timing settings
+  measure_style_resolution: true  # Measure style resolution time
+  measure_file_operations: true  # Measure file operation time
+  measure_configuration_merge: true  # Measure config merge time
+  timing_precision: "microseconds"  # High precision timing
+  
+  # Development optimization settings
+  optimize_for_development: true  # Optimize for development workflow
+  fast_fail_validation: true  # Fast fail on validation errors
+  skip_redundant_operations: true  # Skip redundant operations
+  cache_expensive_computations: false  # Don't cache for consistency
+
+# Development logging configuration
+logging:
+  level: "DEBUG"  # Debug-level logging for development
+  format: "detailed"  # Detailed log format for development
+  include_timestamps: true  # Include timestamps in logs
+  include_memory_usage: true  # Include memory usage in logs
+  include_performance_metrics: true  # Include performance metrics
+  log_style_resolution: true  # Log style resolution process
+  log_configuration_merging: true  # Log configuration merging
+  log_file_operations: true  # Log file operations
+  save_logs_to_file: true  # Save logs to file for analysis
+  log_file_path: "data/dev_outputs/logs/figregistry_kedro.log"
+
+# =============================================================================
+# Configuration Precedence Testing and Validation
+# =============================================================================
+# Markers and settings specifically for testing configuration precedence rules
+_validation:
+  schema_version: "2.0"
+  config_environment: "local"
+  precedence_level: 1  # Highest precedence (local environment)
+  override_base_config: true  # This config should override base
+  merge_strategy: "deep_merge_with_local_precedence"
+  
+  # Precedence testing markers
+  precedence_markers:
+    environment_type: "local"
+    config_source: "environment_local.yml"
+    merge_timestamp: "runtime"
+    expected_precedence: "highest"
+    
+  # Configuration merge testing
+  merge_testing:
+    test_style_overrides: true  # Test that styles are properly overridden
+    test_output_overrides: true  # Test that outputs are properly overridden
+    test_kedro_overrides: true  # Test that Kedro settings are properly overridden
+    test_default_overrides: true  # Test that defaults are properly overridden
+    
+    # Expected override counts for validation
+    expected_style_overrides: 8  # Number of styles that should be overridden
+    expected_kedro_overrides: 12  # Number of Kedro settings that should be overridden
+    expected_output_overrides: 5  # Number of output settings that should be overridden
+    
+  # Configuration validation rules
+  validation_rules:
+    require_environment_marker: true  # Must have environment marker
+    require_override_markers: true  # Must have override markers
+    validate_precedence_chain: true  # Validate precedence chain
+    ensure_development_optimizations: true  # Ensure development optimizations
+
+# Configuration metadata for tracking and debugging
+metadata:
+  config_version: "1.0.0"
+  config_type: "local_development_override"
+  description: "Local environment configuration for development testing and precedence validation"
+  created: "2024-01-01T00:00:00Z"
+  environment: "local"
+  purpose: "development_testing"
+  
+  # Override tracking
+  overrides:
+    - "styles.control: Enhanced development visibility"
+    - "styles.treatment_a: Enhanced development visibility"
+    - "outputs.base_path: Local development path"
+    - "defaults.figure_size: Larger for development"
+    - "kedro.debug_mode: Enabled for development"
+    - "kedro.parallel_execution: Disabled for debugging"
+    - "kedro.cache_styling: Disabled for consistency"
+    - "performance: Development profiling enabled"
+    - "logging: Debug-level logging enabled"
+  
+  # Testing scenario documentation
+  testing_scenarios:
+    - "Configuration precedence validation"
+    - "Environment-specific override testing" 
+    - "Development workflow optimization"
+    - "Debugging and logging configuration"
+    - "Performance monitoring setup"
+    - "Style override precedence testing"
+    - "Output path customization testing"
+    
+  # Usage notes for development team
+  usage_notes:
+    - "Place in tests/data/configs/ for testing configuration bridge merging"
+    - "Simulates conf/local/figregistry.yml in actual Kedro projects"
+    - "Should override all base configuration settings for local development"
+    - "Enables extensive debugging and performance monitoring"
+    - "Optimized for rapid development iteration and troubleshooting"
+    - "Tests configuration precedence rules during bridge operations"

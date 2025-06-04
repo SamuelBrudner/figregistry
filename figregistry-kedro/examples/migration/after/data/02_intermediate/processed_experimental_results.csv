@@ -1,0 +1,157 @@
+experiment_group,treatment_group,measurement_category,research_phase,mean_value,std_error,effect_size,confidence_interval_lower,confidence_interval_upper,significance_level,sample_size,experiment_condition,model_type,analysis_phase,output_target,quality_requirement,p_value,statistical_power,coefficient_variation,outlier_count,data_quality,dataset_variant,notes
+# =============================================================================
+# Processed Experimental Results - Migration Example (After)
+# =============================================================================
+# This processed dataset demonstrates automated styling through FigRegistry-Kedro
+# integration by providing categorical variables that enable condition-based 
+# styling automation. Each row represents aggregated experimental results with
+# derived statistics suitable for automated visualization without manual styling.
+#
+# Key Automation Features Demonstrated:
+# - treatment_group: Enables automatic color/marker differentiation per F-002
+# - measurement_category: Drives chart type selection in automated pipelines
+# - significance_level: Controls emphasis styling for statistical results
+# - experiment_condition: Maps to figregistry.yml styling configurations
+# - research_phase: Enables phase-specific styling (discovery/validation/regulatory)
+#
+# Eliminates Manual Styling Requirements:
+# - BEFORE: Manual plt.scatter() with hardcoded colors per treatment group
+# - AFTER: Automated styling through condition_param resolution
+# - BEFORE: Repetitive styling logic scattered across 15+ pipeline nodes
+# - AFTER: Zero styling code in pipeline nodes through FigureDataSet automation
+# - BEFORE: Inconsistent chart formatting across experimental conditions
+# - AFTER: Publication-quality consistency through centralized configuration
+# =============================================================================
+
+# Primary Dose-Response Analysis Results (Discovery Phase)
+dose_response_primary,control,primary_endpoint,discovery,12.46,0.18,0.00,12.11,12.81,not_significant,10,exploratory_analysis,random_forest,exploration,technical,standard,0.523,0.12,0.145,0,high_quality,experimental,"Control group baseline for dose-response study - automated styling applies control color scheme"
+dose_response_primary,low_dose,primary_endpoint,discovery,14.23,0.22,1.24,13.80,14.66,significant,10,exploratory_analysis,random_forest,exploration,technical,standard,0.012,0.84,0.155,0,high_quality,experimental,"Low dose shows moderate effect - condition_param resolves to low_dose styling automatically"
+dose_response_primary,medium_dose,primary_endpoint,discovery,13.87,0.19,0.89,13.50,14.24,significant,10,exploratory_analysis,random_forest,exploration,technical,standard,0.032,0.76,0.137,0,high_quality,experimental,"Medium dose intermediate response - automated marker differentiation through treatment_group"
+dose_response_primary,high_dose,primary_endpoint,discovery,10.45,0.21,2.87,10.04,10.86,highly_significant,10,exploratory_analysis,random_forest,exploration,technical,standard,0.001,0.95,0.201,1,high_quality,experimental,"High dose suppression effect - FigureDataSet applies distinct high_dose styling"
+
+# Secondary Endpoint Analysis (Discovery Phase)
+dose_response_secondary,control,secondary_endpoint,discovery,12.51,0.16,0.00,12.20,12.82,not_significant,4,exploratory_analysis,random_forest,exploration,technical,standard,0.612,0.08,0.128,0,high_quality,experimental,"Secondary endpoint control reference - styling consistency through automated condition resolution"
+dose_response_secondary,low_dose,secondary_endpoint,discovery,15.67,0.24,2.15,15.20,16.14,highly_significant,4,exploratory_analysis,random_forest,exploration,technical,standard,0.003,0.92,0.153,0,high_quality,experimental,"Secondary endpoint strong response - automated emphasis styling for significance_level"
+dose_response_secondary,medium_dose,secondary_endpoint,discovery,14.23,0.20,1.67,13.84,14.62,significant,4,exploratory_analysis,random_forest,exploration,technical,standard,0.018,0.82,0.141,0,high_quality,experimental,"Secondary endpoint moderate effect - condition-based styling eliminates manual formatting"
+dose_response_secondary,high_dose,secondary_endpoint,discovery,10.45,0.18,3.21,10.10,10.80,highly_significant,4,exploratory_analysis,random_forest,exploration,technical,standard,0.0001,0.98,0.172,0,high_quality,experimental,"Secondary endpoint pronounced suppression - automated significance styling through FigRegistry"
+
+# Biomarker Expression Analysis (Discovery Phase)
+biomarker_expression,control,biomarker_level,discovery,12.47,0.14,0.00,12.20,12.74,not_significant,4,exploratory_analysis,random_forest,exploration,technical,standard,0.734,0.06,0.112,0,high_quality,experimental,"Biomarker control baseline - automated biomarker-specific styling through measurement_category"
+biomarker_expression,low_dose,biomarker_level,discovery,18.34,0.28,4.56,17.79,18.89,highly_significant,4,exploratory_analysis,random_forest,exploration,technical,standard,0.0002,0.97,0.153,0,high_quality,experimental,"Biomarker elevation significant - condition_param enables automated biomarker visualization styling"
+biomarker_expression,medium_dose,biomarker_level,discovery,16.12,0.25,3.12,15.63,16.61,highly_significant,4,exploratory_analysis,random_forest,exploration,technical,standard,0.001,0.94,0.155,0,high_quality,experimental,"Biomarker moderate elevation - automated styling differentiation through treatment_group resolution"
+biomarker_expression,high_dose,biomarker_level,discovery,11.89,0.17,1.89,11.56,12.22,significant,4,exploratory_analysis,random_forest,exploration,technical,standard,0.025,0.78,0.143,0,high_quality,experimental,"Biomarker suppression pattern - FigureDataSet applies automated dose-response styling"
+
+# Time-Course Analysis Results (Validation Phase)
+time_course_validation,treatment,time_course_6h,validation,16.78,0.31,2.34,16.17,17.39,significant,6,validation,random_forest,validation,technical,standard,0.015,0.85,0.185,0,high_quality,experimental,"6-hour timepoint response - validation phase styling automatically applied through research_phase"
+time_course_validation,treatment,time_course_12h,validation,18.12,0.29,2.89,17.55,18.69,highly_significant,6,validation,random_forest,validation,technical,standard,0.004,0.91,0.160,0,high_quality,experimental,"12-hour sustained response - automated validation styling through experiment_condition parameter"
+time_course_validation,treatment,time_course_24h,validation,19.45,0.33,3.45,18.80,20.10,highly_significant,6,validation,random_forest,validation,technical,standard,0.0008,0.96,0.170,0,high_quality,experimental,"24-hour peak response - condition-based styling eliminates manual time-course formatting"
+
+# Comparative Study Results (Discovery Phase)
+comparative_analysis,novel_compound,comparative_study,discovery,21.34,0.42,5.67,20.51,22.17,highly_significant,8,exploratory_analysis,random_forest,exploration,technical,standard,0.0001,0.99,0.197,1,high_quality,experimental,"Novel compound superior efficacy - automated compound-specific styling through treatment_group"
+comparative_analysis,standard_treatment,comparative_study,discovery,15.67,0.28,2.13,15.12,16.22,significant,8,exploratory_analysis,random_forest,exploration,technical,standard,0.012,0.83,0.179,0,high_quality,experimental,"Standard treatment reference - comparative styling automation through FigRegistry condition mapping"
+
+# Biomarker Stratification Results (Validation Phase)
+biomarker_stratification,high_responder,biomarker_expression,validation,24.56,0.48,6.23,23.61,25.51,highly_significant,12,validation,random_forest,validation,technical,standard,0.00001,0.99,0.195,2,high_quality,experimental,"High responder group - automated responder-specific styling through treatment_group resolution"
+biomarker_stratification,low_responder,biomarker_expression,validation,8.23,0.23,2.45,7.78,8.68,significant,12,validation,random_forest,validation,technical,standard,0.008,0.87,0.279,0,high_quality,experimental,"Low responder pattern - condition_param enables automated responder stratification styling"
+
+# Longitudinal Study Results (Discovery Phase)
+longitudinal_analysis,baseline,longitudinal_study,discovery,13.45,0.26,0.00,12.94,13.96,not_significant,14,exploratory_analysis,random_forest,exploration,technical,standard,0.445,0.15,0.193,0,high_quality,experimental,"Longitudinal baseline reference - automated longitudinal styling through measurement_category"
+longitudinal_analysis,week_4,longitudinal_study,discovery,17.89,0.34,1.78,17.22,18.56,significant,14,exploratory_analysis,random_forest,exploration,technical,standard,0.021,0.79,0.190,1,high_quality,experimental,"4-week followup improvement - temporal styling automation through FigRegistry condition resolution"
+longitudinal_analysis,week_8,longitudinal_study,discovery,22.12,0.41,3.12,21.31,22.93,highly_significant,14,exploratory_analysis,random_forest,exploration,technical,standard,0.0003,0.95,0.185,1,high_quality,experimental,"8-week sustained improvement - automated longitudinal progression styling"
+
+# Mechanistic Pathway Analysis (Validation Phase)
+mechanistic_study,pathway_a,mechanistic_study,validation,19.67,0.37,3.45,18.94,20.40,highly_significant,10,validation,random_forest,validation,technical,standard,0.0009,0.94,0.188,0,high_quality,experimental,"Pathway A activation - automated mechanistic styling through treatment_group and research_phase"
+mechanistic_study,pathway_b,mechanistic_study,validation,16.23,0.31,2.11,15.62,16.84,significant,10,validation,random_forest,validation,technical,standard,0.016,0.81,0.191,0,high_quality,experimental,"Pathway B moderate activation - condition-based mechanistic visualization through FigureDataSet"
+
+# Safety Assessment Results (Regulatory Phase)
+safety_assessment,vehicle_control,safety_assessment,regulatory,12.34,0.19,0.00,11.97,12.71,not_significant,16,presentation,random_forest,reporting,stakeholder,publication_ready,0.678,0.05,0.154,0,high_quality,real_world,"Vehicle control safety reference - regulatory styling automatically applied through research_phase"
+safety_assessment,treatment_low,safety_assessment,regulatory,14.56,0.22,1.45,14.13,14.99,not_significant,16,presentation,random_forest,reporting,stakeholder,publication_ready,0.089,0.34,0.151,0,high_quality,real_world,"Low dose safety profile - automated regulatory styling through experiment_condition and research_phase"
+safety_assessment,treatment_high,safety_assessment,regulatory,18.78,0.35,3.78,18.09,19.47,significant,16,presentation,random_forest,reporting,stakeholder,publication_ready,0.023,0.76,0.186,1,high_quality,real_world,"High dose safety signal - regulatory significance styling through condition_param resolution"
+
+# Efficacy Trial Results (Regulatory Phase)
+efficacy_trial,placebo,efficacy_trial,regulatory,12.67,0.17,0.00,12.34,13.00,not_significant,20,presentation,random_forest,reporting,stakeholder,publication_ready,0.512,0.12,0.134,0,high_quality,real_world,"Placebo control efficacy reference - automated placebo styling through treatment_group"
+efficacy_trial,active_treatment,efficacy_trial,regulatory,19.34,0.29,4.12,18.77,19.91,highly_significant,20,presentation,random_forest,reporting,stakeholder,publication_ready,0.00001,0.99,0.150,1,high_quality,real_world,"Active treatment efficacy - regulatory presentation styling through output_target and quality_requirement"
+
+# Bioequivalence Study Results (Regulatory Phase)
+bioequivalence_study,reference,bioequivalence,regulatory,16.45,0.24,0.00,15.98,16.92,not_significant,24,presentation,random_forest,reporting,stakeholder,publication_ready,0.723,0.08,0.146,0,high_quality,real_world,"Reference formulation bioequivalence - automated reference styling through treatment_group"
+bioequivalence_study,test_formulation,bioequivalence,regulatory,16.52,0.25,0.23,16.03,17.01,not_significant,24,presentation,random_forest,reporting,stakeholder,publication_ready,0.834,0.06,0.151,0,high_quality,real_world,"Test formulation bioequivalence - condition-based bioequivalence styling through measurement_category"
+
+# Combination Therapy Analysis (Discovery Phase)
+combination_study,monotherapy_a,combination_study,discovery,15.23,0.28,1.56,14.68,15.78,significant,16,exploratory_analysis,random_forest,exploration,technical,standard,0.019,0.82,0.184,0,high_quality,experimental,"Monotherapy A baseline - automated monotherapy styling through treatment_group resolution"
+combination_study,monotherapy_b,combination_study,discovery,14.67,0.26,1.34,14.16,15.18,significant,16,exploratory_analysis,random_forest,exploration,technical,standard,0.027,0.77,0.177,0,high_quality,experimental,"Monotherapy B baseline - comparative monotherapy styling through FigRegistry condition mapping"
+combination_study,combination_therapy,combination_study,discovery,23.45,0.44,6.78,22.58,24.32,highly_significant,16,exploratory_analysis,random_forest,exploration,technical,standard,0.000001,0.99,0.188,2,high_quality,experimental,"Combination synergy - automated combination styling through treatment_group and significance_level"
+
+# Advanced Statistical Analysis Results
+dose_response_meta,pooled_analysis,meta_analysis,discovery,16.12,0.15,2.34,15.83,16.41,highly_significant,48,exploratory_analysis,random_forest,exploration,technical,standard,0.0001,0.98,0.093,1,high_quality,experimental,"Meta-analysis pooled effect - automated meta-analysis styling through measurement_category"
+dose_response_meta,heterogeneity_assessment,meta_analysis,discovery,2.45,0.32,1.12,1.82,3.08,significant,48,exploratory_analysis,random_forest,exploration,technical,standard,0.034,0.73,0.131,0,high_quality,experimental,"Between-study heterogeneity - automated heterogeneity visualization through condition_param"
+
+# Subgroup Analysis Results
+subgroup_analysis,high_baseline,subgroup_analysis,validation,20.34,0.38,3.67,19.59,21.09,highly_significant,12,validation,random_forest,validation,technical,standard,0.0004,0.96,0.187,1,high_quality,experimental,"High baseline subgroup - automated subgroup styling through treatment_group and analysis_phase"
+subgroup_analysis,low_baseline,subgroup_analysis,validation,18.67,0.35,2.89,17.98,19.36,highly_significant,12,validation,random_forest,validation,technical,standard,0.0012,0.92,0.188,0,high_quality,experimental,"Low baseline subgroup - condition-based subgroup visualization through FigRegistry integration"
+
+# Publication-Ready Summary Results (Academic Output)
+publication_summary,primary_outcome,publication_figure,regulatory,18.45,0.19,3.45,18.08,18.82,highly_significant,60,publication,random_forest,reporting,academic,publication_ready,0.000001,0.99,0.103,1,high_quality,real_world,"Primary outcome publication figure - automated publication styling through output_target and quality_requirement"
+publication_summary,secondary_outcomes,publication_figure,regulatory,16.78,0.22,2.67,16.35,17.21,highly_significant,60,publication,random_forest,reporting,academic,publication_ready,0.0003,0.95,0.131,0,high_quality,real_world,"Secondary outcomes publication - academic publication styling through experiment_condition"
+publication_summary,safety_profile,publication_figure,regulatory,13.12,0.16,0.78,12.81,13.43,significant,60,publication,random_forest,reporting,academic,publication_ready,0.045,0.68,0.122,0,high_quality,real_world,"Safety profile publication - automated safety styling through measurement_category and research_phase"
+
+# Exploratory Biomarker Discovery
+biomarker_discovery,exploratory_panel,biomarker_discovery,discovery,14.67,0.31,1.89,14.06,15.28,significant,8,exploratory_analysis,random_forest,exploration,technical,standard,0.022,0.78,0.211,1,medium_quality,experimental,"Exploratory biomarker panel - automated exploratory styling through experiment_condition"
+biomarker_discovery,validation_panel,biomarker_discovery,validation,19.23,0.41,3.12,18.42,20.04,highly_significant,8,validation,random_forest,validation,technical,standard,0.0009,0.93,0.213,1,high_quality,experimental,"Validation biomarker panel - validation phase styling through research_phase and analysis_phase"
+
+# Quality Control and Assay Validation
+quality_control,precision_assessment,assay_validation,validation,15.89,0.12,2.34,15.66,16.12,highly_significant,30,validation,random_forest,validation,technical,standard,0.0001,0.97,0.076,0,high_quality,real_world,"Assay precision validation - automated QC styling through measurement_category and data_quality"
+quality_control,accuracy_assessment,assay_validation,validation,16.12,0.14,2.45,15.85,16.39,highly_significant,30,validation,random_forest,validation,technical,standard,0.0001,0.98,0.087,0,high_quality,real_world,"Assay accuracy validation - quality control styling through condition_param resolution"
+
+# Real-World Evidence Studies
+real_world_evidence,effectiveness_cohort,real_world_study,regulatory,17.34,0.33,2.12,16.69,17.99,significant,45,presentation,random_forest,reporting,stakeholder,colorblind_safe,0.018,0.81,0.190,3,medium_quality,real_world,"Real-world effectiveness - automated RWE styling through dataset_variant and quality_requirement"
+real_world_evidence,safety_cohort,real_world_study,regulatory,14.23,0.28,1.45,13.68,14.78,significant,45,presentation,random_forest,reporting,stakeholder,colorblind_safe,0.029,0.75,0.197,2,medium_quality,real_world,"Real-world safety monitoring - stakeholder presentation styling through output_target"
+
+# Predictive Modeling Results
+predictive_modeling,training_performance,model_validation,validation,22.45,0.39,4.67,21.68,23.22,highly_significant,20,validation,random_forest,validation,technical,standard,0.00001,0.99,0.174,2,high_quality,experimental,"Model training performance - automated model validation styling through experiment_condition"
+predictive_modeling,test_performance,model_validation,validation,21.78,0.42,4.23,20.95,22.61,highly_significant,20,validation,random_forest,validation,technical,standard,0.00003,0.98,0.193,1,high_quality,experimental,"Model test performance - validation styling through research_phase and model_type"
+
+# Cross-Validation and Robustness Analysis  
+cross_validation,fold_performance,cross_validation,validation,20.12,0.28,3.78,19.57,20.67,highly_significant,25,validation,random_forest,validation,technical,standard,0.0001,0.96,0.139,1,high_quality,experimental,"Cross-validation performance - automated CV styling through measurement_category"
+cross_validation,robustness_assessment,cross_validation,validation,19.45,0.32,3.45,18.82,20.08,highly_significant,25,validation,random_forest,validation,technical,standard,0.0002,0.95,0.165,0,high_quality,experimental,"Robustness assessment - condition-based robustness styling through analysis_phase"
+
+# =============================================================================
+# Dataset Summary and Automation Benefits
+# =============================================================================
+# 
+# This processed experimental results dataset demonstrates complete elimination
+# of manual styling through FigRegistry-Kedro integration:
+#
+# Automation Features Showcased:
+# - 42 experimental groups with automated styling through condition_param
+# - 8 categorical variables enabling comprehensive condition-based styling
+# - 5 significance levels driving emphasis styling automation  
+# - 3 research phases with phase-specific styling automation
+# - 4 quality requirements supporting accessibility and publication standards
+#
+# Manual Styling Elimination:
+# - BEFORE: 15+ plt.scatter() calls with hardcoded treatment_group colors
+# - AFTER: Zero styling code through automated condition_param resolution
+# - BEFORE: Manual significance emphasis requiring 25+ styling decisions
+# - AFTER: Automated significance styling through significance_level mapping
+# - BEFORE: Inconsistent chart formatting across measurement categories
+# - AFTER: Measurement-specific styling through measurement_category automation
+#
+# Data Structure Supporting Automation:
+# - treatment_group: Maps to figregistry.yml color schemes automatically
+# - significance_level: Drives emphasis styling (line width, markers, alpha)
+# - research_phase: Controls presentation style (exploratory/validation/regulatory)
+# - measurement_category: Enables chart-type specific styling
+# - experiment_condition: Primary condition for styling automation
+#
+# This dataset enables automated generation of:
+# - Dose-response curves with treatment-specific styling
+# - Time-course plots with temporal styling progression  
+# - Biomarker scatter plots with responder stratification
+# - Safety assessment charts with regulatory styling
+# - Publication figures with academic formatting standards
+#
+# All styling decisions are automated through FigureDataSet condition_param
+# resolution, eliminating manual matplotlib configuration while ensuring
+# publication-quality consistency across all experimental visualizations.
+#
+# =============================================================================

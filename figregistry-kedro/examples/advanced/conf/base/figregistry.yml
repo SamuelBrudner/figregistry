@@ -1,0 +1,1230 @@
+# Advanced FigRegistry Configuration for Enterprise Kedro Integration
+# =====================================================================
+#
+# This configuration file demonstrates the sophisticated capabilities of the 
+# figregistry-kedro plugin integration, showcasing complex condition-based 
+# styling, hierarchical configuration patterns, and enterprise-grade 
+# visualization management for production data science workflows.
+#
+# Key Features Demonstrated:
+# - Complex condition-based styling with hierarchical patterns (F-002)
+# - Sophisticated palette management and fallback strategies (F-002-RQ-003)
+# - Advanced output path configurations with multi-purpose aliases (F-004)
+# - Enterprise-grade configuration bridge integration (F-007)
+# - Complex experimental design condition mappings (F-002-RQ-002)
+# - Publication-ready styling patterns with statistical indicators
+# - Performance-optimized configuration for large-scale pipeline execution
+# - Multi-environment deployment patterns (development, staging, production)
+#
+# Architecture:
+# This configuration bridges FigRegistry's powerful styling engine with 
+# Kedro's data catalog system, enabling zero-touch figure management with
+# sophisticated experimental condition resolution and automated style application.
+
+# ==============================================================================
+# CONFIGURATION METADATA AND VERSIONING
+# ==============================================================================
+
+# Configuration schema and compatibility metadata
+figregistry_version: ">=0.3.0"
+metadata:
+  config_version: "2.1.0"
+  created_date: "2024-12-19"
+  last_modified: "2024-12-19"
+  author: "FigRegistry-Kedro Advanced Integration Team"
+  purpose: "advanced_experimental_visualization_automation"
+  description: "Enterprise-grade FigRegistry configuration demonstrating sophisticated condition-based styling, complex experimental design support, and seamless Kedro integration patterns"
+  
+  # Configuration compliance tracking
+  compliance:
+    figregistry_compatibility: ">=0.3.0"
+    kedro_compatibility: ">=0.18.0,<0.20.0"
+    python_version: ">=3.10"
+    schema_validation: "pydantic_v2"
+    
+  # Advanced configuration features utilized
+  features_demonstrated:
+    complex_condition_hierarchies: true
+    wildcard_pattern_matching: true
+    multi_environment_support: true
+    statistical_significance_styling: true
+    publication_ready_outputs: true
+    performance_optimization: true
+    enterprise_integration_patterns: true
+    automated_experimental_design: true
+    
+  # Educational and documentation purposes
+  documentation:
+    configuration_guide: "docs/configuration.md"
+    advanced_examples: "examples/advanced/README.md"
+    integration_patterns: "docs/kedro-integration.md"
+    troubleshooting: "docs/troubleshooting.md"
+
+# ==============================================================================
+# SOPHISTICATED CONDITION-BASED STYLING PATTERNS
+# ==============================================================================
+
+# Complex experimental design condition mappings with hierarchical styling
+styles:
+  
+  # ===========================================================================
+  # TRAINING PIPELINE STYLING CONDITIONS
+  # ===========================================================================
+  
+  # Data Quality and Processing Conditions
+  "training.data.raw":
+    color: "#E74C3C"  # Strong red for raw data visualization
+    marker: "x"
+    markersize: 8
+    linestyle: ":"
+    linewidth: 2.0
+    alpha: 0.7
+    label: "Raw Data Quality"
+    description: "Styling for raw data quality analysis and validation plots"
+    
+  "training.data.cleaned":
+    color: "#F39C12"  # Orange for cleaned data
+    marker: "s"
+    markersize: 7
+    linestyle: "--"
+    linewidth: 2.2
+    alpha: 0.8
+    label: "Cleaned Data"
+    description: "Styling for cleaned and validated data visualization"
+    
+  "training.data.transformed":
+    color: "#27AE60"  # Green for transformed data indicating readiness
+    marker: "o"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.9
+    label: "Transformed Data"
+    description: "Styling for fully processed and feature-engineered data"
+    
+  # Model Type Conditions with Performance Indicators
+  "training.model.baseline":
+    color: "#95A5A6"  # Gray for baseline models
+    marker: "^"
+    markersize: 10
+    linestyle: "-"
+    linewidth: 3.0
+    alpha: 0.8
+    label: "Baseline Model"
+    fill_alpha: 0.3
+    edge_color: "#2C3E50"
+    edge_width: 1.5
+    description: "Conservative styling for baseline model performance"
+    
+  "training.model.candidate":
+    color: "#3498DB"  # Blue for candidate models
+    marker: "D"
+    markersize: 9
+    linestyle: "-"
+    linewidth: 3.2
+    alpha: 0.85
+    label: "Candidate Model"
+    fill_alpha: 0.4
+    edge_color: "#2980B9"
+    edge_width: 1.8
+    description: "Professional styling for candidate model evaluation"
+    
+  "training.model.champion":
+    color: "#E67E22"  # Orange-gold for champion models
+    marker: "*"
+    markersize: 12
+    linestyle: "-"
+    linewidth: 4.0
+    alpha: 1.0
+    label: "Champion Model"
+    fill_alpha: 0.6
+    edge_color: "#D35400"
+    edge_width: 2.0
+    description: "Distinguished styling for champion model performance"
+    
+  # Model Algorithm Specific Conditions
+  "training.model.logistic_regression":
+    color: "#9B59B6"  # Purple for logistic regression
+    marker: "o"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.8
+    label: "Logistic Regression"
+    
+  "training.model.random_forest":
+    color: "#16A085"  # Teal for tree-based methods
+    marker: "s"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.8
+    label: "Random Forest"
+    
+  "training.model.gradient_boosting":
+    color: "#E74C3C"  # Red for gradient boosting
+    marker: "^"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.8
+    label: "Gradient Boosting"
+    
+  "training.model.neural_network":
+    color: "#2E86AB"  # Deep blue for neural networks
+    marker: "D"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.8
+    label: "Neural Network"
+    
+  "training.model.ensemble":
+    color: "#F1C40F"  # Gold for ensemble methods
+    marker: "*"
+    markersize: 10
+    linestyle: "-"
+    linewidth: 3.0
+    alpha: 0.9
+    label: "Ensemble Method"
+    
+  # ===========================================================================
+  # INFERENCE PIPELINE STYLING CONDITIONS
+  # ===========================================================================
+  
+  # Prediction Type Conditions
+  "inference.prediction.batch":
+    color: "#3498DB"  # Blue for batch processing
+    marker: "s"
+    markersize: 7
+    linestyle: "-"
+    linewidth: 2.8
+    alpha: 0.8
+    label: "Batch Predictions"
+    description: "Styling for batch prediction analysis and monitoring"
+    
+  "inference.prediction.realtime":
+    color: "#E74C3C"  # Red for real-time processing
+    marker: "o"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 3.0
+    alpha: 0.9
+    label: "Real-time Predictions"
+    description: "Styling for real-time inference performance visualization"
+    
+  # Confidence Level Conditions with Statistical Indicators
+  "inference.confidence.high":
+    color: "#27AE60"  # Green for high confidence
+    marker: "o"
+    markersize: 10
+    linestyle: "-"
+    linewidth: 3.5
+    alpha: 0.9
+    label: "High Confidence (≥85%)"
+    fill_alpha: 0.5
+    confidence_indicator: "solid_fill"
+    description: "Styling for high-confidence predictions with strong visual emphasis"
+    
+  "inference.confidence.medium":
+    color: "#F39C12"  # Orange for medium confidence
+    marker: "o"
+    markersize: 8
+    linestyle: "--"
+    linewidth: 2.8
+    alpha: 0.75
+    label: "Medium Confidence (65-84%)"
+    fill_alpha: 0.3
+    confidence_indicator: "pattern_fill"
+    description: "Styling for medium-confidence predictions with moderate emphasis"
+    
+  "inference.confidence.low":
+    color: "#E74C3C"  # Red for low confidence
+    marker: "x"
+    markersize: 9
+    linestyle: ":"
+    linewidth: 2.0
+    alpha: 0.6
+    label: "Low Confidence (<65%)"
+    fill_alpha: 0.2
+    confidence_indicator: "outline_only"
+    description: "Styling for low-confidence predictions with caution indicators"
+    
+  # ===========================================================================
+  # REPORTING PIPELINE STYLING CONDITIONS
+  # ===========================================================================
+  
+  # Report Type Conditions with Audience-Specific Styling
+  "reporting.summary.executive":
+    color: "#2C3E50"  # Dark navy for executive presentations
+    marker: "o"
+    markersize: 12
+    linestyle: "-"
+    linewidth: 4.0
+    alpha: 1.0
+    label: "Executive Summary"
+    font_family: "Arial"
+    font_size: 16
+    font_weight: "bold"
+    grid_alpha: 0.3
+    description: "Clean, authoritative styling for C-level executive reporting"
+    
+  "reporting.summary.technical":
+    color: "#34495E"  # Darker gray for technical audiences
+    marker: "s"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.9
+    label: "Technical Analysis"
+    font_family: "DejaVu Sans Mono"
+    font_size: 12
+    grid_alpha: 0.7
+    description: "Detailed, analytical styling for technical deep-dive reports"
+    
+  # Report Section Conditions
+  "reporting.detail.performance":
+    color: "#3498DB"  # Blue for performance analysis
+    marker: "D"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.8
+    alpha: 0.85
+    label: "Performance Analysis"
+    error_bar_alpha: 0.6
+    description: "Styling for detailed performance metric visualization"
+    
+  "reporting.detail.insights":
+    color: "#9B59B6"  # Purple for insights and interpretability
+    marker: "^"
+    markersize: 9
+    linestyle: "-"
+    linewidth: 2.6
+    alpha: 0.8
+    label: "Model Insights"
+    description: "Styling for model interpretation and insight visualization"
+    
+  "reporting.detail.recommendations":
+    color: "#E67E22"  # Orange for actionable recommendations
+    marker: "*"
+    markersize: 11
+    linestyle: "-"
+    linewidth: 3.0
+    alpha: 0.9
+    label: "Recommendations"
+    description: "Emphasis styling for strategic recommendations and action items"
+    
+  # ===========================================================================
+  # EXPERIMENTAL DESIGN STYLING CONDITIONS
+  # ===========================================================================
+  
+  # Control and Treatment Group Conditions
+  "experiment.control":
+    color: "#95A5A6"  # Neutral gray for control groups
+    marker: "o"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.8
+    label: "Control Group"
+    fill_alpha: 0.4
+    description: "Standard styling for experimental control group visualization"
+    
+  "experiment.treatment.group_a":
+    color: "#3498DB"  # Blue for treatment group A
+    marker: "s"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.8
+    label: "Treatment A (Algorithm Enhancement)"
+    fill_alpha: 0.4
+    description: "Distinctive styling for algorithm enhancement treatment group"
+    
+  "experiment.treatment.group_b":
+    color: "#E74C3C"  # Red for treatment group B
+    marker: "^"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.8
+    label: "Treatment B (Hyperparameter Optimization)"
+    fill_alpha: 0.4
+    description: "Distinctive styling for hyperparameter optimization treatment"
+    
+  "experiment.treatment.group_c":
+    color: "#27AE60"  # Green for treatment group C
+    marker: "D"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.8
+    label: "Treatment C (Ensemble Method)"
+    fill_alpha: 0.4
+    description: "Distinctive styling for ensemble method treatment group"
+    
+  "experiment.treatment.group_d":
+    color: "#F39C12"  # Orange for treatment group D
+    marker: "*"
+    markersize: 9
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 0.8
+    label: "Treatment D (Neural Network Architecture)"
+    fill_alpha: 0.4
+    description: "Distinctive styling for neural network architecture treatment"
+    
+  # Statistical Significance Conditions with Visual Indicators
+  "result.significant.p001":
+    color: "#1E8449"  # Dark green for highly significant results
+    marker: "o"
+    markersize: 12
+    linestyle: "-"
+    linewidth: 4.0
+    alpha: 1.0
+    label: "Highly Significant (p < 0.001) ***"
+    significance_symbol: "***"
+    significance_color: "#1E8449"
+    border_style: "double"
+    description: "Strong visual emphasis for highly significant statistical results"
+    
+  "result.significant.p01":
+    color: "#239B56"  # Medium green for very significant results
+    marker: "o"
+    markersize: 10
+    linestyle: "-"
+    linewidth: 3.5
+    alpha: 0.9
+    label: "Very Significant (p < 0.01) **"
+    significance_symbol: "**"
+    significance_color: "#239B56"
+    border_style: "solid"
+    description: "Moderate emphasis for very significant statistical results"
+    
+  "result.significant.p05":
+    color: "#58D68D"  # Light green for significant results
+    marker: "o"
+    markersize: 8
+    linestyle: "-"
+    linewidth: 3.0
+    alpha: 0.8
+    label: "Significant (p < 0.05) *"
+    significance_symbol: "*"
+    significance_color: "#58D68D"
+    border_style: "solid"
+    description: "Standard emphasis for significant statistical results"
+    
+  "result.not_significant":
+    color: "#BDC3C7"  # Light gray for non-significant results
+    marker: "o"
+    markersize: 6
+    linestyle: "--"
+    linewidth: 2.0
+    alpha: 0.6
+    label: "Not Significant (p ≥ 0.05) ns"
+    significance_symbol: "ns"
+    significance_color: "#7F8C8D"
+    description: "Subdued styling for non-significant statistical results"
+    
+  # ===========================================================================
+  # ENVIRONMENT-SPECIFIC STYLING CONDITIONS
+  # ===========================================================================
+  
+  # Development Environment Conditions
+  "*.development":
+    # Base styling with debugging enhancements
+    debug_mode: true
+    grid_alpha: 1.0
+    grid_linewidth: 0.8
+    annotation_enabled: true
+    color_intensity: 0.8  # Slightly muted for development
+    description: "Development environment styling with debugging enhancements"
+    
+  "training.model.*.development":
+    alpha: 0.7
+    grid_visible: true
+    debug_annotations: true
+    performance_indicators: true
+    
+  # Staging Environment Conditions
+  "*.staging":
+    # Professional styling for validation
+    validation_mode: true
+    color_intensity: 0.9
+    grid_alpha: 0.6
+    annotation_selective: true
+    description: "Staging environment styling for validation and testing"
+    
+  "training.model.*.staging":
+    alpha: 0.85
+    grid_visible: true
+    validation_indicators: true
+    performance_thresholds: true
+    
+  # Production Environment Conditions
+  "*.production":
+    # Clean, professional styling for production deployment
+    production_mode: true
+    color_intensity: 1.0
+    grid_alpha: 0.5
+    annotation_minimal: true
+    high_contrast: true
+    description: "Production environment styling optimized for clarity and impact"
+    
+  "training.model.*.production":
+    alpha: 1.0
+    grid_visible: false
+    clean_presentation: true
+    publication_ready: true
+
+# ==============================================================================
+# SOPHISTICATED PALETTE MANAGEMENT
+# ==============================================================================
+
+# Advanced color palettes with fallback strategies and accessibility considerations
+palettes:
+  
+  # Primary palette for general experimental conditions
+  experimental_primary:
+    - "#2E86AB"  # Professional blue
+    - "#A23B72"  # Deep magenta
+    - "#F18F01"  # Vibrant orange
+    - "#C73E1D"  # Strong red
+    - "#592E83"  # Deep purple
+    - "#1A5E63"  # Dark teal
+    - "#7A3803"  # Brown
+    - "#4B4B4D"  # Charcoal gray
+    
+  # Performance-based palette with visual hierarchy
+  performance_gradient:
+    excellent: "#1E8449"    # Dark green for excellent performance
+    good: "#27AE60"         # Green for good performance
+    satisfactory: "#F39C12" # Orange for satisfactory performance
+    poor: "#E74C3C"         # Red for poor performance
+    
+  # Statistical significance palette
+  significance_palette:
+    highly_significant: "#1E8449"  # Dark green
+    very_significant: "#239B56"    # Medium green  
+    significant: "#58D68D"         # Light green
+    not_significant: "#BDC3C7"     # Light gray
+    
+  # Confidence level palette with gradient
+  confidence_gradient:
+    high: "#27AE60"      # Green for high confidence
+    medium: "#F39C12"    # Orange for medium confidence
+    low: "#E74C3C"       # Red for low confidence
+    
+  # Publication-ready grayscale palette
+  publication_grayscale:
+    - "#000000"  # Black
+    - "#2C2C2C"  # Very dark gray
+    - "#555555"  # Dark gray
+    - "#808080"  # Medium gray
+    - "#AAAAAA"  # Light gray
+    - "#D0D0D0"  # Very light gray
+    
+  # Accessibility-friendly palette (colorblind safe)
+  accessibility_palette:
+    - "#1f77b4"  # Blue
+    - "#ff7f0e"  # Orange
+    - "#2ca02c"  # Green
+    - "#d62728"  # Red
+    - "#9467bd"  # Purple
+    - "#8c564b"  # Brown
+    - "#e377c2"  # Pink
+    - "#7f7f7f"  # Gray
+    
+  # Environment-specific palettes
+  development_palette:
+    - "#34495E"  # Muted blue-gray
+    - "#7F8C8D"  # Medium gray
+    - "#BDC3C7"  # Light gray
+    
+  production_palette:
+    - "#2C3E50"  # Professional navy
+    - "#34495E"  # Deep blue-gray
+    - "#5D6D7E"  # Lighter blue-gray
+
+# ==============================================================================
+# COMPREHENSIVE DEFAULT STYLING CONFIGURATIONS
+# ==============================================================================
+
+# Enterprise-grade default styling with comprehensive parameter coverage
+defaults:
+  
+  # Figure-level defaults optimized for various output purposes
+  figure:
+    figsize: [12, 8]           # Balanced aspect ratio for most use cases
+    dpi: 200                   # High resolution for professional quality
+    facecolor: "white"         # Clean white background
+    edgecolor: "none"          # No figure border
+    tight_layout: true         # Automatic layout optimization
+    constrained_layout: false  # Manual control preferred for consistency
+    
+  # Axes styling for professional presentation
+  axes:
+    titlesize: 16              # Clear, readable titles
+    titleweight: "bold"        # Emphasis for titles
+    titlepad: 20               # Spacing above title
+    labelsize: 14              # Readable axis labels
+    labelweight: "normal"      # Standard weight for labels
+    labelpad: 8                # Spacing around labels
+    
+    # Spine and border configuration
+    spines_top: false          # Clean top border removal
+    spines_right: false        # Clean right border removal
+    spines_left: true          # Left spine for y-axis reference
+    spines_bottom: true        # Bottom spine for x-axis reference
+    linewidth: 1.5             # Moderate border thickness
+    edgecolor: "#2C3E50"       # Professional dark color
+    
+    # Grid configuration for readability
+    grid: true                 # Enable grid for data reading
+    grid_alpha: 0.6            # Subtle grid visibility
+    grid_color: "#BDC3C7"      # Light gray grid
+    grid_linestyle: "-"        # Solid grid lines
+    grid_linewidth: 0.5        # Thin grid lines
+    axisbelow: true            # Grid behind data
+    
+    # Background and appearance
+    facecolor: "#FAFAFA"       # Very light gray background
+    alpha: 1.0                 # Full opacity
+    
+  # Line styling for clarity and distinction
+  line:
+    linewidth: 2.5             # Visible but not overwhelming
+    linestyle: "-"             # Solid lines by default
+    marker: "o"                # Circle markers for data points
+    markersize: 6              # Moderate marker size
+    markerfacecolor: "auto"    # Match line color
+    markeredgecolor: "white"   # White border for definition
+    markeredgewidth: 1.0       # Thin marker border
+    alpha: 0.8                 # Slight transparency for overlays
+    antialiased: true          # Smooth line rendering
+    
+  # Text and typography defaults
+  text:
+    fontfamily: ["DejaVu Sans", "Arial", "sans-serif"]  # Professional fonts
+    fontsize: 12               # Readable default size
+    fontweight: "normal"       # Standard weight
+    color: "#2C3E50"           # Dark professional color
+    usetex: false              # No LaTeX for compatibility
+    
+  # Legend configuration for clarity
+  legend:
+    loc: "best"                # Automatic optimal placement
+    frameon: true              # Border for definition
+    framealpha: 0.9            # Slight transparency
+    fancybox: true             # Rounded corners
+    shadow: false              # No shadow for simplicity
+    facecolor: "white"         # White background
+    edgecolor: "#BDC3C7"       # Light border
+    fontsize: 11               # Slightly smaller than body text
+    numpoints: 1               # Single point in legend
+    markerscale: 1.2           # Slightly larger markers in legend
+    
+  # Tick configuration for readability
+  ticks:
+    direction: "out"           # Ticks pointing outward
+    length: 5                  # Moderate tick length
+    width: 1.0                 # Standard tick width
+    color: "#2C3E50"           # Match axes color
+    labelsize: 11              # Readable tick labels
+    
+  # Error bar styling for statistical visualization
+  errorbar:
+    capsize: 4                 # Cap size for error bars
+    capthick: 1.5              # Cap thickness
+    elinewidth: 1.5            # Error line thickness
+    alpha: 0.7                 # Moderate transparency
+    
+  # Scatter plot defaults
+  scatter:
+    s: 50                      # Default marker size
+    alpha: 0.7                 # Transparency for overlapping points
+    edgecolors: "white"        # White borders for definition
+    linewidths: 0.5            # Thin border width
+    
+  # Bar chart defaults
+  bar:
+    width: 0.8                 # Bar width relative to spacing
+    alpha: 0.8                 # Slight transparency
+    edgecolor: "white"         # White borders between bars
+    linewidth: 0.5             # Thin border width
+    
+  # Histogram defaults
+  histogram:
+    bins: 30                   # Default number of bins
+    alpha: 0.7                 # Transparency for overlapping histograms
+    edgecolor: "white"         # White borders between bins
+    linewidth: 0.5             # Thin border width
+    
+  # Fallback styling for undefined conditions
+  fallback_style:
+    color: "#7F8C8D"           # Neutral gray for unknown conditions
+    marker: "o"                # Standard circle marker
+    linestyle: "-"             # Solid line
+    linewidth: 2.0             # Standard width
+    alpha: 0.6                 # Reduced visibility to indicate fallback
+    label: "Undefined Condition"  # Clear indication of fallback usage
+    description: "Fallback styling applied when specific condition mapping not found"
+
+# ==============================================================================
+# ADVANCED OUTPUT MANAGEMENT CONFIGURATION
+# ==============================================================================
+
+# Enterprise-grade output management with multi-purpose support
+outputs:
+  
+  # Base output directory configuration
+  base_path: "data/08_reporting"
+  
+  # Purpose-specific output aliases with professional organization
+  aliases:
+    # Exploratory analysis outputs
+    exploration:
+      path: "figures/exploration"
+      description: "Exploratory data analysis and development visualizations"
+      
+    # Presentation-ready outputs
+    presentation:
+      path: "figures/presentation"
+      description: "Professional presentation materials and stakeholder communications"
+      
+    # Publication-quality outputs
+    publication:
+      path: "figures/publication"
+      description: "Journal-quality figures for academic and professional publication"
+      
+    # Dashboard and monitoring outputs
+    monitoring:
+      path: "figures/monitoring"
+      description: "Real-time monitoring and performance tracking visualizations"
+      
+    # Debug and development outputs
+    debug:
+      path: "figures/debug"
+      description: "Development debugging and diagnostic visualizations"
+      
+    # Archive and historical outputs
+    archive:
+      path: "figures/archive"
+      description: "Historical and archived visualization outputs"
+  
+  # Advanced naming patterns with comprehensive metadata
+  naming:
+    # Template with rich metadata inclusion
+    template: "{purpose}_{name}_{condition}_{environment}_{timestamp}"
+    
+    # Timestamp formatting for version control
+    timestamp_format: "%Y%m%d_%H%M%S"
+    
+    # Condition parameter sanitization
+    condition_sanitization:
+      replace_dots: "_"
+      replace_spaces: "_"
+      lowercase: true
+      max_length: 50
+      
+    # Environment-specific naming
+    environment_suffix: true
+    
+  # Format-specific configuration
+  formats:
+    # Exploration formats optimized for speed
+    exploration:
+      png:
+        dpi: 150
+        transparent: false
+        bbox_inches: "tight"
+        facecolor: "white"
+        
+    # Presentation formats with high quality
+    presentation:
+      png:
+        dpi: 300
+        transparent: false
+        bbox_inches: "tight"
+        facecolor: "white"
+      pdf:
+        dpi: 300
+        transparent: false
+        bbox_inches: "tight"
+        
+    # Publication formats with maximum quality
+    publication:
+      pdf:
+        dpi: 600
+        transparent: false
+        bbox_inches: "tight"
+        format: "pdf"
+      eps:
+        dpi: 600
+        transparent: false
+        bbox_inches: "tight"
+        format: "eps"
+      png:
+        dpi: 600
+        transparent: false
+        bbox_inches: "tight"
+        facecolor: "white"
+        
+  # Directory management
+  directory_management:
+    auto_create: true          # Automatically create missing directories
+    permissions: 0o755         # Standard directory permissions
+    backup_existing: false     # No backup for regular operations
+    
+  # File management policies
+  file_management:
+    overwrite_policy: "timestamp"  # Add timestamp if file exists
+    compression: false         # No compression for accessibility
+    metadata_embedding: true   # Embed metadata in files where possible
+
+# ==============================================================================
+# KEDRO-SPECIFIC INTEGRATION CONFIGURATION
+# ==============================================================================
+
+# Advanced configuration bridge settings for seamless Kedro integration
+kedro:
+  
+  # Configuration bridge parameters (F-007)
+  config_bridge:
+    enabled: true              # Enable configuration bridge functionality
+    merge_strategy: "deep"     # Deep merge for nested configurations
+    validation_strict: true    # Strict validation for production quality
+    cache_enabled: true        # Enable configuration caching for performance
+    cache_ttl: 300            # Cache time-to-live in seconds
+    performance_target_ms: 10  # Target merge time in milliseconds
+    
+    # Precedence rules for configuration merging
+    precedence_order:
+      - "kedro_parameters"     # Highest precedence: Kedro pipeline parameters
+      - "kedro_figregistry"    # Medium precedence: Kedro figregistry configuration
+      - "figregistry_yaml"     # Lowest precedence: Traditional figregistry.yaml
+      
+    # Environment-specific override patterns
+    environment_overrides:
+      development:
+        performance_target_ms: 20  # Relaxed performance for development
+        validation_strict: false   # Relaxed validation for development
+        debug_mode: true
+        
+      staging:
+        performance_target_ms: 15  # Moderate performance for staging
+        validation_strict: true    # Strict validation for staging
+        
+      production:
+        performance_target_ms: 10  # Strict performance for production
+        validation_strict: true    # Strict validation for production
+        error_tolerance: false     # No error tolerance in production
+  
+  # FigureDataSet default configurations (F-005)
+  datasets:
+    default_purpose: "exploration"           # Default purpose for FigureDataSet
+    auto_versioning: true                    # Enable automatic versioning
+    condition_param_resolution: "deep"       # Deep parameter resolution
+    style_param_inheritance: true           # Inherit style parameters
+    performance_optimization: true          # Enable performance optimizations
+    
+    # Context injection configuration (F-005-RQ-004)
+    context_injection:
+      enabled: true            # Enable context-based parameter injection
+      parameter_sources:
+        - "run_metadata"       # Kedro run metadata
+        - "pipeline_parameters" # Pipeline-specific parameters
+        - "experiment_tracking" # Experiment tracking metadata
+        
+      # Parameter mapping configuration
+      parameter_mapping:
+        experiment_condition: "condition_parameters.experiment_condition"
+        model_type: "condition_parameters.model_type"
+        environment: "run_environment"
+        
+    # Error handling for dataset operations
+    error_handling:
+      fallback_enabled: true   # Enable graceful fallback
+      fallback_style: "defaults.fallback_style"
+      retry_attempts: 3        # Number of retry attempts
+      error_logging: "detailed" # Detailed error logging
+  
+  # Lifecycle hooks configuration (F-006)
+  hooks:
+    auto_registration: true    # Automatically register hooks
+    initialization_timeout: 30 # Hook initialization timeout in seconds
+    
+    # Hook execution configuration
+    execution:
+      before_pipeline_run: true     # Initialize before pipeline
+      after_pipeline_run: true      # Cleanup after pipeline
+      before_node_run: false        # No node-level hooks by default
+      after_node_run: false         # No node-level hooks by default
+      
+    # Performance monitoring for hooks
+    performance_monitoring:
+      enabled: true            # Monitor hook performance
+      target_execution_ms: 50  # Target hook execution time
+      logging_enabled: true    # Log performance metrics
+  
+  # Integration validation and testing
+  validation:
+    catalog_validation: true   # Validate catalog integration
+    parameter_validation: true # Validate parameter resolution
+    performance_testing: true  # Enable performance testing
+    
+    # Testing configuration
+    testing:
+      mock_data_generation: true   # Generate mock data for testing
+      integration_tests: true     # Run integration tests
+      performance_benchmarks: true # Run performance benchmarks
+
+# ==============================================================================
+# ADVANCED STYLE INHERITANCE AND COMPOSITION
+# ==============================================================================
+
+# Sophisticated style inheritance patterns with wildcard support
+style_inheritance:
+  
+  # Wildcard pattern matching (F-002-RQ-002)
+  wildcard_patterns:
+    enabled: true              # Enable wildcard pattern matching
+    
+    # Pattern matching rules
+    patterns:
+      "training.model.*":      # Match any training model
+        base_style: "training.model.baseline"
+        inherit_properties: ["color", "marker", "linewidth"]
+        
+      "inference.confidence.*": # Match any confidence level
+        base_style: "inference.confidence.medium"
+        inherit_properties: ["alpha", "linestyle"]
+        
+      "experiment.treatment.*": # Match any treatment group
+        base_style: "experiment.treatment.group_a"
+        inherit_properties: ["marker", "markersize"]
+        
+      "*.development":         # Match any development condition
+        base_style: "defaults.line"
+        override_properties:
+          alpha: 0.7
+          grid_visible: true
+          
+      "*.production":          # Match any production condition
+        base_style: "defaults.line"
+        override_properties:
+          alpha: 1.0
+          grid_visible: false
+    
+    # Precedence rules for pattern matching
+    precedence_order:
+      - "exact_match"          # Exact condition matches have highest precedence
+      - "specific_wildcard"    # More specific wildcards
+      - "general_wildcard"     # More general wildcards
+      - "fallback"             # Fallback style has lowest precedence
+  
+  # Style composition rules
+  composition:
+    # Property inheritance hierarchy
+    inheritance_hierarchy:
+      - "color_properties"     # Color, alpha, transparency
+      - "marker_properties"    # Marker style, size, edge properties
+      - "line_properties"      # Line style, width, dash patterns
+      - "text_properties"      # Font, size, weight
+      - "layout_properties"    # Grid, axes, spacing
+      
+    # Composition strategies
+    strategies:
+      additive: ["alpha", "linewidth"]  # Properties that can be combined
+      override: ["color", "marker"]     # Properties that replace base values
+      merge: ["text_properties"]        # Properties that merge dictionaries
+
+# ==============================================================================
+# CONDITIONAL STYLING RULES AND LOGIC
+# ==============================================================================
+
+# Advanced conditional styling with complex rule evaluation
+conditional_rules:
+  
+  # Performance-based conditional styling
+  performance_conditions:
+    # High performance styling
+    high_performance:
+      condition: "performance >= 0.85"
+      style_overrides:
+        color: "#27AE60"       # Green for high performance
+        linewidth: 3.5
+        marker: "*"
+        markersize: 10
+        alpha: 1.0
+        
+    # Medium performance styling
+    medium_performance:
+      condition: "performance >= 0.70 and performance < 0.85"
+      style_overrides:
+        color: "#F39C12"       # Orange for medium performance
+        linewidth: 3.0
+        marker: "s"
+        markersize: 8
+        alpha: 0.8
+        
+    # Low performance styling
+    low_performance:
+      condition: "performance < 0.70"
+      style_overrides:
+        color: "#E74C3C"       # Red for low performance
+        linewidth: 2.5
+        marker: "x"
+        markersize: 8
+        alpha: 0.6
+  
+  # Statistical significance conditional styling
+  significance_conditions:
+    # Highly significant results
+    highly_significant:
+      condition: "p_value < 0.001"
+      style_overrides:
+        color: "#1E8449"
+        linewidth: 4.0
+        marker: "o"
+        markersize: 12
+        alpha: 1.0
+        border_style: "double"
+        
+    # Significant results
+    significant:
+      condition: "p_value < 0.05"
+      style_overrides:
+        color: "#58D68D"
+        linewidth: 3.0
+        marker: "o"
+        markersize: 8
+        alpha: 0.8
+        
+    # Non-significant results
+    not_significant:
+      condition: "p_value >= 0.05"
+      style_overrides:
+        color: "#BDC3C7"
+        linewidth: 2.0
+        marker: "o"
+        markersize: 6
+        alpha: 0.6
+        linestyle: "--"
+  
+  # Environment-based conditional styling
+  environment_conditions:
+    # Development environment
+    development:
+      condition: "environment == 'development'"
+      style_overrides:
+        alpha: 0.7
+        grid_alpha: 1.0
+        debug_annotations: true
+        
+    # Production environment
+    production:
+      condition: "environment == 'production'"
+      style_overrides:
+        alpha: 1.0
+        grid_alpha: 0.5
+        clean_presentation: true
+
+# ==============================================================================
+# PERFORMANCE OPTIMIZATION CONFIGURATION
+# ==============================================================================
+
+# Advanced performance optimization for large-scale pipeline execution
+performance:
+  
+  # Caching configuration for style lookups
+  caching:
+    style_cache_enabled: true          # Enable style caching
+    style_cache_size: 1000            # Maximum cache entries
+    style_cache_ttl: 3600             # Cache time-to-live in seconds
+    config_cache_enabled: true        # Enable configuration caching
+    config_cache_size: 100            # Configuration cache size
+    
+    # Cache warming strategies
+    cache_warming:
+      enabled: true                   # Pre-populate cache
+      preload_patterns:
+        - "training.model.*"          # Preload training patterns
+        - "inference.confidence.*"    # Preload inference patterns
+        - "experiment.*"              # Preload experiment patterns
+  
+  # Performance monitoring and optimization
+  monitoring:
+    enabled: true                     # Enable performance monitoring
+    
+    # Performance targets and thresholds
+    targets:
+      style_lookup_ms: 1.0           # Target style lookup time
+      config_merge_ms: 10.0          # Target configuration merge time
+      figure_save_overhead_percent: 5.0  # Target save overhead
+      
+    # Performance measurement intervals
+    measurement:
+      sample_rate: 0.1               # Sample 10% of operations
+      aggregation_window: 300        # 5-minute aggregation windows
+      alert_threshold_multiplier: 2.0 # Alert when 2x target time
+      
+  # Memory optimization
+  memory:
+    # Garbage collection optimization
+    gc_optimization: true            # Enable garbage collection optimization
+    gc_threshold_scaling: 1.5        # Scale GC thresholds
+    
+    # Memory usage monitoring
+    memory_monitoring: true          # Monitor memory usage
+    memory_alert_threshold_mb: 500   # Alert threshold in MB
+    
+  # Concurrency and thread safety
+  concurrency:
+    thread_safe: true               # Enable thread-safe operations
+    max_concurrent_operations: 10   # Maximum concurrent operations
+    operation_timeout_seconds: 30   # Operation timeout
+
+# ==============================================================================
+# VALIDATION AND QUALITY ASSURANCE
+# ==============================================================================
+
+# Comprehensive validation rules and quality assurance
+validation:
+  
+  # Configuration validation rules
+  config_validation:
+    strict_schema: true             # Strict Pydantic schema validation
+    version_constraint_check: true  # Validate version constraints
+    color_validation: true          # Validate color specifications
+    path_validation: true           # Validate file paths
+    
+    # Custom validation rules
+    custom_rules:
+      condition_key_format:
+        pattern: "^[a-zA-Z][a-zA-Z0-9._]*$"  # Valid Python identifier pattern
+        description: "Condition keys must be valid Python identifiers"
+        
+      color_format:
+        patterns:
+          - "^#[0-9A-Fa-f]{6}$"     # Hex color pattern
+          - "^[a-zA-Z]+$"           # Named color pattern
+        description: "Colors must be valid hex codes or named colors"
+        
+      performance_requirements:
+        style_lookup_max_ms: 5.0    # Maximum style lookup time
+        config_merge_max_ms: 25.0   # Maximum configuration merge time
+  
+  # Runtime validation
+  runtime_validation:
+    parameter_validation: true      # Validate parameters at runtime
+    style_validation: true          # Validate applied styles
+    output_validation: true         # Validate generated outputs
+    
+    # Error handling configuration
+    error_handling:
+      validation_errors: "strict"   # Strict error handling
+      fallback_on_error: true      # Use fallback on validation errors
+      error_logging: "detailed"    # Detailed error logging
+      
+  # Quality assurance metrics
+  quality_metrics:
+    coverage_tracking: true         # Track condition coverage
+    performance_tracking: true     # Track performance metrics
+    error_rate_tracking: true      # Track error rates
+    
+    # Quality thresholds
+    thresholds:
+      condition_coverage_percent: 80.0    # Minimum condition coverage
+      error_rate_percent: 5.0            # Maximum acceptable error rate
+      performance_regression_percent: 10.0 # Maximum performance regression
+
+# ==============================================================================
+# COMPREHENSIVE USAGE EXAMPLES
+# ==============================================================================
+
+# Detailed examples showcasing advanced configuration capabilities
+examples:
+  
+  # Basic condition-based styling example
+  basic_usage:
+    description: "Simple condition-based styling for training models"
+    code_example: |
+      # In your Kedro catalog.yml:
+      model_performance_plot:
+        type: figregistry_kedro.FigureDataSet
+        filepath: data/08_reporting/figures/model_performance.png
+        purpose: presentation
+        condition_param: model_type  # Resolves to training.model.{model_type}
+        
+    expected_behavior: "Automatic style application based on model_type parameter"
+    
+  # Advanced hierarchical condition example
+  hierarchical_conditions:
+    description: "Complex hierarchical condition resolution with wildcards"
+    code_example: |
+      # Parameter in parameters.yml:
+      model_type: "champion"
+      environment: "production"
+      
+      # Resolves to: training.model.champion.production
+      # Falls back to: training.model.champion
+      # Falls back to: training.model.*
+      
+    expected_behavior: "Hierarchical style resolution with intelligent fallback"
+    
+  # Multi-environment configuration example
+  multi_environment:
+    description: "Environment-specific styling with automatic resolution"
+    code_example: |
+      # Development: training.model.baseline.development
+      # Staging: training.model.baseline.staging  
+      # Production: training.model.baseline.production
+      
+    expected_behavior: "Automatic environment detection and style application"
+    
+  # Statistical significance example
+  statistical_significance:
+    description: "Automatic statistical significance styling"
+    code_example: |
+      # Parameter resolution:
+      p_value: 0.0005  # Resolves to result.significant.p001
+      
+      # Automatic styling with significance indicators
+      
+    expected_behavior: "Visual emphasis based on statistical significance levels"
+    
+  # Performance optimization example
+  performance_optimization:
+    description: "Optimized configuration for large-scale pipelines"
+    code_example: |
+      # Enable caching and performance monitoring
+      performance:
+        caching:
+          style_cache_enabled: true
+          cache_warming:
+            enabled: true
+            
+    expected_behavior: "Sub-millisecond style lookups with cache warming"
+
+# ==============================================================================
+# END OF ADVANCED FIGREGISTRY CONFIGURATION
+# ==============================================================================
+
+# This configuration file represents the culmination of sophisticated 
+# visualization management capabilities, demonstrating:
+#
+# ✓ Complex condition-based styling with hierarchical patterns (F-002)
+# ✓ Advanced palette management with accessibility considerations
+# ✓ Enterprise-grade output management with multi-purpose support (F-004)
+# ✓ Seamless Kedro integration through configuration bridge (F-007)
+# ✓ Performance-optimized operations for production workflows
+# ✓ Comprehensive validation and quality assurance
+# ✓ Multi-environment deployment patterns
+# ✓ Statistical significance visual indicators
+# ✓ Publication-ready styling configurations
+# ✓ Automated experimental design support
+#
+# This configuration serves as both a functional implementation for the 
+# advanced example and a comprehensive reference for production deployments 
+# requiring sophisticated visualization automation within Kedro workflows.

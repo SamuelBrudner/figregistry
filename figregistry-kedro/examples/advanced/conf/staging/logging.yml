@@ -1,0 +1,541 @@
+# Staging Environment Logging Configuration for Advanced FigRegistry-Kedro Integration
+# 
+# This staging logging configuration provides production-like log levels with enhanced
+# detail for comprehensive deployment validation and production readiness assessment.
+# The configuration enables thorough validation of FigRegistry-Kedro plugin operations
+# while maintaining enterprise-grade audit trails and monitoring patterns appropriate
+# for staging environment validation and production migration workflows.
+#
+# Key Staging Features:
+# - Production-like logging levels with validation-appropriate detail
+# - Enhanced monitoring of FigRegistry integration operations for production readiness
+# - Comprehensive audit trail capabilities for enterprise compliance validation
+# - Staging-specific performance monitoring supporting production deployment assessment
+# - Enterprise logging patterns ensuring consistency with production validation requirements
+# - Thorough staging validation of configuration bridge, dataset operations, and lifecycle hooks
+# - Enhanced error tracking and alerting patterns for staging deployment validation
+
+version: 1
+disable_existing_loggers: false
+
+# =============================================================================
+# FORMATTERS - Staging Environment Format Definitions with Production Alignment
+# =============================================================================
+
+formatters:
+  # Production-like console formatter for staging validation
+  console_staging:
+    format: "[{asctime}] {levelname:8} | STAGING | {name:45} | {funcName:25} | {message}"
+    style: "{"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+
+  # Enhanced staging formatter with production validation context
+  console_staging_detailed:
+    format: "[{asctime}] {levelname:8} | STAGING | {name:45} | {pathname}:{lineno:4} | {funcName:25} | PID:{process:6} | TID:{thread:12} | {message}"
+    style: "{"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+
+  # Production-aligned file formatter for staging deployment validation
+  file_staging_production:
+    format: "STAGING | {asctime} | {levelname:8} | {name:55} | {pathname}:{lineno:4} | {funcName:30} | PID:{process:6} | TID:{thread:12} | {message}"
+    style: "{"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+
+  # Enterprise JSON formatter for staging monitoring and validation systems
+  json_staging_enterprise:
+    format: '{"environment": "staging", "timestamp": "%(asctime)s", "level": "%(levelname)s", "logger": "%(name)s", "module": "%(module)s", "function": "%(funcName)s", "line": %(lineno)d, "process": %(process)d, "thread": %(thread)d, "deployment_phase": "validation", "message": "%(message)s"}'
+    datefmt: "%Y-%m-%dT%H:%M:%S.%fZ"
+
+  # Staging audit trail formatter for enterprise compliance validation
+  audit_staging_enterprise:
+    format: "STAGING_AUDIT | {asctime} | {levelname:8} | {name:55} | USER:{user} | ACTION:{action} | RESOURCE:{resource} | RESULT:{result} | DEPLOYMENT_PHASE:validation | {message}"
+    style: "{"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+
+  # Production-like performance metrics formatter for staging validation
+  performance_staging_metrics:
+    format: "STAGING_PERF | {asctime} | {name:45} | OPERATION:{operation} | DURATION:{duration_ms}ms | SLA_TARGET:{sla_target_ms}ms | SLA_MET:{sla_met} | VALIDATION_PHASE:{validation_phase} | {message}"
+    style: "{"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+
+  # FigRegistry plugin staging formatter for comprehensive integration validation
+  figregistry_staging_detailed:
+    format: "FIGREGISTRY_STAGING | {asctime} | {levelname:8} | {name:55} | COMPONENT:{component} | OPERATION:{operation} | NODE:{node_name} | PIPELINE:{pipeline_name} | {message}"
+    style: "{"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+
+# =============================================================================
+# HANDLERS - Staging Multi-Channel Output Configuration for Production Validation
+# =============================================================================
+
+handlers:
+  # Production-like console handler for staging validation visibility
+  console_staging:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: console_staging
+    stream: ext://sys.stdout
+
+  # Enhanced console handler for detailed staging validation and debugging
+  console_staging_debug:
+    class: logging.StreamHandler
+    level: INFO  # Production-like level with staging detail
+    formatter: console_staging_detailed
+    stream: ext://sys.stdout
+
+  # Staging application file handler with production-like configuration
+  file_staging_app:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: file_staging_production
+    filename: logs/staging_kedro_app.log
+    maxBytes: 52428800  # 50MB - production-like size
+    backupCount: 15     # Extended for staging validation
+    encoding: utf8
+
+  # Staging validation file handler for comprehensive deployment assessment
+  file_staging_validation:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: file_staging_production
+    filename: logs/staging_deployment_validation.log
+    maxBytes: 104857600  # 100MB for comprehensive validation capture
+    backupCount: 10
+    encoding: utf8
+
+  # FigRegistry plugin staging handler for integration validation
+  file_staging_figregistry:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG  # Enhanced detail for staging validation
+    formatter: figregistry_staging_detailed
+    filename: logs/staging_figregistry_integration.log
+    maxBytes: 52428800  # 50MB
+    backupCount: 12
+    encoding: utf8
+
+  # Staging performance monitoring handler for production readiness assessment
+  file_staging_performance:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: performance_staging_metrics
+    filename: logs/staging_performance_validation.log
+    maxBytes: 26214400  # 25MB
+    backupCount: 20     # Extended for staging analysis
+    encoding: utf8
+
+  # Critical error handler for staging deployment issues
+  file_staging_errors:
+    class: logging.handlers.RotatingFileHandler
+    level: WARNING  # Production-like level for staging
+    formatter: file_staging_production
+    filename: logs/staging_critical_errors.log
+    maxBytes: 26214400  # 25MB
+    backupCount: 30     # Extended retention for staging analysis
+    encoding: utf8
+
+  # Enterprise JSON handler for staging monitoring system integration
+  file_staging_json:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: json_staging_enterprise
+    filename: logs/staging_enterprise_structured.json
+    maxBytes: 52428800  # 50MB
+    backupCount: 20
+    encoding: utf8
+
+  # Staging audit trail handler for enterprise compliance validation
+  file_staging_audit:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: audit_staging_enterprise
+    filename: logs/staging_enterprise_audit.log
+    maxBytes: 26214400  # 25MB
+    backupCount: 60     # Extended retention for compliance validation
+    encoding: utf8
+
+  # Time-based staging handler for operational validation tracking
+  file_staging_daily:
+    class: logging.handlers.TimedRotatingFileHandler
+    level: INFO
+    formatter: file_staging_production
+    filename: logs/staging_daily_operations.log
+    when: midnight
+    interval: 1
+    backupCount: 14     # Two weeks for staging validation cycles
+    encoding: utf8
+
+  # Staging deployment metrics handler for production migration assessment
+  file_staging_deployment:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: performance_staging_metrics
+    filename: logs/staging_deployment_metrics.log
+    maxBytes: 26214400  # 25MB
+    backupCount: 30
+    encoding: utf8
+
+# =============================================================================
+# LOGGERS - Staging Environment Configuration with Production Alignment
+# =============================================================================
+
+loggers:
+  # ==========================================================================
+  # KEDRO CORE LOGGERS - Production-Like Configuration for Staging Validation
+  # ==========================================================================
+  
+  # Root Kedro logger with staging deployment validation
+  kedro:
+    level: INFO  # Production-like level
+    handlers: [console_staging, file_staging_app, file_staging_json, file_staging_daily]
+    propagate: false
+
+  # Kedro I/O operations with enhanced staging monitoring
+  kedro.io:
+    level: INFO
+    handlers: [file_staging_app, file_staging_figregistry, file_staging_validation]
+    propagate: true
+
+  # Kedro pipeline execution with comprehensive staging validation
+  kedro.pipeline:
+    level: INFO
+    handlers: [console_staging, file_staging_app, file_staging_performance, file_staging_validation]
+    propagate: true
+
+  # Kedro configuration management with staging audit trails
+  kedro.config:
+    level: INFO
+    handlers: [file_staging_app, file_staging_audit, file_staging_validation]
+    propagate: true
+
+  # Kedro runner execution with staging performance monitoring
+  kedro.runner:
+    level: INFO
+    handlers: [file_staging_app, file_staging_performance, file_staging_deployment]
+    propagate: true
+
+  # Kedro framework hooks with enhanced staging validation
+  kedro.framework.hooks:
+    level: INFO  # Production-like level with staging detail
+    handlers: [file_staging_validation, file_staging_figregistry, file_staging_deployment]
+    propagate: true
+
+  # ==========================================================================
+  # FIGREGISTRY CORE LOGGERS - Staging Validation Configuration
+  # ==========================================================================
+
+  # Root FigRegistry logger with staging integration validation
+  figregistry:
+    level: INFO  # Production-like level for staging validation
+    handlers: [console_staging_debug, file_staging_figregistry, file_staging_validation]
+    propagate: false
+
+  # FigRegistry configuration engine with staging validation tracking
+  figregistry.config:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_audit, file_staging_validation]
+    propagate: true
+
+  # FigRegistry style management with staging condition resolution validation
+  figregistry.style:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_performance, file_staging_validation]
+    propagate: true
+
+  # FigRegistry output management with staging file operation validation
+  figregistry.output:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_performance, file_staging_validation]
+    propagate: true
+
+  # ==========================================================================
+  # FIGREGISTRY-KEDRO PLUGIN LOGGERS - Comprehensive Staging Validation
+  # ==========================================================================
+
+  # Root plugin logger with comprehensive staging enterprise monitoring
+  figregistry_kedro:
+    level: INFO  # Production-like level with staging validation detail
+    handlers: [console_staging, file_staging_figregistry, file_staging_json, file_staging_performance, file_staging_validation]
+    propagate: false
+
+  # Configuration bridge with detailed staging merge operation validation
+  figregistry_kedro.config:
+    level: INFO  # Enhanced for staging validation
+    handlers: [console_staging_debug, file_staging_figregistry, file_staging_audit, file_staging_validation]
+    propagate: false
+    
+  # FigRegistryConfigBridge specific operations for staging validation
+  figregistry_kedro.config.bridge:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_audit, file_staging_performance, file_staging_validation]
+    propagate: true
+
+  # Configuration validation and schema compliance for staging deployment
+  figregistry_kedro.config.validation:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_audit, file_staging_errors, file_staging_validation]
+    propagate: true
+
+  # Lifecycle hooks with staging initialization and context management validation
+  figregistry_kedro.hooks:
+    level: INFO  # Production-like level for staging validation
+    handlers: [console_staging_debug, file_staging_figregistry, file_staging_performance, file_staging_validation, file_staging_deployment]
+    propagate: false
+
+  # Hook registration and discovery tracking for staging deployment validation
+  figregistry_kedro.hooks.registration:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_audit, file_staging_validation, file_staging_deployment]
+    propagate: true
+
+  # Hook lifecycle event processing for staging validation
+  figregistry_kedro.hooks.lifecycle:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_performance, file_staging_validation]
+    propagate: true
+
+  # Dataset operations with comprehensive staging save/load validation
+  figregistry_kedro.datasets:
+    level: INFO  # Production-like level with staging validation detail
+    handlers: [console_staging_debug, file_staging_figregistry, file_staging_performance, file_staging_validation]
+    propagate: false
+
+  # FigureDataSet specific operations and staging styling validation
+  figregistry_kedro.datasets.figure:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_performance, file_staging_audit, file_staging_validation]
+    propagate: true
+
+  # Dataset styling and condition resolution for staging validation
+  figregistry_kedro.datasets.styling:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_performance, file_staging_validation]
+    propagate: true
+
+  # Performance monitoring with staging SLA compliance validation
+  figregistry_kedro.performance:
+    level: INFO
+    handlers: [file_staging_performance, file_staging_json, file_staging_deployment]
+    propagate: false
+
+  # Performance timing and metrics collection for staging assessment
+  figregistry_kedro.performance.timing:
+    level: INFO  # Enhanced visibility for staging
+    handlers: [file_staging_performance, file_staging_deployment]
+    propagate: true
+
+  # SLA monitoring and alerting for staging production readiness
+  figregistry_kedro.performance.sla:
+    level: INFO
+    handlers: [file_staging_performance, console_staging, file_staging_errors, file_staging_deployment]
+    propagate: true
+
+  # ==========================================================================
+  # INTEGRATION LOGGERS - Staging Third-Party and Framework Validation
+  # ==========================================================================
+
+  # Matplotlib backend operations with staging monitoring
+  matplotlib:
+    level: WARNING
+    handlers: [file_staging_app, file_staging_validation]
+    propagate: true
+
+  # Pydantic validation with staging configuration schema tracking
+  pydantic:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_audit, file_staging_validation]
+    propagate: true
+
+  # YAML configuration parsing for staging validation
+  yaml:
+    level: WARNING
+    handlers: [file_staging_app, file_staging_errors, file_staging_validation]
+    propagate: true
+
+  # File system operations and I/O for staging validation
+  fsspec:
+    level: WARNING
+    handlers: [file_staging_app, file_staging_validation]
+    propagate: true
+
+  # ==========================================================================
+  # ENTERPRISE AUDIT AND COMPLIANCE LOGGERS - Staging Validation
+  # ==========================================================================
+
+  # Configuration changes and administrative actions for staging validation
+  audit.configuration:
+    level: INFO
+    handlers: [file_staging_audit, file_staging_json, file_staging_validation]
+    propagate: false
+
+  # File access and data persistence operations for staging validation
+  audit.data_access:
+    level: INFO
+    handlers: [file_staging_audit, file_staging_validation]
+    propagate: false
+
+  # User actions and pipeline execution tracking for staging validation
+  audit.user_actions:
+    level: INFO
+    handlers: [file_staging_audit, file_staging_json, file_staging_validation]
+    propagate: false
+
+  # Security-related events and access control for staging validation
+  audit.security:
+    level: WARNING
+    handlers: [file_staging_audit, file_staging_errors, console_staging, file_staging_validation]
+    propagate: false
+
+  # ==========================================================================
+  # OPERATIONAL MONITORING LOGGERS - Staging Deployment Validation
+  # ==========================================================================
+
+  # System health and status monitoring for staging validation
+  monitoring.health:
+    level: INFO
+    handlers: [file_staging_performance, file_staging_json, file_staging_validation, file_staging_deployment]
+    propagate: false
+
+  # Resource utilization and capacity tracking for staging assessment
+  monitoring.resources:
+    level: INFO
+    handlers: [file_staging_performance, file_staging_deployment]
+    propagate: false
+
+  # Business metrics and usage analytics for staging validation
+  monitoring.analytics:
+    level: INFO
+    handlers: [file_staging_json, file_staging_validation]
+    propagate: false
+
+  # ==========================================================================
+  # STAGING-SPECIFIC VALIDATION LOGGERS
+  # ==========================================================================
+
+  # Staging deployment validation and production readiness assessment
+  staging.deployment:
+    level: INFO
+    handlers: [console_staging, file_staging_deployment, file_staging_json, file_staging_validation]
+    propagate: false
+
+  # Configuration bridge validation for staging environment
+  staging.config_bridge:
+    level: INFO
+    handlers: [file_staging_figregistry, file_staging_audit, file_staging_validation]
+    propagate: false
+
+  # Integration testing and validation workflows
+  staging.integration:
+    level: INFO
+    handlers: [file_staging_validation, file_staging_performance, file_staging_deployment]
+    propagate: false
+
+  # Production migration readiness assessment
+  staging.production_readiness:
+    level: INFO
+    handlers: [console_staging, file_staging_deployment, file_staging_audit, file_staging_validation]
+    propagate: false
+
+  # Enterprise compliance validation for staging deployment
+  staging.compliance:
+    level: INFO
+    handlers: [file_staging_audit, file_staging_json, file_staging_validation]
+    propagate: false
+
+# =============================================================================
+# ROOT LOGGER - Staging Environment Default Configuration
+# =============================================================================
+
+root:
+  level: INFO  # Production-like level for staging
+  handlers: [console_staging, file_staging_app, file_staging_errors]
+
+# =============================================================================
+# STAGING CONFIGURATION NOTES AND OPERATIONAL GUIDANCE
+# =============================================================================
+
+# Staging Environment Operational Guidelines:
+# 
+# 1. PRODUCTION-LIKE LOG LEVELS:
+#    - Core components: INFO level (production alignment)
+#    - FigRegistry plugin: INFO level with enhanced detail for validation
+#    - Integration points: INFO level for comprehensive validation coverage
+#    - Error tracking: WARNING level for production-like error detection
+#
+# 2. COMPREHENSIVE VALIDATION MONITORING:
+#    - Enhanced coverage of figregistry_kedro plugin operations
+#    - Detailed tracking of configuration bridge merge operations
+#    - Comprehensive dataset operation validation and performance assessment
+#    - Hook lifecycle validation with initialization and context management
+#
+# 3. ENTERPRISE AUDIT TRAIL CAPABILITIES:
+#    - Extended retention periods for staging analysis (60-day audit logs)
+#    - Comprehensive compliance logging for enterprise validation requirements
+#    - Detailed user action tracking and security event monitoring
+#    - Configuration change audit trails for deployment validation
+#
+# 4. STAGING DEPLOYMENT VALIDATION:
+#    - Production readiness assessment through comprehensive logging
+#    - Integration testing validation with detailed operation tracking
+#    - Performance monitoring aligned with production SLA requirements
+#    - Configuration validation ensuring production deployment compatibility
+#
+# 5. PERFORMANCE MONITORING FOR PRODUCTION READINESS:
+#    - SLA compliance tracking aligned with production requirements
+#    - Resource utilization monitoring for capacity planning validation
+#    - Performance regression detection for production deployment assessment
+#    - Comprehensive timing analysis for all plugin operations
+#
+# 6. STAGING-SPECIFIC ENHANCEMENTS:
+#    - Extended log retention for staging validation cycles
+#    - Enhanced detail in performance metrics for validation analysis
+#    - Comprehensive integration testing logging
+#    - Production migration readiness assessment tracking
+#
+# 7. LOG ROTATION AND RETENTION - Staging Configuration:
+#    - Application logs: 15 files × 50MB (750MB total) - Extended for staging
+#    - Validation logs: 10 files × 100MB (1GB total) - Comprehensive capture
+#    - Performance logs: 20 files × 25MB (500MB total) - Extended analysis
+#    - Audit logs: 60 files × 25MB (1.5GB total) - Extended validation retention
+#    - Daily logs: 14 days retention - Staging validation cycles
+#    - Deployment logs: 30 files × 25MB (750MB total) - Migration tracking
+#
+# 8. ENTERPRISE INTEGRATION - Staging Validation:
+#    - JSON structured logs for staging monitoring system validation
+#    - Audit trail format validation for production compliance preparation
+#    - Performance metrics integration testing for production monitoring systems
+#    - Configuration bridge validation for enterprise deployment patterns
+#
+# 9. FIGREGISTRY-KEDRO PLUGIN STAGING VALIDATION:
+#    - Comprehensive hook initialization timing and validation
+#    - Enhanced configuration bridge operation monitoring
+#    - Detailed dataset save operation tracking with context preservation
+#    - Style resolution validation with fallback action verification
+#    - Integration testing coverage for production deployment readiness
+#
+# 10. STAGING-TO-PRODUCTION MIGRATION SUPPORT:
+#     - Configuration validation ensuring production compatibility
+#     - Performance baseline establishment for production SLA validation
+#     - Comprehensive audit trail preparation for compliance requirements
+#     - Integration pattern validation for enterprise deployment workflows
+#     - Error handling and recovery validation for production resilience
+#
+# Environment Variable Overrides for Staging:
+# - FIGREGISTRY_KEDRO_STAGING_LOG_LEVEL: Override plugin staging log level
+# - KEDRO_STAGING_LOG_LEVEL: Override Kedro framework staging log level
+# - FIGREGISTRY_STAGING_LOG_LEVEL: Override FigRegistry core staging log level
+# - STAGING_AUDIT_ENABLED: Enable/disable staging audit trail logging
+# - STAGING_PERFORMANCE_ENABLED: Enable/disable staging performance monitoring
+# - STAGING_VALIDATION_MODE: Enable comprehensive validation logging mode
+# - PRODUCTION_READINESS_ASSESSMENT: Enable production migration assessment logging
+#
+# Staging Deployment Validation Checklist:
+# - [ ] Hook registration successful in staging environment
+# - [ ] Configuration bridge merge operations functioning correctly
+# - [ ] Dataset save operations performing within SLA targets
+# - [ ] Style resolution working with production-like configuration
+# - [ ] Audit trails capturing all required compliance events
+# - [ ] Performance metrics meeting production readiness criteria
+# - [ ] Integration testing passing for all plugin components
+# - [ ] Error handling and recovery mechanisms validated
+# - [ ] Enterprise monitoring system integration functioning
+# - [ ] Production migration readiness assessment completed

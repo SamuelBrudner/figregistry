@@ -1,0 +1,415 @@
+# =============================================================================
+# Kedro Data Catalog Configuration - FigRegistry Integration Basic Example
+# =============================================================================
+# This catalog demonstrates the seamless integration between Kedro's data 
+# catalog system and FigRegistry's automated figure styling through the 
+# FigureDataSet implementation (F-005). The configuration showcases how to
+# eliminate manual plt.savefig() calls by enabling zero-touch figure management
+# where pipeline nodes output raw matplotlib figures and the catalog system
+# automatically applies condition-based styling and handles file persistence.
+#
+# Key Integration Features Demonstrated:
+# - FigureDataSet with specialized parameters (purpose, condition_param, style_params)
+# - Automated condition-based styling through parameter resolution (F-002)
+# - Kedro versioning integration with FigRegistry's output management (F-005-RQ-002)
+# - Multiple figure outputs showcasing different experimental conditions
+# - Purpose-driven styling categorization (exploratory, presentation, publication)
+# - Dynamic style resolution from pipeline execution context (F-005-RQ-004)
+# - Elimination of manual figure management code in pipeline nodes
+#
+# Pipeline Node Integration:
+# Nodes simply return matplotlib.figure.Figure objects - all styling and
+# persistence is handled automatically by the FigureDataSet during catalog
+# save operations, demonstrating the zero-touch automation objective.
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Primary Training Visualizations (F-005: Automated Figure Management)
+# -----------------------------------------------------------------------------
+# These datasets demonstrate core FigureDataSet functionality with condition-based
+# styling that automatically applies appropriate styling based on experimental
+# conditions defined in parameters.yml, eliminating manual styling code.
+
+# Training progress visualization with dynamic condition resolution
+training_progress_plot:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/training_progress.png
+  purpose: exploratory                              # Exploratory analysis styling
+  condition_param: experiment_condition             # Resolves to "treatment_group_a" from parameters.yml
+  metadata:
+    description: "Training progress visualization showing loss and accuracy curves over epochs"
+    experimental_context: "Primary treatment group analysis during training phase"
+    usage_pattern: "Demonstrates basic condition resolution from experiment_condition parameter"
+    integration_features:
+      - "Automatic styling based on treatment_group_a condition"
+      - "Exploratory purpose applies soft, approachable styling"
+      - "No manual plt.savefig() required in pipeline nodes"
+      - "Automatic file path management and timestamp integration"
+
+# Model performance comparison across treatment groups
+treatment_comparison_plot:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/treatment_comparison.pdf
+  purpose: presentation                             # Professional presentation styling
+  condition_param: experiment_condition             # Dynamic resolution from pipeline context
+  versioned: true                                   # Enable Kedro versioning integration
+  format_kwargs:
+    dpi: 200                                        # High DPI for presentations
+    bbox_inches: tight                              # Tight layout for clean appearance
+    pad_inches: 0.1                                 # Minimal padding
+  metadata:
+    description: "Comparative analysis across treatment groups A, B, and control"
+    experimental_context: "Multi-group comparison with professional presentation styling"
+    usage_pattern: "Shows versioning integration and format customization"
+    integration_features:
+      - "PDF format for presentation distribution"
+      - "Kedro versioning for experiment tracking"
+      - "Format parameters for presentation quality"
+      - "Automated styling maintains group visual consistency"
+
+# Control group baseline analysis
+control_baseline_analysis:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/control_baseline.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  style_params:                                     # Dataset-specific style overrides
+    alpha: 0.9                                      # Increased opacity for emphasis
+    linewidth: 2.5                                  # Thicker lines for clarity
+    markersize: 8                                   # Larger markers for visibility
+  metadata:
+    description: "Control group baseline measurements and statistical analysis"
+    experimental_context: "Control condition with enhanced visual styling"
+    usage_pattern: "Demonstrates style_params overrides for specific dataset needs"
+    integration_features:
+      - "Style parameter overrides for enhanced visibility"
+      - "Automatic condition resolution to control_group styling"
+      - "Exploratory purpose for initial data investigation"
+      - "Style inheritance with targeted customizations"
+
+# -----------------------------------------------------------------------------
+# Validation and Testing Visualizations (F-005-RQ-004: Context Injection)
+# -----------------------------------------------------------------------------
+# These datasets demonstrate advanced context resolution where multiple
+# condition parameters can be used for complex experimental scenarios,
+# showcasing the flexibility of condition-based styling automation.
+
+# Validation metrics during model evaluation
+validation_metrics_plot:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/validation_metrics.png
+  purpose: presentation
+  condition_param: experiment_phase                 # Resolves to "training" from parameters.yml
+  versioned: true
+  metadata:
+    description: "Validation metrics including precision, recall, F1-score, and AUC"
+    experimental_context: "Training phase validation with presentation-quality styling"
+    usage_pattern: "Uses experiment_phase for lifecycle-based styling"
+    integration_features:
+      - "Phase-based styling (training phase with orange dashed lines)"
+      - "Presentation purpose for meeting and report distribution"
+      - "Versioned output for tracking validation evolution"
+      - "Automatic metric visualization formatting"
+
+# Model comparison across different algorithms
+model_comparison_analysis:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/model_comparison.pdf
+  purpose: publication                              # Publication-ready styling
+  condition_param: model_type                       # Resolves to "linear_regression" from parameters.yml
+  format_kwargs:
+    dpi: 300                                        # Publication-quality resolution
+    format: pdf                                     # Vector format for scaling
+    backend: pdf                                    # PDF backend for quality
+  metadata:
+    description: "Comparative analysis of linear regression vs other model types"
+    experimental_context: "Model-specific styling for algorithm comparison"
+    usage_pattern: "Publication-ready output with model-type condition resolution"
+    integration_features:
+      - "Model-type based styling (linear_regression blue circle styling)"
+      - "Publication purpose applies high-contrast black styling"
+      - "Vector PDF format for journal submission"
+      - "Professional formatting for academic publication"
+
+# Testing phase final results
+testing_results_summary:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/testing_summary.svg
+  purpose: publication
+  condition_param: analysis_stage                   # Resolves to "exploratory" from parameters.yml
+  versioned: true
+  style_params:
+    color: "#1A1A1A"                                # Override to publication black
+    linewidth: 2.5                                  # Professional line weight
+    markersize: 8                                   # Clear marker visibility
+  format_kwargs:
+    format: svg                                     # Scalable vector graphics
+    bbox_inches: tight
+  metadata:
+    description: "Final testing results with publication-quality formatting"
+    experimental_context: "Analysis stage styling with publication overrides"
+    usage_pattern: "Shows analysis_stage condition with style_params overrides"
+    integration_features:
+      - "SVG format for web and print compatibility"
+      - "Analysis stage condition resolution to exploratory base styling"
+      - "Style overrides for publication-specific requirements"
+      - "Versioned tracking for final result documentation"
+
+# -----------------------------------------------------------------------------
+# Advanced Integration Examples (F-005-RQ-002: Kedro Versioning Integration)
+# -----------------------------------------------------------------------------
+# These datasets showcase advanced features including multiple output formats,
+# complex condition resolution, and integration with Kedro's experiment tracking
+# capabilities for comprehensive workflow automation.
+
+# Multi-format output for different distribution channels
+comprehensive_results_png:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/comprehensive_results.png
+  purpose: presentation
+  condition_param: experiment_condition
+  versioned: true
+  format_kwargs:
+    dpi: 150                                        # Standard web/presentation DPI
+    transparent: false                              # Opaque background for presentations
+  metadata:
+    description: "Comprehensive results in PNG format for presentations and web"
+    experimental_context: "Multi-format output strategy for different audiences"
+    usage_pattern: "Part of multi-format output set for diverse distribution"
+
+# Same content, publication-ready PDF version
+comprehensive_results_pdf:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/comprehensive_results.pdf
+  purpose: publication
+  condition_param: experiment_condition
+  versioned: true
+  format_kwargs:
+    dpi: 300                                        # High-resolution for print
+    bbox_inches: tight
+    pad_inches: 0.1
+  metadata:
+    description: "Comprehensive results in PDF format for publication submission"
+    experimental_context: "High-quality vector output for academic publication"
+    usage_pattern: "Demonstrates same data with different purpose-driven styling"
+    integration_features:
+      - "Same experiment_condition but different purpose styling"
+      - "Publication purpose overrides presentation formatting"
+      - "Automatic format optimization for target use case"
+      - "Versioned tracking across format variations"
+
+# Statistical significance analysis with combined group styling
+statistical_analysis:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/statistical_analysis.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  style_params:
+    # Override condition-based styling for statistical emphasis
+    color: "#27AE60"                                # Green for combined analysis
+    marker: "D"                                     # Diamond markers for special status
+    linewidth: 3.0                                  # Heavy weight for importance
+    alpha: 0.9                                      # High opacity for prominence
+    label: "Statistical Analysis"                   # Custom label override
+  metadata:
+    description: "Statistical significance testing with enhanced visual emphasis"
+    experimental_context: "Custom styling overrides for statistical analysis presentation"
+    usage_pattern: "Demonstrates extensive style_params customization capabilities"
+    integration_features:
+      - "Complete style override while maintaining condition resolution"
+      - "Statistical analysis specific visual enhancements"
+      - "Custom labeling for specialized analysis types"
+      - "Exploratory purpose with targeted style modifications"
+
+# Interactive exploration dashboard
+exploration_dashboard:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/exploration_dashboard.png
+  purpose: exploratory
+  condition_param: analysis_stage
+  format_kwargs:
+    dpi: 100                                        # Lower DPI for fast iteration
+    facecolor: white                                # Clean background
+  metadata:
+    description: "Interactive exploration dashboard for data investigation"
+    experimental_context: "Fast iteration exploratory analysis with reduced quality"
+    usage_pattern: "Optimized for development speed over output quality"
+    integration_features:
+      - "Analysis stage condition (exploratory) with soft mint styling"
+      - "Performance-optimized settings for rapid iteration"
+      - "Clean, approachable styling for data exploration"
+      - "Development-friendly configuration for quick feedback"
+
+# -----------------------------------------------------------------------------
+# Example Data Inputs and Intermediate Outputs
+# -----------------------------------------------------------------------------
+# Supporting dataset definitions that complement the figure outputs,
+# demonstrating the complete Kedro pipeline integration where data flows
+# through processing stages and culminates in styled visualizations.
+
+# Raw experimental data input
+raw_experimental_data:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/experimental_data.csv
+  metadata:
+    description: "Raw experimental data for treatment groups A, B, and control"
+    usage: "Input data for condition-based analysis pipeline"
+
+# Processed features for modeling
+processed_features:
+  type: pandas.ParquetDataSet
+  filepath: data/03_primary/processed_features.parquet
+  metadata:
+    description: "Engineered features ready for model training and evaluation"
+    usage: "Intermediate data feeding into visualization pipeline"
+
+# Model training results
+model_training_results:
+  type: json.JSONDataSet
+  filepath: data/06_models/training_results.json
+  metadata:
+    description: "Model performance metrics and training history"
+    usage: "Data source for training progress and validation visualizations"
+
+# Statistical analysis results
+statistical_test_results:
+  type: json.JSONDataSet
+  filepath: data/07_model_output/statistical_tests.json
+  metadata:
+    description: "Statistical significance test results and effect sizes"
+    usage: "Data source for statistical analysis visualizations"
+
+# -----------------------------------------------------------------------------
+# Advanced Configuration Examples
+# -----------------------------------------------------------------------------
+# These examples demonstrate advanced FigureDataSet configuration patterns
+# including conditional styling, complex parameter resolution, and integration
+# with Kedro's advanced features for production pipeline deployments.
+
+# Dynamic condition resolution example
+dynamic_condition_plot:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/dynamic_condition.png
+  purpose: presentation
+  condition_param: experiment_condition             # Primary condition resolution
+  style_params:
+    # Conditional styling based on purpose
+    grid_alpha: 0.3                                 # Professional grid for presentations
+    legend_fontsize: 12                             # Larger legend for visibility
+  format_kwargs:
+    dpi: "${visualization.dpi}"                     # Dynamic resolution from parameters.yml
+    figsize: "${visualization.figure_size}"         # Dynamic size from parameters.yml
+  metadata:
+    description: "Demonstrates dynamic parameter resolution from configuration"
+    experimental_context: "Advanced parameter interpolation and condition resolution"
+    usage_pattern: "Shows integration with Kedro parameter templating system"
+    integration_features:
+      - "Parameter interpolation for dynamic configuration"
+      - "Condition resolution with parameter-driven overrides"
+      - "Integration with Kedro's configuration management"
+      - "Flexible sizing and quality based on environment parameters"
+
+# Error handling and fallback demonstration
+fallback_styling_example:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/fallback_example.png
+  purpose: exploratory
+  condition_param: nonexistent_condition           # Will trigger fallback styling
+  metadata:
+    description: "Demonstrates graceful fallback when condition parameter is undefined"
+    experimental_context: "Error handling and fallback behavior validation"
+    usage_pattern: "Shows robust operation when condition resolution fails"
+    integration_features:
+      - "Graceful fallback to default styling when condition not found"
+      - "Maintains pipeline execution despite configuration mismatches"
+      - "Clear logging of fallback behavior for debugging"
+      - "Demonstrates robustness of condition resolution system"
+
+# Performance optimization example
+optimized_output:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/optimized_output.png
+  purpose: exploratory
+  condition_param: experiment_condition
+  enable_caching: true                              # Enable style resolution caching
+  format_kwargs:
+    dpi: 72                                         # Low DPI for development speed
+    optimize: true                                  # PNG optimization for file size
+  metadata:
+    description: "Performance-optimized configuration for development environments"
+    experimental_context: "Speed-optimized settings for rapid iteration and testing"
+    usage_pattern: "Development environment configuration for fast feedback cycles"
+    integration_features:
+      - "Style caching enabled for repeated condition lookups"
+      - "Low DPI for fast rendering and small file sizes"
+      - "Optimized PNG compression for development efficiency"
+      - "Balanced quality vs performance for iterative development"
+
+# =============================================================================
+# Integration Notes and Best Practices
+# =============================================================================
+#
+# 1. FigureDataSet Parameter Usage:
+#    - filepath: Kedro-compliant file path, automatically managed by catalog
+#    - purpose: Categories (exploratory, presentation, publication) drive base styling
+#    - condition_param: References parameters.yml values for dynamic styling
+#    - style_params: Dataset-specific overrides applied on top of condition styling
+#    - format_kwargs: Direct matplotlib.savefig() parameters for format control
+#    - versioned: Enables Kedro's versioning system for experiment tracking
+#
+# 2. Condition Resolution Chain:
+#    - condition_param value looked up in current Kedro parameter context
+#    - Resolved value used as key in figregistry.yml styles section
+#    - If condition not found, fallback_style from figregistry.yml is used
+#    - style_params override individual properties from resolved style
+#    - format_kwargs control matplotlib-specific output formatting
+#
+# 3. Purpose-Driven Styling:
+#    - exploratory: Soft colors, fast rendering, PNG format, low DPI
+#    - presentation: Professional colors, medium quality, PNG/PDF formats
+#    - publication: High contrast, vector formats, maximum quality, strict formatting
+#
+# 4. Versioning Integration:
+#    - versioned: true enables Kedro's automatic version management
+#    - Each pipeline run creates new version with timestamp/ID
+#    - Integrates with kedro-viz for experiment tracking and comparison
+#    - Compatible with MLflow and other experiment tracking backends
+#
+# 5. Pipeline Node Integration:
+#    - Nodes return matplotlib.figure.Figure objects directly
+#    - No plt.savefig() calls needed in node implementations
+#    - Styling and persistence handled automatically by catalog save operations
+#    - Thread-safe for parallel pipeline execution with multiple workers
+#
+# 6. Error Handling and Robustness:
+#    - Invalid condition_param values trigger graceful fallback styling
+#    - Missing configuration files result in warning logs, not pipeline failures
+#    - Style resolution errors fall back to base palette colors
+#    - File system errors are logged with clear diagnostic information
+#
+# 7. Performance Considerations:
+#    - Style resolution cached for repeated condition lookups (<5ms)
+#    - Configuration loaded once per pipeline run, not per figure save
+#    - <5% overhead compared to manual matplotlib save operations
+#    - Memory-efficient figure handling with automatic cleanup
+#
+# 8. Advanced Usage Patterns:
+#    - Multiple condition parameters for complex experimental designs
+#    - Environment-specific styling through Kedro's configuration layers
+#    - Custom palettes and color schemes for domain-specific visualizations
+#    - Integration with Kedro plugins for enhanced experiment tracking
+#
+# 9. Common Integration Patterns:
+#    - Use experiment_condition for treatment/control group styling
+#    - Use experiment_phase for workflow stage styling (training/validation/testing)
+#    - Use analysis_stage for output purpose styling (exploratory/presentation/publication)
+#    - Use model_type for algorithm-specific styling in ML pipelines
+#
+# 10. Troubleshooting:
+#     - Check kedro info for FigRegistry plugin registration
+#     - Verify condition_param values exist in parameters.yml
+#     - Validate figregistry.yml syntax and style definitions
+#     - Review logs for condition resolution and fallback behavior
+#     - Use kedro catalog list to verify dataset configuration
+#
+# =============================================================================

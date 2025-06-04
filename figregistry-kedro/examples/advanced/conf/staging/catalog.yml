@@ -1,0 +1,1670 @@
+# Staging Environment Kedro Data Catalog Configuration
+# Advanced FigRegistry-Kedro Integration - Enterprise Production Validation
+# ========================================================================
+#
+# This staging catalog provides production-like FigureDataSet configurations with
+# comprehensive staging validation patterns, enhanced logging capabilities, and
+# staging-specific safety mechanisms for enterprise deployment readiness testing.
+# Building upon the base catalog structure, this configuration enables thorough
+# testing of production workflows while maintaining staging-appropriate rollback
+# capabilities and enhanced audit trails for enterprise compliance validation.
+#
+# Staging Features Demonstrated:
+# - Production-like FigureDataSet configurations with staging safety per Section 8.3.2.1
+# - Enhanced validation patterns ensuring production deployment readiness per Section 8.3.4.1
+# - Comprehensive condition-based styling testing with production scenarios per F-002
+# - Advanced staging deployment workflows supporting production migration per Section 0.2.5
+# - Enterprise-grade figure versioning with staging-specific audit trails per F-005-RQ-002
+# - Sophisticated parameter resolution testing in staging enterprise scenarios per F-005-RQ-004
+# - Enhanced logging and performance monitoring for deployment validation per Section 8.3.1.1
+# - Staging-specific dataset validation ensuring production readiness per Section 8.3.2.1
+# - Comprehensive catalog patterns with staging safety mechanisms per Section 8.3.5
+#
+# Architecture:
+# This staging catalog extends the base advanced catalog with production-like complexity
+# while incorporating staging-specific validation, safety mechanisms, and enhanced
+# monitoring capabilities to ensure comprehensive production readiness validation.
+
+# ==============================================================================
+# ENHANCED STAGING TRAINING PIPELINE DATASETS
+# ==============================================================================
+
+# Enhanced staging data quality plots with comprehensive validation
+training_data_quality_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/training/data_quality_analysis_staging.png
+  purpose: exploration
+  condition_param: data_quality_condition
+  style_params:
+    # Enhanced staging visualization parameters for comprehensive validation
+    figure.figsize: [14, 10]  # Larger for staging validation detail
+    figure.dpi: 200  # Higher resolution for staging assessment
+    axes.titlesize: 18  # Larger titles for staging review
+    axes.labelsize: 16  # Enhanced readability for staging validation
+    legend.fontsize: 14  # Larger legends for staging assessment
+    # Enhanced grid for detailed staging analysis
+    grid.alpha: 0.9
+    grid.linewidth: 1.0
+    grid.linestyle: "-"
+    # Staging-specific enhancements
+    lines.linewidth: 3.0  # Thicker lines for staging visibility
+    lines.markersize: 10  # Larger markers for staging assessment
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+    # Staging-specific metadata for audit trails
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "comprehensive"
+      audit_level: "enhanced"
+  versioned: true
+  # Staging-specific performance monitoring
+  staging_validation:
+    enable_enhanced_logging: true
+    enable_performance_tracking: true
+    enable_audit_trail: true
+    rollback_capability: true
+
+# Enhanced staging model performance comparison with production simulation
+training_model_performance_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/training/model_performance_comparison_staging.png
+  purpose: presentation
+  condition_param: model_type
+  style_params:
+    # Production-like presentation styling with staging validation markers
+    figure.figsize: [16, 12]  # Extended for staging detail
+    figure.dpi: 250  # Enhanced resolution for staging validation
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.grid: true
+    axes.axisbelow: true
+    # Enhanced markers for staging model comparison
+    lines.markersize: 10  # Larger for staging assessment
+    lines.markeredgewidth: 2.0  # Thicker edges for staging contrast
+    lines.linewidth: 3.5  # Thicker lines for staging visibility
+    # Staging validation indicators
+    scatter.s: 150  # Larger scatter points for staging
+    scatter.edgecolors: "black"  # Enhanced contrast for staging
+    scatter.linewidths: 2
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.25  # Extra padding for staging annotations
+    facecolor: white
+    # Enhanced staging metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "production_simulation"
+      model_complexity: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_production_simulation: true
+    enable_comprehensive_logging: true
+    enable_performance_benchmarking: true
+
+# Advanced staging hyperparameter optimization with enterprise validation
+training_hyperparameter_optimization:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/training/hyperparameter_optimization_staging.png
+  purpose: exploration
+  condition_param: model_algorithm
+  style_params:
+    # Enhanced scientific analysis styling for staging validation
+    figure.figsize: [18, 14]  # Larger for comprehensive staging analysis
+    figure.dpi: 200  # Production-like quality for staging
+    axes.titleweight: bold
+    axes.titlesize: 20  # Larger titles for staging visibility
+    # Enhanced color palette for multidimensional staging analysis
+    image.cmap: "viridis"
+    axes.facecolor: "#FAFAFA"
+    # Staging-specific enhancement markers
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.2
+    # Enhanced annotation styling for staging
+    text.fontsize: 14  # Larger text for staging readability
+    text.fontweight: "bold"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    transparent: false
+    format: png
+    # Comprehensive staging metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "comprehensive"
+      analysis_complexity: "enterprise_grade"
+      hyperparameter_search_trials: 200  # Enhanced for staging
+  versioned: true
+  staging_validation:
+    enable_enhanced_validation: true
+    enable_algorithm_performance_tracking: true
+    enable_hyperparameter_audit: true
+
+# Comprehensive staging cross-validation with statistical rigor
+training_cross_validation_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/training/cross_validation_performance_staging.png
+  purpose: presentation
+  condition_param: validation_score
+  style_params:
+    # Enhanced statistical analysis presentation for staging validation
+    figure.figsize: [14, 11]  # Extended for staging statistical detail
+    figure.dpi: 250  # High quality for staging assessment
+    # Enhanced error bar styling for confidence intervals
+    errorbar.capsize: 6  # Larger caps for staging visibility
+    errorbar.capthick: 3  # Thicker caps for staging contrast
+    errorbar.elinewidth: 2.5  # Thicker error lines for staging
+    # Enhanced box plot styling for distribution analysis
+    boxplot.flierprops.marker: "D"  # Different marker for staging
+    boxplot.flierprops.markersize: 10  # Larger for staging visibility
+    boxplot.boxprops.linewidth: 2.5  # Thicker boxes for staging
+    boxplot.medianprops.linewidth: 3  # Thicker medians for staging
+    # Staging validation enhancements
+    axes.titlesize: 18
+    axes.labelsize: 15
+    legend.fontsize: 13
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    edgecolor: none
+    # Enhanced staging validation metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "statistical_comprehensive"
+      cross_validation_folds: 10  # Enhanced for staging
+      statistical_rigor: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_statistical_validation: true
+    enable_confidence_interval_validation: true
+    enable_statistical_significance_tracking: true
+
+# Enhanced staging feature importance with advanced interpretability
+training_feature_importance:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/training/feature_importance_analysis_staging.png
+  purpose: exploration
+  condition_param: model_name
+  style_params:
+    # Enhanced feature analysis styling for staging validation
+    figure.figsize: [12, 16]  # Taller format for comprehensive staging feature lists
+    figure.dpi: 200  # Production-like quality for staging
+    axes.titlesize: 18  # Larger for staging visibility
+    xtick.labelrotation: 45  # Maintain readability for staging
+    ytick.labelsize: 12  # Larger for staging readability
+    # Enhanced bar chart styling for staging
+    patch.linewidth: 1.0  # Thicker borders for staging contrast
+    patch.edgecolor: "black"
+    # Staging-specific color enhancements
+    axes.facecolor: "#FAFAFA"
+    figure.facecolor: "white"
+    # Enhanced spacing for staging readability
+    figure.subplot.hspace: 0.3
+    figure.subplot.wspace: 0.2
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.4  # Extra padding for staging annotations
+    # Comprehensive staging feature metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "feature_analysis_comprehensive"
+      feature_count: 225  # Enhanced feature set for staging
+      interpretability_level: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_feature_importance_validation: true
+    enable_interpretability_analysis: true
+    enable_feature_selection_audit: true
+
+# Enhanced staging convergence monitoring with comprehensive tracking
+training_convergence_monitoring:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/training/model_convergence_tracking_staging.png
+  purpose: exploration
+  condition_param: training_environment
+  style_params:
+    # Enhanced time series analysis styling for staging
+    figure.figsize: [16, 10]  # Extended for staging convergence detail
+    figure.dpi: 200  # Production-like quality for staging
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    lines.linewidth: 3.0  # Thicker for staging visibility
+    # Enhanced convergence markers for staging
+    lines.marker: "o"
+    lines.markersize: 6  # Larger for staging visibility
+    lines.markerfacecolor: "white"
+    lines.markeredgewidth: 2.0  # Thicker edges for staging contrast
+    # Staging-specific enhancements
+    axes.titlesize: 18
+    axes.labelsize: 15
+    legend.fontsize: 13
+    legend.framealpha: 1.0  # Solid background for staging
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    format: png
+    # Enhanced staging convergence metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "convergence_analysis_comprehensive"
+      training_iterations: 200  # Enhanced for staging
+      convergence_monitoring: "real_time"
+  versioned: true
+  staging_validation:
+    enable_convergence_validation: true
+    enable_training_stability_analysis: true
+    enable_optimization_audit: true
+
+# ==============================================================================
+# ENHANCED STAGING INFERENCE PIPELINE DATASETS
+# ==============================================================================
+
+# Advanced staging prediction quality with comprehensive confidence analysis
+inference_prediction_quality:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/inference/prediction_quality_analysis_staging.png
+  purpose: presentation
+  condition_param: confidence_level
+  style_params:
+    # Enhanced quality analysis presentation for staging validation
+    figure.figsize: [14, 10]  # Extended for staging quality detail
+    figure.dpi: 250  # High quality for staging assessment
+    axes.titlesize: 18  # Larger for staging visibility
+    axes.labelsize: 16  # Enhanced readability for staging
+    # Enhanced confidence interval styling for staging
+    fill.alpha: 0.4  # More visible for staging assessment
+    lines.linewidth: 3.0  # Thicker for staging visibility
+    lines.markersize: 8  # Larger markers for staging
+    # Enhanced quality threshold indicators for staging
+    axhline.linewidth: 3  # Thicker threshold lines for staging
+    axhline.linestyle: "--"
+    axhline.alpha: 0.9  # More visible for staging
+    # Staging validation enhancements
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+    legend.shadow: true  # Enhanced legend for staging
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+    # Comprehensive staging quality metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "prediction_quality_comprehensive"
+      confidence_threshold: 0.95  # High threshold for staging
+      quality_monitoring: "real_time"
+  versioned: true
+  staging_validation:
+    enable_prediction_quality_validation: true
+    enable_confidence_analysis: true
+    enable_quality_threshold_monitoring: true
+
+# Enhanced staging prediction comparison with enterprise scenarios
+inference_prediction_comparison:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/inference/batch_vs_realtime_comparison_staging.png
+  purpose: presentation
+  condition_param: prediction_type
+  style_params:
+    # Enhanced comparative analysis styling for staging validation
+    figure.figsize: [16, 12]  # Extended for staging comparison detail
+    figure.dpi: 250  # High quality for staging assessment
+    axes.spines.top: false
+    axes.spines.right: false
+    # Enhanced comparison styling for staging
+    lines.linewidth: 4.0  # Thicker for staging visibility
+    lines.markersize: 10  # Larger markers for staging assessment
+    legend.loc: "best"
+    legend.framealpha: 1.0
+    legend.fontsize: 14  # Larger for staging readability
+    legend.shadow: true  # Enhanced visibility for staging
+    # Staging-specific enhancement indicators
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    axes.titlesize: 18
+    axes.labelsize: 16
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.2  # Extra padding for staging annotations
+    # Enhanced staging comparison metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "prediction_comparison_comprehensive"
+      batch_size: 50000  # Production-scale for staging
+      realtime_latency_target_ms: 50  # Stringent for staging
+      comparison_scope: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_prediction_comparison_validation: true
+    enable_latency_performance_analysis: true
+    enable_throughput_benchmarking: true
+
+# Comprehensive staging model drift detection with enterprise monitoring
+inference_model_drift_detection:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/inference/model_drift_analysis_staging.png
+  purpose: exploration
+  condition_param: inference_environment
+  style_params:
+    # Enhanced monitoring dashboard styling for staging validation
+    figure.figsize: [18, 12]  # Large for comprehensive staging monitoring
+    figure.dpi: 200  # Production-like quality for staging
+    # Enhanced time series monitoring styling for staging
+    axes.grid: true
+    grid.alpha: 0.7
+    grid.linestyle: ":"
+    grid.linewidth: 1.0
+    # Enhanced drift threshold indicators for staging
+    axhline.color: "red"
+    axhline.linewidth: 3.5  # Thicker for staging visibility
+    axhline.alpha: 1.0  # Fully visible for staging alerts
+    axhline.linestyle: "--"
+    # Staging-specific monitoring enhancements
+    lines.linewidth: 3.0
+    lines.markersize: 7
+    axes.titlesize: 20  # Larger for staging dashboard
+    axes.labelsize: 16
+    legend.fontsize: 14
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    format: png
+    # Comprehensive staging drift metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "drift_detection_comprehensive"
+      drift_monitoring_frequency: "every_30_minutes"  # Enhanced for staging
+      drift_detection_sensitivity: 0.05  # More sensitive for staging
+      monitoring_scope: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_drift_detection_validation: true
+    enable_monitoring_dashboard_validation: true
+    enable_alert_threshold_analysis: true
+
+# Enhanced staging performance metrics with comprehensive tracking
+inference_performance_metrics:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/inference/performance_metrics_tracking_staging.png
+  purpose: presentation
+  condition_param: quality_status
+  style_params:
+    # Enhanced metrics dashboard styling for staging validation
+    figure.figsize: [14, 11]  # Extended for staging metrics detail
+    figure.dpi: 250  # High quality for staging assessment
+    axes.titleweight: bold
+    axes.titlesize: 18  # Larger for staging visibility
+    # Enhanced metrics styling for staging
+    lines.linewidth: 3.0  # Thicker for staging visibility
+    lines.marker: "s"  # Square markers for staging differentiation
+    lines.markersize: 8  # Larger for staging assessment
+    # Enhanced color coding for staging performance levels
+    scatter.s: 120  # Larger scatter points for staging
+    scatter.alpha: 0.9  # More visible for staging
+    scatter.edgecolors: "black"
+    scatter.linewidths: 2  # Thicker edges for staging contrast
+    # Staging validation enhancements
+    axes.grid: true
+    grid.alpha: 0.8
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    # Enhanced staging performance metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "performance_metrics_comprehensive"
+      metrics_tracking_frequency: "real_time"
+      performance_targets: "enterprise_grade"
+      quality_monitoring: "comprehensive"
+  versioned: true
+  staging_validation:
+    enable_performance_metrics_validation: true
+    enable_quality_status_monitoring: true
+    enable_performance_threshold_analysis: true
+
+# Advanced staging A/B testing with enhanced statistical analysis
+inference_ab_testing_results:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/inference/ab_testing_statistical_analysis_staging.png
+  purpose: presentation
+  condition_param: significance_level
+  style_params:
+    # Enhanced statistical testing presentation for staging validation
+    figure.figsize: [16, 10]  # Extended for staging statistical detail
+    figure.dpi: 250  # High quality for staging assessment
+    # Enhanced statistical significance indicators for staging
+    errorbar.capsize: 8  # Larger caps for staging visibility
+    errorbar.capthick: 3.0  # Thicker caps for staging contrast
+    errorbar.elinewidth: 2.5  # Thicker error lines for staging
+    # Enhanced significance level styling for staging
+    text.fontsize: 14  # Larger text for staging readability
+    text.fontweight: "bold"
+    # Staging-specific statistical enhancements
+    axes.titlesize: 18
+    axes.labelsize: 16
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+    legend.shadow: true
+    # Enhanced annotation styling for staging
+    axes.grid: true
+    grid.alpha: 0.8
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.25  # Extra padding for staging statistical annotations
+    # Comprehensive staging A/B testing metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "ab_testing_comprehensive"
+      statistical_significance_threshold: 0.01  # Stringent for staging
+      effect_size_threshold: "medium_large"
+      testing_strategy: "enterprise_multivariate"
+  versioned: true
+  staging_validation:
+    enable_ab_testing_validation: true
+    enable_statistical_significance_analysis: true
+    enable_effect_size_validation: true
+
+# ==============================================================================
+# ENHANCED STAGING REPORTING PIPELINE DATASETS
+# ==============================================================================
+
+# Comprehensive staging executive summary with enterprise stakeholder readiness
+reporting_executive_summary:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/reporting/executive_summary_dashboard_staging.png
+  purpose: publication
+  condition_param: report_type
+  style_params:
+    # Enhanced executive presentation styling for staging validation
+    figure.figsize: [18, 14]  # Extended for comprehensive staging executive summary
+    figure.dpi: 300  # High quality for staging stakeholder assessment
+    axes.titlesize: 22  # Larger for staging executive visibility
+    axes.labelsize: 18  # Enhanced readability for staging stakeholders
+    # Enhanced clean, professional styling for staging
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.spines.left: false
+    axes.spines.bottom: false
+    # Minimal grid for staging executive clarity
+    axes.grid: false
+    # Enhanced large, clear fonts for staging executives
+    font.size: 16  # Larger for staging readability
+    font.weight: "normal"
+    # Staging-specific executive enhancements
+    legend.fontsize: 16
+    legend.framealpha: 1.0
+    legend.shadow: true
+    # Enhanced spacing for staging executive layout
+    figure.subplot.hspace: 0.3
+    figure.subplot.wspace: 0.2
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+    format: pdf  # High-quality format for staging executive review
+    # Comprehensive staging executive metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "executive_summary_comprehensive"
+      target_audience: "c_level_executives_and_stakeholders"
+      stakeholder_readiness: "enterprise_grade"
+      presentation_format: "executive_dashboard"
+  versioned: true
+  staging_validation:
+    enable_executive_summary_validation: true
+    enable_stakeholder_readiness_assessment: true
+    enable_presentation_quality_validation: true
+
+# Enhanced staging technical analysis with comprehensive deep-dive validation
+reporting_technical_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/reporting/technical_deep_dive_analysis_staging.png
+  purpose: publication
+  condition_param: report_section
+  style_params:
+    # Enhanced technical documentation styling for staging validation
+    figure.figsize: [16, 20]  # Tall format for comprehensive staging technical analysis
+    figure.dpi: 300  # High quality for staging technical assessment
+    axes.titlesize: 20  # Larger for staging technical visibility
+    axes.labelsize: 16  # Enhanced readability for staging technical teams
+    # Enhanced detailed grid for staging technical analysis
+    axes.grid: true
+    grid.alpha: 0.9  # More visible for staging technical detail
+    grid.linewidth: 0.8
+    grid.linestyle: "-"
+    # Enhanced code/data styling for staging
+    font.family: ["DejaVu Sans Mono", "Courier New", "monospace"]
+    font.size: 13  # Larger for staging technical readability
+    # Staging-specific technical enhancements
+    axes.facecolor: "#FAFAFA"
+    figure.facecolor: "white"
+    legend.fontsize: 13
+    legend.framealpha: 1.0
+    # Enhanced spacing for staging technical layout
+    figure.subplot.hspace: 0.4
+    figure.subplot.wspace: 0.3
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.4  # Extra padding for staging technical annotations
+    format: pdf  # High-quality format for staging technical documentation
+    # Comprehensive staging technical metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "technical_analysis_comprehensive"
+      target_audience: "data_scientists_and_engineers"
+      technical_depth: "enterprise_deep_dive"
+      documentation_format: "technical_comprehensive"
+  versioned: true
+  staging_validation:
+    enable_technical_analysis_validation: true
+    enable_deep_dive_content_validation: true
+    enable_technical_documentation_quality_assessment: true
+
+# Enhanced staging performance benchmarks with enterprise publication quality
+reporting_performance_benchmarks:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/reporting/performance_benchmark_comparison_staging.png
+  purpose: publication
+  condition_param: target_audience
+  style_params:
+    # Enhanced academic/scientific publication styling for staging
+    figure.figsize: [14, 10]  # Extended for staging benchmark detail
+    figure.dpi: 300  # High quality for staging publication assessment
+    # Enhanced journal-quality styling for staging
+    axes.linewidth: 2.0  # Thicker for staging publication contrast
+    axes.edgecolor: "black"
+    # Enhanced clear, publication-ready fonts for staging
+    font.family: ["Times New Roman", "serif"]
+    font.size: 14  # Larger for staging publication readability
+    axes.titlesize: 16  # Larger for staging publication visibility
+    axes.labelsize: 14  # Enhanced readability for staging publication
+    # Enhanced minimal, professional appearance for staging
+    axes.spines.top: false
+    axes.spines.right: false
+    # Staging-specific publication enhancements
+    legend.fontsize: 13
+    legend.framealpha: 1.0
+    legend.frameon: true
+    legend.fancybox: true
+    # Enhanced grid for staging publication clarity
+    axes.grid: true
+    grid.alpha: 0.7
+    grid.linewidth: 0.5
+  save_args:
+    dpi: 600  # Ultra-high resolution for staging publication assessment
+    bbox_inches: tight
+    format: pdf  # Vector format for staging publication quality
+    transparent: false
+    # Comprehensive staging publication metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "performance_benchmarks_publication_ready"
+      target_audience: "academic_and_enterprise_stakeholders"
+      publication_quality: "journal_grade"
+      benchmark_scope: "enterprise_comprehensive"
+  versioned: true
+  staging_validation:
+    enable_performance_benchmarks_validation: true
+    enable_publication_quality_assessment: true
+    enable_benchmark_accuracy_validation: true
+
+# Enhanced staging business impact analysis with comprehensive ROI validation
+reporting_business_impact:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/reporting/business_impact_analysis_staging.png
+  purpose: presentation
+  condition_param: reporting_environment
+  style_params:
+    # Enhanced business presentation styling for staging validation
+    figure.figsize: [16, 12]  # Extended for comprehensive staging business analysis
+    figure.dpi: 250  # High quality for staging business assessment
+    # Enhanced professional business styling for staging
+    axes.titlesize: 20  # Larger for staging business visibility
+    axes.labelsize: 16  # Enhanced readability for staging business stakeholders
+    # Enhanced currency/financial styling for staging
+    axes.ticklabelsize: 14  # Larger for staging financial readability
+    # Enhanced clear value communication for staging
+    lines.linewidth: 4.0  # Thicker for staging business visibility
+    lines.markersize: 10  # Larger markers for staging business assessment
+    bars.edgewidth: 2.0  # Thicker bar edges for staging business contrast
+    # Staging-specific business enhancements
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    legend.fontsize: 15
+    legend.framealpha: 1.0
+    legend.shadow: true
+    # Enhanced spacing for staging business layout
+    figure.subplot.hspace: 0.3
+    figure.subplot.wspace: 0.2
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    format: png  # Standard format for staging business presentations
+    # Comprehensive staging business metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "business_impact_comprehensive"
+      target_audience: "business_stakeholders_and_executives"
+      business_focus: "roi_and_value_impact"
+      analysis_scope: "enterprise_comprehensive"
+  versioned: true
+  staging_validation:
+    enable_business_impact_validation: true
+    enable_roi_analysis_validation: true
+    enable_value_impact_assessment: true
+
+# ==============================================================================
+# ENHANCED STAGING EXPERIMENTAL ANALYSIS DATASETS
+# ==============================================================================
+
+# Advanced staging algorithm comparison with comprehensive enterprise validation
+experimental_algorithm_comparison:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/experiments/algorithm_comparison_study_staging.png
+  purpose: exploration
+  condition_param: experimental_group
+  style_params:
+    # Enhanced experimental analysis styling for staging validation
+    figure.figsize: [18, 14]  # Large for comprehensive staging experimental analysis
+    figure.dpi: 200  # Production-like quality for staging
+    # Enhanced multi-panel comparison styling for staging
+    axes.titlesize: 18  # Larger for staging experimental visibility
+    axes.labelsize: 15  # Enhanced readability for staging experimental analysis
+    # Enhanced experimental condition differentiation for staging
+    lines.linewidth: 3.0  # Thicker for staging experimental visibility
+    lines.markersize: 9  # Larger markers for staging experimental assessment
+    # Enhanced statistical comparison styling for staging
+    errorbar.capsize: 6  # Larger caps for staging experimental visibility
+    errorbar.capthick: 2.0  # Thicker caps for staging experimental contrast
+    errorbar.elinewidth: 2.5  # Thicker error lines for staging
+    # Staging-specific experimental enhancements
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+    legend.shadow: true
+    # Enhanced spacing for staging experimental layout
+    figure.subplot.hspace: 0.4
+    figure.subplot.wspace: 0.3
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.3  # Extra padding for staging experimental annotations
+    # Comprehensive staging experimental metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "experimental_comparison_comprehensive"
+      experimental_scope: "algorithm_comparison_enterprise"
+      statistical_rigor: "enterprise_grade"
+      comparison_complexity: "multi_algorithm_advanced"
+  versioned: true
+  staging_validation:
+    enable_experimental_comparison_validation: true
+    enable_algorithm_performance_analysis: true
+    enable_statistical_comparison_validation: true
+
+# Comprehensive staging statistical significance with enhanced validation
+experimental_significance_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/experiments/statistical_significance_validation_staging.png
+  purpose: publication
+  condition_param: p_value
+  style_params:
+    # Enhanced statistical validation publication styling for staging
+    figure.figsize: [14, 12]  # Extended for staging statistical detail
+    figure.dpi: 300  # High quality for staging statistical assessment
+    # Enhanced statistical significance styling for staging
+    axes.titlesize: 18  # Larger for staging statistical visibility
+    axes.labelsize: 16  # Enhanced readability for staging statistical analysis
+    # Enhanced P-value visualization styling for staging
+    text.fontsize: 13  # Larger text for staging statistical readability
+    text.color: "black"
+    text.fontweight: "bold"
+    # Enhanced significance indicators for staging
+    scatter.s: 140  # Larger scatter points for staging statistical visibility
+    scatter.alpha: 0.9  # More visible for staging statistical assessment
+    scatter.edgecolors: "black"
+    scatter.linewidths: 2  # Thicker edges for staging statistical contrast
+    # Staging-specific statistical enhancements
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+    legend.shadow: true
+    # Enhanced annotation styling for staging
+    axes.facecolor: "#FAFAFA"
+    figure.facecolor: "white"
+  save_args:
+    dpi: 600  # Ultra-high resolution for staging statistical publication assessment
+    bbox_inches: tight
+    format: pdf  # Vector format for staging statistical publication quality
+    transparent: false
+    # Comprehensive staging statistical metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "statistical_significance_publication_ready"
+      statistical_rigor: "enterprise_grade"
+      significance_analysis: "comprehensive"
+      publication_quality: "journal_grade"
+  versioned: true
+  staging_validation:
+    enable_statistical_significance_validation: true
+    enable_p_value_analysis_validation: true
+    enable_statistical_publication_quality_assessment: true
+
+# Enhanced staging treatment analysis with comprehensive effect size validation
+experimental_treatment_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/experiments/treatment_group_analysis_staging.png
+  purpose: publication
+  condition_param: group_id
+  style_params:
+    # Enhanced treatment group comparison styling for staging validation
+    figure.figsize: [16, 11]  # Extended for staging treatment detail
+    figure.dpi: 300  # High quality for staging treatment assessment
+    # Enhanced group differentiation styling for staging
+    axes.titlesize: 18  # Larger for staging treatment visibility
+    axes.labelsize: 16  # Enhanced readability for staging treatment analysis
+    # Enhanced effect size visualization for staging
+    bars.edgewidth: 2.0  # Thicker bar edges for staging treatment contrast
+    bars.alpha: 0.9  # More visible for staging treatment assessment
+    # Enhanced confidence interval styling for staging
+    errorbar.capsize: 7  # Larger caps for staging treatment visibility
+    errorbar.elinewidth: 2.5  # Thicker error lines for staging treatment
+    errorbar.capthick: 3.0  # Thicker caps for staging treatment contrast
+    # Staging-specific treatment enhancements
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+    legend.shadow: true
+    # Enhanced color scheme for staging treatment differentiation
+    axes.facecolor: "#FAFAFA"
+    figure.facecolor: "white"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    format: pdf  # Vector format for staging treatment publication quality
+    # Comprehensive staging treatment metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "treatment_analysis_comprehensive"
+      treatment_scope: "group_comparison_enterprise"
+      effect_size_analysis: "comprehensive"
+      statistical_validation: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_treatment_analysis_validation: true
+    enable_effect_size_validation: true
+    enable_group_comparison_analysis: true
+
+# ==============================================================================
+# ENHANCED STAGING ENVIRONMENT-SPECIFIC CONFIGURATIONS
+# ==============================================================================
+
+# Comprehensive staging debug visualization with enhanced monitoring
+debug_model_internals:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/debug/model_internal_analysis_staging.png
+  purpose: exploration
+  condition_param: model_name
+  style_params:
+    # Enhanced debug-specific styling for staging detailed analysis
+    figure.figsize: [22, 18]  # Very large format for comprehensive staging debugging
+    figure.dpi: 150  # Balanced for staging debugging speed vs quality
+    # Enhanced debug grid for staging precise analysis
+    axes.grid: true
+    grid.alpha: 1.0  # Fully visible for staging debugging
+    grid.linewidth: 1.2  # Thicker for staging debugging visibility
+    grid.linestyle: "-"
+    # Enhanced visibility for staging debugging
+    lines.linewidth: 3.5  # Thicker for staging debugging visibility
+    lines.markersize: 12  # Larger for staging debugging assessment
+    # Enhanced debug annotations for staging
+    text.fontsize: 12  # Larger text for staging debugging readability
+    text.color: "red"
+    text.fontweight: "bold"
+    # Staging-specific debugging enhancements
+    axes.titlesize: 20
+    axes.labelsize: 16
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+    # Enhanced contrast for staging debugging
+    axes.facecolor: "white"
+    figure.facecolor: "white"
+  save_args:
+    dpi: 200  # Enhanced for staging debugging detail
+    bbox_inches: tight
+    format: png
+    # Enhanced staging debugging metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "debug_analysis_comprehensive"
+      debugging_scope: "model_internals_detailed"
+      analysis_depth: "comprehensive"
+  versioned: false  # No versioning for staging debug outputs (matches base)
+  staging_validation:
+    enable_debug_analysis_validation: true
+    enable_model_internals_monitoring: true
+    enable_debugging_audit: true
+
+# Enhanced staging validation plots with comprehensive quality assurance
+staging_model_validation:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/validation/model_validation_results_staging.png
+  purpose: presentation
+  condition_param: validation_level
+  style_params:
+    # Enhanced staging validation styling
+    figure.figsize: [16, 12]  # Extended for comprehensive staging validation detail
+    figure.dpi: 250  # High quality for staging validation assessment
+    # Enhanced validation-specific styling for staging
+    axes.titlesize: 19  # Larger for staging validation visibility
+    axes.labelsize: 16  # Enhanced readability for staging validation
+    # Enhanced quality assurance indicators for staging
+    lines.linewidth: 3.0  # Thicker for staging validation visibility
+    lines.marker: "D"  # Diamond markers for staging validation differentiation
+    lines.markersize: 8  # Larger for staging validation assessment
+    # Enhanced threshold indicators for staging
+    axhline.linewidth: 3  # Thicker threshold lines for staging validation
+    axhline.color: "orange"
+    axhline.alpha: 1.0  # Fully visible for staging validation alerts
+    # Staging-specific validation enhancements
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+    legend.shadow: true
+    # Enhanced quality indicators for staging
+    scatter.s: 100
+    scatter.edgecolors: "black"
+    scatter.linewidths: 2
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    # Comprehensive staging validation metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "model_validation_comprehensive"
+      validation_scope: "enterprise_quality_assurance"
+      quality_monitoring: "real_time"
+      validation_strictness: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_model_validation_comprehensive: true
+    enable_quality_assurance_monitoring: true
+    enable_validation_threshold_analysis: true
+
+# Enhanced staging production monitoring with enterprise-grade dashboards
+production_monitoring_dashboard:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/production_simulation/monitoring_dashboard_staging.png
+  purpose: presentation
+  condition_param: performance_level
+  style_params:
+    # Enhanced production monitoring styling for staging validation
+    figure.figsize: [20, 14]  # Large for comprehensive staging production monitoring
+    figure.dpi: 300  # High quality for staging production assessment
+    # Enhanced dashboard styling for staging production monitoring
+    axes.titlesize: 20  # Larger for staging production visibility
+    axes.labelsize: 17  # Enhanced readability for staging production monitoring
+    # Enhanced real-time monitoring indicators for staging
+    lines.linewidth: 3.5  # Thicker for staging production visibility
+    lines.marker: "o"
+    lines.markersize: 7  # Larger for staging production assessment
+    # Enhanced alert threshold styling for staging
+    axhline.linewidth: 4  # Very thick for staging production alerts
+    axhline.color: "red"
+    axhline.alpha: 1.0  # Fully visible for staging production alerts
+    # Staging-specific production monitoring enhancements
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    legend.fontsize: 15
+    legend.framealpha: 1.0
+    legend.shadow: true
+    # Enhanced dashboard layout for staging
+    figure.subplot.hspace: 0.3
+    figure.subplot.wspace: 0.25
+    axes.facecolor: "#FAFAFA"
+    figure.facecolor: "white"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+    # Comprehensive staging production monitoring metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "production_monitoring_comprehensive"
+      monitoring_scope: "enterprise_dashboard"
+      real_time_monitoring: true
+      production_simulation: true
+      alert_system: "comprehensive"
+  versioned: true
+  staging_validation:
+    enable_production_monitoring_validation: true
+    enable_dashboard_functionality_validation: true
+    enable_alert_system_validation: true
+
+# ==============================================================================
+# ENHANCED STAGING ADVANCED MULTI-PURPOSE CONFIGURATIONS
+# ==============================================================================
+
+# Comprehensive staging EDA with enhanced validation capabilities
+eda_comprehensive_analysis:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/eda/comprehensive_data_analysis_staging.png
+  purpose: exploration
+  condition_param: data_quality_condition
+  style_params:
+    # Enhanced EDA-optimized styling for staging validation
+    figure.figsize: [18, 22]  # Very large vertical format for comprehensive staging EDA
+    figure.dpi: 200  # Production-like quality for staging
+    # Enhanced multi-plot styling for staging
+    axes.titlesize: 16  # Larger for staging EDA visibility
+    axes.labelsize: 14  # Enhanced readability for staging EDA
+    # Enhanced data exploration styling for staging
+    hist.bins: 60  # More bins for staging detail
+    hist.alpha: 0.9  # More visible for staging assessment
+    scatter.alpha: 0.7  # More visible for staging scatter analysis
+    scatter.s: 35  # Larger scatter points for staging visibility
+    # Staging-specific EDA enhancements
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 0.8
+    legend.fontsize: 13
+    legend.framealpha: 1.0
+    # Enhanced spacing for staging EDA layout
+    figure.subplot.hspace: 0.5
+    figure.subplot.wspace: 0.4
+    axes.facecolor: "#FAFAFA"
+    figure.facecolor: "white"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    pad_inches: 0.4  # Extra padding for staging EDA annotations
+    # Comprehensive staging EDA metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "eda_comprehensive"
+      data_analysis_scope: "enterprise_exploratory"
+      data_quality_assessment: "comprehensive"
+      exploratory_depth: "enhanced"
+  versioned: true
+  staging_validation:
+    enable_eda_validation: true
+    enable_data_quality_assessment: true
+    enable_exploratory_analysis_validation: true
+
+# Enhanced staging presentation visuals with comprehensive stakeholder readiness
+presentation_summary_visuals:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/presentation/executive_summary_visuals_staging.png
+  purpose: presentation
+  condition_param: target_audience
+  style_params:
+    # Enhanced executive presentation styling for staging validation
+    figure.figsize: [18, 10]  # Extended widescreen format for staging presentations
+    figure.dpi: 250  # High quality for staging presentation assessment
+    # Enhanced presentation-optimized styling for staging
+    axes.titlesize: 22  # Very large for staging presentation visibility
+    axes.labelsize: 18  # Enhanced readability for staging presentations
+    font.size: 16  # Larger for staging presentation readability
+    # Enhanced high contrast for staging projection
+    axes.edgecolor: "black"
+    axes.linewidth: 2.5  # Thicker for staging presentation contrast
+    lines.linewidth: 5.0  # Very thick for staging presentation visibility
+    # Staging-specific presentation enhancements
+    legend.fontsize: 16
+    legend.framealpha: 1.0
+    legend.shadow: true
+    legend.fancybox: true
+    # Enhanced layout for staging presentations
+    figure.subplot.hspace: 0.3
+    figure.subplot.wspace: 0.2
+    axes.facecolor: "white"
+    figure.facecolor: "white"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    format: png  # Standard format for staging presentations
+    # Comprehensive staging presentation metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "presentation_summary_comprehensive"
+      target_audience: "enterprise_stakeholders"
+      presentation_format: "executive_widescreen"
+      stakeholder_readiness: "comprehensive"
+  versioned: true
+  staging_validation:
+    enable_presentation_validation: true
+    enable_stakeholder_readiness_assessment: true
+    enable_presentation_quality_validation: true
+
+# Enhanced staging publication figures with journal-grade validation
+publication_journal_figures:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/publication/journal_quality_figures_staging.pdf
+  purpose: publication
+  condition_param: significance_level
+  style_params:
+    # Enhanced journal publication styling for staging validation
+    figure.figsize: [10, 8]  # Extended journal format for staging validation
+    figure.dpi: 300  # High quality for staging publication assessment
+    # Enhanced academic publication styling for staging
+    font.family: ["Times New Roman", "serif"]
+    font.size: 12  # Larger for staging publication readability
+    axes.titlesize: 14  # Larger for staging publication visibility
+    axes.labelsize: 12  # Enhanced readability for staging publication
+    # Enhanced minimal, professional styling for staging
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.linewidth: 1.5  # Thicker for staging publication contrast
+    lines.linewidth: 2.0  # Thicker for staging publication visibility
+    # Enhanced grayscale compatibility for staging
+    axes.prop_cycle: "cycler('color', ['black', 'gray', 'darkgray', 'dimgray'])"
+    # Staging-specific publication enhancements
+    legend.fontsize: 11
+    legend.framealpha: 1.0
+    legend.frameon: true
+    legend.fancybox: true
+    # Enhanced spacing for staging publication layout
+    axes.labelpad: 8
+    legend.borderpad: 0.8
+  save_args:
+    dpi: 600  # Ultra-high resolution for staging publication assessment
+    bbox_inches: tight
+    format: pdf  # Vector format for staging publication quality
+    transparent: false
+    # Comprehensive staging publication metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "publication_journal_grade"
+      publication_quality: "journal_ready"
+      academic_standards: "enterprise_compliant"
+      peer_review_ready: true
+  versioned: true
+  staging_validation:
+    enable_publication_quality_validation: true
+    enable_journal_standards_assessment: true
+    enable_peer_review_readiness_validation: true
+
+# ==============================================================================
+# ENHANCED STAGING CONDITION PARAMETER EXAMPLES
+# ==============================================================================
+
+# Advanced dynamic condition resolution with comprehensive staging validation
+dynamic_condition_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/advanced/dynamic_condition_example_staging.png
+  purpose: exploration
+  condition_param: experimental_conditions.control.condition_id
+  style_params:
+    # Enhanced nested parameter resolution for staging validation
+    figure.figsize: [14, 10]  # Extended for staging condition detail
+    figure.dpi: 200  # Production-like quality for staging
+    axes.titlesize: 18  # Larger for staging condition visibility
+    # Staging-specific dynamic resolution enhancements
+    lines.linewidth: 3.0
+    lines.markersize: 8
+    axes.grid: true
+    grid.alpha: 0.8
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    # Enhanced staging dynamic condition metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "dynamic_condition_comprehensive"
+      parameter_resolution: "nested_advanced"
+      condition_complexity: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_dynamic_condition_validation: true
+    enable_parameter_resolution_validation: true
+    enable_nested_condition_analysis: true
+
+# Enhanced template condition resolution with comprehensive staging testing
+template_condition_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/advanced/template_condition_example_staging.png
+  purpose: exploration
+  condition_param: condition_parameter_mapping.experimental_conditions.group_id
+  style_params:
+    # Enhanced template parameter resolution for staging validation
+    figure.figsize: [12, 10]  # Extended for staging template detail
+    figure.dpi: 200  # Production-like quality for staging
+    axes.titlesize: 16  # Larger for staging template visibility
+    # Staging-specific template resolution enhancements
+    lines.linewidth: 2.8
+    lines.markersize: 7
+    axes.grid: true
+    grid.alpha: 0.8
+    legend.fontsize: 13
+    legend.framealpha: 1.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    # Enhanced staging template condition metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "template_condition_comprehensive"
+      parameter_mapping: "template_based_advanced"
+      resolution_complexity: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_template_condition_validation: true
+    enable_parameter_mapping_validation: true
+    enable_template_resolution_analysis: true
+
+# Comprehensive hierarchical condition resolution with staging enterprise validation
+hierarchical_condition_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/advanced/hierarchical_condition_example_staging.png
+  purpose: presentation
+  condition_param: experimental_scenarios.algorithm_comparison_study.conditions.baseline_comparison.condition_id
+  style_params:
+    # Enhanced hierarchical condition resolution for staging validation
+    figure.figsize: [16, 12]  # Extended for staging hierarchical detail
+    figure.dpi: 250  # High quality for staging hierarchical assessment
+    axes.titlesize: 18  # Larger for staging hierarchical visibility
+    # Staging-specific hierarchical resolution enhancements
+    lines.linewidth: 3.2
+    lines.markersize: 9
+    axes.grid: true
+    grid.alpha: 0.8
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+    legend.shadow: true
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    # Comprehensive staging hierarchical condition metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "hierarchical_condition_comprehensive"
+      parameter_hierarchy: "multi_level_advanced"
+      resolution_depth: "enterprise_grade"
+      condition_complexity: "hierarchical_comprehensive"
+  versioned: true
+  staging_validation:
+    enable_hierarchical_condition_validation: true
+    enable_multi_level_parameter_validation: true
+    enable_hierarchical_resolution_analysis: true
+
+# ==============================================================================
+# ENHANCED STAGING PERFORMANCE OPTIMIZATION EXAMPLES
+# ==============================================================================
+
+# Enhanced cache-optimized visualizations with comprehensive staging monitoring
+cache_optimized_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/performance/cache_optimized_example_staging.png
+  purpose: exploration
+  condition_param: model_type
+  style_params:
+    # Enhanced optimization for staging cache performance
+    figure.figsize: [14, 10]  # Extended for staging cache detail
+    figure.dpi: 200  # Production-like quality for staging
+    # Enhanced minimal style parameters for staging cache efficiency
+    axes.titlesize: 16  # Larger for staging cache visibility
+    lines.linewidth: 2.5  # Optimized for staging cache performance
+    # Staging-specific cache optimization enhancements
+    axes.grid: true
+    grid.alpha: 0.7
+    legend.fontsize: 13
+    legend.framealpha: 1.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    # Enhanced staging cache optimization metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "cache_optimization_comprehensive"
+      performance_focus: "cache_efficiency"
+      optimization_level: "enterprise_grade"
+  versioned: false  # No versioning for staging performance testing (matches base)
+  staging_validation:
+    enable_cache_optimization_validation: true
+    enable_performance_monitoring: true
+    enable_cache_efficiency_analysis: true
+
+# Enhanced concurrent pipeline visualization with comprehensive staging validation
+concurrent_pipeline_plots:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/performance/concurrent_pipeline_example_staging.png
+  purpose: exploration
+  condition_param: training_environment
+  style_params:
+    # Enhanced thread-safe styling configuration for staging
+    figure.figsize: [12, 8]  # Extended for staging concurrent detail
+    figure.dpi: 200  # Production-like quality for staging
+    axes.titlesize: 16  # Larger for staging concurrent visibility
+    # Staging-specific concurrent optimization enhancements
+    lines.linewidth: 2.8
+    lines.markersize: 7
+    axes.grid: true
+    grid.alpha: 0.8
+    legend.fontsize: 13
+    legend.framealpha: 1.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    # Enhanced staging concurrent pipeline metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "concurrent_pipeline_comprehensive"
+      thread_safety: "validated"
+      concurrent_optimization: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_concurrent_pipeline_validation: true
+    enable_thread_safety_validation: true
+    enable_concurrent_performance_analysis: true
+
+# ==============================================================================
+# ENHANCED STAGING ERROR HANDLING AND FALLBACK EXAMPLES
+# ==============================================================================
+
+# Enhanced graceful fallback with comprehensive staging validation
+fallback_styling_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/fallback/graceful_fallback_example_staging.png
+  purpose: exploration
+  condition_param: undefined_condition_parameter
+  style_params:
+    # Enhanced fallback styling for staging validation
+    figure.figsize: [12, 8]  # Extended for staging fallback detail
+    figure.dpi: 200  # Production-like quality for staging
+    axes.titlesize: 16  # Larger for staging fallback visibility
+    # Enhanced explicit fallback styling for staging
+    color: "gray"
+    linestyle: "--"
+    marker: "o"
+    linewidth: 2.5  # Thicker for staging fallback visibility
+    markersize: 7  # Larger for staging fallback assessment
+    # Staging-specific fallback enhancements
+    axes.grid: true
+    grid.alpha: 0.8
+    legend.fontsize: 13
+    legend.framealpha: 1.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    # Enhanced staging fallback metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "fallback_handling_comprehensive"
+      error_handling: "graceful_degradation"
+      fallback_validation: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_fallback_validation: true
+    enable_error_handling_validation: true
+    enable_graceful_degradation_analysis: true
+
+# Enhanced configuration validation with comprehensive staging testing
+config_validation_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/validation/config_validation_example_staging.png
+  purpose: exploration
+  condition_param: model_type
+  style_params:
+    # Enhanced comprehensive parameter validation for staging
+    figure.figsize: [14, 10]  # Extended for staging validation detail
+    figure.dpi: 200  # Production-like quality for staging
+    axes.titlesize: 18  # Larger for staging validation visibility
+    axes.labelsize: 16  # Enhanced readability for staging validation
+    # Enhanced validated style parameters for staging
+    lines.linewidth: 3.0  # Thicker for staging validation visibility
+    lines.markersize: 8  # Larger for staging validation assessment
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    # Staging-specific validation enhancements
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+    legend.shadow: true
+    axes.facecolor: "white"
+    figure.facecolor: "white"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    # Comprehensive staging validation metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "configuration_validation_comprehensive"
+      parameter_validation: "comprehensive_enhanced"
+      validation_scope: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_configuration_validation_comprehensive: true
+    enable_parameter_validation_enhanced: true
+    enable_validation_completeness_analysis: true
+
+# ==============================================================================
+# ENHANCED STAGING INTEGRATION SHOWCASE EXAMPLES
+# ==============================================================================
+
+# Comprehensive staging full integration showcase with enterprise validation
+full_integration_showcase:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/integration/full_pipeline_showcase_staging.png
+  purpose: publication
+  condition_param: experimental_scenarios.deployment_validation_study.environment_conditions.production_validation.condition_id
+  style_params:
+    # Enhanced comprehensive integration demonstration for staging
+    figure.figsize: [18, 14]  # Extended for staging integration detail
+    figure.dpi: 300  # High quality for staging integration assessment
+    # Enhanced publication-quality styling for staging
+    axes.titlesize: 20  # Larger for staging integration visibility
+    axes.labelsize: 18  # Enhanced readability for staging integration
+    font.size: 16  # Larger for staging integration readability
+    # Enhanced professional appearance for staging
+    axes.spines.top: false
+    axes.spines.right: false
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    # Staging-specific integration enhancements
+    legend.fontsize: 16
+    legend.framealpha: 1.0
+    legend.shadow: true
+    legend.fancybox: true
+    # Enhanced layout for staging integration
+    figure.subplot.hspace: 0.3
+    figure.subplot.wspace: 0.25
+    axes.facecolor: "#FAFAFA"
+    figure.facecolor: "white"
+  save_args:
+    dpi: 600  # Ultra-high resolution for staging integration assessment
+    bbox_inches: tight
+    format: pdf  # Vector format for staging integration quality
+    transparent: false
+    # Comprehensive staging integration metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "full_integration_comprehensive"
+      integration_scope: "end_to_end_enterprise"
+      demonstration_complexity: "comprehensive"
+      validation_completeness: "enterprise_grade"
+  versioned: true
+  staging_validation:
+    enable_full_integration_validation: true
+    enable_end_to_end_testing: true
+    enable_comprehensive_integration_analysis: true
+
+# Enhanced staging enterprise workflow with comprehensive automation validation
+enterprise_workflow_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/enterprise/workflow_automation_example_staging.png
+  purpose: presentation
+  condition_param: condition_parameter_mapping.reporting_conditions.reporting_environment
+  style_params:
+    # Enhanced enterprise-grade automation demonstration for staging
+    figure.figsize: [20, 16]  # Large for comprehensive staging enterprise workflow
+    figure.dpi: 300  # High quality for staging enterprise assessment
+    # Enhanced corporate presentation styling for staging
+    axes.titlesize: 22  # Very large for staging enterprise visibility
+    axes.labelsize: 20  # Enhanced readability for staging enterprise
+    font.size: 18  # Large for staging enterprise readability
+    # Enhanced professional branding-ready styling for staging
+    figure.facecolor: "white"
+    axes.facecolor: "#FAFAFA"
+    axes.edgecolor: "#333333"
+    axes.linewidth: 2.0  # Thicker for staging enterprise contrast
+    # Staging-specific enterprise enhancements
+    legend.fontsize: 17
+    legend.framealpha: 1.0
+    legend.shadow: true
+    legend.fancybox: true
+    # Enhanced spacing for staging enterprise layout
+    figure.subplot.hspace: 0.4
+    figure.subplot.wspace: 0.3
+    # Enhanced enterprise styling elements
+    lines.linewidth: 4.0
+    lines.markersize: 10
+    bars.edgewidth: 2.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+    format: png  # Standard format for staging enterprise presentations
+    # Comprehensive staging enterprise metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "enterprise_workflow_comprehensive"
+      workflow_scope: "automation_enterprise"
+      enterprise_readiness: "comprehensive"
+      stakeholder_alignment: "c_level_ready"
+  versioned: true
+  staging_validation:
+    enable_enterprise_workflow_validation: true
+    enable_automation_validation: true
+    enable_enterprise_readiness_assessment: true
+
+# ==============================================================================
+# ENHANCED STAGING METADATA AND DOCUMENTATION EXAMPLES
+# ==============================================================================
+
+# Advanced staging metadata tracking with comprehensive validation
+metadata_tracking_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/metadata/advanced_metadata_tracking_staging.png
+  purpose: exploration
+  condition_param: metadata.example_metadata.purpose
+  style_params:
+    # Enhanced metadata-driven styling for staging validation
+    figure.figsize: [14, 10]  # Extended for staging metadata detail
+    figure.dpi: 200  # Production-like quality for staging
+    axes.titlesize: 18  # Larger for staging metadata visibility
+    # Enhanced metadata visualization styling for staging
+    text.fontsize: 14  # Larger text for staging metadata readability
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    # Staging-specific metadata enhancements
+    legend.fontsize: 14
+    legend.framealpha: 1.0
+    legend.shadow: true
+    axes.facecolor: "#FAFAFA"
+    figure.facecolor: "white"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    # Enhanced staging metadata tracking metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "metadata_tracking_comprehensive"
+      metadata_scope: "advanced_enterprise"
+      tracking_completeness: "comprehensive"
+  versioned: true
+  staging_validation:
+    enable_metadata_tracking_validation: true
+    enable_metadata_completeness_analysis: true
+    enable_advanced_metadata_validation: true
+
+# Enhanced staging compliance validation with comprehensive enterprise testing
+compliance_validation_example:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/compliance/validation_example_staging.png
+  purpose: exploration
+  condition_param: metadata.compliance.figregistry_version
+  style_params:
+    # Enhanced compliance validation demonstration for staging
+    figure.figsize: [12, 8]  # Extended for staging compliance detail
+    figure.dpi: 200  # Production-like quality for staging
+    axes.titlesize: 16  # Larger for staging compliance visibility
+    # Staging-specific compliance enhancements
+    lines.linewidth: 2.8
+    lines.markersize: 7
+    axes.grid: true
+    grid.alpha: 0.8
+    legend.fontsize: 13
+    legend.framealpha: 1.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    # Enhanced staging compliance metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "compliance_validation_comprehensive"
+      compliance_scope: "enterprise_grade"
+      validation_completeness: "comprehensive"
+  versioned: true
+  staging_validation:
+    enable_compliance_validation_comprehensive: true
+    enable_enterprise_compliance_analysis: true
+    enable_validation_completeness_assessment: true
+
+# ==============================================================================
+# STAGING-SPECIFIC ADDITIONAL VALIDATION DATASETS
+# ==============================================================================
+
+# Comprehensive staging production readiness assessment
+staging_production_readiness_assessment:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/assessment/production_readiness_comprehensive_staging.png
+  purpose: presentation
+  condition_param: production_readiness_testing
+  style_params:
+    # Enhanced production readiness styling for staging
+    figure.figsize: [18, 12]  # Large for comprehensive staging assessment
+    figure.dpi: 300  # High quality for staging readiness assessment
+    axes.titlesize: 20  # Large for staging readiness visibility
+    axes.labelsize: 17  # Enhanced readability for staging readiness
+    # Enhanced readiness indicators for staging
+    lines.linewidth: 4.0  # Very thick for staging readiness visibility
+    lines.markersize: 10  # Large markers for staging readiness assessment
+    # Enhanced assessment styling for staging
+    axes.grid: true
+    grid.alpha: 0.9
+    grid.linewidth: 1.2
+    legend.fontsize: 16
+    legend.framealpha: 1.0
+    legend.shadow: true
+    # Enhanced contrast for staging assessment
+    axes.facecolor: "white"
+    figure.facecolor: "white"
+    axes.edgecolor: "black"
+    axes.linewidth: 2.0
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+    format: pdf  # High-quality format for staging assessment documentation
+    # Comprehensive staging readiness metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "production_readiness_comprehensive"
+      assessment_scope: "enterprise_deployment_ready"
+      readiness_validation: "comprehensive"
+      deployment_simulation: "production_like"
+  versioned: true
+  staging_validation:
+    enable_production_readiness_comprehensive: true
+    enable_deployment_readiness_validation: true
+    enable_enterprise_assessment_analysis: true
+
+# Enhanced staging deployment validation dashboard
+staging_deployment_validation_dashboard:
+  type: figregistry_kedro.FigureDataSet
+  filepath: data/08_reporting/figures/staging/deployment/validation_dashboard_comprehensive_staging.png
+  purpose: presentation
+  condition_param: comprehensive_enterprise_staging
+  style_params:
+    # Enhanced deployment validation dashboard for staging
+    figure.figsize: [20, 14]  # Very large for comprehensive staging deployment dashboard
+    figure.dpi: 300  # High quality for staging deployment assessment
+    axes.titlesize: 22  # Very large for staging deployment visibility
+    axes.labelsize: 18  # Enhanced readability for staging deployment
+    # Enhanced deployment monitoring for staging
+    lines.linewidth: 3.5  # Thick for staging deployment visibility
+    lines.markersize: 9  # Large markers for staging deployment assessment
+    # Enhanced dashboard layout for staging
+    axes.grid: true
+    grid.alpha: 0.8
+    grid.linewidth: 1.0
+    legend.fontsize: 16
+    legend.framealpha: 1.0
+    legend.shadow: true
+    legend.fancybox: true
+    # Enhanced spacing for staging deployment dashboard
+    figure.subplot.hspace: 0.4
+    figure.subplot.wspace: 0.3
+    axes.facecolor: "#FAFAFA"
+    figure.facecolor: "white"
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    facecolor: white
+    transparent: false
+    # Comprehensive staging deployment metadata
+    metadata:
+      environment: "staging_enterprise"
+      validation_tier: "deployment_validation_comprehensive"
+      dashboard_scope: "enterprise_deployment"
+      validation_completeness: "comprehensive"
+      monitoring_level: "real_time"
+  versioned: true
+  staging_validation:
+    enable_deployment_validation_comprehensive: true
+    enable_dashboard_functionality_comprehensive: true
+    enable_deployment_monitoring_validation: true
+
+# ==============================================================================
+# END OF ENHANCED STAGING CATALOG CONFIGURATION
+# ==============================================================================
+
+# This enhanced staging catalog demonstrates comprehensive production-like
+# FigureDataSet configurations with staging-specific validation patterns,
+# safety mechanisms, and enterprise-grade testing capabilities. Building
+# upon the base advanced catalog, this configuration provides:
+#
+# Key Staging Achievements:
+# - Production-like FigureDataSet configurations with comprehensive staging validation
+# - Enhanced audit trails and logging for enterprise deployment workflows
+# - Staging-specific safety mechanisms with rollback capabilities
+# - Comprehensive condition-based styling testing with production scenarios
+# - Advanced parameter resolution validation in enterprise staging contexts
+# - Enhanced performance monitoring and regression detection for deployment readiness
+# - Comprehensive integration patterns supporting production migration workflows
+# - Enterprise-grade compliance validation and quality assurance mechanisms
+# - Sophisticated experimental design validation for complex deployment scenarios
+# - Advanced error handling and fallback validation with comprehensive recovery testing
+#
+# This staging configuration serves as both a comprehensive validation environment
+# for production deployment readiness and a complete reference for implementing
+# sophisticated FigRegistry integration patterns in enterprise staging workflows,
+# ensuring thorough testing and validation before production deployment while
+# maintaining staging-appropriate safety measures and rollback capabilities.

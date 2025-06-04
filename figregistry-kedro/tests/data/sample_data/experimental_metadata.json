@@ -1,0 +1,678 @@
+{
+  "metadata": {
+    "version": "1.2.0",
+    "created_timestamp": "2024-12-19T14:30:00Z",
+    "last_modified": "2024-12-19T14:30:00Z",
+    "schema_version": "experimental_metadata_v1",
+    "description": "Comprehensive experimental metadata for testing FigRegistry-Kedro integration scenarios including condition parameter resolution, multi-environment configuration, and catalog parameter extraction"
+  },
+  "project_information": {
+    "project_id": "figregistry-kedro-test-001",
+    "project_name": "Machine Learning Pipeline Validation",
+    "description": "Test project for validating FigRegistry integration with Kedro data science pipelines",
+    "organization": "Test Research Institute",
+    "funding_source": "Internal R&D",
+    "project_phase": "development",
+    "compliance_level": "internal",
+    "data_classification": "internal_use"
+  },
+  "researcher_information": {
+    "principal_investigator": {
+      "name": "Dr. Sarah Chen",
+      "email": "s.chen@test-institute.org",
+      "orcid": "0000-0000-0000-0001",
+      "affiliation": "Test Research Institute",
+      "role": "Principal Investigator"
+    },
+    "research_team": [
+      {
+        "name": "Alex Martinez",
+        "email": "a.martinez@test-institute.org",
+        "role": "Data Scientist",
+        "responsibilities": ["pipeline_development", "model_training"]
+      },
+      {
+        "name": "Jordan Kim",
+        "email": "j.kim@test-institute.org", 
+        "role": "ML Engineer",
+        "responsibilities": ["infrastructure", "deployment"]
+      },
+      {
+        "name": "Taylor Thompson",
+        "email": "t.thompson@test-institute.org",
+        "role": "Research Assistant",
+        "responsibilities": ["data_analysis", "visualization"]
+      }
+    ]
+  },
+  "experimental_parameters": {
+    "experiment_condition": {
+      "type": "categorical",
+      "description": "Primary experimental condition for testing condition-based styling",
+      "values": {
+        "exploratory": {
+          "description": "Initial data exploration and hypothesis generation",
+          "priority": 1,
+          "output_requirements": ["quick_iteration", "readable_labels"],
+          "style_preferences": {
+            "color_scheme": "exploratory_palette",
+            "marker_visibility": "high",
+            "line_thickness": "medium"
+          }
+        },
+        "presentation": {
+          "description": "Results formatted for stakeholder presentations",
+          "priority": 2,
+          "output_requirements": ["professional_quality", "clear_titles"],
+          "style_preferences": {
+            "color_scheme": "presentation_palette", 
+            "marker_visibility": "medium",
+            "line_thickness": "bold"
+          }
+        },
+        "publication": {
+          "description": "Publication-ready figures for academic journals",
+          "priority": 3,
+          "output_requirements": ["high_resolution", "monochrome_compatible"],
+          "style_preferences": {
+            "color_scheme": "publication_palette",
+            "marker_visibility": "low",
+            "line_thickness": "precise"
+          }
+        },
+        "validation": {
+          "description": "Model validation and testing scenarios",
+          "priority": 2,
+          "output_requirements": ["error_bars", "confidence_intervals"],
+          "style_preferences": {
+            "color_scheme": "validation_palette",
+            "marker_visibility": "high",
+            "line_thickness": "medium"
+          }
+        }
+      },
+      "default_value": "exploratory",
+      "validation_rules": ["must_be_valid_condition", "case_sensitive"]
+    },
+    "experiment_phase": {
+      "type": "categorical", 
+      "description": "Phase of the experimental workflow for hierarchical condition resolution",
+      "values": {
+        "data_ingestion": {
+          "description": "Initial data loading and preprocessing phase",
+          "typical_duration_hours": 2,
+          "required_resources": ["storage", "compute"],
+          "quality_gates": ["data_validation", "schema_compliance"]
+        },
+        "feature_engineering": {
+          "description": "Feature extraction and transformation phase",
+          "typical_duration_hours": 8,
+          "required_resources": ["compute", "memory"],
+          "quality_gates": ["feature_validation", "distribution_checks"]
+        },
+        "model_training": {
+          "description": "Machine learning model training phase",
+          "typical_duration_hours": 24,
+          "required_resources": ["gpu", "high_memory"],
+          "quality_gates": ["convergence_check", "validation_metrics"]
+        },
+        "model_evaluation": {
+          "description": "Model performance assessment and validation",
+          "typical_duration_hours": 4,
+          "required_resources": ["compute"],
+          "quality_gates": ["performance_thresholds", "bias_checks"]
+        },
+        "inference": {
+          "description": "Model deployment and prediction generation",
+          "typical_duration_hours": 1,
+          "required_resources": ["api_endpoint"],
+          "quality_gates": ["latency_requirements", "accuracy_monitoring"]
+        }
+      },
+      "default_value": "data_ingestion",
+      "validation_rules": ["must_be_valid_phase", "sequential_ordering"]
+    },
+    "analysis_stage": {
+      "type": "categorical",
+      "description": "Granular analysis stage for multi-dimensional condition mapping",
+      "values": {
+        "preliminary": {
+          "description": "Initial analysis and data understanding",
+          "confidence_level": 0.6,
+          "review_required": false,
+          "automated_checks": ["basic_statistics", "missing_values"]
+        },
+        "intermediate": {
+          "description": "Detailed analysis with hypothesis testing",
+          "confidence_level": 0.8,
+          "review_required": true,
+          "automated_checks": ["statistical_tests", "effect_sizes"]
+        },
+        "final": {
+          "description": "Conclusive analysis ready for decision making",
+          "confidence_level": 0.95,
+          "review_required": true,
+          "automated_checks": ["peer_review", "sensitivity_analysis"]
+        },
+        "supplementary": {
+          "description": "Additional analysis supporting main findings",
+          "confidence_level": 0.7,
+          "review_required": false,
+          "automated_checks": ["consistency_checks", "robustness_tests"]
+        }
+      },
+      "default_value": "preliminary",
+      "validation_rules": ["confidence_thresholds", "review_workflows"]
+    },
+    "model_type": {
+      "type": "categorical",
+      "description": "Machine learning model category for model-specific styling",
+      "values": {
+        "linear_regression": {
+          "description": "Linear regression models including Ridge and Lasso",
+          "complexity": "low",
+          "interpretability": "high",
+          "typical_features": ["coefficients", "residuals", "r_squared"],
+          "visualization_types": ["scatter_plots", "residual_plots", "coefficient_plots"]
+        },
+        "tree_based": {
+          "description": "Decision trees, Random Forest, and XGBoost models",
+          "complexity": "medium",
+          "interpretability": "medium",
+          "typical_features": ["feature_importance", "tree_depth", "splits"],
+          "visualization_types": ["feature_importance", "partial_dependence", "tree_diagrams"]
+        },
+        "neural_network": {
+          "description": "Deep learning models including feedforward and convolutional networks",
+          "complexity": "high",
+          "interpretability": "low", 
+          "typical_features": ["loss_curves", "activations", "gradients"],
+          "visualization_types": ["training_curves", "confusion_matrices", "layer_visualizations"]
+        },
+        "ensemble": {
+          "description": "Ensemble methods combining multiple base models",
+          "complexity": "high",
+          "interpretability": "medium",
+          "typical_features": ["model_weights", "diversity_metrics", "voting_patterns"],
+          "visualization_types": ["ensemble_performance", "model_contributions", "diversity_plots"]
+        },
+        "unsupervised": {
+          "description": "Clustering and dimensionality reduction models",
+          "complexity": "medium",
+          "interpretability": "variable",
+          "typical_features": ["cluster_centers", "explained_variance", "silhouette_scores"],
+          "visualization_types": ["cluster_plots", "dimensionality_reduction", "dendrogram"]
+        }
+      },
+      "default_value": "linear_regression",
+      "validation_rules": ["model_compatibility", "feature_requirements"]
+    }
+  },
+  "environment_specific_metadata": {
+    "development": {
+      "description": "Local development environment configuration for rapid iteration",
+      "priority": "speed",
+      "configuration_overrides": {
+        "cache_enabled": true,
+        "validation_strict": false,
+        "performance_target_ms": 50.0,
+        "debug_logging": true
+      },
+      "output_settings": {
+        "base_path": "data/01_raw/dev_outputs",
+        "figure_formats": ["png"],
+        "dpi": 100,
+        "timestamp_format": "dev_{ts}_{name}",
+        "versioning_enabled": false
+      },
+      "experimental_parameters": {
+        "experiment_condition": "exploratory",
+        "experiment_phase": "data_ingestion",
+        "analysis_stage": "preliminary",
+        "model_type": "linear_regression"
+      },
+      "resource_constraints": {
+        "max_memory_gb": 8,
+        "max_cpu_cores": 4,
+        "storage_quota_gb": 100,
+        "execution_timeout_minutes": 30
+      }
+    },
+    "staging": {
+      "description": "Staging environment for integration testing and validation",
+      "priority": "reliability",
+      "configuration_overrides": {
+        "cache_enabled": true,
+        "validation_strict": true,
+        "performance_target_ms": 25.0,
+        "debug_logging": false
+      },
+      "output_settings": {
+        "base_path": "data/08_reporting/staging",
+        "figure_formats": ["png", "pdf"],
+        "dpi": 150,
+        "timestamp_format": "staging_{ts}_{name}",
+        "versioning_enabled": true
+      },
+      "experimental_parameters": {
+        "experiment_condition": "presentation",
+        "experiment_phase": "model_evaluation",
+        "analysis_stage": "intermediate",
+        "model_type": "tree_based"
+      },
+      "resource_constraints": {
+        "max_memory_gb": 32,
+        "max_cpu_cores": 16,
+        "storage_quota_gb": 500,
+        "execution_timeout_minutes": 120
+      }
+    },
+    "production": {
+      "description": "Production environment for final results and publication-ready outputs",
+      "priority": "quality",
+      "configuration_overrides": {
+        "cache_enabled": true,
+        "validation_strict": true,
+        "performance_target_ms": 10.0,
+        "debug_logging": false
+      },
+      "output_settings": {
+        "base_path": "data/08_reporting/production",
+        "figure_formats": ["png", "pdf", "svg"],
+        "dpi": 300,
+        "timestamp_format": "prod_{ts}_{name}",
+        "versioning_enabled": true
+      },
+      "experimental_parameters": {
+        "experiment_condition": "publication",
+        "experiment_phase": "inference",
+        "analysis_stage": "final",
+        "model_type": "ensemble"
+      },
+      "resource_constraints": {
+        "max_memory_gb": 128,
+        "max_cpu_cores": 64,
+        "storage_quota_gb": 2000,
+        "execution_timeout_minutes": 480
+      }
+    }
+  },
+  "condition_mappings": {
+    "style_resolution_patterns": {
+      "exact_match": {
+        "description": "Direct condition key matching for primary styles",
+        "examples": [
+          {"condition": "exploratory", "expected_style": "exploratory_style"},
+          {"condition": "presentation", "expected_style": "presentation_style"},
+          {"condition": "publication", "expected_style": "publication_style"}
+        ]
+      },
+      "hierarchical_match": {
+        "description": "Multi-level condition resolution with parameter combinations",
+        "examples": [
+          {
+            "condition_params": {
+              "experiment_condition": "exploratory",
+              "experiment_phase": "data_ingestion",
+              "analysis_stage": "preliminary"
+            },
+            "expected_style": "exploratory_preliminary",
+            "fallback_chain": ["exploratory", "default"]
+          },
+          {
+            "condition_params": {
+              "experiment_condition": "publication",
+              "experiment_phase": "inference",
+              "model_type": "neural_network"
+            },
+            "expected_style": "publication_neural_network",
+            "fallback_chain": ["publication", "neural_network", "default"]
+          }
+        ]
+      },
+      "wildcard_patterns": {
+        "description": "Pattern matching for flexible condition resolution",
+        "examples": [
+          {"pattern": "*_regression", "matches": ["linear_regression", "logistic_regression"]},
+          {"pattern": "model_*", "matches": ["model_training", "model_evaluation"]},
+          {"pattern": "exp_*_final", "matches": ["exp_001_final", "exp_baseline_final"]}
+        ]
+      }
+    },
+    "figregistry_alignment": {
+      "color_schemes": {
+        "exploratory_palette": {
+          "primary": "#A8E6CF",
+          "secondary": "#88D8A3",
+          "accent": "#7FCDCD",
+          "description": "Calming greens for exploratory analysis"
+        },
+        "presentation_palette": {
+          "primary": "#FFB6C1", 
+          "secondary": "#FFA07A",
+          "accent": "#F0E68C",
+          "description": "Warm colors for stakeholder presentations"
+        },
+        "publication_palette": {
+          "primary": "#1A1A1A",
+          "secondary": "#404040",
+          "accent": "#666666",
+          "description": "Professional grayscale for publications"
+        },
+        "validation_palette": {
+          "primary": "#6495ED",
+          "secondary": "#4682B4", 
+          "accent": "#5F9EA0",
+          "description": "Blues for validation and testing"
+        }
+      },
+      "marker_styles": {
+        "high_visibility": {"marker": "o", "markersize": 8, "markeredgewidth": 2},
+        "medium_visibility": {"marker": "s", "markersize": 6, "markeredgewidth": 1},
+        "low_visibility": {"marker": ".", "markersize": 4, "markeredgewidth": 0},
+        "publication_ready": {"marker": "o", "markersize": 5, "markeredgewidth": 1}
+      },
+      "line_styles": {
+        "medium": {"linewidth": 1.5, "linestyle": "-", "alpha": 0.8},
+        "bold": {"linewidth": 2.5, "linestyle": "-", "alpha": 0.9},
+        "precise": {"linewidth": 1.0, "linestyle": "-", "alpha": 1.0},
+        "dashed": {"linewidth": 2.0, "linestyle": "--", "alpha": 0.7}
+      }
+    }
+  },
+  "catalog_parameter_scenarios": {
+    "basic_dataset_parameters": {
+      "scenario_1": {
+        "description": "FigureDataSet with minimal parameters for basic functionality testing",
+        "parameters": {
+          "type": "figregistry_kedro.datasets.FigureDataSet",
+          "filepath": "data/08_reporting/basic_plot.png",
+          "purpose": "exploratory"
+        },
+        "expected_behavior": {
+          "style_resolution": "default_exploratory",
+          "condition_param": null,
+          "versioning": false
+        }
+      },
+      "scenario_2": {
+        "description": "FigureDataSet with condition parameter for dynamic styling",
+        "parameters": {
+          "type": "figregistry_kedro.datasets.FigureDataSet",
+          "filepath": "data/08_reporting/conditional_plot.png",
+          "purpose": "presentation",
+          "condition_param": "experiment_condition"
+        },
+        "expected_behavior": {
+          "style_resolution": "presentation_with_condition",
+          "condition_param": "experiment_condition",
+          "versioning": false
+        }
+      }
+    },
+    "advanced_dataset_parameters": {
+      "scenario_3": {
+        "description": "FigureDataSet with versioning and environment-specific configuration",
+        "parameters": {
+          "type": "figregistry_kedro.datasets.FigureDataSet",
+          "filepath": "data/08_reporting/versioned_plot.png",
+          "purpose": "publication",
+          "condition_param": "model_type",
+          "versioned": true,
+          "style_params": {
+            "override_color": "#2E86AB",
+            "override_marker": "^"
+          }
+        },
+        "expected_behavior": {
+          "style_resolution": "publication_with_overrides",
+          "condition_param": "model_type",
+          "versioning": true,
+          "style_overrides_applied": true
+        }
+      },
+      "scenario_4": {
+        "description": "FigureDataSet with complex multi-parameter condition resolution",
+        "parameters": {
+          "type": "figregistry_kedro.datasets.FigureDataSet",
+          "filepath": "data/08_reporting/complex_conditional_plot.png",
+          "purpose": "validation",
+          "condition_param": ["experiment_condition", "experiment_phase", "model_type"],
+          "versioned": true,
+          "metadata": {
+            "experiment_id": "exp_001",
+            "researcher": "alex_martinez",
+            "pipeline_version": "v1.2.0"
+          }
+        },
+        "expected_behavior": {
+          "style_resolution": "hierarchical_condition_matching",
+          "condition_param": ["experiment_condition", "experiment_phase", "model_type"],
+          "versioning": true,
+          "metadata_preservation": true
+        }
+      }
+    }
+  },
+  "pipeline_context_testing": {
+    "kedro_parameter_injection": {
+      "parameters_yaml_structure": {
+        "experiment_condition": "presentation",
+        "experiment_phase": "model_training",
+        "analysis_stage": "intermediate", 
+        "model_type": "tree_based",
+        "plot_settings": {
+          "figure_size": [12, 8],
+          "dpi": 150,
+          "style_theme": "professional"
+        },
+        "execution_config": {
+          "output_base_path": "data/08_reporting/pipeline_run",
+          "figure_formats": ["png", "pdf"],
+          "versioning_strategy": "timestamp",
+          "quality_checks": true
+        }
+      },
+      "expected_parameter_resolution": {
+        "figregistry_condition_parameters": {
+          "experiment_condition": "presentation",
+          "experiment_phase": "model_training",
+          "analysis_stage": "intermediate",
+          "model_type": "tree_based"
+        },
+        "merged_configuration": {
+          "styles_available": ["presentation", "tree_based", "intermediate", "model_training"],
+          "output_base_path": "data/08_reporting/pipeline_run",
+          "figure_defaults": {
+            "figsize": [12, 8],
+            "dpi": 150
+          }
+        }
+      }
+    },
+    "context_propagation": {
+      "pipeline_metadata": {
+        "run_id": "test_run_20241219_143000",
+        "environment": "staging",
+        "kedro_version": "0.19.0",
+        "figregistry_version": "0.3.0",
+        "figregistry_kedro_version": "0.1.0"
+      },
+      "expected_context_availability": {
+        "hooks_initialization": true,
+        "config_bridge_merging": true,
+        "dataset_parameter_resolution": true,
+        "styling_context_injection": true
+      }
+    }
+  },
+  "versioning_compatibility": {
+    "protocol_versions": {
+      "v1.0": {
+        "description": "Initial experimental protocol version",
+        "features": ["basic_conditions", "simple_styling"],
+        "compatibility": ["figregistry>=0.1.0", "kedro>=0.18.0"],
+        "deprecated": false
+      },
+      "v1.1": {
+        "description": "Enhanced protocol with hierarchical conditions",
+        "features": ["basic_conditions", "simple_styling", "hierarchical_matching"],
+        "compatibility": ["figregistry>=0.2.0", "kedro>=0.18.5"],
+        "deprecated": false
+      },
+      "v1.2": {
+        "description": "Current protocol with full multi-environment support",
+        "features": ["basic_conditions", "simple_styling", "hierarchical_matching", "environment_specific_config"],
+        "compatibility": ["figregistry>=0.3.0", "kedro>=0.19.0"],
+        "deprecated": false
+      }
+    },
+    "audit_information": {
+      "created_by": "figregistry-kedro test suite",
+      "creation_timestamp": "2024-12-19T14:30:00Z",
+      "schema_validation": {
+        "pydantic_version": "2.9.0",
+        "validation_passed": true,
+        "last_validated": "2024-12-19T14:30:00Z"
+      },
+      "change_history": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2024-12-19T14:00:00Z",
+          "changes": ["Initial metadata structure creation"],
+          "author": "test_suite_generator"
+        },
+        {
+          "version": "1.1.0", 
+          "timestamp": "2024-12-19T14:15:00Z",
+          "changes": ["Added hierarchical condition examples", "Enhanced environment configurations"],
+          "author": "test_suite_generator"
+        },
+        {
+          "version": "1.2.0",
+          "timestamp": "2024-12-19T14:30:00Z",
+          "changes": ["Added versioning compatibility section", "Enhanced catalog parameter scenarios"],
+          "author": "test_suite_generator"
+        }
+      ]
+    }
+  },
+  "testing_scenarios": {
+    "f_005_4_condition_parameter_resolution": {
+      "description": "Test scenarios for F-005.4 condition parameter resolution functionality",
+      "test_cases": [
+        {
+          "test_id": "cpr_001",
+          "description": "Single condition parameter resolution",
+          "input_parameters": {"experiment_condition": "presentation"},
+          "expected_style": "presentation_style",
+          "assertion_type": "exact_match"
+        },
+        {
+          "test_id": "cpr_002", 
+          "description": "Multi-parameter hierarchical resolution",
+          "input_parameters": {
+            "experiment_condition": "publication",
+            "model_type": "neural_network",
+            "experiment_phase": "inference"
+          },
+          "expected_style": "publication_neural_network",
+          "fallback_chain": ["publication_neural_network", "publication", "default"],
+          "assertion_type": "hierarchical_match"
+        },
+        {
+          "test_id": "cpr_003",
+          "description": "Wildcard pattern matching",
+          "input_parameters": {"model_type": "linear_regression"},
+          "expected_pattern": "*_regression",
+          "expected_style": "regression_style",
+          "assertion_type": "pattern_match"
+        }
+      ]
+    },
+    "f_007_2_multi_environment_configuration": {
+      "description": "Test scenarios for F-007.2 multi-environment configuration functionality",
+      "test_cases": [
+        {
+          "test_id": "mec_001",
+          "description": "Development environment configuration override",
+          "environment": "development",
+          "base_config": "kedro_base_config.yml",
+          "override_config": "environment_local.yml",
+          "expected_merge_precedence": ["environment_local", "kedro_base", "defaults"]
+        },
+        {
+          "test_id": "mec_002",
+          "description": "Production environment configuration with strict validation",
+          "environment": "production", 
+          "base_config": "kedro_base_config.yml",
+          "override_config": "environment_production.yml",
+          "expected_validation": "strict",
+          "expected_performance_target": 10.0
+        },
+        {
+          "test_id": "mec_003",
+          "description": "Configuration bridge parameter injection",
+          "environment": "staging",
+          "kedro_parameters": {
+            "experiment_condition": "validation",
+            "plot_settings": {"dpi": 200}
+          },
+          "expected_merged_config": {
+            "condition_parameters": {"experiment_condition": "validation"},
+            "defaults": {"figure": {"dpi": 200}}
+          }
+        }
+      ]
+    },
+    "section_5_2_6_catalog_parameter_extraction": {
+      "description": "Test scenarios for Section 5.2.6 catalog parameter extraction in FigureDataSet operations",
+      "test_cases": [
+        {
+          "test_id": "cpe_001",
+          "description": "Basic dataset parameter validation",
+          "dataset_config": {
+            "type": "figregistry_kedro.datasets.FigureDataSet",
+            "purpose": "exploratory"
+          },
+          "expected_parameters": {
+            "purpose": "exploratory",
+            "condition_param": null,
+            "style_params": {}
+          }
+        },
+        {
+          "test_id": "cpe_002",
+          "description": "Advanced dataset with condition parameter extraction",
+          "dataset_config": {
+            "type": "figregistry_kedro.datasets.FigureDataSet",
+            "purpose": "presentation",
+            "condition_param": "model_type",
+            "style_params": {"override_color": "#FF5733"}
+          },
+          "pipeline_context": {"model_type": "tree_based"},
+          "expected_style_resolution": "presentation_tree_based_with_color_override"
+        },
+        {
+          "test_id": "cpe_003",
+          "description": "Complex multi-parameter dataset configuration",
+          "dataset_config": {
+            "type": "figregistry_kedro.datasets.FigureDataSet",
+            "purpose": "publication",
+            "condition_param": ["experiment_condition", "analysis_stage"],
+            "versioned": true
+          },
+          "pipeline_context": {
+            "experiment_condition": "publication",
+            "analysis_stage": "final"
+          },
+          "expected_behavior": {
+            "style_resolution": "hierarchical",
+            "versioning_enabled": true,
+            "condition_hierarchy": ["publication_final", "publication", "default"]
+          }
+        }
+      ]
+    }
+  }
+}

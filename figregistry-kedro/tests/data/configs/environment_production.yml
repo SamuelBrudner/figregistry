@@ -1,0 +1,556 @@
+# FigRegistry Kedro Production Environment Configuration
+# This configuration provides production-optimized settings for deployment testing
+# scenarios with strict validation, performance optimization, and security-conscious
+# configuration patterns suitable for enterprise production environments.
+#
+# Requirements Coverage:
+# - F-007.2: Production environment configuration for deployment testing
+# - Section 5.2.5: Production-grade performance and security settings
+# - Section 8.6: Security and compliance requirements for production environments
+# - Performance monitoring and operational requirements per SLA targets
+
+# =============================================================================
+# Production Environment Metadata
+# =============================================================================
+figregistry_version: ">=0.3.0"
+environment: "production"  # Production environment identifier
+
+# Production environment operational metadata
+metadata:
+  config_version: "1.0.0"
+  config_type: "kedro_production"
+  description: "Production-optimized configuration for FigRegistry-Kedro integration"
+  created: "2024-01-01T00:00:00Z"
+  deployment_target: "production"
+  compatible_kedro_versions: [">=0.18.0", "<0.20.0"]
+  compatible_figregistry_versions: [">=0.3.0"]
+  security_level: "production"
+  performance_profile: "optimized"
+  
+  # Production validation requirements
+  validation_strict: true
+  monitoring_enabled: true
+  error_tracking: true
+  performance_monitoring: true
+  
+  # Deployment configuration tracking
+  deployment_environment: "production"
+  resource_limits:
+    max_memory_mb: 4096
+    max_concurrent_figures: 8
+    max_cache_size_mb: 512
+    operation_timeout_seconds: 300
+
+# =============================================================================
+# Production-Grade Style Conditions
+# =============================================================================
+# Publication-quality styling conditions optimized for production workflows
+# with strict validation and consistency requirements
+styles:
+  # Publication-ready primary conditions with professional styling
+  publication_final:
+    color: "#000000"  # Pure black for publication standards
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 1.0
+    label: "Publication"
+    zorder: 10
+    # Production-specific styling parameters
+    antialiased: true
+    rasterized: false  # Vector output for scalability
+    clip_on: true
+
+  publication_draft:
+    color: "#2C3E50"  # Dark blue-gray for draft quality
+    marker: "s"
+    linestyle: "--"
+    linewidth: 2.0
+    markersize: 7
+    alpha: 0.95
+    label: "Draft"
+    zorder: 8
+    antialiased: true
+    rasterized: false
+
+  # High-quality presentation conditions for stakeholder reporting
+  presentation_executive:
+    color: "#1ABC9C"  # Professional teal for executive presentations
+    marker: "^"
+    linestyle: "-"
+    linewidth: 3.0
+    markersize: 10
+    alpha: 1.0
+    label: "Executive"
+    zorder: 9
+    antialiased: true
+    rasterized: false
+    
+  presentation_client:
+    color: "#3498DB"  # Professional blue for client presentations
+    marker: "D"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 8
+    alpha: 0.9
+    label: "Client"
+    zorder: 7
+    antialiased: true
+    rasterized: false
+
+  # Production validation and quality assurance conditions
+  validation_final:
+    color: "#27AE60"  # Success green for validated results
+    marker: "v"
+    linestyle: "-."
+    linewidth: 2.0
+    markersize: 7
+    alpha: 0.85
+    label: "Validated"
+    zorder: 6
+    antialiased: true
+    
+  quality_assured:
+    color: "#8E44AD"  # Professional purple for QA results
+    marker: "p"
+    linestyle: ":"
+    linewidth: 2.0
+    markersize: 6
+    alpha: 0.8
+    label: "QA Approved"
+    zorder: 5
+    antialiased: true
+
+  # Production model performance tracking
+  model_production:
+    color: "#E74C3C"  # Alert red for production model results
+    marker: "X"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 9
+    alpha: 1.0
+    label: "Production Model"
+    zorder: 10
+    antialiased: true
+    rasterized: false
+
+  # Baseline and control conditions for production monitoring
+  baseline_production:
+    color: "#34495E"  # Neutral gray for production baseline
+    marker: "+"
+    linestyle: "-"
+    linewidth: 1.8
+    markersize: 8
+    alpha: 0.7
+    label: "Baseline"
+    zorder: 3
+    antialiased: true
+
+  # Emergency/fallback condition for production systems
+  fallback_production:
+    color: "#95A5A6"  # Light gray for fallback scenarios
+    marker: "."
+    linestyle: "-"
+    linewidth: 1.5
+    markersize: 4
+    alpha: 0.6
+    label: "Fallback"
+    zorder: 1
+    antialiased: true
+
+# =============================================================================
+# Production Color Palettes
+# =============================================================================
+# Professional color palettes optimized for production environments
+# with accessibility and brand compliance
+palettes:
+  # Production-grade default palette with accessibility compliance
+  production_default: ["#000000", "#2C3E50", "#1ABC9C", "#3498DB", "#27AE60", "#8E44AD"]
+  
+  # High-contrast palette for production accessibility requirements
+  accessibility_production: ["#000000", "#FFFFFF", "#0173B2", "#DE8F05", "#029E73", "#CC78BC"]
+  
+  # Corporate brand palette for production presentations
+  corporate_brand: ["#1A1A1A", "#2C3E50", "#3498DB", "#1ABC9C", "#27AE60", "#F39C12"]
+  
+  # Publication-quality grayscale for production documents
+  publication_grayscale: ["#000000", "#2C3E50", "#566573", "#839192", "#BDC3C7", "#ECF0F1"]
+  
+  # Performance monitoring palette for production dashboards
+  performance_monitoring: ["#27AE60", "#F39C12", "#E74C3C", "#8E44AD", "#1ABC9C", "#34495E"]
+  
+  # Quality assurance palette for production validation
+  quality_assurance: ["#27AE60", "#F1C40F", "#E67E22", "#E74C3C", "#9B59B6", "#3498DB"]
+
+# =============================================================================
+# Production Output Configuration
+# =============================================================================
+# Optimized output configuration for production environments
+# with security restrictions and performance optimization
+outputs:
+  # Production base path with security restrictions
+  base_path: "/opt/data/figregistry/production/figures"
+  
+  # Production-specific path aliases with restricted access
+  path_aliases:
+    # Production data layers with access control
+    validated: "validated/figures"
+    production: "production/figures"
+    release: "release/figures"
+    archive: "archive/figures"
+    
+    # Quality assurance paths
+    qa: "quality_assurance/figures"
+    validation: "validation/figures"
+    approved: "approved/figures"
+    
+    # Emergency and debugging (restricted access)
+    emergency: "emergency/figures"
+    debug: "debug/figures"  # Limited retention
+    audit: "audit/figures"  # Compliance tracking
+    
+  # Production file naming with compliance tracking
+  timestamp_format: "{name}_{purpose}_{ts:%Y%m%d_%H%M%S}_{version}"
+  slug_format: "prod_{purpose}_{name}_{condition}_{checksum}"
+  
+  # Production quality output formats
+  default_format: "pdf"  # Vector format for production
+  formats: ["pdf", "png", "svg"]  # Restricted format list
+  
+  # High-quality production settings
+  dpi: 600  # Publication-quality resolution
+  bbox_inches: "tight"
+  pad_inches: 0.05  # Minimal padding for production
+  facecolor: "white"
+  edgecolor: "none"
+  transparent: false  # Solid backgrounds for production
+  
+  # Production metadata and compliance
+  metadata: true
+  include_git_hash: true  # Version tracking
+  include_environment: true  # Environment tracking
+  include_timestamp: true  # Audit compliance
+  
+  # Security and retention policies
+  file_permissions: "640"  # Restricted read access
+  retention_days: 365  # One-year retention for audit
+  backup_enabled: true
+  compression_enabled: true  # Storage optimization
+
+# =============================================================================
+# Production rcParams for Consistent High-Quality Output
+# =============================================================================
+# Matplotlib rcParams optimized for production publication quality
+defaults:
+  # Production figure specifications
+  figure_size: [12, 8]  # Larger size for production quality
+  figure_dpi: 150  # High-resolution display
+  figure_max_open_warning: 10  # Conservative limit for production
+  
+  # Production font configuration
+  font_family: "serif"  # Professional serif fonts for production
+  font_size: 14  # Larger font for readability
+  font_weight: "normal"
+  
+  # Text hierarchy for production documents
+  title_size: 18  # Prominent titles
+  label_size: 14  # Clear axis labels
+  tick_size: 12  # Readable tick labels
+  legend_size: 13  # Prominent legend
+  
+  # Production line and marker specifications
+  line_width: 2.0  # Bold lines for production
+  marker_size: 8  # Visible markers
+  
+  # Production color management
+  color_cycle: "production_default"
+  
+  # Grid configuration for production clarity
+  grid: true
+  grid_alpha: 0.2  # Subtle grid for production
+  grid_linewidth: 0.5
+  grid_linestyle: "-"
+  grid_color: "#BDC3C7"
+  
+  # Professional axis spine configuration
+  spine_visibility:
+    top: false
+    right: false
+    bottom: true
+    left: true
+  
+  spine_linewidth: 1.5  # Bold spines for production
+  spine_color: "#2C3E50"
+  
+  # Production tick configuration
+  tick_direction: "out"
+  tick_major_size: 6.0
+  tick_minor_size: 3.0
+  tick_major_width: 1.5
+  tick_minor_width: 1.0
+  tick_color: "#2C3E50"
+  
+  # Professional legend configuration
+  legend_frameon: true
+  legend_fancybox: false  # Clean rectangular legend
+  legend_shadow: false
+  legend_numpoints: 1
+  legend_scatterpoints: 1
+  legend_facecolor: "white"
+  legend_edgecolor: "#2C3E50"
+  legend_borderpad: 0.5
+  
+  # Production axis formatting
+  axes_linewidth: 1.5
+  axes_edgecolor: "#2C3E50"
+  axes_labelpad: 6.0
+  axes_axisbelow: true
+  axes_labelcolor: "#2C3E50"
+  
+  # Image handling for production
+  image_interpolation: "bilinear"
+  image_resample: true
+  image_cmap: "viridis"  # Accessible colormap
+  
+  # Production save configuration
+  savefig_dpi: 600  # Publication quality
+  savefig_bbox: "tight"
+  savefig_pad_inches: 0.05
+  savefig_format: "pdf"
+  savefig_facecolor: "white"
+  savefig_edgecolor: "none"
+  savefig_transparent: false
+
+# =============================================================================
+# Production Kedro Integration Configuration
+# =============================================================================
+# Kedro plugin configuration optimized for production environments
+kedro:
+  # Production versioning and dataset management
+  enable_versioning: true
+  version_format: "%Y-%m-%dT%H.%M.%S.%fZ"
+  version_save_only: true  # No version loading in production
+  
+  # Production pipeline execution settings
+  parallel_execution: true
+  max_workers: 4  # Conservative concurrency for stability
+  execution_timeout_seconds: 1800  # 30-minute timeout
+  
+  # Production debugging and monitoring
+  debug_mode: false  # Disabled for production
+  verbose_logging: false  # Minimal logging overhead
+  
+  # Production performance optimization
+  cache_styling: true
+  cache_ttl_seconds: 7200  # 2-hour cache for stability
+  enable_concurrent_access: true
+  memory_limit_mb: 2048  # Conservative memory limit
+  
+  # Production validation and error handling
+  validation_enabled: true
+  strict_validation: true  # Strict validation for production
+  fail_on_missing_styles: true  # Fail fast for missing styles
+  fail_on_validation_errors: true  # No graceful degradation
+  
+  # Production performance monitoring
+  performance_monitoring: true
+  timing_threshold_ms: 5  # Strict timing requirements
+  memory_monitoring: true
+  disk_monitoring: true
+  
+  # Production integration settings
+  auto_register_datasets: true
+  hook_priority: 50  # High priority for production
+  
+  # Production data layer mapping
+  purpose_mapping:
+    "01_raw": "validation"  # Validation for raw data
+    "02_intermediate": "quality_assured"  # QA for intermediate
+    "03_primary": "validated"  # Validated for primary
+    "04_feature": "quality_assured"  # QA for features
+    "05_model_input": "validated"  # Validated for model input
+    "06_models": "production"  # Production for models
+    "07_model_output": "publication_final"  # Final for output
+    "08_reporting": "publication_final"  # Final for reporting
+  
+  # Production environment-specific settings
+  environment_overrides:
+    production:
+      debug_mode: false
+      cache_styling: true
+      performance_monitoring: true
+      strict_validation: true
+      fail_on_missing_styles: true
+      memory_limit_mb: 2048
+      execution_timeout_seconds: 1800
+      max_workers: 4
+
+# =============================================================================
+# Production Security and Compliance Configuration
+# =============================================================================
+# Security-conscious configuration for production deployment
+security:
+  # Access control and permissions
+  file_permissions: "640"  # Owner read/write, group read only
+  directory_permissions: "750"  # Owner full, group read/execute
+  
+  # Path validation and restrictions
+  allowed_base_paths:
+    - "/opt/data/figregistry/production"
+    - "/var/log/figregistry/production"
+    - "/tmp/figregistry/production"
+  
+  blocked_paths:
+    - "/etc"
+    - "/usr"
+    - "/var/www"
+    - "/home"
+  
+  # File validation and restrictions
+  allowed_extensions: [".png", ".pdf", ".svg", ".yml", ".yaml"]
+  max_file_size_mb: 100
+  max_path_length: 255
+  
+  # Security monitoring
+  audit_logging: true
+  security_scanning: true
+  compliance_validation: true
+
+# =============================================================================
+# Production Performance Monitoring Configuration
+# =============================================================================
+# Performance monitoring and SLA compliance tracking
+performance:
+  # SLA targets for production environments
+  sla_targets:
+    configuration_merge_ms: 5  # <5ms for config merging
+    style_resolution_ms: 1  # <1ms for style resolution
+    figure_save_ms: 50  # <50ms for figure saving
+    hook_execution_ms: 25  # <25ms for hook execution
+    dataset_operation_ms: 100  # <100ms for dataset operations
+  
+  # Performance monitoring settings
+  monitoring_enabled: true
+  metric_collection_interval_seconds: 60
+  performance_alerts: true
+  sla_violation_threshold: 0.95  # 95% compliance required
+  
+  # Resource monitoring
+  memory_monitoring: true
+  cpu_monitoring: true
+  disk_monitoring: true
+  network_monitoring: false  # Local-only operation
+  
+  # Performance optimization settings
+  lazy_loading: true
+  connection_pooling: false  # Not applicable for local operation
+  caching_strategy: "aggressive"
+  cache_size_mb: 256
+  cache_eviction_policy: "lru"
+
+# =============================================================================
+# Production Error Handling and Recovery Configuration
+# =============================================================================
+# Robust error handling for production environments
+error_handling:
+  # Error reporting and tracking
+  error_tracking: true
+  error_aggregation: true
+  error_notification: true
+  
+  # Retry and recovery settings
+  max_retries: 3
+  retry_delay_seconds: 1
+  exponential_backoff: true
+  circuit_breaker_enabled: true
+  
+  # Failure handling strategies
+  fail_fast: true  # Fail fast for production reliability
+  graceful_degradation: false  # No degradation in production
+  error_recovery: "abort"  # Abort on critical errors
+  
+  # Logging and audit
+  error_logging_level: "ERROR"
+  audit_trail: true
+  compliance_reporting: true
+
+# =============================================================================
+# Production Validation Configuration
+# =============================================================================
+# Comprehensive validation for production deployment
+validation:
+  # Schema validation settings
+  schema_validation: true
+  type_checking: true
+  constraint_validation: true
+  business_rule_validation: true
+  
+  # Configuration validation
+  config_validation_strict: true
+  required_sections: ["styles", "outputs", "defaults", "kedro"]
+  optional_sections: ["palettes", "metadata", "security", "performance"]
+  
+  # Runtime validation
+  parameter_validation: true
+  condition_validation: true
+  style_validation: true
+  output_validation: true
+  
+  # Production-specific validation rules
+  production_rules:
+    require_publication_styles: true
+    require_security_config: true
+    require_performance_monitoring: true
+    require_error_handling: true
+    require_audit_logging: true
+
+# =============================================================================
+# Production Documentation and Compliance Tracking
+# =============================================================================
+# Documentation and compliance metadata for production environments
+compliance:
+  # Regulatory compliance tracking
+  regulations: ["SOX", "ISO27001", "GDPR"]
+  compliance_version: "2024.1"
+  audit_requirements: true
+  
+  # Documentation requirements
+  configuration_documentation: true
+  change_tracking: true
+  approval_workflow: true
+  
+  # Production deployment metadata
+  deployment_approval: "APPROVED"
+  deployment_date: "2024-01-01T00:00:00Z"
+  deployment_version: "1.0.0"
+  deployment_environment: "production"
+  
+  # Contact and responsibility
+  technical_contact: "devops@company.com"
+  business_contact: "product@company.com"
+  compliance_contact: "compliance@company.com"
+  
+  # Change management
+  change_control: true
+  version_control: true
+  rollback_procedures: true
+  disaster_recovery: true
+
+# =============================================================================
+# Schema Validation Markers for Production
+# =============================================================================
+# Validation markers for production configuration compliance
+_validation:
+  schema_version: "3.0"
+  pydantic_model: "FigRegistryKedroProductionConfig"
+  environment_type: "production"
+  security_level: "high"
+  performance_profile: "optimized"
+  compliance_level: "enterprise"
+  required_sections: ["styles", "outputs", "defaults", "kedro", "security", "performance"]
+  optional_sections: ["palettes", "metadata", "error_handling", "validation", "compliance"]
+  production_validation: true
+  security_validation: true
+  performance_validation: true
+  compliance_validation: true

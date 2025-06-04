@@ -1,0 +1,64 @@
+# Empty Configuration for Default Value Testing
+# This minimal configuration file tests the FigRegistryConfigBridge's ability to handle
+# empty or minimal configuration inputs while applying appropriate defaults per Section 5.2.5
+
+# Metadata section with minimal information for tracking
+metadata:
+  description: "Minimal empty configuration for testing default value handling"
+  config_version: "1.0.0"
+  test_purpose: "edge_case_validation"
+
+# Empty styles section to test default styling behavior and fallback mechanisms
+styles: {}
+
+# Empty palettes section to test default color scheme application
+palettes: {}
+
+# Minimal defaults section with only essential overrides for testing completion
+defaults:
+  # Empty figure settings to test default figsize and DPI population
+  figure: {}
+  # Empty line settings to test default color and linewidth application
+  line: {}
+  # Empty fallback_style to test complete default style population
+  fallback_style: {}
+
+# Minimal outputs section to test default path generation and naming
+outputs:
+  # Empty naming configuration to test default template application
+  naming: {}
+  # Empty formats to test default format assignment by purpose
+  formats: {}
+  # Empty paths to test default path structure generation
+  paths: {}
+
+# Empty style inheritance configuration to test default inheritance behavior
+style_inheritance: {}
+
+# Empty conditional rules to test default pattern matching behavior
+conditional_rules: {}
+
+# Minimal performance section with empty cache settings for default optimization testing
+performance:
+  # No cache settings to test default cache_enabled and max_cache_size values
+  cache_enabled: null
+  # No target time to test default merge time target application
+  target_merge_time_ms: null
+
+# Empty validation section to test default strict_mode and required_fields application
+validation: {}
+
+# Minimal kedro section for testing Kedro-specific default configurations
+kedro:
+  # Empty config_bridge to test default merge strategy and enabled state
+  config_bridge: {}
+  # Empty datasets to test default purpose assignment
+  datasets: {}
+
+# Empty examples section to test default documentation handling
+examples: {}
+
+# Additional empty sections for comprehensive edge case testing
+rcParams: {}
+custom_extensions: {}
+experimental_features: {}

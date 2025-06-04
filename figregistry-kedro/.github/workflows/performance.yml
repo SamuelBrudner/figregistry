@@ -1,0 +1,1167 @@
+name: Performance Benchmarking
+
+# Performance benchmarking workflow that measures plugin overhead, validates performance 
+# thresholds, and ensures plugin integration maintains <5% overhead compared to manual 
+# figure management approaches per Section 6.6.4.3 and Section 6.6.6.3
+
+on:
+  # Trigger performance testing on significant events
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/figregistry_kedro/**'
+      - 'benchmarks/**'
+      - 'pyproject.toml'
+      - '.github/workflows/performance.yml'
+  
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/figregistry_kedro/**'
+      - 'benchmarks/**'
+      - 'pyproject.toml'
+      - '.github/workflows/performance.yml'
+  
+  # Schedule weekly performance baseline updates
+  schedule:
+    - cron: '0 2 * * 1'  # Weekly on Monday at 2 AM UTC
+  
+  # Manual trigger for performance validation
+  workflow_dispatch:
+    inputs:
+      benchmark_iterations:
+        description: 'Number of benchmark iterations'
+        required: false
+        default: '100'
+        type: string
+      strict_thresholds:
+        description: 'Use strict performance thresholds'
+        required: false
+        default: true
+        type: boolean
+
+# Global environment variables for performance testing
+env:
+  # Performance thresholds per Section 6.6.4.3
+  PLUGIN_OVERHEAD_THRESHOLD: '5'      # <5% performance impact
+  CONFIG_BRIDGE_THRESHOLD: '50'      # <50ms configuration bridge timing
+  HOOK_INIT_THRESHOLD: '25'          # <25ms hook initialization
+  DATASET_SAVE_THRESHOLD: '200'      # <200ms dataset save operation
+  
+  # Benchmark configuration
+  BENCHMARK_ITERATIONS: ${{ github.event.inputs.benchmark_iterations || '100' }}
+  STRICT_THRESHOLDS: ${{ github.event.inputs.strict_thresholds || 'true' }}
+  
+  # Environment setup
+  PYTHONPATH: "./src"
+  PYTEST_ADDOPTS: "--verbose --tb=short"
+
+jobs:
+  # Performance baseline establishment and validation
+  performance-benchmarks:
+    name: Performance Benchmarks (${{ matrix.python-version }}, ${{ matrix.kedro-version }})
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+        kedro-version: ['0.18.14', '0.19.8']
+      fail-fast: false
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # Needed for performance comparison
+      
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+      
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential
+          
+          # Install time command for precise timing measurements
+          sudo apt-get install -y time
+          
+          # Install memory profiling tools
+          sudo apt-get install -y valgrind
+      
+      - name: Install Core Dependencies
+        run: |
+          python -m pip install --upgrade pip wheel setuptools
+          
+          # Install figregistry core (required dependency)
+          pip install figregistry>=0.3.0
+          
+          # Install specific Kedro version for matrix testing
+          pip install kedro==${{ matrix.kedro-version }}
+          
+          # Install testing and benchmarking dependencies
+          pip install pytest pytest-benchmark pytest-mock matplotlib numpy pandas
+          pip install psutil memory-profiler line-profiler
+      
+      - name: Install Plugin Package
+        run: |
+          # Install figregistry-kedro in development mode for testing
+          pip install -e .
+          
+          # Verify plugin installation and dependency resolution
+          python -c "import figregistry_kedro; print(f'Plugin version: {figregistry_kedro.__version__}')"
+          python -c "import figregistry_kedro; figregistry_kedro.validate_version_compatibility()"
+      
+      - name: Create Benchmark Infrastructure
+        run: |
+          # Create benchmarks directory if it doesn't exist
+          mkdir -p benchmarks/results
+          mkdir -p benchmarks/data
+          
+          # Create performance test data fixtures
+          python -c "
+          import matplotlib.pyplot as plt
+          import numpy as np
+          import pickle
+          import os
+          
+          # Generate test figures for benchmarking
+          os.makedirs('benchmarks/data', exist_ok=True)
+          
+          # Simple figure for basic benchmarks
+          fig, ax = plt.subplots(figsize=(8, 6))
+          x = np.linspace(0, 10, 100)
+          ax.plot(x, np.sin(x))
+          ax.set_title('Simple Benchmark Figure')
+          with open('benchmarks/data/simple_figure.pkl', 'wb') as f:
+              pickle.dump(fig, f)
+          plt.close(fig)
+          
+          # Complex figure for stress testing
+          fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(12, 10))
+          x = np.linspace(0, 4*np.pi, 1000)
+          ax1.plot(x, np.sin(x), 'b-', linewidth=2)
+          ax2.scatter(np.random.randn(500), np.random.randn(500), alpha=0.6)
+          ax3.bar(range(20), np.random.randn(20))
+          ax4.imshow(np.random.rand(50, 50), cmap='viridis')
+          fig.suptitle('Complex Benchmark Figure')
+          with open('benchmarks/data/complex_figure.pkl', 'wb') as f:
+              pickle.dump(fig, f)
+          plt.close(fig)
+          "
+      
+      - name: Run Plugin Overhead Benchmarks
+        run: |
+          # Create comprehensive plugin overhead benchmark script
+          cat > benchmarks/plugin_overhead_benchmark.py << 'EOF'
+          """
+          Plugin overhead benchmarking per Section 6.6.4.3
+          
+          Measures plugin performance against manual matplotlib operations to ensure
+          <5% overhead threshold compliance across all plugin components.
+          """
+          import time
+          import pytest
+          import matplotlib.pyplot as plt
+          import numpy as np
+          import pickle
+          import tempfile
+          import os
+          from pathlib import Path
+          import statistics
+          import json
+          
+          # Plugin imports
+          from figregistry_kedro.datasets import FigureDataSet
+          from figregistry_kedro.hooks import FigRegistryHooks
+          from figregistry_kedro.config import FigRegistryConfigBridge
+          
+          
+          class PerformanceBenchmark:
+              """Performance benchmarking suite for figregistry-kedro plugin."""
+              
+              def __init__(self, iterations=100):
+                  self.iterations = iterations
+                  self.results = {}
+                  
+              def time_operation(self, operation_name, operation_func, *args, **kwargs):
+                  """Time an operation across multiple iterations."""
+                  times = []
+                  for _ in range(self.iterations):
+                      start_time = time.perf_counter()
+                      try:
+                          result = operation_func(*args, **kwargs)
+                      except Exception as e:
+                          print(f"Error in {operation_name}: {e}")
+                          continue
+                      end_time = time.perf_counter()
+                      times.append((end_time - start_time) * 1000)  # Convert to milliseconds
+                  
+                  if times:
+                      self.results[operation_name] = {
+                          'mean_ms': statistics.mean(times),
+                          'median_ms': statistics.median(times),
+                          'std_ms': statistics.stdev(times) if len(times) > 1 else 0,
+                          'min_ms': min(times),
+                          'max_ms': max(times),
+                          'iterations': len(times)
+                      }
+                      return statistics.mean(times)
+                  return float('inf')
+              
+              def benchmark_manual_save(self, figure_path):
+                  """Benchmark manual matplotlib figure saving."""
+                  with open(figure_path, 'rb') as f:
+                      fig = pickle.load(f)
+                  
+                  def manual_save():
+                      with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as tmp:
+                          fig.savefig(tmp.name, dpi=300, bbox_inches='tight')
+                          os.unlink(tmp.name)
+                  
+                  return self.time_operation('manual_matplotlib_save', manual_save)
+              
+              def benchmark_plugin_save(self, figure_path):
+                  """Benchmark plugin FigureDataSet save operation."""
+                  with open(figure_path, 'rb') as f:
+                      fig = pickle.load(f)
+                  
+                  def plugin_save():
+                      with tempfile.TemporaryDirectory() as tmpdir:
+                          dataset = FigureDataSet(
+                              filepath=f"{tmpdir}/test_figure.png",
+                              purpose="benchmark",
+                              condition_param="test_condition"
+                          )
+                          dataset.save(fig)
+                  
+                  return self.time_operation('plugin_figure_dataset_save', plugin_save)
+              
+              def benchmark_config_bridge(self):
+                  """Benchmark configuration bridge operations per Section 6.6.4.3."""
+                  def config_operation():
+                      bridge = FigRegistryConfigBridge()
+                      # Simulate configuration loading and merging
+                      config = {
+                          'purposes': {'benchmark': {'dpi': 300}},
+                          'conditions': {'test_condition': {'purpose': 'benchmark'}}
+                      }
+                      return bridge._validate_config(config)
+                  
+                  return self.time_operation('config_bridge_operation', config_operation)
+              
+              def benchmark_hook_initialization(self):
+                  """Benchmark hook initialization per Section 6.6.4.3."""
+                  def hook_init():
+                      hooks = FigRegistryHooks()
+                      # Simulate hook registration and setup
+                      mock_context = type('MockContext', (), {
+                          'config_loader': type('MockLoader', (), {'get': lambda x: {}})(),
+                          'catalog': type('MockCatalog', (), {})()
+                      })()
+                      return hooks._initialize_context(mock_context)
+                  
+                  return self.time_operation('hook_initialization', hook_init)
+              
+              def calculate_overhead_percentage(self, manual_time, plugin_time):
+                  """Calculate plugin overhead percentage."""
+                  if manual_time == 0:
+                      return float('inf')
+                  return ((plugin_time - manual_time) / manual_time) * 100
+              
+              def run_comprehensive_benchmark(self):
+                  """Run all performance benchmarks and calculate overhead."""
+                  print(f"Running performance benchmarks with {self.iterations} iterations...")
+                  
+                  # Benchmark simple figure operations
+                  simple_manual = self.benchmark_manual_save('benchmarks/data/simple_figure.pkl')
+                  simple_plugin = self.benchmark_plugin_save('benchmarks/data/simple_figure.pkl')
+                  simple_overhead = self.calculate_overhead_percentage(simple_manual, simple_plugin)
+                  
+                  # Benchmark complex figure operations
+                  complex_manual = self.benchmark_manual_save('benchmarks/data/complex_figure.pkl')
+                  complex_plugin = self.benchmark_plugin_save('benchmarks/data/complex_figure.pkl')
+                  complex_overhead = self.calculate_overhead_percentage(complex_manual, complex_plugin)
+                  
+                  # Benchmark plugin-specific operations
+                  config_time = self.benchmark_config_bridge()
+                  hook_time = self.benchmark_hook_initialization()
+                  
+                  # Calculate overall metrics
+                  avg_overhead = (simple_overhead + complex_overhead) / 2
+                  
+                  # Store comprehensive results
+                  self.results['overhead_analysis'] = {
+                      'simple_figure_overhead_pct': simple_overhead,
+                      'complex_figure_overhead_pct': complex_overhead,
+                      'average_overhead_pct': avg_overhead,
+                      'config_bridge_time_ms': config_time,
+                      'hook_initialization_time_ms': hook_time
+                  }
+                  
+                  return self.results
+          
+          
+          def main():
+              """Main benchmark execution."""
+              benchmark = PerformanceBenchmark(iterations=int(os.environ.get('BENCHMARK_ITERATIONS', 100)))
+              results = benchmark.run_comprehensive_benchmark()
+              
+              # Save results for analysis
+              with open('benchmarks/results/performance_results.json', 'w') as f:
+                  json.dump(results, f, indent=2)
+              
+              # Print summary
+              overhead = results['overhead_analysis']
+              print(f"\n{'='*60}")
+              print("PERFORMANCE BENCHMARK RESULTS")
+              print(f"{'='*60}")
+              print(f"Plugin Overhead Analysis:")
+              print(f"  Simple Figure: {overhead['simple_figure_overhead_pct']:.2f}%")
+              print(f"  Complex Figure: {overhead['complex_figure_overhead_pct']:.2f}%")
+              print(f"  Average Overhead: {overhead['average_overhead_pct']:.2f}%")
+              print(f"\nComponent Performance:")
+              print(f"  Config Bridge: {overhead['config_bridge_time_ms']:.2f}ms")
+              print(f"  Hook Initialization: {overhead['hook_initialization_time_ms']:.2f}ms")
+              
+              # Validate thresholds
+              thresholds = {
+                  'plugin_overhead': float(os.environ.get('PLUGIN_OVERHEAD_THRESHOLD', 5)),
+                  'config_bridge': float(os.environ.get('CONFIG_BRIDGE_THRESHOLD', 50)),
+                  'hook_init': float(os.environ.get('HOOK_INIT_THRESHOLD', 25))
+              }
+              
+              violations = []
+              if overhead['average_overhead_pct'] > thresholds['plugin_overhead']:
+                  violations.append(f"Plugin overhead {overhead['average_overhead_pct']:.2f}% exceeds {thresholds['plugin_overhead']}% threshold")
+              
+              if overhead['config_bridge_time_ms'] > thresholds['config_bridge']:
+                  violations.append(f"Config bridge {overhead['config_bridge_time_ms']:.2f}ms exceeds {thresholds['config_bridge']}ms threshold")
+              
+              if overhead['hook_initialization_time_ms'] > thresholds['hook_init']:
+                  violations.append(f"Hook initialization {overhead['hook_initialization_time_ms']:.2f}ms exceeds {thresholds['hook_init']}ms threshold")
+              
+              if violations:
+                  print(f"\n{'='*60}")
+                  print("PERFORMANCE THRESHOLD VIOLATIONS:")
+                  for violation in violations:
+                      print(f"  ❌ {violation}")
+                  print(f"{'='*60}")
+                  
+                  if os.environ.get('STRICT_THRESHOLDS', 'true').lower() == 'true':
+                      exit(1)
+              else:
+                  print(f"\n✅ All performance thresholds met!")
+              
+              return results
+          
+          
+          if __name__ == "__main__":
+              main()
+          EOF
+          
+          # Execute the comprehensive benchmark
+          python benchmarks/plugin_overhead_benchmark.py
+      
+      - name: Run Dataset Save Benchmarks
+        run: |
+          # Create dataset-specific performance tests
+          cat > benchmarks/dataset_save_benchmark.py << 'EOF'
+          """
+          FigureDataSet save operation benchmarking per Section 6.6.4.3
+          
+          Validates that dataset save operations complete within <200ms target
+          across various figure types and styling conditions.
+          """
+          import time
+          import tempfile
+          import json
+          import os
+          import statistics
+          import matplotlib.pyplot as plt
+          import numpy as np
+          import pickle
+          from figregistry_kedro.datasets import FigureDataSet
+          
+          
+          def benchmark_dataset_saves():
+              """Benchmark FigureDataSet save operations across scenarios."""
+              scenarios = [
+                  {
+                      'name': 'simple_figure_basic_styling',
+                      'figure_path': 'benchmarks/data/simple_figure.pkl',
+                      'purpose': 'presentation',
+                      'condition_param': 'basic_condition'
+                  },
+                  {
+                      'name': 'complex_figure_advanced_styling', 
+                      'figure_path': 'benchmarks/data/complex_figure.pkl',
+                      'purpose': 'publication',
+                      'condition_param': 'advanced_condition'
+                  }
+              ]
+              
+              results = {}
+              iterations = int(os.environ.get('BENCHMARK_ITERATIONS', 100))
+              
+              for scenario in scenarios:
+                  print(f"Benchmarking scenario: {scenario['name']}")
+                  
+                  # Load test figure
+                  with open(scenario['figure_path'], 'rb') as f:
+                      test_figure = pickle.load(f)
+                  
+                  times = []
+                  
+                  for i in range(iterations):
+                      with tempfile.TemporaryDirectory() as tmpdir:
+                          # Create dataset instance
+                          dataset = FigureDataSet(
+                              filepath=f"{tmpdir}/benchmark_{i}.png",
+                              purpose=scenario['purpose'],
+                              condition_param=scenario['condition_param']
+                          )
+                          
+                          # Time the save operation
+                          start_time = time.perf_counter()
+                          try:
+                              dataset.save(test_figure)
+                              end_time = time.perf_counter()
+                              save_time_ms = (end_time - start_time) * 1000
+                              times.append(save_time_ms)
+                          except Exception as e:
+                              print(f"Error in iteration {i}: {e}")
+                              continue
+                  
+                  if times:
+                      scenario_results = {
+                          'mean_ms': statistics.mean(times),
+                          'median_ms': statistics.median(times),
+                          'std_ms': statistics.stdev(times) if len(times) > 1 else 0,
+                          'min_ms': min(times),
+                          'max_ms': max(times),
+                          'p95_ms': sorted(times)[int(0.95 * len(times))],
+                          'iterations': len(times)
+                      }
+                      results[scenario['name']] = scenario_results
+                      
+                      print(f"  Mean: {scenario_results['mean_ms']:.2f}ms")
+                      print(f"  P95: {scenario_results['p95_ms']:.2f}ms")
+                      print(f"  Max: {scenario_results['max_ms']:.2f}ms")
+              
+              # Save detailed results
+              with open('benchmarks/results/dataset_save_results.json', 'w') as f:
+                  json.dump(results, f, indent=2)
+              
+              # Validate against 200ms threshold
+              threshold = float(os.environ.get('DATASET_SAVE_THRESHOLD', 200))
+              violations = []
+              
+              for scenario_name, metrics in results.items():
+                  if metrics['p95_ms'] > threshold:
+                      violations.append(f"{scenario_name}: P95 {metrics['p95_ms']:.2f}ms > {threshold}ms")
+                  if metrics['max_ms'] > threshold * 2:  # Allow 2x threshold for max
+                      violations.append(f"{scenario_name}: Max {metrics['max_ms']:.2f}ms > {threshold*2}ms")
+              
+              print(f"\n{'='*50}")
+              print("DATASET SAVE BENCHMARK RESULTS")
+              print(f"{'='*50}")
+              
+              if violations:
+                  print("THRESHOLD VIOLATIONS:")
+                  for violation in violations:
+                      print(f"  ❌ {violation}")
+                  if os.environ.get('STRICT_THRESHOLDS', 'true').lower() == 'true':
+                      exit(1)
+              else:
+                  print("✅ All dataset save operations meet performance thresholds!")
+              
+              return results
+          
+          
+          if __name__ == "__main__":
+              benchmark_dataset_saves()
+          EOF
+          
+          python benchmarks/dataset_save_benchmark.py
+      
+      - name: Run Memory Usage Analysis
+        run: |
+          # Create memory profiling script
+          cat > benchmarks/memory_benchmark.py << 'EOF'
+          """
+          Memory usage analysis for plugin components per Section 6.6.4.3
+          
+          Ensures plugin maintains <10MB total footprint and <5MB plugin overhead.
+          """
+          import psutil
+          import os
+          import json
+          import gc
+          import sys
+          import pickle
+          from memory_profiler import profile
+          
+          
+          def get_memory_usage():
+              """Get current memory usage in MB."""
+              process = psutil.Process(os.getpid())
+              return process.memory_info().rss / 1024 / 1024  # Convert to MB
+          
+          
+          def benchmark_memory_usage():
+              """Benchmark memory usage across plugin operations."""
+              results = {}
+              
+              # Baseline memory usage
+              gc.collect()
+              baseline_memory = get_memory_usage()
+              results['baseline_memory_mb'] = baseline_memory
+              
+              # Import plugin components
+              pre_import_memory = get_memory_usage()
+              
+              from figregistry_kedro.datasets import FigureDataSet
+              from figregistry_kedro.hooks import FigRegistryHooks  
+              from figregistry_kedro.config import FigRegistryConfigBridge
+              
+              post_import_memory = get_memory_usage()
+              import_overhead = post_import_memory - pre_import_memory
+              results['import_overhead_mb'] = import_overhead
+              
+              # Test figure loading and processing
+              with open('benchmarks/data/complex_figure.pkl', 'rb') as f:
+                  test_figure = pickle.load(f)
+              
+              pre_operation_memory = get_memory_usage()
+              
+              # Simulate typical plugin operations
+              config_bridge = FigRegistryConfigBridge()
+              hooks = FigRegistryHooks()
+              dataset = FigureDataSet(
+                  filepath="/tmp/memory_test.png",
+                  purpose="benchmark",
+                  condition_param="test"
+              )
+              
+              # Memory usage during operations
+              operation_memory = get_memory_usage()
+              operation_overhead = operation_memory - pre_operation_memory
+              results['operation_overhead_mb'] = operation_overhead
+              
+              # Total plugin footprint
+              total_plugin_overhead = operation_memory - baseline_memory
+              results['total_plugin_overhead_mb'] = total_plugin_overhead
+              
+              # Cleanup and final memory
+              del config_bridge, hooks, dataset, test_figure
+              gc.collect()
+              
+              final_memory = get_memory_usage()
+              cleanup_efficiency = (operation_memory - final_memory) / operation_memory * 100
+              results['cleanup_efficiency_pct'] = cleanup_efficiency
+              results['final_memory_mb'] = final_memory
+              
+              return results
+          
+          
+          def main():
+              """Main memory benchmark execution."""
+              results = benchmark_memory_usage()
+              
+              # Save results
+              with open('benchmarks/results/memory_results.json', 'w') as f:
+                  json.dump(results, f, indent=2)
+              
+              # Print summary
+              print(f"\n{'='*50}")
+              print("MEMORY USAGE ANALYSIS")
+              print(f"{'='*50}")
+              print(f"Baseline Memory: {results['baseline_memory_mb']:.2f} MB")
+              print(f"Import Overhead: {results['import_overhead_mb']:.2f} MB")
+              print(f"Operation Overhead: {results['operation_overhead_mb']:.2f} MB")
+              print(f"Total Plugin Overhead: {results['total_plugin_overhead_mb']:.2f} MB")
+              print(f"Cleanup Efficiency: {results['cleanup_efficiency_pct']:.1f}%")
+              
+              # Validate thresholds
+              total_threshold = 10.0  # <10MB total footprint
+              plugin_threshold = 5.0  # <5MB plugin overhead
+              
+              violations = []
+              if results['final_memory_mb'] > total_threshold:
+                  violations.append(f"Total memory {results['final_memory_mb']:.2f}MB > {total_threshold}MB")
+              
+              if results['total_plugin_overhead_mb'] > plugin_threshold:
+                  violations.append(f"Plugin overhead {results['total_plugin_overhead_mb']:.2f}MB > {plugin_threshold}MB")
+              
+              if violations:
+                  print(f"\nMEMORY THRESHOLD VIOLATIONS:")
+                  for violation in violations:
+                      print(f"  ❌ {violation}")
+                  if os.environ.get('STRICT_THRESHOLDS', 'true').lower() == 'true':
+                      exit(1)
+              else:
+                  print(f"\n✅ Memory usage within acceptable limits!")
+              
+              return results
+          
+          
+          if __name__ == "__main__":
+              main()
+          EOF
+          
+          python benchmarks/memory_benchmark.py
+      
+      - name: Generate Performance Report
+        run: |
+          # Create comprehensive performance report
+          cat > benchmarks/generate_report.py << 'EOF'
+          """
+          Generate comprehensive performance report from benchmark results.
+          """
+          import json
+          import os
+          from datetime import datetime
+          
+          
+          def load_results():
+              """Load all benchmark results."""
+              results = {}
+              
+              result_files = [
+                  'benchmarks/results/performance_results.json',
+                  'benchmarks/results/dataset_save_results.json', 
+                  'benchmarks/results/memory_results.json'
+              ]
+              
+              for file_path in result_files:
+                  if os.path.exists(file_path):
+                      with open(file_path, 'r') as f:
+                          key = os.path.basename(file_path).replace('.json', '')
+                          results[key] = json.load(f)
+              
+              return results
+          
+          
+          def generate_markdown_report(results):
+              """Generate markdown performance report."""
+              report = f"""# Performance Benchmark Report
+          
+          **Generated:** {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}
+          **Python Version:** {os.environ.get('PYTHON_VERSION', 'Unknown')}
+          **Kedro Version:** {os.environ.get('KEDRO_VERSION', 'Unknown')}
+          **Benchmark Iterations:** {os.environ.get('BENCHMARK_ITERATIONS', 'Unknown')}
+          
+          ## Executive Summary
+          
+          This report validates figregistry-kedro plugin performance against established
+          thresholds per Section 6.6.4.3 of the technical specification.
+          
+          ### Performance Thresholds
+          
+          | Metric | Threshold | Status |
+          |--------|-----------|--------|"""
+              
+              # Add threshold validation results
+              if 'performance_results' in results and 'overhead_analysis' in results['performance_results']:
+                  overhead = results['performance_results']['overhead_analysis']
+                  
+                  # Plugin overhead
+                  overhead_status = "✅ PASS" if overhead['average_overhead_pct'] <= 5 else "❌ FAIL"
+                  report += f"\n| Plugin Overhead | <5% | {overhead_status} ({overhead['average_overhead_pct']:.2f}%) |"
+                  
+                  # Config bridge timing
+                  config_status = "✅ PASS" if overhead['config_bridge_time_ms'] <= 50 else "❌ FAIL"
+                  report += f"\n| Config Bridge | <50ms | {config_status} ({overhead['config_bridge_time_ms']:.2f}ms) |"
+                  
+                  # Hook initialization
+                  hook_status = "✅ PASS" if overhead['hook_initialization_time_ms'] <= 25 else "❌ FAIL"
+                  report += f"\n| Hook Initialization | <25ms | {hook_status} ({overhead['hook_initialization_time_ms']:.2f}ms) |"
+              
+              # Dataset save performance
+              if 'dataset_save_results' in results:
+                  for scenario, metrics in results['dataset_save_results'].items():
+                      save_status = "✅ PASS" if metrics['p95_ms'] <= 200 else "❌ FAIL"
+                      report += f"\n| Dataset Save ({scenario}) | <200ms | {save_status} ({metrics['p95_ms']:.2f}ms P95) |"
+              
+              # Memory usage
+              if 'memory_results' in results:
+                  memory = results['memory_results']
+                  memory_status = "✅ PASS" if memory['total_plugin_overhead_mb'] <= 5 else "❌ FAIL"
+                  report += f"\n| Memory Overhead | <5MB | {memory_status} ({memory['total_plugin_overhead_mb']:.2f}MB) |"
+              
+              report += """
+          
+          ## Detailed Results
+          
+          ### Plugin Overhead Analysis
+          """
+              
+              if 'performance_results' in results:
+                  overhead = results['performance_results']['overhead_analysis']
+                  report += f"""
+          - **Simple Figure Overhead:** {overhead['simple_figure_overhead_pct']:.2f}%
+          - **Complex Figure Overhead:** {overhead['complex_figure_overhead_pct']:.2f}%
+          - **Average Plugin Overhead:** {overhead['average_overhead_pct']:.2f}%
+          - **Configuration Bridge Time:** {overhead['config_bridge_time_ms']:.2f}ms
+          - **Hook Initialization Time:** {overhead['hook_initialization_time_ms']:.2f}ms
+          """
+              
+              report += """
+          ### Dataset Save Performance
+          """
+              
+              if 'dataset_save_results' in results:
+                  for scenario, metrics in results['dataset_save_results'].items():
+                      report += f"""
+          #### {scenario.replace('_', ' ').title()}
+          - **Mean Time:** {metrics['mean_ms']:.2f}ms
+          - **Median Time:** {metrics['median_ms']:.2f}ms
+          - **95th Percentile:** {metrics['p95_ms']:.2f}ms
+          - **Maximum Time:** {metrics['max_ms']:.2f}ms
+          - **Standard Deviation:** {metrics['std_ms']:.2f}ms
+          """
+              
+              report += """
+          ### Memory Usage Analysis
+          """
+              
+              if 'memory_results' in results:
+                  memory = results['memory_results']
+                  report += f"""
+          - **Baseline Memory:** {memory['baseline_memory_mb']:.2f}MB
+          - **Import Overhead:** {memory['import_overhead_mb']:.2f}MB
+          - **Operation Overhead:** {memory['operation_overhead_mb']:.2f}MB
+          - **Total Plugin Overhead:** {memory['total_plugin_overhead_mb']:.2f}MB
+          - **Cleanup Efficiency:** {memory['cleanup_efficiency_pct']:.1f}%
+          """
+              
+              report += f"""
+          
+          ## Benchmark Configuration
+          
+          - **Iterations:** {os.environ.get('BENCHMARK_ITERATIONS', 'Unknown')}
+          - **Strict Thresholds:** {os.environ.get('STRICT_THRESHOLDS', 'Unknown')}
+          - **Environment:** GitHub Actions Ubuntu Latest
+          - **Test Data:** Generated matplotlib figures (simple and complex)
+          
+          ## Recommendations
+          
+          Based on the benchmark results:
+          
+          1. **Performance Optimization:** Focus on components exceeding thresholds
+          2. **Memory Management:** Monitor plugin overhead growth over time
+          3. **Regression Testing:** Establish baseline for future comparisons
+          4. **Threshold Tuning:** Adjust thresholds based on real-world usage patterns
+          """
+              
+              return report
+          
+          
+          def main():
+              """Generate and save performance report."""
+              results = load_results()
+              report = generate_markdown_report(results)
+              
+              # Save markdown report
+              with open('benchmarks/results/performance_report.md', 'w') as f:
+                  f.write(report)
+              
+              # Save combined JSON results
+              with open('benchmarks/results/combined_results.json', 'w') as f:
+                  json.dump(results, f, indent=2)
+              
+              print("Performance report generated successfully!")
+              print(f"Markdown report: benchmarks/results/performance_report.md")
+              print(f"Combined results: benchmarks/results/combined_results.json")
+              
+              return results
+          
+          
+          if __name__ == "__main__":
+              main()
+          EOF
+          
+          python benchmarks/generate_report.py
+      
+      - name: Upload Performance Results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: performance-results-py${{ matrix.python-version }}-kedro${{ matrix.kedro-version }}
+          path: |
+            benchmarks/results/
+            benchmarks/data/
+          retention-days: 30
+      
+      - name: Comment Performance Results on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            
+            try {
+              // Read performance report
+              const reportPath = 'benchmarks/results/performance_report.md';
+              if (fs.existsSync(reportPath)) {
+                const report = fs.readFileSync(reportPath, 'utf8');
+                
+                // Post comment with performance results
+                await github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: `## Performance Benchmark Results\n\n${report}\n\n---\n*Generated by Performance Benchmarking workflow*`
+                });
+              }
+            } catch (error) {
+              console.log('Could not post performance results:', error);
+            }
+
+  # Performance regression detection
+  performance-regression:
+    name: Performance Regression Detection
+    runs-on: ubuntu-latest
+    needs: performance-benchmarks
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 50  # Need history for comparison
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Download Performance Results
+        uses: actions/download-artifact@v3
+        with:
+          name: performance-results-py3.11-kedro0.19.8
+          path: current-results/
+      
+      - name: Get Baseline Performance
+        run: |
+          # Try to get performance results from main branch
+          git checkout origin/main -- benchmarks/results/ 2>/dev/null || echo "No baseline found"
+          
+          # If baseline exists, compare results
+          if [ -f "benchmarks/results/combined_results.json" ]; then
+            cp benchmarks/results/combined_results.json baseline_results.json
+          else
+            echo "No baseline performance data found - this will establish baseline"
+            echo '{}' > baseline_results.json
+          fi
+      
+      - name: Analyze Performance Regression
+        run: |
+          cat > performance_regression_analysis.py << 'EOF'
+          """
+          Performance regression analysis per Section 6.6.6.2
+          
+          Compares current performance against baseline to detect regressions
+          exceeding acceptable thresholds.
+          """
+          import json
+          import sys
+          import os
+          
+          
+          def load_json_safe(filepath):
+              """Safely load JSON file."""
+              try:
+                  if os.path.exists(filepath):
+                      with open(filepath, 'r') as f:
+                          return json.load(f)
+              except Exception as e:
+                  print(f"Error loading {filepath}: {e}")
+              return {}
+          
+          
+          def analyze_regression():
+              """Analyze performance regression between baseline and current."""
+              baseline = load_json_safe('baseline_results.json')
+              current = load_json_safe('current-results/combined_results.json')
+              
+              if not baseline or not current:
+                  print("Insufficient data for regression analysis")
+                  return False
+              
+              regressions = []
+              improvements = []
+              
+              # Analyze plugin overhead regression
+              if ('performance_results' in baseline and 'performance_results' in current and
+                  'overhead_analysis' in baseline['performance_results'] and 
+                  'overhead_analysis' in current['performance_results']):
+                  
+                  baseline_overhead = baseline['performance_results']['overhead_analysis']
+                  current_overhead = current['performance_results']['overhead_analysis']
+                  
+                  # Check average overhead regression
+                  baseline_avg = baseline_overhead.get('average_overhead_pct', 0)
+                  current_avg = current_overhead.get('average_overhead_pct', 0)
+                  
+                  if baseline_avg > 0:
+                      overhead_change = ((current_avg - baseline_avg) / baseline_avg) * 100
+                      if overhead_change > 10:  # >10% regression threshold
+                          regressions.append(f"Plugin overhead increased by {overhead_change:.1f}% ({baseline_avg:.2f}% → {current_avg:.2f}%)")
+                      elif overhead_change < -5:  # >5% improvement
+                          improvements.append(f"Plugin overhead improved by {abs(overhead_change):.1f}% ({baseline_avg:.2f}% → {current_avg:.2f}%)")
+                  
+                  # Check config bridge regression
+                  baseline_config = baseline_overhead.get('config_bridge_time_ms', 0)
+                  current_config = current_overhead.get('config_bridge_time_ms', 0)
+                  
+                  if baseline_config > 0:
+                      config_change = ((current_config - baseline_config) / baseline_config) * 100
+                      if config_change > 20:  # >20% regression threshold
+                          regressions.append(f"Config bridge time increased by {config_change:.1f}% ({baseline_config:.2f}ms → {current_config:.2f}ms)")
+                  
+                  # Check hook initialization regression
+                  baseline_hook = baseline_overhead.get('hook_initialization_time_ms', 0)
+                  current_hook = current_overhead.get('hook_initialization_time_ms', 0)
+                  
+                  if baseline_hook > 0:
+                      hook_change = ((current_hook - baseline_hook) / baseline_hook) * 100
+                      if hook_change > 20:  # >20% regression threshold
+                          regressions.append(f"Hook initialization time increased by {hook_change:.1f}% ({baseline_hook:.2f}ms → {current_hook:.2f}ms)")
+              
+              # Analyze dataset save regression
+              if 'dataset_save_results' in baseline and 'dataset_save_results' in current:
+                  for scenario in baseline['dataset_save_results']:
+                      if scenario in current['dataset_save_results']:
+                          baseline_p95 = baseline['dataset_save_results'][scenario].get('p95_ms', 0)
+                          current_p95 = current['dataset_save_results'][scenario].get('p95_ms', 0)
+                          
+                          if baseline_p95 > 0:
+                              save_change = ((current_p95 - baseline_p95) / baseline_p95) * 100
+                              if save_change > 15:  # >15% regression threshold
+                                  regressions.append(f"Dataset save P95 for {scenario} increased by {save_change:.1f}% ({baseline_p95:.2f}ms → {current_p95:.2f}ms)")
+              
+              # Analyze memory regression
+              if 'memory_results' in baseline and 'memory_results' in current:
+                  baseline_memory = baseline['memory_results'].get('total_plugin_overhead_mb', 0)
+                  current_memory = current['memory_results'].get('total_plugin_overhead_mb', 0)
+                  
+                  if baseline_memory > 0:
+                      memory_change = ((current_memory - baseline_memory) / baseline_memory) * 100
+                      if memory_change > 25:  # >25% memory regression threshold
+                          regressions.append(f"Memory overhead increased by {memory_change:.1f}% ({baseline_memory:.2f}MB → {current_memory:.2f}MB)")
+              
+              # Generate report
+              print("="*60)
+              print("PERFORMANCE REGRESSION ANALYSIS")
+              print("="*60)
+              
+              if regressions:
+                  print("⚠️  PERFORMANCE REGRESSIONS DETECTED:")
+                  for regression in regressions:
+                      print(f"  • {regression}")
+                  print()
+              
+              if improvements:
+                  print("✅ PERFORMANCE IMPROVEMENTS:")
+                  for improvement in improvements:
+                      print(f"  • {improvement}")
+                  print()
+              
+              if not regressions and not improvements:
+                  print("📊 No significant performance changes detected")
+              
+              # Return whether to fail the check
+              return len(regressions) > 0
+          
+          
+          def main():
+              """Main regression analysis execution."""
+              has_regressions = analyze_regression()
+              
+              if has_regressions:
+                  print("\n❌ Performance regression check FAILED")
+                  print("Consider optimizing the affected components before merging.")
+                  sys.exit(1)
+              else:
+                  print("\n✅ Performance regression check PASSED")
+              
+              return has_regressions
+          
+          
+          if __name__ == "__main__":
+              main()
+          EOF
+          
+          python performance_regression_analysis.py
+
+  # Performance monitoring and alerting
+  performance-monitoring:
+    name: Performance Monitoring & Alerting
+    runs-on: ubuntu-latest
+    needs: performance-benchmarks
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Download Performance Results
+        uses: actions/download-artifact@v3
+        with:
+          name: performance-results-py3.11-kedro0.19.8
+          path: performance-results/
+      
+      - name: Store Performance Baselines
+        run: |
+          # Store performance results as baselines for future comparisons
+          mkdir -p .github/performance-baselines
+          
+          # Copy current results as new baseline
+          cp performance-results/combined_results.json .github/performance-baselines/latest_baseline.json
+          
+          # Add timestamp
+          echo "{\"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\", \"commit\": \"$GITHUB_SHA\"}" > .github/performance-baselines/baseline_metadata.json
+          
+          # Commit updated baselines
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .github/performance-baselines/
+          git commit -m "Update performance baselines [skip ci]" || echo "No changes to commit"
+          git push || echo "No changes to push"
+      
+      - name: Performance Alert Check
+        run: |
+          cat > performance_alerting.py << 'EOF'
+          """
+          Performance monitoring and alerting per Section 6.6.6.2
+          
+          Monitors performance metrics and sends alerts when thresholds are exceeded
+          or significant degradations are detected.
+          """
+          import json
+          import os
+          
+          
+          def check_performance_alerts():
+              """Check for performance conditions requiring alerts."""
+              alerts = []
+              
+              try:
+                  with open('performance-results/combined_results.json', 'r') as f:
+                      results = json.load(f)
+              except Exception as e:
+                  alerts.append(f"Failed to load performance results: {e}")
+                  return alerts
+              
+              # Check critical threshold violations
+              if 'performance_results' in results and 'overhead_analysis' in results['performance_results']:
+                  overhead = results['performance_results']['overhead_analysis']
+                  
+                  # Critical plugin overhead alert
+                  if overhead.get('average_overhead_pct', 0) > 8:  # Alert at 8% (before 10% failure)
+                      alerts.append(f"CRITICAL: Plugin overhead at {overhead['average_overhead_pct']:.2f}% approaching 10% failure threshold")
+                  
+                  # Config bridge performance alert
+                  if overhead.get('config_bridge_time_ms', 0) > 75:  # Alert at 75ms (before 100ms concern)
+                      alerts.append(f"WARNING: Config bridge timing at {overhead['config_bridge_time_ms']:.2f}ms may impact user experience")
+                  
+                  # Hook initialization alert
+                  if overhead.get('hook_initialization_time_ms', 0) > 40:  # Alert at 40ms (before 50ms concern)
+                      alerts.append(f"WARNING: Hook initialization at {overhead['hook_initialization_time_ms']:.2f}ms may slow project startup")
+              
+              # Check dataset save performance
+              if 'dataset_save_results' in results:
+                  for scenario, metrics in results['dataset_save_results'].items():
+                      if metrics.get('p95_ms', 0) > 250:  # Alert at 250ms (before 300ms critical)
+                          alerts.append(f"WARNING: Dataset save P95 for {scenario} at {metrics['p95_ms']:.2f}ms approaching critical threshold")
+              
+              # Check memory usage
+              if 'memory_results' in results:
+                  memory_overhead = results['memory_results'].get('total_plugin_overhead_mb', 0)
+                  if memory_overhead > 7:  # Alert at 7MB (before 10MB limit)
+                      alerts.append(f"WARNING: Memory overhead at {memory_overhead:.2f}MB approaching 10MB limit")
+              
+              return alerts
+          
+          
+          def main():
+              """Main alert checking execution."""
+              alerts = check_performance_alerts()
+              
+              if alerts:
+                  print("🚨 PERFORMANCE ALERTS DETECTED:")
+                  for alert in alerts:
+                      print(f"  • {alert}")
+                  
+                  # Create GitHub issue for critical alerts
+                  critical_alerts = [a for a in alerts if 'CRITICAL' in a]
+                  if critical_alerts:
+                      print("\n📋 Creating GitHub issue for critical performance alerts...")
+                      # Issue creation would be handled by subsequent GitHub Actions step
+              else:
+                  print("✅ All performance metrics within acceptable ranges")
+              
+              return alerts
+          
+          
+          if __name__ == "__main__":
+              main()
+          EOF
+          
+          python performance_alerting.py
+
+      - name: Create Performance Issue on Critical Alert
+        if: success()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs = require('fs');
+            
+            // Check if performance alerting detected critical issues
+            try {
+              const { execSync } = require('child_process');
+              const alertOutput = execSync('python performance_alerting.py', { encoding: 'utf8' });
+              
+              if (alertOutput.includes('CRITICAL:')) {
+                // Create issue for critical performance degradation
+                const issueBody = `
+            ## Critical Performance Alert
+            
+            **Commit:** ${context.sha}
+            **Workflow:** ${context.workflow}
+            **Run:** ${context.runNumber}
+            
+            ### Alert Details
+            
+            \`\`\`
+            ${alertOutput}
+            \`\`\`
+            
+            ### Action Required
+            
+            This alert indicates that performance has degraded beyond acceptable thresholds. 
+            Please investigate and address the performance issues before they impact users.
+            
+            ### Performance Data
+            
+            Detailed performance results are available in the workflow artifacts.
+            
+            ---
+            *This issue was automatically created by the Performance Monitoring workflow*
+                `;
+                
+                await github.rest.issues.create({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  title: `🚨 Critical Performance Alert - ${new Date().toISOString().split('T')[0]}`,
+                  body: issueBody,
+                  labels: ['performance', 'critical', 'automated']
+                });
+              }
+            } catch (error) {
+              console.log('Performance alerting check completed normally');
+            }

@@ -1,0 +1,178 @@
+# Basic Valid FigRegistry Configuration for Plugin Testing
+# This configuration provides minimal required fields for successful validation
+# and testing of the figregistry-kedro plugin functionality per Section 5.2.5
+
+# Configuration metadata for tracking and validation
+metadata:
+  config_version: "1.0.0"
+  created_by: "figregistry-kedro test suite"
+  description: "Basic valid configuration for plugin functionality testing"
+  last_updated: "2024-01-15T10:30:00Z"
+  project_name: "figregistry-kedro-basic-test"
+
+# Standard styling conditions for condition-based testing per F-002
+styles:
+  # Exploratory analysis style
+  exploratory:
+    color: "#A8E6CF"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Exploratory Analysis"
+    markersize: 6
+
+  # Presentation-ready style
+  presentation:
+    color: "#FFB6C1"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.8
+    label: "Presentation Ready"
+    markersize: 8
+
+  # Publication-quality style
+  publication:
+    color: "#1A1A1A"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.5
+    alpha: 1.0
+    label: "Publication Quality"
+    markersize: 10
+
+  # Additional test conditions for condition mapping
+  baseline:
+    color: "#2E86AB"
+    marker: "o"
+    linestyle: "--"
+    linewidth: 2.0
+    alpha: 0.9
+    label: "Baseline Condition"
+
+  treatment:
+    color: "#F24236"
+    marker: "D"
+    linestyle: "-"
+    linewidth: 2.0
+    alpha: 0.9
+    label: "Treatment Condition"
+
+# Color palettes for fallback styling
+palettes:
+  default: ["#2E86AB", "#A23B72", "#F18F01", "#C73E1D"]
+  colorblind_safe: ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"]
+  publication:
+    primary: "#000000"
+    secondary: "#666666"
+    accent: "#2E86AB"
+    highlight: "#F24236"
+
+# Default styling parameters and fallback configurations
+defaults:
+  figure:
+    figsize: [10, 8]
+    dpi: 150
+    facecolor: "white"
+    edgecolor: "none"
+  
+  line:
+    color: "#2E86AB"
+    linewidth: 2.0
+    alpha: 0.8
+  
+  scatter:
+    s: 50
+    alpha: 0.7
+    edgecolors: "black"
+    linewidth: 0.5
+  
+  # Fallback style for unknown conditions
+  fallback_style:
+    color: "#95A5A6"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Unknown Condition"
+
+# Output configuration with standard paths and file naming patterns
+outputs:
+  base_path: "data/08_reporting"
+  naming:
+    template: "{name}_{condition}_{ts}"
+    timestamp_format: "%Y%m%d_%H%M%S"
+  
+  formats:
+    defaults:
+      exploratory: ["png"]
+      presentation: ["png", "pdf"]
+      publication: ["pdf", "svg"]
+    resolution:
+      png:
+        dpi: 300
+      pdf:
+        dpi: 300
+      svg:
+        dpi: 300
+  
+  paths:
+    exploratory: "exploratory"
+    presentation: "presentation" 
+    publication: "publication"
+
+# Style inheritance and composition rules
+style_inheritance:
+  enabled: true
+  hierarchy: ["specific", "category", "defaults"]
+  merge_strategy: "deep"
+
+# Conditional styling rules for complex scenarios
+conditional_rules:
+  wildcard_patterns: ["*_control", "*_treatment"]
+  partial_matching: true
+  case_sensitive: false
+
+# Performance monitoring and optimization settings for baseline testing
+performance:
+  cache_enabled: true
+  max_cache_size: 1000
+  target_merge_time_ms: 10.0
+
+# Configuration validation schema and rules
+validation:
+  strict_mode: true
+  required_fields: ["styles", "defaults", "outputs"]
+  schema_version: "1.0"
+
+# Kedro-specific integration settings for plugin testing
+kedro:
+  config_bridge:
+    enabled: true
+    merge_strategy: "override"
+  datasets:
+    default_purpose: "exploratory"
+  
+# Basic rcParams settings for matplotlib styling validation
+rcParams:
+  figure.facecolor: "white"
+  figure.edgecolor: "none"
+  axes.grid: true
+  axes.grid.alpha: 0.3
+  font.size: 12
+  font.family: "sans-serif"
+  lines.linewidth: 2.0
+  lines.markersize: 6
+
+# Simple condition mappings for testing get_style() integration
+condition_mappings:
+  test_condition: "exploratory"
+  dev_condition: "exploratory"
+  staging_condition: "presentation"
+  prod_condition: "publication"
+  experiment_a: "baseline"
+  experiment_b: "treatment"
+
+# Version constraint for compatibility validation
+figregistry_version: ">=0.3.0"

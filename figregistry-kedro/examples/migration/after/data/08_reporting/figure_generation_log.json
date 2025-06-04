@@ -1,0 +1,697 @@
+{
+  "log_metadata": {
+    "format_version": "1.0.0",
+    "generated_by": "figregistry-kedro v0.1.0",
+    "description": "Automated figure generation audit log capturing systematic tracking of all figure creation, styling decisions, and configuration resolution during Kedro pipeline execution",
+    "purpose": "Demonstrate comprehensive logging capabilities for reproducible research and debugging automated workflows",
+    "creation_timestamp": "2024-01-15T14:23:45.123Z",
+    "session_id": "migration_example_20240115_142345",
+    "project_name": "kedro_figregistry_example",
+    "environment": "local"
+  },
+  "pipeline_execution": {
+    "run_id": "2024-01-15T14.23.45.123Z",
+    "pipeline_name": "data_visualization",
+    "kedro_version": "0.19.1",
+    "figregistry_version": "0.3.0",
+    "figregistry_kedro_version": "0.1.0",
+    "execution_start": "2024-01-15T14:23:45.123Z",
+    "execution_end": "2024-01-15T14:24:12.456Z",
+    "total_duration_ms": 27333,
+    "status": "completed"
+  },
+  "hooks_lifecycle": {
+    "initialization": {
+      "timestamp": "2024-01-15T14:23:45.150Z",
+      "hook_method": "after_config_loaded",
+      "duration_ms": 12.5,
+      "status": "success",
+      "config_bridge_initialized": true,
+      "configuration_sources": [
+        "conf/base/figregistry.yml",
+        "figregistry.yaml",
+        "conf/local/figregistry.yml"
+      ],
+      "merged_config_sections": [
+        "metadata",
+        "styles", 
+        "defaults",
+        "outputs",
+        "kedro"
+      ],
+      "validation_results": {
+        "schema_validation": "passed",
+        "constraint_checks": "passed",
+        "warnings": [],
+        "errors": []
+      }
+    },
+    "pipeline_setup": {
+      "timestamp": "2024-01-15T14:23:45.890Z",
+      "hook_method": "before_pipeline_run",
+      "duration_ms": 4.2,
+      "status": "success",
+      "figregistry_context_established": true,
+      "catalog_validation": {
+        "figuredataset_entries_found": 3,
+        "entries": [
+          "scatter_analysis_plot",
+          "trend_comparison_chart", 
+          "summary_report_figure"
+        ],
+        "configuration_available": true,
+        "validation_status": "passed"
+      }
+    },
+    "pipeline_cleanup": {
+      "timestamp": "2024-01-15T14:24:12.445Z",
+      "hook_method": "after_pipeline_run", 
+      "duration_ms": 2.1,
+      "status": "success",
+      "contexts_cleaned": 1,
+      "performance_summary": {
+        "total_invocations": 3,
+        "avg_initialization_time_ms": 12.5,
+        "avg_cleanup_time_ms": 2.1,
+        "cache_hit_rate": 0.67,
+        "errors": 0,
+        "warnings": 1
+      }
+    }
+  },
+  "configuration_resolution": {
+    "merge_operations": [
+      {
+        "timestamp": "2024-01-15T14:23:45.160Z",
+        "operation": "config_merge",
+        "duration_ms": 8.3,
+        "sources": {
+          "base_config": "conf/base/figregistry.yml",
+          "local_overrides": "conf/local/figregistry.yml",
+          "environment_vars": []
+        },
+        "precedence_applied": {
+          "rule": "local > base > defaults",
+          "conflicts_resolved": 2,
+          "details": [
+            {
+              "path": "styles.presentation.color",
+              "base_value": "#2E86AB",
+              "override_value": "#1A5490",
+              "final_value": "#1A5490",
+              "source": "local"
+            },
+            {
+              "path": "outputs.base_path", 
+              "base_value": "data/08_reporting",
+              "override_value": "outputs/figures",
+              "final_value": "outputs/figures",
+              "source": "local"
+            }
+          ]
+        },
+        "validation": {
+          "schema_check": "passed",
+          "type_validation": "passed",
+          "constraint_validation": "passed"
+        },
+        "cache_status": "miss",
+        "cache_key": "config_merge_local_20240115_142345"
+      }
+    ],
+    "style_resolutions": [
+      {
+        "timestamp": "2024-01-15T14:23:58.234Z",
+        "figure_name": "scatter_analysis_plot", 
+        "condition_param": "analysis_type",
+        "condition_value": "exploratory",
+        "resolution_method": "direct_match",
+        "style_applied": {
+          "color": "#A8E6CF",
+          "marker": "o",
+          "linestyle": "-",
+          "linewidth": 1.5,
+          "alpha": 0.7,
+          "label": "Exploratory Analysis"
+        },
+        "overrides_applied": {
+          "dataset_style_params": {
+            "color": "#2E86AB"
+          },
+          "final_merged_style": {
+            "color": "#2E86AB",
+            "marker": "o", 
+            "linestyle": "-",
+            "linewidth": 1.5,
+            "alpha": 0.7,
+            "label": "Exploratory Analysis"
+          }
+        },
+        "cache_status": "miss",
+        "resolution_time_ms": 1.2
+      },
+      {
+        "timestamp": "2024-01-15T14:24:05.567Z",
+        "figure_name": "trend_comparison_chart",
+        "condition_param": "output_purpose", 
+        "condition_value": "presentation",
+        "resolution_method": "direct_match",
+        "style_applied": {
+          "color": "#1A5490",
+          "marker": "s",
+          "linestyle": "-",
+          "linewidth": 2.0,
+          "alpha": 0.8,
+          "label": "Trend Analysis"
+        },
+        "overrides_applied": {
+          "dataset_style_params": {},
+          "final_merged_style": {
+            "color": "#1A5490",
+            "marker": "s",
+            "linestyle": "-", 
+            "linewidth": 2.0,
+            "alpha": 0.8,
+            "label": "Trend Analysis"
+          }
+        },
+        "cache_status": "hit",
+        "resolution_time_ms": 0.3
+      },
+      {
+        "timestamp": "2024-01-15T14:24:09.890Z",
+        "figure_name": "summary_report_figure",
+        "condition_param": "report_type",
+        "condition_value": "publication",
+        "resolution_method": "direct_match", 
+        "style_applied": {
+          "color": "#1A1A1A",
+          "marker": "o",
+          "linestyle": "-",
+          "linewidth": 2.5,
+          "alpha": 1.0,
+          "label": "Summary Report"
+        },
+        "overrides_applied": {
+          "dataset_style_params": {
+            "linewidth": 3.0,
+            "marker": "^"
+          },
+          "final_merged_style": {
+            "color": "#1A1A1A",
+            "marker": "^",
+            "linestyle": "-",
+            "linewidth": 3.0,
+            "alpha": 1.0,
+            "label": "Summary Report"
+          }
+        },
+        "cache_status": "miss",
+        "resolution_time_ms": 1.1
+      }
+    ]
+  },
+  "figure_generation_events": [
+    {
+      "event_id": "fig_001_scatter_analysis_plot", 
+      "timestamp": "2024-01-15T14:23:58.245Z",
+      "dataset_info": {
+        "name": "scatter_analysis_plot",
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/scatter_analysis_plot.png",
+        "purpose": "exploratory",
+        "condition_param": "analysis_type",
+        "versioned": false,
+        "format_kwargs": {
+          "dpi": 150,
+          "bbox_inches": "tight",
+          "facecolor": "white"
+        }
+      },
+      "pipeline_context": {
+        "run_id": "2024-01-15T14.23.45.123Z",
+        "pipeline_name": "data_visualization",
+        "node_name": "create_scatter_plot",
+        "namespace": null,
+        "parameters": {
+          "analysis_type": "exploratory",
+          "sample_size": 1000,
+          "random_seed": 42
+        }
+      },
+      "styling_decisions": {
+        "condition_resolution": {
+          "method": "direct_parameter_match",
+          "condition_key": "exploratory",
+          "style_source": "merged_config",
+          "cache_used": false
+        },
+        "style_application": {
+          "base_style": {
+            "color": "#A8E6CF",
+            "marker": "o",
+            "linestyle": "-",
+            "linewidth": 1.5,
+            "alpha": 0.7
+          },
+          "dataset_overrides": {
+            "color": "#2E86AB"
+          },
+          "final_style": {
+            "color": "#2E86AB",
+            "marker": "o",
+            "linestyle": "-", 
+            "linewidth": 1.5,
+            "alpha": 0.7,
+            "label": "Exploratory Analysis"
+          },
+          "matplotlib_properties_set": [
+            "line.color",
+            "line.marker", 
+            "line.linestyle",
+            "line.linewidth",
+            "line.alpha"
+          ]
+        }
+      },
+      "save_operation": {
+        "file_path": "data/08_reporting/scatter_analysis_plot.png",
+        "file_size_bytes": 156789,
+        "save_method": "matplotlib_savefig",
+        "save_kwargs_used": {
+          "dpi": 150,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "edgecolor": "none"
+        },
+        "directory_created": false,
+        "backup_created": false
+      },
+      "performance_metrics": {
+        "total_save_time_ms": 23.4,
+        "style_resolution_time_ms": 1.2,
+        "matplotlib_render_time_ms": 18.7,
+        "file_write_time_ms": 3.5,
+        "validation_time_ms": 0.8,
+        "overhead_percentage": 4.2
+      },
+      "validation_results": {
+        "figure_validation": "passed",
+        "filepath_validation": "passed", 
+        "parameter_validation": "passed",
+        "style_validation": "passed",
+        "warnings": [],
+        "errors": []
+      },
+      "status": "success"
+    },
+    {
+      "event_id": "fig_002_trend_comparison_chart",
+      "timestamp": "2024-01-15T14:24:05.578Z", 
+      "dataset_info": {
+        "name": "trend_comparison_chart",
+        "type": "figregistry_kedro.datasets.FigureDataSet",
+        "filepath": "data/08_reporting/trend_comparison_chart.png",
+        "purpose": "presentation",
+        "condition_param": "output_purpose", 
+        "versioned": true,
+        "save_version": "2024-01-15T14.23.45.123Z",
+        "format_kwargs": {
+          "dpi": 200,
+          "bbox_inches": "tight",
+          "transparent": false
+        }
+      },
+      "pipeline_context": {
+        "run_id": "2024-01-15T14.23.45.123Z",
+        "pipeline_name": "data_visualization",
+        "node_name": "generate_trend_chart",
+        "namespace": null,
+        "parameters": {
+          "output_purpose": "presentation",
+          "time_period": "monthly",
+          "include_confidence_bands": true
+        }
+      },
+      "styling_decisions": {
+        "condition_resolution": {
+          "method": "direct_parameter_match",
+          "condition_key": "presentation",
+          "style_source": "merged_config",
+          "cache_used": true,
+          "cache_key": "style_presentation_20240115"
+        },
+        "style_application": {
+          "base_style": {
+            "color": "#1A5490",
+            "marker": "s",
+            "linestyle": "-",
+            "linewidth": 2.0,
+            "alpha": 0.8
+          },
+          "dataset_overrides": {},
+          "final_style": {
+            "color": "#1A5490",
+            "marker": "s",
+            "linestyle": "-",
+            "linewidth": 2.0, 
+            "alpha": 0.8,
+            "label": "Trend Analysis"
+          },
+          "matplotlib_properties_set": [
+            "line.color",
+            "line.marker",
+            "line.linestyle", 
+            "line.linewidth",
+            "line.alpha",
+            "axes.grid"
+          ]
+        }
+      },
+      "save_operation": {
+        "file_path": "data/08_reporting/trend_comparison_chart_2024-01-15T14.23.45.123Z.png",
+        "file_size_bytes": 234567,
+        "save_method": "matplotlib_savefig",
+        "save_kwargs_used": {
+          "dpi": 200,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "edgecolor": "none",
+          "transparent": false
+        },
+        "directory_created": false,
+        "backup_created": false,
+        "versioning": {
+          "enabled": true,
+          "version_tag": "2024-01-15T14.23.45.123Z",
+          "version_strategy": "kedro_timestamp"
+        }
+      },
+      "performance_metrics": {
+        "total_save_time_ms": 19.2,
+        "style_resolution_time_ms": 0.3,
+        "matplotlib_render_time_ms": 15.8,
+        "file_write_time_ms": 2.9,
+        "validation_time_ms": 0.7,
+        "overhead_percentage": 3.1
+      },
+      "validation_results": {
+        "figure_validation": "passed",
+        "filepath_validation": "passed",
+        "parameter_validation": "passed", 
+        "style_validation": "passed",
+        "warnings": [],
+        "errors": []
+      },
+      "status": "success"
+    },
+    {
+      "event_id": "fig_003_summary_report_figure",
+      "timestamp": "2024-01-15T14:24:09.901Z",
+      "dataset_info": {
+        "name": "summary_report_figure",
+        "type": "figregistry_kedro.datasets.FigureDataSet", 
+        "filepath": "data/08_reporting/summary_report_figure.pdf",
+        "purpose": "publication",
+        "condition_param": "report_type",
+        "versioned": false,
+        "format_kwargs": {
+          "dpi": 300,
+          "bbox_inches": "tight",
+          "transparent": false,
+          "format": "pdf"
+        }
+      },
+      "pipeline_context": {
+        "run_id": "2024-01-15T14.23.45.123Z",
+        "pipeline_name": "data_visualization",
+        "node_name": "create_summary_report",
+        "namespace": null,
+        "parameters": {
+          "report_type": "publication",
+          "include_methodology": true,
+          "citation_format": "APA"
+        }
+      },
+      "styling_decisions": {
+        "condition_resolution": {
+          "method": "direct_parameter_match", 
+          "condition_key": "publication",
+          "style_source": "merged_config",
+          "cache_used": false
+        },
+        "style_application": {
+          "base_style": {
+            "color": "#1A1A1A",
+            "marker": "o",
+            "linestyle": "-",
+            "linewidth": 2.5,
+            "alpha": 1.0
+          },
+          "dataset_overrides": {
+            "linewidth": 3.0,
+            "marker": "^"
+          },
+          "final_style": {
+            "color": "#1A1A1A",
+            "marker": "^",
+            "linestyle": "-",
+            "linewidth": 3.0,
+            "alpha": 1.0,
+            "label": "Summary Report"
+          },
+          "matplotlib_properties_set": [
+            "line.color",
+            "line.marker",
+            "line.linestyle",
+            "line.linewidth", 
+            "line.alpha",
+            "figure.dpi",
+            "figure.facecolor"
+          ]
+        }
+      },
+      "save_operation": {
+        "file_path": "data/08_reporting/summary_report_figure.pdf",
+        "file_size_bytes": 456789,
+        "save_method": "matplotlib_savefig",
+        "save_kwargs_used": {
+          "dpi": 300,
+          "bbox_inches": "tight",
+          "facecolor": "white",
+          "edgecolor": "none",
+          "transparent": false,
+          "format": "pdf"
+        },
+        "directory_created": false,
+        "backup_created": false
+      },
+      "performance_metrics": {
+        "total_save_time_ms": 41.7,
+        "style_resolution_time_ms": 1.1,
+        "matplotlib_render_time_ms": 35.2,
+        "file_write_time_ms": 4.8,
+        "validation_time_ms": 0.9,
+        "overhead_percentage": 4.8
+      },
+      "validation_results": {
+        "figure_validation": "passed",
+        "filepath_validation": "passed",
+        "parameter_validation": "passed",
+        "style_validation": "passed",
+        "warnings": [
+          {
+            "type": "performance",
+            "message": "PDF rendering time 35.2ms exceeds target for publication format",
+            "recommendation": "Consider optimizing figure complexity for publication outputs"
+          }
+        ],
+        "errors": []
+      },
+      "status": "success"
+    }
+  ],
+  "cache_performance": {
+    "style_cache": {
+      "total_lookups": 3,
+      "cache_hits": 1,
+      "cache_misses": 2,
+      "hit_rate": 0.33,
+      "cache_size": 2,
+      "max_cache_size": 100,
+      "evictions": 0
+    },
+    "config_cache": {
+      "total_lookups": 4,
+      "cache_hits": 3,
+      "cache_misses": 1,
+      "hit_rate": 0.75,
+      "cache_size": 1,
+      "max_cache_size": 10,
+      "evictions": 0
+    },
+    "cache_memory_usage_bytes": 15432
+  },
+  "performance_summary": {
+    "total_figures_generated": 3,
+    "total_processing_time_ms": 84.3,
+    "average_save_time_ms": 28.1,
+    "average_overhead_percentage": 4.0,
+    "style_resolution_performance": {
+      "total_time_ms": 2.6,
+      "average_time_ms": 0.87,
+      "cache_efficiency": 0.33
+    },
+    "file_operations": {
+      "total_write_time_ms": 11.2,
+      "total_bytes_written": 848145,
+      "average_write_speed_mbps": 0.61
+    },
+    "targets_vs_actual": {
+      "save_overhead_target": "< 5%",
+      "save_overhead_actual": "4.0%",
+      "style_resolution_target": "< 1ms",
+      "style_resolution_actual": "0.87ms",
+      "hook_execution_target": "< 50ms",
+      "hook_execution_actual": "18.8ms"
+    }
+  },
+  "audit_trail": {
+    "configuration_provenance": {
+      "base_config_checksum": "sha256:a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6",
+      "local_config_checksum": "sha256:z9y8x7w6v5u4t3s2r1q0p9o8n7m6l5k4",
+      "merged_config_checksum": "sha256:f1e2d3c4b5a6987654321fedcba9876",
+      "environment_variables": {},
+      "configuration_sources_validated": true
+    },
+    "execution_environment": {
+      "python_version": "3.11.7",
+      "kedro_version": "0.19.1", 
+      "figregistry_version": "0.3.0",
+      "figregistry_kedro_version": "0.1.0",
+      "matplotlib_version": "3.8.2",
+      "numpy_version": "1.24.3",
+      "pandas_version": "2.1.4",
+      "platform": "linux-x86_64",
+      "hostname": "migration-example-host"
+    },
+    "reproducibility_info": {
+      "random_seeds": {
+        "global_seed": 42,
+        "numpy_seed": 42,
+        "pipeline_seed": 42
+      },
+      "kedro_context_params": {
+        "package_name": "kedro_figregistry_example",
+        "project_path": "/workspace/figregistry-kedro/examples/migration/after",
+        "config_loader_class": "kedro.config.ConfigLoader"
+      },
+      "dataset_versions": {
+        "input_data": "20240115_140000",
+        "processed_data": "20240115_142000"
+      }
+    },
+    "compliance_checks": {
+      "figregistry_api_compatibility": "passed",
+      "kedro_dataset_interface": "passed", 
+      "matplotlib_backend_compatibility": "passed",
+      "thread_safety_validation": "passed"
+    }
+  },
+  "warnings_and_errors": {
+    "warnings": [
+      {
+        "timestamp": "2024-01-15T14:24:09.935Z",
+        "type": "performance",
+        "component": "FigureDataSet",
+        "message": "PDF rendering time 35.2ms exceeds target for publication format",
+        "suggestion": "Consider optimizing figure complexity for publication outputs",
+        "figure_name": "summary_report_figure"
+      }
+    ],
+    "errors": [],
+    "error_recovery": {
+      "fallback_styles_used": 0,
+      "configuration_fallbacks": 0,
+      "graceful_degradations": 0
+    }
+  },
+  "debugging_information": {
+    "condition_parameter_resolution": [
+      {
+        "figure_name": "scatter_analysis_plot",
+        "parameter_name": "analysis_type",
+        "parameter_source": "pipeline_parameters",
+        "resolved_value": "exploratory",
+        "resolution_path": "run_params.parameters.analysis_type"
+      },
+      {
+        "figure_name": "trend_comparison_chart", 
+        "parameter_name": "output_purpose",
+        "parameter_source": "pipeline_parameters",
+        "resolved_value": "presentation",
+        "resolution_path": "run_params.parameters.output_purpose"
+      },
+      {
+        "figure_name": "summary_report_figure",
+        "parameter_name": "report_type",
+        "parameter_source": "pipeline_parameters", 
+        "resolved_value": "publication",
+        "resolution_path": "run_params.parameters.report_type"
+      }
+    ],
+    "style_inheritance_chains": [
+      {
+        "condition": "exploratory",
+        "inheritance": [
+          "merged_config.styles.exploratory",
+          "merged_config.defaults.fallback_style",
+          "hardcoded_defaults"
+        ],
+        "overrides_applied": ["dataset.style_params"]
+      },
+      {
+        "condition": "presentation",
+        "inheritance": [
+          "merged_config.styles.presentation", 
+          "merged_config.defaults.fallback_style",
+          "hardcoded_defaults"
+        ],
+        "overrides_applied": []
+      },
+      {
+        "condition": "publication",
+        "inheritance": [
+          "merged_config.styles.publication",
+          "merged_config.defaults.fallback_style", 
+          "hardcoded_defaults"
+        ],
+        "overrides_applied": ["dataset.style_params"]
+      }
+    ]
+  },
+  "summary": {
+    "execution_status": "completed_successfully",
+    "figures_created": 3,
+    "total_execution_time_ms": 27333,
+    "figregistry_overhead_ms": 84.3,
+    "overhead_percentage": 0.31,
+    "automation_benefits": {
+      "manual_styling_calls_eliminated": 3,
+      "configuration_reuse_instances": 3,
+      "reproducibility_features_enabled": [
+        "automated_style_application",
+        "configuration_audit_trail",
+        "parameter_resolution_tracking",
+        "performance_monitoring"
+      ]
+    },
+    "quality_metrics": {
+      "configuration_validation_passed": true,
+      "all_figures_generated_successfully": true,
+      "performance_targets_met": true,
+      "no_critical_errors": true,
+      "audit_trail_complete": true
+    }
+  }
+}

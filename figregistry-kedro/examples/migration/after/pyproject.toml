@@ -1,0 +1,236 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kedro-figregistry-example"
+version = "0.1.0"
+description = "Converted Kedro project demonstrating automated figure management with figregistry-kedro integration"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "FigRegistry Contributors", email = "contributors@figregistry.org"}
+]
+keywords = ["kedro", "figregistry", "matplotlib", "visualization", "data-science", "automation", "integration"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research", 
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: Kedro",
+]
+
+# Core runtime dependencies for automated figure management with figregistry-kedro
+dependencies = [
+    # Primary integration plugin for automated figure management per F-005 requirements
+    "figregistry-kedro>=0.1.0",
+    
+    # Kedro framework with version constraints supporting lifecycle hooks per F-006 requirements
+    "kedro>=0.18.0,<0.20.0",
+    "kedro-datasets>=1.0.0",
+    
+    # Core FigRegistry dependency for configuration-driven styling (inherited via figregistry-kedro)
+    # "figregistry>=0.3.0",  # Automatically installed as figregistry-kedro dependency
+    
+    # Visualization framework with enhanced integration per Section 3.2.1.2
+    "matplotlib>=3.9.0",
+    
+    # Data processing stack per Section 3.2.2.1
+    "numpy>=1.24.0",
+    "pandas>=2.0.0",
+    "scipy>=1.10.0",
+    
+    # Configuration management framework per Section 3.2.2.2
+    "pydantic>=2.9.0",
+    "pyyaml>=6.0.1",
+]
+
+[project.optional-dependencies]
+# Development dependencies for testing and validation
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-mock>=3.14.0",  # Essential for mocking Kedro components per Section 3.6.1.2
+    "hypothesis>=6.0.0",
+    "black>=23.0.0",
+    "isort>=5.0.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
+]
+
+# Documentation dependencies
+docs = [
+    "mkdocs>=1.4.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings>=0.20.0",
+]
+
+# Integration testing dependencies
+integration = [
+    "kedro-viz>=6.0.0",     # Optional visualization pipeline integration
+    "jupyterlab>=4.0.0",   # Notebook development environment
+    "ipykernel>=6.0.0",    # Jupyter kernel support
+]
+
+# All optional dependencies combined
+all = [
+    "kedro-figregistry-example[dev,docs,integration]"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/figregistry/figregistry-kedro"
+"Repository" = "https://github.com/figregistry/figregistry-kedro"
+"Documentation" = "https://figregistry-kedro.readthedocs.io/"
+"Bug Reports" = "https://github.com/figregistry/figregistry-kedro/issues"
+"Migration Guide" = "https://figregistry-kedro.readthedocs.io/en/latest/migration/"
+
+[project.entry-points."kedro.project_commands"]
+# Enable Kedro project discovery and command execution with figregistry integration
+figregistry = "kedro_figregistry_example.cli:commands"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["kedro_figregistry_example*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"kedro_figregistry_example" = ["conf/**/*", "data/**/*"]
+
+# Black configuration for code formatting
+[tool.black]
+line-length = 88
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# isort configuration for import sorting
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+line_length = 88
+known_first_party = ["kedro_figregistry_example"]
+known_third_party = [
+    "kedro", 
+    "matplotlib", 
+    "pandas", 
+    "numpy", 
+    "scipy", 
+    "pydantic", 
+    "yaml",
+    "figregistry",
+    "figregistry_kedro"
+]
+
+# MyPy configuration for type checking with plugin support
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[[tool.mypy.overrides]]
+module = [
+    "kedro.*",
+    "matplotlib.*",
+    "scipy.*",
+    "figregistry.*",
+    "figregistry_kedro.*",
+]
+ignore_missing_imports = true
+
+# Pytest configuration with plugin integration testing
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--cov=kedro_figregistry_example",
+    "--cov-report=html",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-fail-under=85",  # Higher coverage target for integrated project
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "figregistry: marks tests requiring figregistry-kedro integration",
+    "hooks: marks tests for lifecycle hook functionality",
+    "datasets: marks tests for FigureDataSet functionality",
+]
+
+# Coverage configuration
+[tool.coverage.run]
+branch = true
+source = ["src/kedro_figregistry_example"]
+omit = [
+    "tests/*",
+    "*/test_*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# FigRegistry-Kedro Integration Configuration
+[tool.figregistry-kedro]
+# Plugin-specific configuration for development and testing
+enable_performance_monitoring = true
+strict_validation = true
+cache_enabled = true
+
+# Integration testing configuration
+testing = {
+    "mock_kedro_context" = true,
+    "validate_figure_datasets" = true,
+    "test_hook_registration" = true,
+    "performance_benchmarking" = true
+}
+
+# Development workflow configuration
+development = {
+    "auto_reload_config" = true,
+    "debug_logging" = true,
+    "validation_warnings" = true
+}

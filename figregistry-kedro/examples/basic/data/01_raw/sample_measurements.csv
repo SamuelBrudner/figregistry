@@ -1,0 +1,123 @@
+sample_id,experiment_id,treatment,measurement_type,value,std_dev,n_samples,measurement_unit,time_point,researcher,notes
+SMPL001,EXP001,treatment_group_a,efficacy,0.82,0.12,25,percentage,baseline,Dr. Sarah Chen,Initial dose-response measurement compound X-47
+SMPL002,EXP001,treatment_group_a,efficacy,0.85,0.08,25,percentage,week_2,Dr. Sarah Chen,Follow-up efficacy assessment
+SMPL003,EXP001,treatment_group_a,efficacy,0.89,0.09,25,percentage,week_4,Dr. Sarah Chen,Peak efficacy measurement
+SMPL004,EXP001,treatment_group_a,toxicity,0.15,0.04,25,severity_score,baseline,Dr. Sarah Chen,Safety profile assessment
+SMPL005,EXP001,treatment_group_a,toxicity,0.18,0.05,25,severity_score,week_2,Dr. Sarah Chen,Toxicity monitoring
+SMPL006,EXP001,treatment_group_a,toxicity,0.22,0.06,25,severity_score,week_4,Dr. Sarah Chen,Extended safety evaluation
+SMPL007,EXP001,treatment_group_a,biomarker_level,2.4,0.3,25,ng_ml,baseline,Dr. Sarah Chen,Biomarker expression baseline
+SMPL008,EXP001,treatment_group_a,biomarker_level,3.1,0.4,25,ng_ml,week_2,Dr. Sarah Chen,Biomarker response measurement
+SMPL009,EXP001,treatment_group_a,biomarker_level,3.8,0.5,25,ng_ml,week_4,Dr. Sarah Chen,Peak biomarker expression
+SMPL010,EXP002,treatment_group_b,efficacy,0.76,0.14,25,percentage,baseline,Dr. Sarah Chen,Secondary compound Y-23 baseline
+SMPL011,EXP002,treatment_group_b,efficacy,0.78,0.11,25,percentage,week_2,Dr. Sarah Chen,Y-23 efficacy progression
+SMPL012,EXP002,treatment_group_b,efficacy,0.81,0.13,25,percentage,week_4,Dr. Sarah Chen,Y-23 peak efficacy
+SMPL013,EXP002,treatment_group_b,toxicity,0.12,0.03,25,severity_score,baseline,Dr. Sarah Chen,Y-23 safety baseline
+SMPL014,EXP002,treatment_group_b,toxicity,0.14,0.04,25,severity_score,week_2,Dr. Sarah Chen,Y-23 toxicity monitoring
+SMPL015,EXP002,treatment_group_b,toxicity,0.17,0.05,25,severity_score,week_4,Dr. Sarah Chen,Y-23 safety assessment
+SMPL016,EXP002,treatment_group_b,biomarker_level,1.8,0.2,25,ng_ml,baseline,Dr. Sarah Chen,Y-23 biomarker baseline
+SMPL017,EXP002,treatment_group_b,biomarker_level,2.3,0.3,25,ng_ml,week_2,Dr. Sarah Chen,Y-23 biomarker response
+SMPL018,EXP002,treatment_group_b,biomarker_level,2.7,0.4,25,ng_ml,week_4,Dr. Sarah Chen,Y-23 biomarker peak
+SMPL019,EXP003,control_group,efficacy,0.12,0.06,25,percentage,baseline,Dr. Sarah Chen,Placebo control baseline
+SMPL020,EXP003,control_group,efficacy,0.13,0.07,25,percentage,week_2,Dr. Sarah Chen,Control efficacy monitoring
+SMPL021,EXP003,control_group,efficacy,0.15,0.08,25,percentage,week_4,Dr. Sarah Chen,Control final assessment
+SMPL022,EXP003,control_group,toxicity,0.08,0.02,25,severity_score,baseline,Dr. Sarah Chen,Control safety baseline
+SMPL023,EXP003,control_group,toxicity,0.09,0.03,25,severity_score,week_2,Dr. Sarah Chen,Control toxicity monitoring
+SMPL024,EXP003,control_group,toxicity,0.10,0.03,25,severity_score,week_4,Dr. Sarah Chen,Control safety final
+SMPL025,EXP003,control_group,biomarker_level,0.8,0.1,25,ng_ml,baseline,Dr. Sarah Chen,Control biomarker baseline
+SMPL026,EXP003,control_group,biomarker_level,0.9,0.1,25,ng_ml,week_2,Dr. Sarah Chen,Control biomarker monitoring
+SMPL027,EXP003,control_group,biomarker_level,1.0,0.1,25,ng_ml,week_4,Dr. Sarah Chen,Control biomarker final
+SMPL028,EXP004,treatment_group_a,efficacy,0.86,0.10,50,percentage,baseline,Dr. Michael Rodriguez,Validation phase X-47 increased sample
+SMPL029,EXP004,treatment_group_a,efficacy,0.87,0.09,50,percentage,week_2,Dr. Michael Rodriguez,X-47 validation efficacy
+SMPL030,EXP004,treatment_group_a,efficacy,0.90,0.08,50,percentage,week_4,Dr. Michael Rodriguez,X-47 validation peak
+SMPL031,EXP004,treatment_group_a,toxicity,0.16,0.04,50,severity_score,baseline,Dr. Michael Rodriguez,X-47 validation safety
+SMPL032,EXP004,treatment_group_a,toxicity,0.19,0.05,50,severity_score,week_2,Dr. Michael Rodriguez,X-47 validation toxicity
+SMPL033,EXP004,treatment_group_a,toxicity,0.21,0.05,50,severity_score,week_4,Dr. Michael Rodriguez,X-47 validation final safety
+SMPL034,EXP005,treatment_group_b,efficacy,0.79,0.12,50,percentage,baseline,Dr. Michael Rodriguez,Y-23 validation baseline
+SMPL035,EXP005,treatment_group_b,efficacy,0.81,0.10,50,percentage,week_2,Dr. Michael Rodriguez,Y-23 validation efficacy
+SMPL036,EXP005,treatment_group_b,efficacy,0.84,0.11,50,percentage,week_4,Dr. Michael Rodriguez,Y-23 validation peak
+SMPL037,EXP005,treatment_group_b,toxicity,0.13,0.03,50,severity_score,baseline,Dr. Michael Rodriguez,Y-23 validation safety
+SMPL038,EXP005,treatment_group_b,toxicity,0.15,0.04,50,severity_score,week_2,Dr. Michael Rodriguez,Y-23 validation toxicity
+SMPL039,EXP005,treatment_group_b,toxicity,0.16,0.04,50,severity_score,week_4,Dr. Michael Rodriguez,Y-23 validation final safety
+SMPL040,EXP006,control_group,efficacy,0.14,0.07,50,percentage,baseline,Dr. Michael Rodriguez,Control validation baseline
+SMPL041,EXP006,control_group,efficacy,0.15,0.08,50,percentage,week_2,Dr. Michael Rodriguez,Control validation monitoring
+SMPL042,EXP006,control_group,efficacy,0.16,0.07,50,percentage,week_4,Dr. Michael Rodriguez,Control validation final
+SMPL043,EXP006,control_group,toxicity,0.09,0.02,50,severity_score,baseline,Dr. Michael Rodriguez,Control validation safety
+SMPL044,EXP006,control_group,toxicity,0.10,0.03,50,severity_score,week_2,Dr. Michael Rodriguez,Control validation toxicity
+SMPL045,EXP006,control_group,toxicity,0.11,0.03,50,severity_score,week_4,Dr. Michael Rodriguez,Control validation final safety
+SMPL046,EXP007,combined_groups,efficacy,0.84,0.15,100,percentage,baseline,Dr. Emily Watson,Combined analysis baseline
+SMPL047,EXP007,combined_groups,efficacy,0.85,0.14,100,percentage,week_2,Dr. Emily Watson,Combined analysis progression
+SMPL048,EXP007,combined_groups,efficacy,0.87,0.13,100,percentage,week_4,Dr. Emily Watson,Combined analysis final
+SMPL049,EXP007,combined_groups,toxicity,0.16,0.08,100,severity_score,baseline,Dr. Emily Watson,Combined toxicity baseline
+SMPL050,EXP007,combined_groups,toxicity,0.18,0.09,100,severity_score,week_2,Dr. Emily Watson,Combined toxicity monitoring
+SMPL051,EXP007,combined_groups,toxicity,0.19,0.09,100,severity_score,week_4,Dr. Emily Watson,Combined toxicity final
+SMPL052,EXP008,treatment_group_a,biomarker_level,2.6,0.4,15,ng_ml,baseline,Dr. James Kim,Biomarker discovery cohort 1
+SMPL053,EXP008,treatment_group_a,biomarker_level,3.2,0.5,15,ng_ml,week_2,Dr. James Kim,Biomarker discovery response
+SMPL054,EXP008,treatment_group_a,biomarker_level,3.9,0.6,15,ng_ml,week_4,Dr. James Kim,Biomarker discovery peak
+SMPL055,EXP008,treatment_group_a,genetic_marker,0.73,0.11,15,expression_ratio,baseline,Dr. James Kim,Genetic marker baseline
+SMPL056,EXP008,treatment_group_a,genetic_marker,0.78,0.12,15,expression_ratio,week_2,Dr. James Kim,Genetic marker response
+SMPL057,EXP008,treatment_group_a,genetic_marker,0.82,0.13,15,expression_ratio,week_4,Dr. James Kim,Genetic marker peak
+SMPL058,EXP009,treatment_group_b,biomarker_level,1.9,0.3,15,ng_ml,baseline,Dr. James Kim,Biomarker discovery cohort 2
+SMPL059,EXP009,treatment_group_b,biomarker_level,2.4,0.4,15,ng_ml,week_2,Dr. James Kim,Cohort 2 biomarker response
+SMPL060,EXP009,treatment_group_b,biomarker_level,2.8,0.5,15,ng_ml,week_4,Dr. James Kim,Cohort 2 biomarker peak
+SMPL061,EXP009,treatment_group_b,genetic_marker,0.69,0.10,15,expression_ratio,baseline,Dr. James Kim,Cohort 2 genetic baseline
+SMPL062,EXP009,treatment_group_b,genetic_marker,0.71,0.11,15,expression_ratio,week_2,Dr. James Kim,Cohort 2 genetic response
+SMPL063,EXP009,treatment_group_b,genetic_marker,0.74,0.12,15,expression_ratio,week_4,Dr. James Kim,Cohort 2 genetic peak
+SMPL064,EXP010,control_group,biomarker_level,0.9,0.1,15,ng_ml,baseline,Dr. James Kim,Control biomarker discovery
+SMPL065,EXP010,control_group,biomarker_level,1.0,0.1,15,ng_ml,week_2,Dr. James Kim,Control biomarker monitoring
+SMPL066,EXP010,control_group,biomarker_level,1.1,0.2,15,ng_ml,week_4,Dr. James Kim,Control biomarker final
+SMPL067,EXP010,control_group,genetic_marker,0.08,0.02,15,expression_ratio,baseline,Dr. James Kim,Control genetic baseline
+SMPL068,EXP010,control_group,genetic_marker,0.09,0.02,15,expression_ratio,week_2,Dr. James Kim,Control genetic monitoring
+SMPL069,EXP010,control_group,genetic_marker,0.10,0.03,15,expression_ratio,week_4,Dr. James Kim,Control genetic final
+SMPL070,EXP014,treatment_group_a,efficacy,0.45,0.09,20,percentage,baseline,Dr. Robert Taylor,Low dose efficacy baseline
+SMPL071,EXP014,treatment_group_a,efficacy,0.47,0.08,20,percentage,week_1,Dr. Robert Taylor,Low dose short-term response
+SMPL072,EXP014,treatment_group_a,efficacy,0.48,0.09,20,percentage,week_2,Dr. Robert Taylor,Low dose final assessment
+SMPL073,EXP014,treatment_group_a,toxicity,0.08,0.02,20,severity_score,baseline,Dr. Robert Taylor,Low dose safety baseline
+SMPL074,EXP014,treatment_group_a,toxicity,0.09,0.02,20,severity_score,week_1,Dr. Robert Taylor,Low dose safety monitoring
+SMPL075,EXP014,treatment_group_a,toxicity,0.10,0.03,20,severity_score,week_2,Dr. Robert Taylor,Low dose safety final
+SMPL076,EXP015,treatment_group_b,efficacy,0.91,0.06,20,percentage,baseline,Dr. Robert Taylor,High dose efficacy baseline
+SMPL077,EXP015,treatment_group_b,efficacy,0.92,0.05,20,percentage,week_1,Dr. Robert Taylor,High dose short-term response
+SMPL078,EXP015,treatment_group_b,efficacy,0.93,0.06,20,percentage,week_2,Dr. Robert Taylor,High dose final assessment
+SMPL079,EXP015,treatment_group_b,toxicity,0.28,0.08,20,severity_score,baseline,Dr. Robert Taylor,High dose safety baseline
+SMPL080,EXP015,treatment_group_b,toxicity,0.31,0.09,20,severity_score,week_1,Dr. Robert Taylor,High dose safety monitoring
+SMPL081,EXP015,treatment_group_b,toxicity,0.34,0.10,20,severity_score,week_2,Dr. Robert Taylor,High dose safety final
+SMPL082,EXP016,control_group,efficacy,0.09,0.04,20,percentage,baseline,Dr. Robert Taylor,Dose study control baseline
+SMPL083,EXP016,control_group,efficacy,0.10,0.05,20,percentage,week_1,Dr. Robert Taylor,Dose study control monitoring
+SMPL084,EXP016,control_group,efficacy,0.11,0.05,20,percentage,week_2,Dr. Robert Taylor,Dose study control final
+SMPL085,EXP020,treatment_group_a,efficacy,0.62,0.10,10,percentage,week_1,Dr. David Chang,Longitudinal study week 1
+SMPL086,EXP020,treatment_group_a,biomarker_level,2.1,0.3,10,ng_ml,week_1,Dr. David Chang,Longitudinal biomarker week 1
+SMPL087,EXP021,treatment_group_a,efficacy,0.79,0.09,10,percentage,week_4,Dr. David Chang,Longitudinal study week 4
+SMPL088,EXP021,treatment_group_a,biomarker_level,3.4,0.4,10,ng_ml,week_4,Dr. David Chang,Longitudinal biomarker week 4
+SMPL089,EXP022,treatment_group_a,efficacy,0.84,0.08,10,percentage,week_8,Dr. David Chang,Longitudinal study week 8
+SMPL090,EXP022,treatment_group_a,biomarker_level,4.1,0.5,10,ng_ml,week_8,Dr. David Chang,Longitudinal biomarker week 8
+SMPL091,EXP023,treatment_group_a,efficacy,0.81,0.09,10,percentage,week_12,Dr. David Chang,Longitudinal study week 12
+SMPL092,EXP023,treatment_group_a,biomarker_level,3.8,0.5,10,ng_ml,week_12,Dr. David Chang,Longitudinal biomarker week 12
+SMPL093,EXP024,treatment_group_a,safety_score,0.93,0.04,7,safety_index,month_1,Dr. Maria Gonzalez,Safety profile month 1
+SMPL094,EXP024,treatment_group_a,safety_score,0.91,0.05,7,safety_index,month_3,Dr. Maria Gonzalez,Safety profile month 3
+SMPL095,EXP024,treatment_group_a,safety_score,0.90,0.06,7,safety_index,month_6,Dr. Maria Gonzalez,Safety profile month 6
+SMPL096,EXP025,treatment_group_b,safety_score,0.89,0.05,7,safety_index,month_1,Dr. Maria Gonzalez,Alternative treatment safety month 1
+SMPL097,EXP025,treatment_group_b,safety_score,0.87,0.06,7,safety_index,month_3,Dr. Maria Gonzalez,Alternative treatment safety month 3
+SMPL098,EXP025,treatment_group_b,safety_score,0.86,0.07,7,safety_index,month_6,Dr. Maria Gonzalez,Alternative treatment safety month 6
+SMPL099,EXP026,control_group,safety_score,0.97,0.02,7,safety_index,month_1,Dr. Maria Gonzalez,Control safety month 1
+SMPL100,EXP026,control_group,safety_score,0.96,0.03,7,safety_index,month_3,Dr. Maria Gonzalez,Control safety month 3
+SMPL101,EXP026,control_group,safety_score,0.95,0.03,7,safety_index,month_6,Dr. Maria Gonzalez,Control safety month 6
+SMPL102,EXP027,combined_groups,safety_score,0.91,0.08,21,safety_index,month_1,Dr. Maria Gonzalez,Combined safety analysis month 1
+SMPL103,EXP027,combined_groups,safety_score,0.89,0.09,21,safety_index,month_3,Dr. Maria Gonzalez,Combined safety analysis month 3
+SMPL104,EXP027,combined_groups,safety_score,0.88,0.10,21,safety_index,month_6,Dr. Maria Gonzalez,Combined safety analysis month 6
+SMPL105,EXP032,treatment_group_a,efficacy,0.68,0.11,30,percentage,month_1,Dr. Rachel Adams,Standard care comparison
+SMPL106,EXP032,treatment_group_a,efficacy,0.70,0.10,30,percentage,month_3,Dr. Rachel Adams,Standard care progression
+SMPL107,EXP032,treatment_group_a,efficacy,0.72,0.12,30,percentage,month_6,Dr. Rachel Adams,Standard care final
+SMPL108,EXP033,treatment_group_b,efficacy,0.81,0.09,30,percentage,month_1,Dr. Rachel Adams,Experimental treatment comparison
+SMPL109,EXP033,treatment_group_b,efficacy,0.83,0.08,30,percentage,month_3,Dr. Rachel Adams,Experimental treatment progression
+SMPL110,EXP033,treatment_group_b,efficacy,0.85,0.10,30,percentage,month_6,Dr. Rachel Adams,Experimental treatment final
+SMPL111,EXP034,combined_groups,efficacy,0.76,0.13,60,percentage,month_1,Dr. Rachel Adams,Head-to-head comparison month 1
+SMPL112,EXP034,combined_groups,efficacy,0.78,0.12,60,percentage,month_3,Dr. Rachel Adams,Head-to-head comparison month 3
+SMPL113,EXP034,combined_groups,efficacy,0.79,0.14,60,percentage,month_6,Dr. Rachel Adams,Head-to-head comparison final
+SMPL114,EXP035,treatment_group_a,efficacy,0.72,0.13,5,percentage,week_2,Dr. Thomas Wilson,Pilot study early assessment
+SMPL115,EXP035,treatment_group_a,efficacy,0.74,0.12,5,percentage,week_4,Dr. Thomas Wilson,Pilot study final
+SMPL116,EXP036,control_group,efficacy,0.11,0.05,5,percentage,week_2,Dr. Thomas Wilson,Pilot control early
+SMPL117,EXP036,control_group,efficacy,0.12,0.06,5,percentage,week_4,Dr. Thomas Wilson,Pilot control final
+SMPL118,EXP037,combined_groups,efficacy,0.61,0.18,10,percentage,week_2,Dr. Thomas Wilson,Pilot combined early
+SMPL119,EXP037,combined_groups,efficacy,0.63,0.17,10,percentage,week_4,Dr. Thomas Wilson,Pilot combined final
+SMPL120,EXP038,treatment_group_a,efficacy,0.75,0.16,120,percentage,historical,Dr. Sophia Martinez,Historical treatment A analysis
+SMPL121,EXP039,treatment_group_b,efficacy,0.71,0.17,120,percentage,historical,Dr. Sophia Martinez,Historical treatment B analysis
+SMPL122,EXP040,combined_groups,efficacy,0.73,0.19,240,percentage,historical,Dr. Sophia Martinez,Meta-analysis combined historical

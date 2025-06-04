@@ -1,0 +1,626 @@
+# =============================================================================
+# Kedro Project Parameters for FigRegistry Integration - Basic Example
+# =============================================================================
+# This file defines the parameter context that enables condition-based styling
+# resolution through the FigureDataSet condition_param mechanism. Parameters
+# defined here are automatically available to pipeline nodes and can be
+# resolved by FigureDataSet instances to apply appropriate styling based on
+# experimental conditions, analysis stages, and model configurations.
+#
+# Key Integration Features:
+# - Support for condition-based styling demonstration per F-002
+# - Experimental context for FigureDataSet condition resolution per F-005-RQ-004
+# - Educational parameter structure showing different experimental scenarios
+# - Pipeline node configuration supporting the basic example requirements
+# - Parameter-driven styling variation for demonstrating FigRegistry capabilities
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# Experimental Design Parameters (F-002 Condition-Based Styling Support)
+# -----------------------------------------------------------------------------
+# These parameters define the experimental context that drives condition-based
+# styling through the FigRegistry integration. The condition_param mechanism
+# in FigureDataSet instances will resolve these values to apply appropriate
+# styling from the figregistry.yml configuration.
+
+# Primary experimental condition for main analysis
+# Maps to styles: treatment_group_a, treatment_group_b, control_group, combined_groups
+experiment_condition: "treatment_group_a"
+
+# Alternative experimental conditions for comparison scenarios
+experiment_conditions:
+  primary: "treatment_group_a"     # Red styling with circle markers
+  secondary: "treatment_group_b"   # Teal styling with square markers
+  control: "control_group"         # Blue styling with triangle markers
+  aggregate: "combined_groups"     # Green styling with diamond markers
+
+# Current experimental phase for pipeline progression
+# Maps to styles: training, validation, testing, final
+experiment_phase: "training"
+
+# Analysis stage for output categorization
+# Maps to styles: exploratory, presentation, publication
+analysis_stage: "exploratory"
+
+# Current model type for algorithm-specific styling
+# Maps to styles: linear_regression, random_forest, ensemble
+model_type: "linear_regression"
+
+# Environment-specific experimental conditions
+environment_conditions:
+  development:
+    experiment_condition: "treatment_group_a"
+    analysis_stage: "exploratory"
+    experiment_phase: "training"
+    
+  testing:
+    experiment_condition: "control_group"
+    analysis_stage: "presentation"
+    experiment_phase: "validation"
+    
+  production:
+    experiment_condition: "combined_groups"
+    analysis_stage: "publication"
+    experiment_phase: "final"
+
+# -----------------------------------------------------------------------------
+# Data Processing Parameters
+# -----------------------------------------------------------------------------
+# Configuration parameters for data processing and visualization pipeline
+# supporting the basic example nodes and analysis workflows
+
+# Dataset parameters for data loading and preprocessing
+data_processing:
+  # Sample data generation parameters
+  sample_size: 1000
+  random_seed: 42
+  noise_level: 0.1
+  
+  # Data splitting parameters
+  train_split: 0.7
+  validation_split: 0.15
+  test_split: 0.15
+  
+  # Feature engineering parameters
+  feature_scaling: "standard"  # standard, robust, minmax
+  feature_selection: true
+  n_features: 10
+  
+  # Data quality parameters
+  missing_value_threshold: 0.05
+  outlier_detection_method: "iqr"  # iqr, zscore, isolation_forest
+  outlier_threshold: 3.0
+
+# Statistical analysis parameters
+statistical_analysis:
+  # Hypothesis testing parameters
+  alpha_level: 0.05
+  multiple_testing_correction: "bonferroni"  # bonferroni, fdr, none
+  
+  # Effect size parameters
+  effect_size_threshold: 0.2
+  confidence_interval: 0.95
+  
+  # Bootstrap parameters for confidence intervals
+  bootstrap_iterations: 1000
+  bootstrap_confidence: 0.95
+
+# Visualization parameters specific to the basic example
+visualization:
+  # Figure dimensions and quality
+  figure_size: [10, 8]
+  dpi: 150
+  font_size: 12
+  
+  # Plot styling overrides (merged with FigRegistry styles)
+  style_overrides:
+    grid_alpha: 0.3
+    legend_fontsize: 10
+    title_fontsize: 14
+    
+  # Plot-specific parameters
+  scatter_plot:
+    alpha: 0.7
+    marker_size: 50
+    
+  line_plot:
+    line_width: 2.0
+    marker_size: 6
+    
+  histogram:
+    bins: 30
+    alpha: 0.8
+    
+  box_plot:
+    show_outliers: true
+    outlier_marker: "+"
+
+# -----------------------------------------------------------------------------
+# Model Configuration Parameters
+# -----------------------------------------------------------------------------
+# Machine learning model parameters that support different model types
+# and enable model-specific styling through the model_type condition
+
+# Linear regression parameters
+linear_regression:
+  # Model hyperparameters
+  fit_intercept: true
+  normalize: false
+  regularization: null  # null, ridge, lasso, elastic_net
+  
+  # Ridge regression parameters (when regularization = "ridge")
+  ridge_alpha: 1.0
+  
+  # Lasso regression parameters (when regularization = "lasso")
+  lasso_alpha: 1.0
+  max_iter: 1000
+  
+  # Elastic net parameters (when regularization = "elastic_net")
+  elastic_alpha: 1.0
+  l1_ratio: 0.5
+  
+  # Evaluation parameters
+  cross_validation_folds: 5
+  scoring_metric: "r2"  # r2, mse, mae
+
+# Random forest parameters
+random_forest:
+  # Core hyperparameters
+  n_estimators: 100
+  max_depth: null
+  min_samples_split: 2
+  min_samples_leaf: 1
+  
+  # Randomization parameters
+  random_state: 42
+  bootstrap: true
+  oob_score: true
+  
+  # Feature selection parameters
+  max_features: "sqrt"  # sqrt, log2, auto, int, float
+  
+  # Performance parameters
+  n_jobs: -1
+  warm_start: false
+  
+  # Evaluation parameters
+  cross_validation_folds: 5
+  scoring_metric: "accuracy"  # accuracy, f1, precision, recall
+
+# Ensemble model parameters
+ensemble:
+  # Base estimators configuration
+  base_estimators:
+    - type: "random_forest"
+      n_estimators: 50
+      max_depth: 10
+    - type: "linear_regression"
+      regularization: "ridge"
+      ridge_alpha: 0.1
+    - type: "gradient_boosting"
+      n_estimators: 50
+      learning_rate: 0.1
+      
+  # Ensemble method configuration
+  ensemble_method: "voting"  # voting, stacking, bagging
+  voting_strategy: "soft"    # hard, soft (for voting ensemble)
+  
+  # Stacking parameters (when ensemble_method = "stacking")
+  final_estimator: "linear_regression"
+  cv_folds: 3
+  
+  # Evaluation parameters
+  cross_validation_folds: 5
+  scoring_metric: "f1_weighted"
+
+# -----------------------------------------------------------------------------
+# Pipeline Execution Parameters
+# -----------------------------------------------------------------------------
+# Parameters controlling pipeline execution flow and experiment tracking
+
+# Experiment tracking parameters
+experiment_tracking:
+  # Experiment identification
+  experiment_name: "figregistry_basic_example"
+  experiment_version: "1.0.0"
+  run_name: "baseline_comparison"
+  
+  # Logging configuration
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
+  log_artifacts: true
+  log_models: true
+  
+  # Metrics tracking
+  track_metrics: true
+  metrics_update_frequency: 10  # epochs/iterations
+  
+  # Artifact management
+  save_intermediate_results: true
+  artifact_compression: "gzip"
+
+# Pipeline flow control parameters
+pipeline_control:
+  # Stage execution flags
+  run_data_preprocessing: true
+  run_feature_engineering: true
+  run_model_training: true
+  run_model_evaluation: true
+  run_visualization: true
+  
+  # Conditional execution parameters
+  skip_if_exists: false
+  force_regenerate: false
+  
+  # Parallel execution parameters
+  parallel_execution: false
+  max_workers: 4
+  
+  # Memory management
+  memory_limit_gb: 8
+  cleanup_intermediate: false
+
+# Output management parameters
+output_management:
+  # File naming parameters
+  timestamp_format: "%Y%m%d_%H%M%S"
+  include_experiment_id: true
+  include_parameters_hash: false
+  
+  # Versioning parameters
+  version_outputs: true
+  keep_versions: 5
+  archive_old_versions: true
+  
+  # Format preferences
+  preferred_formats:
+    figures: ["png", "pdf"]
+    data: ["csv", "parquet"]
+    models: ["joblib", "pickle"]
+
+# -----------------------------------------------------------------------------
+# Scenario-Specific Parameter Sets
+# -----------------------------------------------------------------------------
+# Pre-defined parameter combinations for different experimental scenarios
+# These demonstrate how different parameter values trigger different styling
+# conditions in the FigRegistry configuration
+
+# Scenario 1: Initial exploration with treatment group A
+scenario_exploration:
+  experiment_condition: "treatment_group_a"
+  analysis_stage: "exploratory"
+  experiment_phase: "training"
+  model_type: "linear_regression"
+  
+  # Scenario-specific overrides
+  data_processing:
+    sample_size: 500
+    train_split: 0.8
+    
+  visualization:
+    dpi: 100  # Lower DPI for faster iteration
+    
+  output_management:
+    preferred_formats:
+      figures: ["png"]  # PNG only for exploration
+
+# Scenario 2: Comparative analysis across treatment groups
+scenario_comparison:
+  experiment_condition: "combined_groups"
+  analysis_stage: "presentation"
+  experiment_phase: "validation"
+  model_type: "random_forest"
+  
+  # Scenario-specific overrides
+  data_processing:
+    sample_size: 2000
+    
+  statistical_analysis:
+    multiple_testing_correction: "fdr"
+    
+  visualization:
+    dpi: 200  # Higher DPI for presentations
+    
+  output_management:
+    preferred_formats:
+      figures: ["png", "pdf"]  # Both formats for presentations
+
+# Scenario 3: Final publication analysis
+scenario_publication:
+  experiment_condition: "combined_groups"
+  analysis_stage: "publication"
+  experiment_phase: "final"
+  model_type: "ensemble"
+  
+  # Scenario-specific overrides
+  data_processing:
+    sample_size: 5000
+    
+  statistical_analysis:
+    alpha_level: 0.01  # More stringent for publication
+    bootstrap_iterations: 5000
+    
+  visualization:
+    dpi: 300  # Publication quality
+    
+  output_management:
+    preferred_formats:
+      figures: ["pdf", "eps"]  # Vector formats for publication
+
+# Scenario 4: Model comparison across algorithms
+scenario_model_comparison:
+  experiment_condition: "control_group"
+  analysis_stage: "presentation"
+  experiment_phase: "testing"
+  
+  # Multiple model types for comparison
+  model_types_to_compare:
+    - "linear_regression"
+    - "random_forest"
+    - "ensemble"
+    
+  # Comparison-specific parameters
+  comparison_metrics:
+    - "accuracy"
+    - "f1_score"
+    - "precision"
+    - "recall"
+    - "roc_auc"
+
+# -----------------------------------------------------------------------------
+# Advanced Configuration Parameters
+# -----------------------------------------------------------------------------
+# Additional parameters demonstrating advanced features and integration
+# capabilities of the FigRegistry-Kedro plugin
+
+# Dynamic parameter resolution for condition_param
+dynamic_conditions:
+  # Primary condition resolution chain
+  primary_condition_sources:
+    - "experiment_condition"
+    - "analysis_stage"
+    - "experiment_phase"
+    
+  # Fallback condition sources
+  fallback_condition_sources:
+    - "model_type"
+    - "default_condition"
+    
+  # Default condition when all resolution fails
+  default_condition: "exploratory"
+
+# Context-aware parameter sets for different execution contexts
+context_parameters:
+  # Interactive development context
+  interactive:
+    experiment_condition: "treatment_group_a"
+    analysis_stage: "exploratory"
+    quick_iteration: true
+    
+  # Automated testing context
+  testing:
+    experiment_condition: "control_group"
+    analysis_stage: "presentation"
+    sample_size: 100  # Smaller for faster tests
+    
+  # Production deployment context
+  production:
+    experiment_condition: "combined_groups"
+    analysis_stage: "publication"
+    full_validation: true
+    comprehensive_logging: true
+
+# Feature flags for experimental features
+feature_flags:
+  # FigRegistry integration features
+  enable_condition_styling: true
+  enable_automatic_versioning: true
+  enable_style_caching: true
+  
+  # Advanced pipeline features
+  enable_parallel_processing: false
+  enable_distributed_computation: false
+  enable_gpu_acceleration: false
+  
+  # Debugging and development features
+  enable_debug_logging: false
+  enable_performance_profiling: false
+  enable_memory_monitoring: false
+
+# Performance tuning parameters
+performance_tuning:
+  # Memory management
+  figure_cache_size: 100
+  style_cache_size: 1000
+  max_memory_usage_mb: 2048
+  
+  # Processing optimization
+  batch_size: 32
+  num_threads: 4
+  prefetch_count: 2
+  
+  # I/O optimization
+  buffer_size_kb: 64
+  compression_level: 6
+  async_writes: true
+
+# -----------------------------------------------------------------------------
+# Validation and Quality Assurance Parameters
+# -----------------------------------------------------------------------------
+# Parameters supporting validation of the FigRegistry integration and
+# quality assurance for the basic example implementation
+
+# Integration validation parameters
+integration_validation:
+  # FigRegistry integration checks
+  validate_config_bridge: true
+  validate_style_resolution: true
+  validate_output_management: true
+  
+  # Kedro integration checks
+  validate_dataset_interface: true
+  validate_hook_registration: true
+  validate_catalog_compatibility: true
+  
+  # Performance validation
+  max_style_resolution_ms: 10
+  max_save_overhead_percent: 5
+  max_hook_overhead_ms: 50
+
+# Test data parameters
+test_data:
+  # Synthetic data generation
+  generate_synthetic_data: true
+  synthetic_data_size: 1000
+  data_complexity: "medium"  # simple, medium, complex
+  
+  # Known ground truth for validation
+  include_ground_truth: true
+  noise_levels: [0.0, 0.1, 0.2, 0.5]
+  
+  # Edge case testing
+  test_edge_cases: true
+  edge_case_scenarios:
+    - "empty_dataset"
+    - "single_point"
+    - "outliers_only"
+    - "missing_values"
+
+# Quality metrics parameters
+quality_metrics:
+  # Figure quality metrics
+  min_figure_resolution: 150
+  max_file_size_mb: 10
+  acceptable_formats: ["png", "pdf", "svg", "eps"]
+  
+  # Styling consistency metrics
+  color_consistency_threshold: 0.95
+  style_application_success_rate: 0.98
+  
+  # Performance metrics
+  target_processing_time_s: 30
+  memory_efficiency_threshold: 0.8
+
+# -----------------------------------------------------------------------------
+# Educational Documentation Parameters
+# -----------------------------------------------------------------------------
+# Parameters that demonstrate usage patterns and provide educational value
+# for users learning the FigRegistry-Kedro integration
+
+# Usage examples configuration
+usage_examples:
+  # Basic usage patterns
+  basic_patterns:
+    simple_condition_resolution:
+      condition_param: "experiment_condition"
+      expected_style: "treatment_group_a"
+      
+    purpose_categorization:
+      purpose: "exploratory"
+      expected_output_path: "data/08_reporting/exploratory"
+      
+    automatic_versioning:
+      versioned: true
+      expected_behavior: "timestamp_based_naming"
+  
+  # Advanced usage patterns
+  advanced_patterns:
+    multi_condition_styling:
+      primary_condition: "experiment_condition"
+      secondary_condition: "experiment_phase"
+      combination_logic: "hierarchical"
+      
+    environment_specific_styling:
+      development_style: "exploratory"
+      production_style: "publication"
+      override_mechanism: "environment_variables"
+      
+    dynamic_style_parameters:
+      runtime_condition_resolution: true
+      parameter_interpolation: true
+      fallback_strategies: ["default_style", "base_palette"]
+
+# Best practices demonstration
+best_practices:
+  # Configuration organization
+  config_organization:
+    separate_environments: true
+    use_parameter_hierarchies: true
+    document_condition_mappings: true
+    
+  # Performance optimization
+  performance_optimization:
+    cache_style_lookups: true
+    minimize_figure_recreations: true
+    use_appropriate_output_formats: true
+    
+  # Error handling
+  error_handling:
+    graceful_fallbacks: true
+    comprehensive_logging: true
+    user_friendly_messages: true
+
+# Common pitfalls and solutions
+common_pitfalls:
+  # Configuration issues
+  config_issues:
+    missing_condition_definitions:
+      problem: "Condition not found in figregistry.yml"
+      solution: "Use fallback_condition or define in styles section"
+      
+    type_mismatches:
+      problem: "Parameter type doesn't match expected condition format"
+      solution: "Ensure string types for condition parameters"
+      
+    circular_dependencies:
+      problem: "Parameter references create circular loops"
+      solution: "Use hierarchical parameter structure"
+  
+  # Integration issues  
+  integration_issues:
+    hook_registration_failures:
+      problem: "FigRegistryHooks not registered in Kedro settings"
+      solution: "Add hooks to HOOKS tuple in settings.py"
+      
+    dataset_configuration_errors:
+      problem: "Invalid FigureDataSet parameters in catalog.yml"
+      solution: "Validate against schema and examples"
+      
+    version_compatibility:
+      problem: "Kedro/FigRegistry version conflicts"
+      solution: "Check version constraints in pyproject.toml"
+
+# =============================================================================
+# Parameter Usage Notes for Developers
+# =============================================================================
+#
+# 1. Condition Parameter Resolution:
+#    - FigureDataSet uses condition_param to lookup parameter values
+#    - Example: condition_param="experiment_condition" resolves to "treatment_group_a"
+#    - Resolved value used in figregistry.get_style() call
+#    - Fallback chain: primary -> secondary -> default conditions
+#
+# 2. Multi-Environment Support:
+#    - Parameters can be overridden in environment-specific files
+#    - Development: focus on speed and iteration
+#    - Testing: emphasis on validation and coverage
+#    - Production: optimization for quality and performance
+#
+# 3. Educational Value:
+#    - Parameters demonstrate different experimental scenarios
+#    - Show how styling changes based on condition values
+#    - Illustrate integration between Kedro and FigRegistry systems
+#    - Provide templates for real-world usage patterns
+#
+# 4. Performance Considerations:
+#    - Style resolution cached for repeated lookups
+#    - Parameter validation at pipeline startup
+#    - Minimal overhead during figure save operations
+#    - Thread-safe for parallel pipeline execution
+#
+# 5. Extensibility:
+#    - Add new experimental conditions by defining in figregistry.yml styles section
+#    - Create condition hierarchies for complex experimental designs
+#    - Support custom styling through style_params overrides
+#    - Enable dynamic condition resolution through parameter interpolation
+#
+# =============================================================================
