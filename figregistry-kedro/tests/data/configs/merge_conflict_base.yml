@@ -1,24 +1,25 @@
-# FigRegistry Kedro Configuration Base - Merge Conflict Testing
+# FigRegistry Kedro Base Configuration - Merge Conflict Testing
 #
-# This configuration file serves as the baseline for testing configuration 
-# merging conflicts and precedence resolution within the FigRegistryConfigBridge 
-# component. It provides specific values designed to conflict with the companion 
-# merge_conflict_override.yml file to validate that override configurations 
-# correctly take precedence during the merging process.
+# This configuration file establishes baseline settings specifically designed 
+# for testing configuration merging conflicts and precedence resolution in the 
+# FigRegistryConfigBridge. Every setting in this file has corresponding 
+# conflicting values in merge_conflict_override.yml to systematically validate 
+# the configuration bridge's precedence handling capabilities per F-007 requirements.
 #
-# Purpose: Establish baseline configuration values that will be systematically 
-# overridden by merge_conflict_override.yml to test the precedence rules:
-# 1. Environment-specific Kedro configurations override base configurations
+# Purpose: Provide foundation configuration values that will be systematically 
+# overridden to test precedence rules defined in Section 5.2.5:
+# 1. Environment-specific overrides take precedence over base configurations
 # 2. Kedro configurations override standalone figregistry.yaml settings  
-# 3. Deep merging for nested dictionaries
-# 4. Lists are replaced entirely (no merging)
+# 3. Deep merging behavior for nested dictionaries
+# 4. Complete replacement behavior for lists
+# 5. Type-safe validation across merged configurations
 #
-# Testing Validation: This configuration is designed to support comprehensive
-# testing of F-007 (Configuration Bridge) feature requirements per Section 5.2.5
+# Testing Framework: This base configuration enables comprehensive validation 
+# of F-007 Configuration Bridge Requirements through systematic conflict resolution
 
-# Base styling conditions designed for systematic override testing
+# Base styling conditions - will be systematically overridden by companion override file
 styles:
-  # Base exploratory styling - designed to conflict with override
+  # Base exploratory styling - designed to conflict with override values
   exploratory:
     figure_size: [10, 6]      # Will conflict with override [12, 8]
     dpi: 100                  # Will conflict with override 150
@@ -32,7 +33,7 @@ styles:
       bottom: true            # Will conflict with override false
       left: true              # Will conflict with override false
   
-  # Base presentation styling - designed to conflict with override
+  # Base presentation styling - designed to conflict with override values
   presentation:
     figure_size: [14, 8]      # Will conflict with override [16, 10]
     dpi: 200                  # Will conflict with override 300
@@ -54,20 +55,20 @@ styles:
     edge_color: "#000000"     # Will conflict with override "#333333"
     save_transparent: false   # Will conflict with override true
 
-# Base color palette definitions designed for conflict testing
+# Base color palette definitions - designed to conflict with override choices
 palettes:
-  # Base default palette - designed to conflict with override
+  # Base default palette - will conflict with override "plasma"
   default: "viridis"          # Will conflict with override "plasma"
   
-  # Base custom palette definitions - designed to conflict with override
+  # Base custom palette definitions - designed for systematic replacement
   custom_sequential:
-    - "#1f77b4"               # Will conflict with override different colors
+    - "#1f77b4"               # Will conflict with override "#440154" set
     - "#ff7f0e"
     - "#2ca02c"
     - "#d62728"
   
   custom_diverging:
-    - "#8e0152"               # Will conflict with override different colors
+    - "#8e0152"               # Will conflict with override "#d73027" set
     - "#c51b7d"
     - "#de77ae"
     - "#f1b6da"
@@ -78,27 +79,27 @@ palettes:
     - "#4d9221"
     - "#276419"
 
-# Base output configuration designed for conflict testing with override paths
+# Base output configuration - designed to conflict with override paths and settings
 outputs:
-  # Base output directory - designed to conflict with override
+  # Base output directory - will conflict with override "/tmp/override_figures"
   base_path: "/tmp/base_figures"  # Will conflict with override "/tmp/override_figures"
   
   # Base path aliases - designed to conflict with override mappings
   path_aliases:
-    expl: "exploratory_base"     # Will conflict with override "exploratory_override"
-    pres: "presentation_base"    # Will conflict with override "presentation_override"
-    pub: "publication_base"      # Will conflict with override "publication_override"
+    expl: "exploratory_base"        # Will conflict with override "exploratory_override"
+    pres: "presentation_base"       # Will conflict with override "presentation_override"
+    pub: "publication_base"         # Will conflict with override "publication_override"
   
-  # Base file naming conventions - designed to conflict with override
-  naming_convention: "{condition}_{timestamp}_base_{index}.png"  # Will conflict with override pattern
+  # Base file naming conventions - designed to conflict with override pattern
+  naming_convention: "{condition}_{timestamp}_base_{index}.png"  # Will conflict with override .svg pattern
   
-  # Base save format preferences - designed to conflict with override
+  # Base save format preferences - designed to conflict with override formats
   formats:
     default: "png"            # Will conflict with override "pdf"
     high_quality: "pdf"       # Will conflict with override "svg"
     web_optimized: "jpg"      # Will conflict with override "png"
   
-  # Base save arguments - designed to conflict with override compression
+  # Base save arguments - designed to conflict with override compression and transparency
   save_args:
     dpi: 150                  # Will conflict with override 300
     bbox_inches: "tight"      # Will conflict with override "standard"
@@ -106,9 +107,9 @@ outputs:
     transparent: false        # Will conflict with override true
     optimize: true            # Will conflict with override false
 
-# Base default rcParams designed for conflict testing with override matplotlib settings
+# Base default rcParams - designed to conflict with override matplotlib settings
 defaults:
-  # Base figure defaults - designed to conflict with override
+  # Base figure defaults - designed to conflict with override dimensions and colors
   figure:
     figsize: [8, 6]           # Will conflict with override [10, 8]
     dpi: 100                  # Will conflict with override 120
@@ -116,14 +117,14 @@ defaults:
     edgecolor: "#000000"      # Will conflict with override "#cccccc"
     autolayout: false         # Will conflict with override true
   
-  # Base font settings - designed to conflict with override
+  # Base font settings - designed to conflict with override typography
   font:
     family: "sans-serif"      # Will conflict with override "serif"
     size: 11                  # Will conflict with override 13
     weight: "normal"          # Will conflict with override "bold"
     style: "normal"           # Will conflict with override "italic"
   
-  # Base axes settings - designed to conflict with override
+  # Base axes settings - designed to conflict with override styling
   axes:
     linewidth: 1.0            # Will conflict with override 2.0
     edgecolor: "#000000"      # Will conflict with override "#666666"
@@ -133,14 +134,14 @@ defaults:
     spines_top: false         # Will conflict with override true
     spines_right: false       # Will conflict with override true
   
-  # Base line properties - designed to conflict with override
+  # Base line properties - designed to conflict with override line styling
   lines:
     linewidth: 1.5            # Will conflict with override 2.5
     markersize: 6             # Will conflict with override 8
     markeredgewidth: 1.0      # Will conflict with override 1.5
     solid_capstyle: "butt"    # Will conflict with override "round"
   
-  # Base legend settings - designed to conflict with override
+  # Base legend settings - designed to conflict with override legend appearance
   legend:
     frameon: true             # Will conflict with override false
     fancybox: false           # Will conflict with override true
@@ -148,196 +149,288 @@ defaults:
     numpoints: 1              # Will conflict with override 2
     fontsize: "medium"        # Will conflict with override "large"
 
-# Base performance and cache settings designed for conflict testing with override values
+# Base performance and cache settings - designed to conflict with override performance values
 performance:
-  # Base caching behavior - designed to conflict with override
+  # Base caching behavior - designed to conflict with override cache settings
   enable_cache: true          # Will conflict with override false
   cache_max_size: 100         # Will conflict with override 50
-  cache_ttl: 3600            # Will conflict with override 600
+  cache_ttl: 3600             # Will conflict with override 600
   
-  # Base parallel processing settings - designed to conflict with override
+  # Base parallel processing settings - designed to conflict with override threading
   max_workers: 4              # Will conflict with override 2
   batch_size: 10              # Will conflict with override 5
   timeout: 60                 # Will conflict with override 30
   
-  # Base memory management - designed to conflict with override
+  # Base memory management - designed to conflict with override memory limits
   memory_limit: "512MB"       # Will conflict with override "256MB"
   gc_threshold: 100           # Will conflict with override 50
   preload_fonts: true         # Will conflict with override false
 
-# Base Kedro-specific settings designed for conflict testing with override integration values
+# Base Kedro-specific settings - designed to conflict with override integration values
 kedro:
-  # Base catalog integration settings - designed to conflict with override
-  auto_register_datasets: true     # Will conflict with override false
-  default_dataset_type: "json"    # Will conflict with override "pickle"
-  enable_versioning: true          # Will conflict with override false
+  # Base catalog integration settings - designed to conflict with override automation
+  auto_register_datasets: true        # Will conflict with override false
+  default_dataset_type: "json"        # Will conflict with override "pickle"
+  enable_versioning: true             # Will conflict with override false
   
-  # Base hook configuration - designed to conflict with override
+  # Base hook configuration - designed to conflict with override hook behavior
   hooks:
-    priority: "high"               # Will conflict with override "low"
-    auto_init: true                # Will conflict with override false
-    fail_on_error: false           # Will conflict with override true
+    priority: "high"                   # Will conflict with override "low"
+    auto_init: true                    # Will conflict with override false
+    fail_on_error: false               # Will conflict with override true
   
-  # Base environment resolution - designed to conflict with override
+  # Base environment resolution - designed to conflict with override precedence order
   environment_precedence:
-    - "local"                      # Will conflict with override order
+    - "local"                          # Will conflict with override order ["override", "base", "local"]
     - "base"
     - "override"
   
-  # Base parameter mapping - designed to conflict with override
+  # Base parameter mapping - designed to conflict with override parameter names
   parameter_mapping:
-    condition_param: "experiment_type"     # Will conflict with override "override_condition"
-    style_param: "visualization_type"     # Will conflict with override "override_style"
-    purpose_param: "output_purpose"       # Will conflict with override "override_purpose"
+    condition_param: "experiment_type"        # Will conflict with override "override_condition"
+    style_param: "visualization_type"        # Will conflict with override "override_style"
+    purpose_param: "output_purpose"          # Will conflict with override "override_purpose"
 
-# Base validation settings designed for conflict testing with override strictness levels
+# Base validation settings - designed to conflict with override strictness levels
 validation:
-  # Base schema validation behavior - designed to conflict with override
+  # Base schema validation behavior - designed to conflict with override validation mode
   strict_mode: true            # Will conflict with override false
   allow_extra_fields: false    # Will conflict with override true
   validate_on_load: true       # Will conflict with override false
   
-  # Base error handling - designed to conflict with override
+  # Base error handling - designed to conflict with override error behavior
   fail_on_invalid: true        # Will conflict with override false
   log_warnings: true           # Will conflict with override false
   suppress_errors: false       # Will conflict with override true
 
-# Base experimental condition mappings designed for conflict testing with override pattern matching
+# Base experimental condition mappings - designed to conflict with override pattern matching
 condition_mappings:
-  # Base pattern matching rules - designed to conflict with override
+  # Base pattern matching rules - designed to conflict with override patterns
   patterns:
-    "exp_*": "experimental_base"       # Will conflict with override "experimental_override"
-    "test_*": "testing_base"           # Will conflict with override "testing_override"
-    "prod_*": "production_base"        # Will conflict with override "production_override"
+    "exp_*": "experimental_base"         # Will conflict with override "experimental_override"
+    "test_*": "testing_base"             # Will conflict with override "testing_override"
+    "prod_*": "production_base"          # Will conflict with override "production_override"
   
-  # Base fallback behavior - designed to conflict with override
-  fallback_style: "exploratory"       # Will conflict with override "publication"
-  case_sensitive: false               # Will conflict with override true
-  regex_enabled: true                 # Will conflict with override false
+  # Base fallback behavior - designed to conflict with override fallback settings
+  fallback_style: "exploratory"        # Will conflict with override "publication"
+  case_sensitive: false                 # Will conflict with override true
+  regex_enabled: true                   # Will conflict with override false
 
-# Base logging configuration designed for conflict testing with override verbosity levels
+# Base logging configuration - designed to conflict with override verbosity levels
 logging:
-  # Base log levels - designed to conflict with override
-  level: "INFO"                       # Will conflict with override "ERROR"
+  # Base log levels - designed to conflict with override "ERROR"
+  level: "INFO"                         # Will conflict with override "ERROR"
   format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"  # Will conflict with override simple format
   
-  # Base output destinations - designed to conflict with override
-  console: true                       # Will conflict with override false
-  file: false                         # Will conflict with override true
-  file_path: "/tmp/base.log"          # Will conflict with override path
+  # Base output destinations - designed to conflict with override console/file settings
+  console: true                         # Will conflict with override false
+  file: false                           # Will conflict with override true
+  file_path: "/tmp/base.log"            # Will conflict with override "/tmp/override.log"
 
-# Base metadata designed for conflict testing with override version and environment information
+# Base metadata - designed to conflict with override version and environment information
 metadata:
-  # Base configuration metadata - designed to conflict with override
-  version: "base-1.0.0"              # Will conflict with override version
-  environment: "testing"             # Will conflict with override "override"
-  created_by: "test_system"          # Will conflict with override "override_system"
-  priority: 1                        # Will conflict with override higher priority
+  # Base configuration metadata - designed to conflict with override metadata
+  version: "base-1.0.0"                # Will conflict with override "override-2.0.0"
+  environment: "testing"                # Will conflict with override "override"
+  created_by: "test_system"             # Will conflict with override "override_system"
+  priority: 1                           # Will conflict with override 999 (higher priority)
   
-  # Base feature flags - designed to conflict with override
+  # Base feature flags - designed to conflict with override feature settings
   features:
-    advanced_styling: true           # Will conflict with override false
-    pattern_matching: true           # Will conflict with override false
-    parallel_processing: true        # Will conflict with override false
-    automatic_cleanup: true          # Will conflict with override false
+    advanced_styling: true              # Will conflict with override false
+    pattern_matching: true              # Will conflict with override false
+    parallel_processing: true           # Will conflict with override false
+    automatic_cleanup: true             # Will conflict with override false
 
-# Additional baseline sections for comprehensive conflict testing per Section 5.2.5 requirements
-
-# Base rcParams values designed to conflict with override configurations
+# Base rcParams values - designed to conflict with override matplotlib configurations
 rcParams:
-  # Base matplotlib global settings - designed for systematic override testing
-  "figure.figsize": [6, 4]           # Will conflict with override different dimensions
-  "figure.dpi": 72                   # Will conflict with override higher DPI
-  "font.size": 10                    # Will conflict with override larger size
-  "axes.titlesize": "large"          # Will conflict with override different size
-  "axes.labelsize": "medium"         # Will conflict with override different size
-  "xtick.labelsize": "small"         # Will conflict with override different size
-  "ytick.labelsize": "small"         # Will conflict with override different size
-  "legend.fontsize": "medium"        # Will conflict with override different size
-  "lines.linewidth": 1.0             # Will conflict with override thicker lines
-  "lines.markersize": 5              # Will conflict with override larger markers
-  "patch.linewidth": 0.5             # Will conflict with override thicker patches
-  "grid.linewidth": 0.8              # Will conflict with override different grid
-  "axes.grid": false                 # Will conflict with override true
-  "axes.edgecolor": "black"          # Will conflict with override different color
-  "axes.facecolor": "white"          # Will conflict with override different color
+  # Base matplotlib global settings - designed for systematic conflicts with override
+  "figure.figsize": [6, 4]             # Will conflict with override [14, 10]
+  "figure.dpi": 72                     # Will conflict with override 150
+  "font.size": 10                      # Will conflict with override 14
+  "axes.titlesize": "large"            # Will conflict with override "x-large"
+  "axes.labelsize": "medium"           # Will conflict with override "large"
+  "xtick.labelsize": "small"           # Will conflict with override "medium"
+  "ytick.labelsize": "small"           # Will conflict with override "medium"
+  "legend.fontsize": "medium"          # Will conflict with override "large"
+  "lines.linewidth": 1.0               # Will conflict with override 2.5
+  "lines.markersize": 5                # Will conflict with override 10
+  "patch.linewidth": 0.5               # Will conflict with override 1.5
+  "grid.linewidth": 0.8                # Will conflict with override 1.2
+  "axes.grid": false                   # Will conflict with override true
+  "axes.edgecolor": "black"            # Will conflict with override "gray"
+  "axes.facecolor": "white"            # Will conflict with override "#f8f8f8"
 
-# Base cache and performance settings for precedence rule validation per F-007
+# Base cache and performance settings - designed to conflict with override F-007 precedence
 cache:
-  # Base configuration caching - designed to conflict with override
-  enable_configuration_cache: true   # Will conflict with override false
-  cache_invalidation_time: 1800      # Will conflict with override different time
-  max_cache_entries: 200             # Will conflict with override different limit
-  cache_compression: false           # Will conflict with override true
+  # Base configuration caching - designed to conflict with override cache behavior
+  enable_configuration_cache: true     # Will conflict with override false
+  cache_invalidation_time: 1800        # Will conflict with override 900
+  max_cache_entries: 200               # Will conflict with override 100
+  cache_compression: false             # Will conflict with override true
   
-  # Base style caching - designed to conflict with override
-  enable_style_cache: true           # Will conflict with override false
-  style_cache_size: 500              # Will conflict with override different size
-  style_cache_ttl: 7200              # Will conflict with override different TTL
+  # Base style caching - designed to conflict with override style cache settings
+  enable_style_cache: true             # Will conflict with override false
+  style_cache_size: 500                # Will conflict with override 250
+  style_cache_ttl: 7200                # Will conflict with override 3600
 
-# Base conditional styling conditions designed for targeted conflict resolution testing
+# Base conditional styling conditions - designed to conflict with override pattern-based conditions
 conditional_styles:
-  # Base pattern-based conditions - designed to conflict with override patterns
+  # Base pattern-based conditions - designed to conflict with override condition types
   "experiment_*":
-    condition_type: "wildcard"       # Will conflict with override different type
-    style_inheritance: "merge"       # Will conflict with override "replace"
-    priority: 100                    # Will conflict with override different priority
+    condition_type: "wildcard"          # Will conflict with override "regex"
+    style_inheritance: "merge"          # Will conflict with override "replace"
+    priority: 100                       # Will conflict with override 500
   
   "analysis_*":
-    condition_type: "regex"          # Will conflict with override different type
-    style_inheritance: "deep_merge"  # Will conflict with override different inheritance
-    priority: 200                    # Will conflict with override different priority
+    condition_type: "regex"             # Will conflict with override "exact"
+    style_inheritance: "deep_merge"     # Will conflict with override "override"
+    priority: 200                       # Will conflict with override 400
   
   "report_*":
-    condition_type: "exact"          # Will conflict with override different type
-    style_inheritance: "override"    # Will conflict with override different inheritance
-    priority: 300                    # Will conflict with override different priority
+    condition_type: "exact"             # Will conflict with override "wildcard"
+    style_inheritance: "override"       # Will conflict with override "merge"
+    priority: 300                       # Will conflict with override 600
 
-# Base integration testing configuration for systematic override validation
+# Base integration testing configuration - designed to conflict with override validation
 integration:
-  # Base Kedro integration settings - designed for comprehensive conflict testing
-  dataset_registration: "automatic"   # Will conflict with override "manual"
-  hook_priority: "normal"             # Will conflict with override different priority
-  context_initialization: "lazy"     # Will conflict with override "eager"
-  error_propagation: "suppress"      # Will conflict with override "raise"
+  # Base Kedro integration settings - designed to conflict with override integration behavior
+  dataset_registration: "automatic"    # Will conflict with override "manual"
+  hook_priority: "normal"              # Will conflict with override "highest"
+  context_initialization: "lazy"       # Will conflict with override "eager"
+  error_propagation: "suppress"        # Will conflict with override "raise"
   
-  # Base configuration merging behavior
-  merge_strategy: "deep"              # Will conflict with override "shallow"
-  conflict_resolution: "override"    # Will conflict with override "merge"
-  validation_level: "strict"         # Will conflict with override "permissive"
-  schema_enforcement: true           # Will conflict with override false
+  # Base configuration merging behavior - designed to conflict with override merge strategy
+  merge_strategy: "deep"               # Will conflict with override "shallow"
+  conflict_resolution: "override"      # Will conflict with override "merge"
+  validation_level: "strict"           # Will conflict with override "permissive"
+  schema_enforcement: true             # Will conflict with override false
 
-# Base environment-specific overrides designed for precedence validation testing
+# Base environment-specific configurations - designed to conflict with override environment settings
 environments:
-  # Base environment configurations - designed to test override precedence
+  # Base environment configurations - designed to conflict with override environment behavior
   development:
-    log_level: "DEBUG"               # Will conflict with override different level
-    cache_enabled: true              # Will conflict with override false
-    validation_strict: false         # Will conflict with override true
+    log_level: "DEBUG"                 # Will conflict with override "CRITICAL"
+    cache_enabled: true                # Will conflict with override false
+    validation_strict: false           # Will conflict with override true
   
   testing:
-    log_level: "INFO"                # Will conflict with override different level
-    cache_enabled: false             # Will conflict with override true
-    validation_strict: true          # Will conflict with override false
+    log_level: "INFO"                  # Will conflict with override "WARNING"
+    cache_enabled: false               # Will conflict with override true
+    validation_strict: true            # Will conflict with override false
   
   production:
-    log_level: "WARNING"             # Will conflict with override different level
-    cache_enabled: true              # Will conflict with override false
-    validation_strict: true          # Will conflict with override false
+    log_level: "WARNING"               # Will conflict with override "ERROR"
+    cache_enabled: true                # Will conflict with override false
+    validation_strict: true            # Will conflict with override false
 
-# Base output management configuration for merge conflict validation per Section 5.2.5
+# Base output management configuration - designed to conflict with override Section 5.2.5 settings
 output_management:
-  # Base versioning strategy - designed to conflict with override
-  versioning_enabled: true           # Will conflict with override false
-  version_format: "timestamp"        # Will conflict with override "semantic"
-  cleanup_policy: "retain_all"       # Will conflict with override "cleanup_old"
+  # Base versioning strategy - designed to conflict with override versioning approach
+  versioning_enabled: true             # Will conflict with override false
+  version_format: "timestamp"          # Will conflict with override "semantic"
+  cleanup_policy: "retain_all"         # Will conflict with override "cleanup_old"
   
-  # Base path resolution - designed to conflict with override
-  path_resolution: "absolute"        # Will conflict with override "relative"
-  create_directories: true           # Will conflict with override false
-  directory_permissions: "0755"     # Will conflict with override different permissions
+  # Base path resolution - designed to conflict with override path handling
+  path_resolution: "absolute"          # Will conflict with override "relative"
+  create_directories: true             # Will conflict with override false
+  directory_permissions: "0755"        # Will conflict with override "0700"
   
-  # Base file operations - designed to conflict with override
-  overwrite_existing: false          # Will conflict with override true
-  backup_originals: true            # Will conflict with override false
-  atomic_operations: true           # Will conflict with override false
+  # Base file operations - designed to conflict with override file handling
+  overwrite_existing: false           # Will conflict with override true
+  backup_originals: true              # Will conflict with override false
+  atomic_operations: true             # Will conflict with override false
+
+# Additional base sections for comprehensive precedence testing per F-007 requirements
+
+# Base advanced styling configuration - designed to conflict with override advanced settings
+advanced_styling:
+  # Base theme management - designed to conflict with override theme system
+  theme_inheritance: "inherited"       # Will conflict with override "none"
+  custom_themes_enabled: true         # Will conflict with override false
+  theme_validation: "enabled"         # Will conflict with override "disabled"
+  
+  # Base color space handling - designed to conflict with override color management
+  color_space: "rgb"                  # Will conflict with override "srgb"
+  gamma_correction: true              # Will conflict with override false
+  color_profile: "default"           # Will conflict with override "override"
+
+# Base data layer mappings - designed to conflict with override Kedro data layer configuration
+data_layer_mappings:
+  # Base Kedro data layer purposes - designed to conflict with override layer assignments
+  "01_raw": "exploratory"             # Will conflict with override "validation"
+  "02_intermediate": "exploratory"    # Will conflict with override "override"
+  "03_primary": "exploratory"         # Will conflict with override "testing"
+  "04_feature": "presentation"        # Will conflict with override "experimental"
+  "05_model_input": "presentation"    # Will conflict with override "override_input"
+  "06_models": "presentation"         # Will conflict with override "override_models"
+  "07_model_output": "publication"    # Will conflict with override "override_output"
+  "08_reporting": "publication"       # Will conflict with override "override_reporting"
+
+# Base experimental features - designed to conflict with override experimental configuration
+experimental:
+  # Base beta features - designed to conflict with override beta feature enablement
+  enable_beta_features: true          # Will conflict with override false
+  experimental_hooks: true            # Will conflict with override false
+  advanced_caching: true             # Will conflict with override false
+  
+  # Base preview functionality - designed to conflict with override preview settings
+  preview_mode: "enabled"             # Will conflict with override "disabled"
+  preview_timeout: 30                 # Will conflict with override 5
+  preview_format: "html"              # Will conflict with override "text"
+
+# Base security configuration - designed to conflict with override security settings
+security:
+  # Base path validation - designed to conflict with override path security
+  validate_paths: true                # Will conflict with override false
+  allow_absolute_paths: false         # Will conflict with override true
+  sandbox_mode: true                  # Will conflict with override false
+  
+  # Base input sanitization - designed to conflict with override input handling
+  sanitize_input: true                # Will conflict with override false
+  escape_output: true                 # Will conflict with override false
+  validate_yaml: true                 # Will conflict with override false
+
+# Base plugin configuration - designed to conflict with override plugin system settings
+plugins:
+  # Base plugin management - designed to conflict with override plugin behavior
+  auto_discovery: true                # Will conflict with override false
+  plugin_validation: "enabled"       # Will conflict with override "disabled"
+  allow_external_plugins: false      # Will conflict with override true
+  
+  # Base plugin execution - designed to conflict with override plugin execution settings
+  parallel_execution: true           # Will conflict with override false
+  plugin_timeout: 60                 # Will conflict with override 10
+  error_handling: "propagate"        # Will conflict with override "ignore"
+
+# Base monitoring configuration - designed to conflict with override monitoring and observability
+monitoring:
+  # Base metrics collection - designed to conflict with override metrics gathering
+  enable_metrics: true               # Will conflict with override false
+  metrics_format: "prometheus"       # Will conflict with override "json"
+  metrics_retention: 30              # Will conflict with override 1
+  
+  # Base performance tracking - designed to conflict with override performance monitoring
+  track_performance: true            # Will conflict with override false
+  performance_threshold: 1000        # Will conflict with override 5000
+  alert_on_slow: true                # Will conflict with override false
+
+# Base compatibility configuration - designed to conflict with override compatibility settings
+compatibility:
+  # Base version compatibility - designed to conflict with override version handling
+  strict_version_check: true         # Will conflict with override false
+  allow_deprecated: false            # Will conflict with override true
+  compatibility_mode: "strict"       # Will conflict with override "permissive"
+  
+  # Base API compatibility - designed to conflict with override API version support
+  api_version: "v1"                  # Will conflict with override "v2"
+  backward_compatibility: true       # Will conflict with override false
+  forward_compatibility: false       # Will conflict with override true
+
+# Final base validation marker - ensures complete configuration foundation
+base_validation:
+  # Base completion marker - provides foundation for comprehensive override testing
+  complete_base: true                # Provides foundation for all override conflicts
+  validation_timestamp: "2024-base"  # Base validation timestamp
+  conflict_count: 150                # Expected number of systematic conflicts
+  precedence_test: "F-007-foundation"  # F-007 Configuration Bridge test foundation marker
