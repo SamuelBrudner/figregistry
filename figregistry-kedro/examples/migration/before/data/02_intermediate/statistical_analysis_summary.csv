@@ -1,57 +1,35 @@
-experiment_group,analysis_category,data_subset,sample_size,group_mean,group_std,confidence_interval_lower,confidence_interval_upper,p_value,statistical_significance,effect_size,quality_score,analysis_timestamp,measurement_type,research_phase,treatment_duration_days
-control,biochemical,protein_levels,45,12.34,2.18,11.69,12.99,0.156,not_significant,0.12,high,2024-01-15T14:30:00,concentration,baseline,0
-control,biochemical,enzyme_activity,45,8.76,1.45,8.33,9.19,0.089,not_significant,0.18,high,2024-01-15T14:30:00,activity_units,baseline,0
-control,biochemical,metabolite_levels,45,15.62,3.21,14.66,16.58,0.234,not_significant,0.08,medium,2024-01-15T14:30:00,concentration,baseline,0
-control,physiological,heart_rate,45,72.5,8.2,70.0,75.0,0.445,not_significant,0.05,high,2024-01-15T14:35:00,bpm,baseline,0
-control,physiological,blood_pressure,45,118.3,12.4,114.6,122.0,0.267,not_significant,0.09,high,2024-01-15T14:35:00,mmHg,baseline,0
-control,physiological,temperature,45,36.8,0.4,36.68,36.92,0.892,not_significant,0.02,high,2024-01-15T14:35:00,celsius,baseline,0
-control,behavioral,activity_score,45,6.2,1.8,5.66,6.74,0.334,not_significant,0.07,medium,2024-01-15T14:40:00,score,baseline,0
-control,behavioral,reaction_time,45,245.6,28.4,237.1,254.1,0.178,not_significant,0.11,high,2024-01-15T14:40:00,milliseconds,baseline,0
-treatment_A,biochemical,protein_levels,42,15.89,2.34,15.16,16.62,0.023,significant,0.35,high,2024-01-22T14:30:00,concentration,treatment,7
-treatment_A,biochemical,enzyme_activity,42,11.23,1.67,10.71,11.75,0.009,significant,0.42,high,2024-01-22T14:30:00,activity_units,treatment,7
-treatment_A,biochemical,metabolite_levels,42,18.94,3.45,17.87,20.01,0.041,significant,0.28,medium,2024-01-22T14:30:00,concentration,treatment,7
-treatment_A,physiological,heart_rate,42,68.4,7.8,66.0,70.8,0.032,significant,0.31,high,2024-01-22T14:35:00,bpm,treatment,7
-treatment_A,physiological,blood_pressure,42,112.1,11.2,108.6,115.6,0.018,significant,0.37,high,2024-01-22T14:35:00,mmHg,treatment,7
-treatment_A,physiological,temperature,42,36.9,0.3,36.81,36.99,0.156,not_significant,0.12,high,2024-01-22T14:35:00,celsius,treatment,7
-treatment_A,behavioral,activity_score,42,7.8,1.9,7.21,8.39,0.007,significant,0.44,medium,2024-01-22T14:40:00,score,treatment,7
-treatment_A,behavioral,reaction_time,42,218.3,25.1,210.5,226.1,0.001,significant,0.58,high,2024-01-22T14:40:00,milliseconds,treatment,7
-treatment_B,biochemical,protein_levels,38,14.67,2.56,14.83,16.51,0.045,significant,0.26,high,2024-01-29T14:30:00,concentration,treatment,14
-treatment_B,biochemical,enzyme_activity,38,10.45,1.89,9.83,11.07,0.078,not_significant,0.19,high,2024-01-29T14:30:00,activity_units,treatment,14
-treatment_B,biochemical,metabolite_levels,38,17.23,3.67,16.02,18.44,0.089,not_significant,0.18,medium,2024-01-29T14:30:00,concentration,treatment,14
-treatment_B,physiological,heart_rate,38,70.1,8.9,67.2,73.0,0.234,not_significant,0.08,high,2024-01-29T14:35:00,bpm,treatment,14
-treatment_B,physiological,blood_pressure,38,115.6,13.1,111.3,119.9,0.456,not_significant,0.04,high,2024-01-29T14:35:00,mmHg,treatment,14
-treatment_B,physiological,temperature,38,37.0,0.5,36.84,37.16,0.067,not_significant,0.21,high,2024-01-29T14:35:00,celsius,treatment,14
-treatment_B,behavioral,activity_score,38,7.1,2.1,6.42,7.78,0.123,not_significant,0.14,medium,2024-01-29T14:40:00,score,treatment,14
-treatment_B,behavioral,reaction_time,38,231.7,31.2,221.5,241.9,0.189,not_significant,0.10,high,2024-01-29T14:40:00,milliseconds,treatment,14
-treatment_C,biochemical,protein_levels,41,18.45,2.89,17.54,19.36,0.001,significant,0.61,high,2024-02-05T14:30:00,concentration,treatment,21
-treatment_C,biochemical,enzyme_activity,41,13.78,2.12,13.11,14.45,0.000,significant,0.72,high,2024-02-05T14:30:00,activity_units,treatment,21
-treatment_C,biochemical,metabolite_levels,41,21.67,4.23,20.34,23.00,0.003,significant,0.52,medium,2024-02-05T14:30:00,concentration,treatment,21
-treatment_C,physiological,heart_rate,41,65.2,6.9,63.0,67.4,0.001,significant,0.59,high,2024-02-05T14:35:00,bpm,treatment,21
-treatment_C,physiological,blood_pressure,41,108.7,10.4,105.4,112.0,0.000,significant,0.68,high,2024-02-05T14:35:00,mmHg,treatment,21
-treatment_C,physiological,temperature,41,37.2,0.4,37.07,37.33,0.002,significant,0.54,high,2024-02-05T14:35:00,celsius,treatment,21
-treatment_C,behavioral,activity_score,41,9.4,2.3,8.67,10.13,0.000,significant,0.74,medium,2024-02-05T14:40:00,score,treatment,21
-treatment_C,behavioral,reaction_time,41,198.5,22.7,191.4,205.6,0.000,significant,0.81,high,2024-02-05T14:40:00,milliseconds,treatment,21
-control_extended,biochemical,protein_levels,43,12.18,2.31,11.48,12.88,0.892,not_significant,0.01,high,2024-02-12T14:30:00,concentration,extended_baseline,28
-control_extended,biochemical,enzyme_activity,43,8.92,1.52,8.46,9.38,0.745,not_significant,0.03,high,2024-02-12T14:30:00,activity_units,extended_baseline,28
-control_extended,biochemical,metabolite_levels,43,15.83,3.34,14.81,16.85,0.623,not_significant,0.05,medium,2024-02-12T14:30:00,concentration,extended_baseline,28
-control_extended,physiological,heart_rate,43,73.1,8.6,70.5,75.7,0.567,not_significant,0.06,high,2024-02-12T14:35:00,bpm,extended_baseline,28
-control_extended,physiological,blood_pressure,43,119.2,12.8,115.3,123.1,0.789,not_significant,0.02,high,2024-02-12T14:35:00,mmHg,extended_baseline,28
-control_extended,physiological,temperature,43,36.8,0.4,36.66,36.94,0.934,not_significant,0.01,high,2024-02-12T14:35:00,celsius,extended_baseline,28
-control_extended,behavioral,activity_score,43,6.3,1.9,5.72,6.88,0.834,not_significant,0.02,medium,2024-02-12T14:40:00,score,extended_baseline,28
-control_extended,behavioral,reaction_time,43,248.2,30.1,239.0,257.4,0.712,not_significant,0.03,high,2024-02-12T14:40:00,milliseconds,extended_baseline,28
-treatment_high_dose,biochemical,protein_levels,39,22.34,3.45,21.22,23.46,0.000,significant,0.89,high,2024-02-19T14:30:00,concentration,high_dose,35
-treatment_high_dose,biochemical,enzyme_activity,39,16.78,2.67,15.91,17.65,0.000,significant,0.92,high,2024-02-19T14:30:00,activity_units,high_dose,35
-treatment_high_dose,biochemical,metabolite_levels,39,26.45,5.12,24.79,28.11,0.000,significant,0.95,medium,2024-02-19T14:30:00,concentration,high_dose,35
-treatment_high_dose,physiological,heart_rate,39,61.8,5.9,59.9,63.7,0.000,significant,0.87,high,2024-02-19T14:35:00,bpm,high_dose,35
-treatment_high_dose,physiological,blood_pressure,39,103.4,9.2,100.4,106.4,0.000,significant,0.93,high,2024-02-19T14:35:00,mmHg,high_dose,35
-treatment_high_dose,physiological,temperature,39,37.4,0.3,37.30,37.50,0.000,significant,0.85,high,2024-02-19T14:35:00,celsius,high_dose,35
-treatment_high_dose,behavioral,activity_score,39,11.2,2.8,10.30,12.10,0.000,significant,0.98,medium,2024-02-19T14:40:00,score,high_dose,35
-treatment_high_dose,behavioral,reaction_time,39,178.4,18.9,172.3,184.5,0.000,significant,1.12,high,2024-02-19T14:40:00,milliseconds,high_dose,35
-washout,biochemical,protein_levels,37,13.45,2.78,12.52,14.38,0.234,not_significant,0.08,high,2024-02-26T14:30:00,concentration,washout,42
-washout,biochemical,enzyme_activity,37,9.67,1.89,9.04,10.30,0.345,not_significant,0.07,high,2024-02-26T14:30:00,activity_units,washout,42
-washout,biochemical,metabolite_levels,37,16.78,3.89,15.50,18.06,0.456,not_significant,0.04,medium,2024-02-26T14:30:00,concentration,washout,42
-washout,physiological,heart_rate,37,71.3,8.1,68.6,74.0,0.567,not_significant,0.06,high,2024-02-26T14:35:00,bpm,washout,42
-washout,physiological,blood_pressure,37,116.8,11.9,112.9,120.7,0.678,not_significant,0.05,high,2024-02-26T14:35:00,mmHg,washout,42
-washout,physiological,temperature,37,36.9,0.4,36.76,37.04,0.789,not_significant,0.02,high,2024-02-26T14:35:00,celsius,washout,42
-washout,behavioral,activity_score,37,6.8,2.1,6.09,7.51,0.890,not_significant,0.01,medium,2024-02-26T14:40:00,score,washout,42
-washout,behavioral,reaction_time,37,241.6,29.3,231.9,251.3,0.712,not_significant,0.03,high,2024-02-26T14:40:00,milliseconds,washout,42
+experiment_group,analysis_category,data_subset,group_mean,group_std,confidence_interval_lower,confidence_interval_upper,sample_size,statistical_significance,p_value,effect_size,researcher_notes,manual_styling_requirements
+control,dose_response_efficacy,baseline_measurements,12.43,0.65,11.61,13.25,3,ns,0.842,0.12,"Baseline efficacy measurements for dose-response study. Manual styling: gray bars with black error bars","Manual color selection: #808080 for control group, error bar width=1.5pt, requires hardcoded plt.bar() styling"
+low_dose,dose_response_efficacy,treatment_5mg,23.60,1.74,21.46,25.74,3,significant,0.034,0.67,"Low dose treatment shows significant improvement. Manual styling: light blue bars","Manual color selection: #87CEEB for low dose, significance stars (**) annotation, requires manual plt.text() positioning"
+medium_dose,dose_response_efficacy,treatment_15mg,49.03,2.85,45.64,52.42,3,highly_significant,0.001,1.89,"Medium dose shows high significance. Manual styling: blue bars with significance indicators","Manual color selection: #4169E1 for medium dose, significance stars (***) annotation, elevated bar height for visual emphasis"
+high_dose,dose_response_efficacy,treatment_50mg,72.87,2.93,69.40,76.34,3,highly_significant,0.0001,2.47,"High dose maximum efficacy. Manual styling: dark blue bars with enhanced significance markers","Manual color selection: #000080 for high dose, significance stars (****) annotation, requires custom legend positioning"
+control,toxicity_safety,baseline_safety,2.10,0.20,1.86,2.34,3,ns,0.756,0.08,"Safety baseline measurements. Manual styling: gray with safety pattern","Manual pattern: hatched gray bars (////) for safety data, requires matplotlib hatch parameter configuration"
+low_dose,toxicity_safety,safety_5mg,2.20,0.20,1.96,2.44,3,ns,0.634,0.15,"Low dose safety profile. Manual styling: light blue with safety hatching","Manual pattern: hatched light blue bars (////), safety threshold line at y=1.5, requires plt.axhline() styling"
+medium_dose,toxicity_safety,safety_15mg,1.80,0.10,1.68,1.92,3,ns,0.234,0.31,"Medium dose acceptable safety. Manual styling: blue with enhanced safety markers","Manual pattern: hatched blue bars (////), safety zone highlighting, requires custom patch overlays"
+high_dose,toxicity_safety,safety_50mg,1.50,0.10,1.38,1.62,3,trending,0.082,0.58,"High dose trending toward significance. Manual styling: dark blue with trending indicators","Manual pattern: hatched dark blue bars (////), trending arrow annotation, requires manual arrow positioning"
+control,time_course_biomarker,day_1_baseline,99.90,1.35,97.98,101.82,3,baseline,1.000,0.00,"Day 1 biomarker baseline. Manual styling: solid gray with time markers","Manual time styling: solid line markers (o), gray color #808080, requires plt.plot() with custom marker styling"
+treatment_A,time_course_biomarker,day_1_treatment,135.60,6.94,127.21,144.00,3,significant,0.021,0.84,"Day 1 treatment response. Manual styling: red markers with significance","Manual time styling: red triangles (^), #FF4500 color, significance background shading, requires fill_between()"
+treatment_A,time_course_biomarker,day_7_peak,188.93,6.42,181.01,196.85,3,highly_significant,0.002,1.95,"Day 7 peak response. Manual styling: dark red with peak indicators","Manual time styling: dark red squares (s), #8B0000 color, peak annotation with arrow, requires annotate()"
+treatment_A,time_course_biomarker,day_14_decline,156.57,6.72,148.42,164.72,3,significant,0.019,1.12,"Day 14 response decline. Manual styling: medium red with decline arrows","Manual time styling: medium red circles (o), #DC143C color, decline annotation, requires custom arrow styling"
+treatment_B,time_course_biomarker,day_1_mild,118.77,6.75,110.78,126.76,3,trending,0.067,0.48,"Day 1 mild response. Manual styling: blue markers with trending indicators","Manual time styling: blue diamonds (D), #4169E1 color, trending dashed line, requires plt.plot() linestyle configuration"
+treatment_B,time_course_biomarker,day_7_significant,167.17,5.83,160.40,173.94,3,significant,0.028,1.23,"Day 7 significant response. Manual styling: dark blue with significance markers","Manual time styling: dark blue hexagons (h), #000080 color, significance box annotation, requires bbox styling"
+treatment_B,time_course_biomarker,day_14_moderate,145.30,6.61,137.37,153.23,3,trending,0.091,0.74,"Day 14 moderate response. Manual styling: medium blue with moderation indicators","Manual time styling: medium blue pentagons (p), #1E90FF color, moderation line annotation, requires text styling"
+control,comparative_response,standard_protocol,8.18,0.24,7.89,8.47,5,baseline,1.000,0.00,"Standard protocol baseline. Manual styling: gray with protocol pattern","Manual protocol styling: striped gray bars (||||), protocol label positioning, requires manual text placement"
+treatment_A,comparative_response,enhanced_protocol,15.64,0.59,14.92,16.36,5,highly_significant,0.0008,3.12,"Enhanced protocol high efficacy. Manual styling: green with enhancement markers","Manual protocol styling: solid green bars #228B22, enhancement arrows (↑), requires custom symbol insertion"
+treatment_B,comparative_response,modified_protocol,12.58,0.55,11.91,13.25,5,significant,0.015,1.78,"Modified protocol moderate efficacy. Manual styling: orange with modification indicators","Manual protocol styling: cross-hatched orange bars (xxxx), modification symbols (~), requires pattern overlay"
+control,longitudinal_function,baseline_function,100.00,1.50,97.88,102.12,3,baseline,1.000,0.00,"Baseline motor function. Manual styling: black with function indicators","Manual longitudinal styling: solid black line (-), function symbol (♦), requires symbol font configuration"
+intervention,longitudinal_function,30day_improvement,115.47,3.14,111.69,119.25,3,significant,0.023,1.24,"30-day significant improvement. Manual styling: green with improvement arrows","Manual longitudinal styling: green line with markers (o-), improvement arrows (↗), requires angle configuration"
+intervention,longitudinal_function,60day_maximum,124.60,3.33,120.64,128.56,3,highly_significant,0.003,2.18,"60-day maximum improvement. Manual styling: dark green with maximum indicators","Manual longitudinal styling: dark green bold line, maximum star markers (*), requires linewidth=3 configuration"
+vehicle,survival_analysis,control_survival,28.52,0.54,27.88,29.16,5,control,1.000,0.00,"Vehicle control survival. Manual styling: gray with survival curve","Manual survival styling: gray step function, confidence bands, requires plt.step() with fill_between()"
+low_dose,survival_analysis,low_dose_survival,26.98,0.49,26.39,27.57,5,ns,0.124,0.34,"Low dose survival profile. Manual styling: light blue survival curve","Manual survival styling: light blue step function, dashed confidence bands, requires linestyle configuration"
+high_dose,survival_analysis,high_dose_survival,22.44,0.54,21.80,23.08,5,significant,0.002,1.87,"High dose reduced survival. Manual styling: red survival curve with significance","Manual survival styling: red step function, significance markers (†), requires custom death symbols"
+control,protein_binding,binding_baseline,85.50,1.85,83.23,87.77,3,baseline,1.000,0.00,"Protein binding baseline. Manual styling: purple with binding patterns","Manual binding styling: purple bars with binding pattern (∞), requires special symbol handling"
+treatment,protein_binding,enhanced_binding,92.70,1.40,91.00,94.40,3,significant,0.034,1.12,"Enhanced protein binding. Manual styling: dark purple with enhancement markers","Manual binding styling: dark purple bars, enhancement symbols (+), requires plus symbol positioning"
+inhibitor_A,enzyme_activity,inhibition_profile,23.67,1.92,21.38,25.96,3,highly_significant,0.001,2.34,"Inhibitor A strong effect. Manual styling: red with inhibition arrows","Manual inhibition styling: red bars with down arrows (↓), inhibition percentage labels, requires percentage formatting"
+inhibitor_B,enzyme_activity,strong_inhibition,18.53,1.31,16.98,20.08,3,highly_significant,0.0005,2.78,"Inhibitor B strongest effect. Manual styling: dark red with maximum inhibition","Manual inhibition styling: dark red bars, maximum inhibition symbols (⊥), requires symbol font configuration"
+mono_A,synergy_analysis,monotherapy_A,1.10,0.10,0.98,1.22,3,additive,0.456,0.00,"Monotherapy A additive effect. Manual styling: blue with additive line","Manual synergy styling: blue bars with additive reference line (y=1), requires horizontal reference styling"
+mono_B,synergy_analysis,monotherapy_B,1.00,0.10,0.88,1.12,3,additive,1.000,0.00,"Monotherapy B baseline additive. Manual styling: light blue with baseline markers","Manual synergy styling: light blue bars, baseline markers (◊), requires diamond symbol configuration"
+combo_low,synergy_analysis,low_synergy,1.80,0.10,1.68,1.92,3,synergistic,0.008,1.95,"Low dose synergistic effect. Manual styling: green with synergy indicators","Manual synergy styling: green bars, synergy arrows (↗), synergy zone shading, requires color gradient"
+combo_high,synergy_analysis,high_synergy,2.40,0.20,2.16,2.64,3,highly_synergistic,0.001,3.45,"High dose strong synergy. Manual styling: dark green with maximum synergy","Manual synergy styling: dark green bars, synergy stars (★), maximum zone highlighting, requires star symbols"
+single_dose,pharmacokinetic,pk_profile_single,45.07,2.22,42.40,47.74,3,pk_profile,0.892,0.15,"Single dose PK profile. Manual styling: orange with PK curve styling","Manual PK styling: orange line with PK markers (△), log scale formatting, requires semilog configuration"
+multiple_dose,pharmacokinetic,pk_profile_multiple,62.63,2.80,59.31,65.95,3,steady_state,0.734,0.28,"Multiple dose steady state. Manual styling: red orange with steady state indicators","Manual PK styling: red-orange line, steady state plateau shading, requires custom plateau detection"
