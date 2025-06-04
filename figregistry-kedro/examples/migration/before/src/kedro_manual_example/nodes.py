@@ -1,834 +1,751 @@
-"""
-Traditional Kedro node functions demonstrating problematic manual matplotlib figure management.
+"""Traditional Kedro node functions demonstrating manual matplotlib figure management.
 
-This module showcases the scattered plt.savefig() calls, hardcoded styling, manual file path
-management, and code duplication patterns that figregistry-kedro eliminates. These functions
-represent the "before" state in the migration example, highlighting the maintenance overhead
-and inconsistencies that automated figure management resolves.
-
-Key Problems Demonstrated:
+This module showcases the problematic approaches that figregistry-kedro eliminates:
 - Manual plt.savefig() calls scattered throughout node functions
-- Hardcoded styling without systematic condition-based management  
-- Manual file path construction and naming patterns
-- Code duplication with repeated styling logic across functions
-- Inconsistent experimental condition handling
-- Manual intervention requirements for figure management
+- Hardcoded styling configuration in each function
+- Inconsistent file naming and path management
+- Code duplication across visualization functions
+- Manual experimental condition handling
+- Maintenance overhead from scattered figure management logic
+
+These patterns demonstrate the baseline state that motivated the development of
+figregistry-kedro's automated figure styling and management capabilities.
 """
 
 import os
-import datetime
-from pathlib import Path
-from typing import Dict, Any, Tuple, Optional
-
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 import seaborn as sns
-from matplotlib.figure import Figure
+from datetime import datetime
+from typing import Dict, List, Any
+from pathlib import Path
 
 
-def explore_data_distribution(data: pd.DataFrame, params: Dict[str, Any]) -> None:
+def create_exploratory_data_analysis(data: pd.DataFrame, experiment_config: Dict[str, Any]) -> None:
+    """Create exploratory data analysis plots with manual figure management.
+    
+    This function demonstrates the traditional approach with:
+    - Manual plt.savefig() calls
+    - Hardcoded styling parameters
+    - Manual file path construction
+    - Inconsistent styling approach
     """
-    Create exploratory data distribution plots with manual figure management.
+    # Manual styling configuration - hardcoded in function
+    plt.style.use('default')
+    plt.rcParams.update({
+        'font.size': 12,
+        'axes.labelsize': 14,
+        'axes.titlesize': 16,
+        'xtick.labelsize': 10,
+        'ytick.labelsize': 10,
+        'legend.fontsize': 12,
+        'figure.titlesize': 18
+    })
     
-    PROBLEMS DEMONSTRATED:
-    - Manual plt.savefig() calls with hardcoded paths
-    - Inconsistent styling across different conditions
-    - Manual timestamp generation for versioning
-    - Hardcoded color schemes without systematic management
-    """
-    # Manual styling configuration - PROBLEM: hardcoded, not reusable
-    if params.get("experiment_type") == "pilot":
-        # Different hardcoded colors for pilot experiments
-        primary_color = "#FF6B6B"  # Red for pilot
-        secondary_color = "#4ECDC4"  # Teal
-        marker_style = "o"
-    elif params.get("experiment_type") == "production":
-        # Different hardcoded colors for production
-        primary_color = "#45B7D1"  # Blue for production  
-        secondary_color = "#96CEB4"  # Green
-        marker_style = "s"
+    # Hardcoded colors for different conditions - no systematic management
+    if experiment_config.get('condition') == 'baseline':
+        color_scheme = '#1f77b4'  # Blue
+        marker_style = 'o'
+    elif experiment_config.get('condition') == 'treatment_a':
+        color_scheme = '#ff7f0e'  # Orange  
+        marker_style = 's'
+    elif experiment_config.get('condition') == 'treatment_b':
+        color_scheme = '#2ca02c'  # Green
+        marker_style = '^'
     else:
-        # Default hardcoded fallback - PROBLEM: inconsistent with above patterns
-        primary_color = "gray"
-        secondary_color = "lightgray"
-        marker_style = "^"
+        # Fallback - inconsistent with other functions
+        color_scheme = 'black'
+        marker_style = 'x'
     
-    # Manual figure creation with hardcoded settings
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-    fig.suptitle("Data Distribution Analysis", fontsize=16, fontweight='bold')
+    # Create figure with manual sizing
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
     
-    # Histogram with manual styling
-    axes[0, 0].hist(data['value'], bins=30, color=primary_color, alpha=0.7, edgecolor='black')
-    axes[0, 0].set_title("Value Distribution", fontsize=14, color=primary_color)
-    axes[0, 0].set_xlabel("Value")
-    axes[0, 0].set_ylabel("Frequency")
-    axes[0, 0].grid(True, alpha=0.3)
+    # Distribution plot - manual styling
+    ax1.hist(data['feature_1'], bins=30, color=color_scheme, alpha=0.7, edgecolor='black')
+    ax1.set_title('Feature 1 Distribution', fontsize=14, fontweight='bold')
+    ax1.set_xlabel('Feature 1 Values')
+    ax1.set_ylabel('Frequency')
+    ax1.grid(True, alpha=0.3)
     
-    # Box plot with different manual styling - PROBLEM: inconsistent with histogram
-    axes[0, 1].boxplot(data['value'], patch_artist=True, 
-                       boxprops=dict(facecolor=secondary_color, alpha=0.7),
-                       medianprops=dict(color='red', linewidth=2))
-    axes[0, 1].set_title("Value Distribution (Box Plot)", fontsize=14, color=secondary_color)
-    axes[0, 1].set_ylabel("Value")
+    # Scatter plot - manual styling
+    ax2.scatter(data['feature_1'], data['feature_2'], 
+               color=color_scheme, marker=marker_style, alpha=0.6, s=50)
+    ax2.set_title('Feature 1 vs Feature 2', fontsize=14, fontweight='bold')
+    ax2.set_xlabel('Feature 1')
+    ax2.set_ylabel('Feature 2')
+    ax2.grid(True, alpha=0.3)
     
-    # Scatter plot with manual condition-based coloring - PROBLEM: not systematic
-    if 'category' in data.columns:
-        categories = data['category'].unique()
-        # Manual color assignment - PROBLEM: hardcoded, not scalable
-        colors = ['red', 'blue', 'green', 'orange', 'purple'][:len(categories)]
-        for i, cat in enumerate(categories):
-            mask = data['category'] == cat
-            axes[1, 0].scatter(data.loc[mask, 'value'], data.loc[mask, 'secondary_value'], 
-                             c=colors[i % len(colors)], marker=marker_style, 
-                             label=cat, alpha=0.6, s=50)
-        axes[1, 0].legend()
-    else:
-        axes[1, 0].scatter(data['value'], data['secondary_value'], 
-                          c=primary_color, marker=marker_style, alpha=0.6, s=50)
+    # Box plot - manual styling
+    box_data = [data[col] for col in ['feature_1', 'feature_2', 'feature_3']]
+    bp = ax3.boxplot(box_data, labels=['Feature 1', 'Feature 2', 'Feature 3'], patch_artist=True)
+    for patch in bp['boxes']:
+        patch.set_facecolor(color_scheme)
+        patch.set_alpha(0.7)
+    ax3.set_title('Feature Distributions', fontsize=14, fontweight='bold')
+    ax3.set_ylabel('Values')
+    ax3.grid(True, alpha=0.3)
     
-    axes[1, 0].set_title("Value Correlation", fontsize=14)
-    axes[1, 0].set_xlabel("Primary Value")
-    axes[1, 0].set_ylabel("Secondary Value")
-    axes[1, 0].grid(True, alpha=0.3)
+    # Correlation heatmap - different styling approach
+    corr_matrix = data[['feature_1', 'feature_2', 'feature_3']].corr()
+    im = ax4.imshow(corr_matrix, cmap='coolwarm', aspect='auto', vmin=-1, vmax=1)
+    ax4.set_xticks(range(len(corr_matrix.columns)))
+    ax4.set_yticks(range(len(corr_matrix.columns)))
+    ax4.set_xticklabels(corr_matrix.columns, rotation=45)
+    ax4.set_yticklabels(corr_matrix.columns)
+    ax4.set_title('Feature Correlations', fontsize=14, fontweight='bold')
     
-    # Time series plot with manual date formatting - PROBLEM: repetitive setup
-    if 'date' in data.columns:
-        axes[1, 1].plot(data['date'], data['value'], color=primary_color, 
-                       linewidth=2, marker=marker_style, markersize=4)
-        axes[1, 1].set_title("Value Over Time", fontsize=14)
-        axes[1, 1].set_xlabel("Date")
-        axes[1, 1].set_ylabel("Value")
-        # Manual date formatting - PROBLEM: repeated code
-        axes[1, 1].xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-        axes[1, 1].xaxis.set_major_locator(mdates.MonthLocator(interval=2))
-        plt.setp(axes[1, 1].xaxis.get_majorticklabels(), rotation=45)
-    else:
-        axes[1, 1].text(0.5, 0.5, "No date data available", 
-                       ha='center', va='center', transform=axes[1, 1].transAxes)
+    # Add colorbar manually
+    cbar = plt.colorbar(im, ax=ax4)
+    cbar.set_label('Correlation Coefficient')
     
     plt.tight_layout()
     
-    # PROBLEM: Manual file path construction with hardcoded patterns
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    experiment = params.get("experiment_type", "default")
+    # Manual file path construction - hardcoded and inconsistent
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    condition = experiment_config.get('condition', 'unknown')
     
-    # PROBLEM: Different path patterns for different purposes - not systematic
-    if params.get("purpose") == "exploratory":
-        output_dir = "data/08_reporting/exploratory"
-        filename = f"data_exploration_{experiment}_{timestamp}.png"
-    elif params.get("purpose") == "presentation":
-        output_dir = "data/08_reporting/presentation"  
-        filename = f"presentation_data_dist_{experiment}_{timestamp}.png"
-    else:
-        # PROBLEM: Inconsistent fallback pattern
-        output_dir = "data/08_reporting"
-        filename = f"figure_{timestamp}.png"
+    # Hardcoded output directory - not configurable
+    output_dir = Path("data/08_reporting/figures/eda")
+    output_dir.mkdir(parents=True, exist_ok=True)
     
-    # PROBLEM: Manual directory creation with error-prone logic
-    os.makedirs(output_dir, exist_ok=True)
-    full_path = os.path.join(output_dir, filename)
+    # Manual filename construction - inconsistent naming pattern
+    filename = f"exploratory_analysis_{condition}_{timestamp}.png"
+    filepath = output_dir / filename
     
-    # PROBLEM: Manual plt.savefig() call with hardcoded parameters
-    plt.savefig(full_path, dpi=300, bbox_inches='tight', 
-                facecolor='white', edgecolor='none')
+    # Manual plt.savefig call with hardcoded parameters
+    plt.savefig(filepath, dpi=300, bbox_inches='tight', facecolor='white', edgecolor='none')
     plt.close()
     
-    print(f"Saved exploration plot to: {full_path}")
+    print(f"EDA plot saved to: {filepath}")
 
 
-def analyze_correlations(data: pd.DataFrame, params: Dict[str, Any]) -> None:
+def create_model_performance_plots(metrics_data: Dict[str, float], 
+                                 training_history: pd.DataFrame,
+                                 experiment_config: Dict[str, Any]) -> None:
+    """Create model performance visualization with manual figure management.
+    
+    Demonstrates more manual styling inconsistencies and file management issues.
     """
-    Create correlation analysis plots with different manual styling patterns.
-    
-    PROBLEMS DEMONSTRATED:
-    - Repeated styling logic from other functions (code duplication)
-    - Different file naming convention (inconsistency)
-    - Manual colormap selection without systematic approach
-    - Different error handling patterns
-    """
-    # PROBLEM: Duplicated condition checking logic from above function
-    experiment = params.get("experiment_type", "unknown")
-    
-    # PROBLEM: Different styling approach than explore_data_distribution
-    if experiment == "pilot":
-        colormap = "Reds"
-        title_color = "#8B0000"  # Different red than above function
-    elif experiment == "production":
-        colormap = "Blues"
-        title_color = "#000080"  # Different blue than above function
-    else:
-        colormap = "Greys"
-        title_color = "black"
-    
-    # Calculate correlation matrix
-    numeric_data = data.select_dtypes(include=[np.number])
-    corr_matrix = numeric_data.corr()
-    
-    # Manual figure setup with different parameters than other functions
-    fig, axes = plt.subplots(1, 2, figsize=(15, 6))
-    
-    # Correlation heatmap with manual styling
-    im = axes[0].imshow(corr_matrix, cmap=colormap, aspect='auto', vmin=-1, vmax=1)
-    axes[0].set_xticks(range(len(corr_matrix.columns)))
-    axes[0].set_yticks(range(len(corr_matrix.columns)))
-    axes[0].set_xticklabels(corr_matrix.columns, rotation=45, ha='right')
-    axes[0].set_yticklabels(corr_matrix.columns)
-    axes[0].set_title("Correlation Matrix", fontsize=16, color=title_color, weight='bold')
-    
-    # Manual colorbar creation - PROBLEM: different approach than other functions
-    cbar = fig.colorbar(im, ax=axes[0], shrink=0.8)
-    cbar.set_label("Correlation Coefficient", fontsize=12)
-    
-    # Add correlation values manually - PROBLEM: repetitive formatting code
-    for i in range(len(corr_matrix.columns)):
-        for j in range(len(corr_matrix.columns)):
-            value = corr_matrix.iloc[i, j]
-            # Manual text color selection based on value
-            text_color = 'white' if abs(value) > 0.5 else 'black'
-            axes[0].text(j, i, f'{value:.2f}', ha='center', va='center', 
-                        color=text_color, fontweight='bold')
-    
-    # Scatter plot matrix with manual subplot management
-    n_vars = min(4, len(numeric_data.columns))  # Limit to 4 variables
-    selected_vars = numeric_data.columns[:n_vars]
-    
-    # Manual grid creation - PROBLEM: complex manual layout management
-    gs = fig.add_gridspec(n_vars, n_vars, left=0.55, right=0.95, 
-                         top=0.9, bottom=0.1, hspace=0.3, wspace=0.3)
-    
-    for i, var1 in enumerate(selected_vars):
-        for j, var2 in enumerate(selected_vars):
-            ax = fig.add_subplot(gs[i, j])
-            if i == j:
-                # Diagonal: histograms with manual styling
-                ax.hist(numeric_data[var1], bins=20, color=title_color, alpha=0.7)
-                ax.set_title(var1, fontsize=10)
-            else:
-                # Off-diagonal: scatter plots with manual styling
-                ax.scatter(numeric_data[var2], numeric_data[var1], 
-                          alpha=0.6, s=20, color=title_color)
-                if i == len(selected_vars) - 1:
-                    ax.set_xlabel(var2, fontsize=9)
-                if j == 0:
-                    ax.set_ylabel(var1, fontsize=9)
-            
-            # Manual tick formatting - PROBLEM: repeated formatting code
-            ax.tick_params(labelsize=8)
-            if len(ax.get_xticklabels()) > 5:
-                ax.tick_params(axis='x', rotation=45)
-    
-    # PROBLEM: Different timestamp format than other functions
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    purpose = params.get("purpose", "analysis")
-    
-    # PROBLEM: Different directory structure logic
-    if purpose == "presentation":
-        base_dir = f"data/08_reporting/presentations/{experiment}"
-        filename = f"correlations_presentation_{timestamp}.pdf"  # Different format!
-    elif purpose == "exploratory":
-        base_dir = f"data/08_reporting/exploration/{experiment}"  
-        filename = f"corr_analysis_{timestamp}.png"
-    else:
-        # PROBLEM: Yet another different fallback pattern
-        base_dir = "figures"  # Different base directory!
-        filename = f"correlation_analysis_{experiment}_{timestamp}.svg"  # Different format!
-    
-    # PROBLEM: Different error handling approach
-    try:
-        Path(base_dir).mkdir(parents=True, exist_ok=True)
-        output_path = Path(base_dir) / filename
-        
-        # PROBLEM: Different save parameters than other functions
-        plt.savefig(output_path, dpi=400, bbox_inches='tight',  # Different DPI!
-                   format=output_path.suffix[1:], transparent=True)  # Different options!
-        plt.close()
-        print(f"Correlation analysis saved to: {output_path}")
-        
-    except Exception as e:
-        print(f"ERROR: Failed to save correlation plot: {e}")
-        plt.close()  # Make sure to close even on error
-
-
-def create_summary_dashboard(data: pd.DataFrame, params: Dict[str, Any]) -> pd.DataFrame:
-    """
-    Generate a comprehensive summary dashboard with manual figure management.
-    
-    PROBLEMS DEMONSTRATED:
-    - Complex manual subplot layout management
-    - Mixed styling approaches from previous functions
-    - Manual aggregation and calculation logic
-    - Inconsistent error handling and file management
-    - Return data along with side-effect figure saving (poor separation)
-    """
-    # PROBLEM: Yet another different styling approach 
-    condition = params.get("condition", "baseline")
-    stage = params.get("stage", "development")
-    
-    # PROBLEM: Complex manual condition-to-style mapping
-    style_config = {
-        "baseline": {"color": "#2E8B57", "marker": "o", "linestyle": "-"},
-        "treatment_a": {"color": "#DC143C", "marker": "s", "linestyle": "--"},
-        "treatment_b": {"color": "#4169E1", "marker": "^", "linestyle": "-."},
-        "control": {"color": "#8B4513", "marker": "d", "linestyle": ":"}
-    }
-    
-    # PROBLEM: Default fallback with different pattern than other functions
-    current_style = style_config.get(condition, {
-        "color": "black", "marker": "x", "linestyle": "-"
-    })
-    
-    # Manual data aggregation - this would be better as separate node
-    summary_stats = {
-        'mean': data.groupby('category')['value'].mean() if 'category' in data.columns else data['value'].mean(),
-        'std': data.groupby('category')['value'].std() if 'category' in data.columns else data['value'].std(),
-        'count': data.groupby('category')['value'].count() if 'category' in data.columns else len(data)
-    }
-    
-    # PROBLEM: Complex manual figure layout with hardcoded dimensions
-    fig = plt.figure(figsize=(16, 12))
-    
-    # Manual subplot creation with magic numbers
-    gs = fig.add_gridspec(3, 3, height_ratios=[1, 1, 1.2], width_ratios=[1, 1, 1],
-                         hspace=0.3, wspace=0.3)
-    
-    # Top row: summary statistics
-    ax1 = fig.add_subplot(gs[0, 0])
-    ax2 = fig.add_subplot(gs[0, 1])
-    ax3 = fig.add_subplot(gs[0, 2])
-    
-    # Manual bar plots with inconsistent styling
-    if isinstance(summary_stats['mean'], pd.Series):
-        # Grouped data case
-        categories = summary_stats['mean'].index
-        x_pos = np.arange(len(categories))
-        
-        # Different color scheme than previous functions
-        colors = plt.cm.Set3(np.linspace(0, 1, len(categories)))  # PROBLEM: different approach
-        
-        ax1.bar(x_pos, summary_stats['mean'], color=colors, alpha=0.8, edgecolor='black')
-        ax1.set_title("Mean Values by Category", fontweight='bold', color=current_style['color'])
-        ax1.set_xticks(x_pos)
-        ax1.set_xticklabels(categories, rotation=45)
-        ax1.set_ylabel("Mean Value")
-        
-        ax2.bar(x_pos, summary_stats['std'], color=colors, alpha=0.6, edgecolor='gray')
-        ax2.set_title("Standard Deviation by Category", fontweight='bold', color=current_style['color'])
-        ax2.set_xticks(x_pos)
-        ax2.set_xticklabels(categories, rotation=45)
-        ax2.set_ylabel("Std Deviation")
-        
-        ax3.bar(x_pos, summary_stats['count'], color=colors, alpha=0.9, edgecolor='darkblue')
-        ax3.set_title("Sample Count by Category", fontweight='bold', color=current_style['color'])
-        ax3.set_xticks(x_pos)
-        ax3.set_xticklabels(categories, rotation=45)
-        ax3.set_ylabel("Count")
-        
-    else:
-        # Single value case - PROBLEM: completely different visualization approach
-        metrics = ['Mean', 'Std Dev', 'Count']
-        values = [summary_stats['mean'], summary_stats['std'], summary_stats['count']]
-        
-        for ax, metric, value in zip([ax1, ax2, ax3], metrics, values):
-            ax.bar([0], [value], color=current_style['color'], alpha=0.7, width=0.5)
-            ax.set_title(f"{metric}: {value:.2f}", fontweight='bold')
-            ax.set_xticks([])
-            ax.set_ylabel("Value")
-    
-    # Middle row: distribution analysis
-    ax4 = fig.add_subplot(gs[1, :])  # Span all columns
-    
-    if 'category' in data.columns:
-        # PROBLEM: Manual violin plot setup with hardcoded parameters
-        categories = data['category'].unique()
-        positions = range(len(categories))
-        violin_data = [data[data['category'] == cat]['value'].values for cat in categories]
-        
-        parts = ax4.violinplot(violin_data, positions=positions, widths=0.8, 
-                              showmeans=True, showmedians=True)
-        
-        # Manual styling of violin plot components - PROBLEM: complex manual customization
-        for pc in parts['bodies']:
-            pc.set_facecolor(current_style['color'])
-            pc.set_alpha(0.6)
-        
-        parts['cmeans'].set_color('red')
-        parts['cmedians'].set_color('blue') 
-        parts['cbars'].set_color('black')
-        parts['cmins'].set_color('black')
-        parts['cmaxes'].set_color('black')
-        
-        ax4.set_xticks(positions)
-        ax4.set_xticklabels(categories)
-        ax4.set_title("Value Distribution by Category", fontsize=14, fontweight='bold',
-                     color=current_style['color'])
-        ax4.set_ylabel("Value")
-        ax4.grid(True, alpha=0.3)
-        
-    else:
-        # Single distribution
-        ax4.hist(data['value'], bins=50, color=current_style['color'], 
-                alpha=0.7, edgecolor='black', density=True)
-        ax4.set_title("Overall Value Distribution", fontsize=14, fontweight='bold')
-        ax4.set_xlabel("Value")
-        ax4.set_ylabel("Density")
-        ax4.grid(True, alpha=0.3)
-    
-    # Bottom row: trend analysis (if time data available)
-    ax5 = fig.add_subplot(gs[2, :])
-    
-    if 'date' in data.columns:
-        # PROBLEM: Manual time series aggregation
-        daily_data = data.groupby(data['date'].dt.date)['value'].agg(['mean', 'std']).reset_index()
-        
-        ax5.plot(daily_data['date'], daily_data['mean'], 
-                color=current_style['color'], linewidth=2, 
-                marker=current_style['marker'], markersize=6,
-                linestyle=current_style['linestyle'], label='Daily Mean')
-        
-        # Manual error band calculation and plotting
-        ax5.fill_between(daily_data['date'], 
-                        daily_data['mean'] - daily_data['std'],
-                        daily_data['mean'] + daily_data['std'],
-                        alpha=0.3, color=current_style['color'], label='±1 Std Dev')
-        
-        ax5.set_title("Daily Value Trends", fontsize=14, fontweight='bold',
-                     color=current_style['color'])
-        ax5.set_xlabel("Date")
-        ax5.set_ylabel("Value")
-        ax5.legend()
-        ax5.grid(True, alpha=0.3)
-        
-        # Manual date formatting - PROBLEM: different from other functions
-        ax5.tick_params(axis='x', rotation=30)
-        
-    else:
-        ax5.text(0.5, 0.5, f"No time series data available\nCondition: {condition}\nStage: {stage}", 
-                ha='center', va='center', transform=ax5.transAxes, 
-                fontsize=12, color=current_style['color'])
-    
-    # PROBLEM: Complex manual title formatting
-    fig.suptitle(f"Summary Dashboard - {condition.title()} Condition ({stage.title()} Stage)", 
-                fontsize=18, fontweight='bold', y=0.98)
-    
-    # PROBLEM: Yet another different file naming and path convention
-    timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M")  # Different format again!
-    
-    # PROBLEM: Complex conditional path logic
-    if stage == "development":
-        if params.get("purpose") == "presentation":
-            output_dir = f"reports/development/presentations/{condition}"
-            filename = f"dashboard_dev_{condition}_{timestamp}.png"
-        else:
-            output_dir = f"reports/development/analysis/{condition}"
-            filename = f"summary_dashboard_dev_{timestamp}.pdf"  # Mixed formats!
-    elif stage == "production":
-        output_dir = f"reports/production/{condition}"
-        filename = f"prod_dashboard_{condition}_{timestamp}.svg"  # Another format!
-    else:
-        # PROBLEM: Yet another fallback pattern
-        output_dir = "outputs/dashboards"
-        filename = f"dashboard_{condition}_{stage}_{timestamp}.png"
-    
-    # PROBLEM: Manual directory creation with different error handling
-    full_output_dir = Path(output_dir)
-    try:
-        full_output_dir.mkdir(parents=True, exist_ok=True)
-    except PermissionError:
-        print(f"WARNING: Permission denied creating {full_output_dir}, using current directory")
-        full_output_dir = Path(".")
-        filename = f"dashboard_fallback_{timestamp}.png"
-    
-    output_path = full_output_dir / filename
-    
-    # PROBLEM: Different save parameters again
-    try:
-        format_type = output_path.suffix[1:] if output_path.suffix else 'png'
-        plt.savefig(output_path, format=format_type, dpi=350,  # Another different DPI!
-                   bbox_inches='tight', facecolor='white', edgecolor='black')  # Different edge!
-        print(f"Dashboard saved successfully to: {output_path}")
-        
-    except Exception as e:
-        # PROBLEM: Fallback save with yet different parameters
-        fallback_path = Path(f"dashboard_error_{timestamp}.png")
-        plt.savefig(fallback_path, dpi=150, bbox_inches='tight')  # Low quality fallback
-        print(f"ERROR saving to {output_path}: {e}")
-        print(f"Saved to fallback location: {fallback_path}")
-    
-    finally:
-        plt.close()
-    
-    # PROBLEM: Mixing side effects (file saving) with data return - poor separation of concerns
-    summary_df = pd.DataFrame({
-        'condition': [condition],
-        'stage': [stage], 
-        'timestamp': [timestamp],
-        'output_path': [str(output_path)],
-        'mean_value': [summary_stats['mean'] if not isinstance(summary_stats['mean'], pd.Series) 
-                      else summary_stats['mean'].mean()],
-        'total_count': [summary_stats['count'] if not isinstance(summary_stats['count'], pd.Series)
-                       else summary_stats['count'].sum()]
-    })
-    
-    return summary_df
-
-
-def create_publication_plots(data: pd.DataFrame, params: Dict[str, Any]) -> None:
-    """
-    Generate publication-ready plots with manual high-DPI formatting.
-    
-    PROBLEMS DEMONSTRATED:
-    - Manual publication formatting with hardcoded parameters
-    - Complex manual legend and annotation management
-    - Inconsistent styling approach from all previous functions
-    - Manual multi-format saving with different compression settings
-    - No systematic approach to publication standards
-    """
-    # PROBLEM: Publication styling hardcoded differently than all other functions
-    condition = params.get("condition", "control")
-    publication_type = params.get("publication_type", "journal")
-    
-    # PROBLEM: Complex manual publication style configuration
-    if publication_type == "journal":
-        figure_width = 6.5  # Single column width in inches
-        figure_height = 5.0
-        font_size = 10
-        title_size = 12
-        dpi_setting = 600  # Journal requirement
-        formats = ['pdf', 'eps', 'png']  # Multiple formats required
-    elif publication_type == "conference":
-        figure_width = 8.0  # Larger for conference
-        figure_height = 6.0  
-        font_size = 12
-        title_size = 14
-        dpi_setting = 300
-        formats = ['pdf', 'png']
-    else:
-        # PROBLEM: Default doesn't match either standard
-        figure_width = 10.0
-        figure_height = 8.0
-        font_size = 11
-        title_size = 13
-        dpi_setting = 150
-        formats = ['png']
-    
-    # PROBLEM: Manual font configuration that overrides matplotlib defaults
+    # Different matplotlib style configuration - inconsistent with other functions
+    plt.style.use('seaborn-v0_8')  # Different base style
     plt.rcParams.update({
-        'font.size': font_size,
-        'axes.titlesize': title_size,
-        'axes.labelsize': font_size,
-        'xtick.labelsize': font_size - 1,
-        'ytick.labelsize': font_size - 1,
-        'legend.fontsize': font_size - 1,
-        'figure.titlesize': title_size + 2,
-        'font.family': 'serif',  # PROBLEM: Hardcoded font choice
-        'font.serif': ['Times New Roman', 'Times', 'serif'],
+        'font.size': 11,  # Different from EDA function
+        'axes.labelsize': 13,  # Different sizing
+        'axes.titlesize': 15,
+        'figure.facecolor': 'white',
+        'axes.facecolor': 'white'
     })
     
-    # Create figure with manual sizing
-    fig, axes = plt.subplots(2, 2, figsize=(figure_width, figure_height))
-    fig.subplots_adjust(hspace=0.35, wspace=0.35)  # Manual spacing
-    
-    # PROBLEM: Manual color palette that doesn't coordinate with other functions
-    pub_colors = {
-        'control': '#1f77b4',      # Blue
-        'treatment_a': '#ff7f0e',  # Orange
-        'treatment_b': '#2ca02c',  # Green  
-        'baseline': '#d62728'      # Red
-    }
-    current_color = pub_colors.get(condition, '#7f7f7f')  # Gray fallback
-    
-    # Plot 1: Main effect with error bars
-    if 'category' in data.columns:
-        categories = data['category'].unique()
-        means = []
-        errors = []
-        
-        for cat in categories:
-            cat_data = data[data['category'] == cat]['value']
-            means.append(cat_data.mean())
-            errors.append(cat_data.std() / np.sqrt(len(cat_data)))  # SEM
-        
-        x_pos = np.arange(len(categories))
-        
-        # PROBLEM: Manual error bar styling with hardcoded parameters
-        bars = axes[0, 0].bar(x_pos, means, yerr=errors, 
-                             color=current_color, alpha=0.8, edgecolor='black',
-                             capsize=5, capthick=2, elinewidth=2, linewidth=1.5)
-        
-        axes[0, 0].set_xticks(x_pos)
-        axes[0, 0].set_xticklabels(categories, rotation=0)
-        axes[0, 0].set_ylabel('Mean Value ± SEM')
-        axes[0, 0].set_title(f'Main Effect ({condition.title()})', fontweight='bold')
-        
-        # PROBLEM: Manual significance annotation - hardcoded positions
-        if len(means) >= 2:
-            y_max = max([m + e for m, e in zip(means, errors)])
-            axes[0, 0].annotate('*', xy=(0.5, y_max * 1.1), ha='center', 
-                               fontsize=16, fontweight='bold')
-            axes[0, 0].plot([0, 1], [y_max * 1.05, y_max * 1.05], 'k-', lw=1)
-    
-    # Plot 2: Dose-response curve with manual curve fitting
-    if 'dose' in data.columns:
-        doses = data['dose'].unique()
-        dose_means = []
-        dose_errors = []
-        
-        for dose in sorted(doses):
-            dose_data = data[data['dose'] == dose]['value']
-            dose_means.append(dose_data.mean())
-            dose_errors.append(dose_data.std() / np.sqrt(len(dose_data)))
-        
-        sorted_doses = sorted(doses)
-        
-        # PROBLEM: Manual curve plotting with hardcoded parameters
-        axes[0, 1].errorbar(sorted_doses, dose_means, yerr=dose_errors,
-                           color=current_color, marker='o', markersize=6,
-                           linewidth=2, capsize=4, capthick=1.5)
-        
-        # Manual trend line - PROBLEM: simplified linear fit
-        z = np.polyfit(sorted_doses, dose_means, 1)
-        p = np.poly1d(z)
-        axes[0, 1].plot(sorted_doses, p(sorted_doses), '--', 
-                       color=current_color, alpha=0.7, linewidth=1.5)
-        
-        axes[0, 1].set_xlabel('Dose (arbitrary units)')
-        axes[0, 1].set_ylabel('Response')
-        axes[0, 1].set_title('Dose-Response Relationship', fontweight='bold')
-        axes[0, 1].grid(True, alpha=0.3, linestyle='-', linewidth=0.5)
-        
-        # PROBLEM: Manual R² calculation and annotation
-        correlation = np.corrcoef(sorted_doses, dose_means)[0, 1]
-        r_squared = correlation ** 2
-        axes[0, 1].text(0.05, 0.95, f'R² = {r_squared:.3f}', 
-                       transform=axes[0, 1].transAxes, fontsize=font_size-1,
-                       bbox=dict(boxstyle="round,pad=0.3", facecolor="white", alpha=0.8))
-    
-    # Plot 3: Distribution comparison with manual statistical annotations
-    if 'group' in data.columns:
-        groups = data['group'].unique()
-        
-        # PROBLEM: Manual box plot styling with publication parameters
-        box_data = [data[data['group'] == group]['value'] for group in groups]
-        bp = axes[1, 0].boxplot(box_data, labels=groups, patch_artist=True,
-                               boxprops=dict(facecolor=current_color, alpha=0.7, linewidth=1.5),
-                               medianprops=dict(color='red', linewidth=2),
-                               whiskerprops=dict(linewidth=1.5),
-                               capprops=dict(linewidth=1.5))
-        
-        axes[1, 0].set_ylabel('Value Distribution')
-        axes[1, 0].set_title('Group Comparison', fontweight='bold')
-        axes[1, 0].grid(True, alpha=0.3, axis='y')
-        
-        # PROBLEM: Manual statistical test annotation (simplified)
-        if len(groups) == 2:
-            from scipy import stats
-            group1_data = data[data['group'] == groups[0]]['value']
-            group2_data = data[data['group'] == groups[1]]['value']
-            t_stat, p_value = stats.ttest_ind(group1_data, group2_data)
-            
-            # Manual p-value annotation formatting
-            if p_value < 0.001:
-                p_text = "p < 0.001"
-            elif p_value < 0.01:
-                p_text = f"p < 0.01"
-            elif p_value < 0.05:
-                p_text = f"p < 0.05"
-            else:
-                p_text = f"p = {p_value:.3f}"
-            
-            axes[1, 0].text(0.5, 0.95, p_text, transform=axes[1, 0].transAxes,
-                           ha='center', fontsize=font_size-1, fontweight='bold')
-    
-    # Plot 4: Time course with publication formatting
-    if 'time' in data.columns:
-        time_points = sorted(data['time'].unique())
-        time_means = []
-        time_errors = []
-        
-        for tp in time_points:
-            tp_data = data[data['time'] == tp]['value']
-            time_means.append(tp_data.mean())
-            time_errors.append(tp_data.std() / np.sqrt(len(tp_data)))
-        
-        # PROBLEM: Manual time course plotting with publication styling
-        axes[1, 1].errorbar(time_points, time_means, yerr=time_errors,
-                           color=current_color, marker='s', markersize=5,
-                           linewidth=2, capsize=3, capthick=1,
-                           markerfacecolor='white', markeredgecolor=current_color,
-                           markeredgewidth=1.5)
-        
-        axes[1, 1].set_xlabel('Time (hours)')
-        axes[1, 1].set_ylabel('Response')
-        axes[1, 1].set_title('Time Course', fontweight='bold')
-        axes[1, 1].grid(True, alpha=0.3)
-        
-        # PROBLEM: Manual axis formatting for publication
-        axes[1, 1].spines['top'].set_visible(False)
-        axes[1, 1].spines['right'].set_visible(False)
-        axes[1, 1].spines['left'].set_linewidth(1.5)
-        axes[1, 1].spines['bottom'].set_linewidth(1.5)
-    
-    # PROBLEM: Manual overall figure formatting
-    fig.suptitle(f'Publication Figure - {condition.title()} Condition', 
-                fontsize=title_size + 2, fontweight='bold', y=0.98)
-    
-    # PROBLEM: Complex manual file saving with multiple formats
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M")
-    base_name = f"publication_{publication_type}_{condition}_{timestamp}"
-    
-    # PROBLEM: Different directory structure again
-    if publication_type == "journal":
-        output_dir = f"manuscripts/figures/{condition}"
-    elif publication_type == "conference":
-        output_dir = f"presentations/conference_figures/{condition}"
+    # Different color scheme logic - code duplication with variations
+    condition = experiment_config.get('condition', 'default')
+    if condition == 'baseline':
+        primary_color = '#2E86AB'  # Different blue than EDA
+        secondary_color = '#A23B72'
+        line_style = '-'
+    elif condition == 'treatment_a':
+        primary_color = '#F18F01'  # Different orange
+        secondary_color = '#C73E1D'
+        line_style = '--'
+    elif condition == 'treatment_b':
+        primary_color = '#85BF3B'  # Different green
+        secondary_color = '#592693'
+        line_style = '-.'
     else:
-        output_dir = f"figures/publication/{condition}"
+        # Different fallback colors - inconsistent
+        primary_color = '#666666'
+        secondary_color = '#333333'
+        line_style = ':'
     
-    # PROBLEM: Manual multi-format saving with different parameters per format
-    Path(output_dir).mkdir(parents=True, exist_ok=True)
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(16, 10))  # Different size
     
-    for fmt in formats:
-        filename = f"{base_name}.{fmt}"
-        filepath = Path(output_dir) / filename
+    # Training loss plot - manual styling
+    epochs = range(len(training_history))
+    ax1.plot(epochs, training_history['train_loss'], color=primary_color, 
+             linewidth=2.5, linestyle=line_style, label='Training Loss', marker='o', markersize=4)
+    ax1.plot(epochs, training_history['val_loss'], color=secondary_color,
+             linewidth=2.5, linestyle=line_style, label='Validation Loss', marker='s', markersize=4)
+    ax1.set_title('Training Progress', fontsize=16, pad=20)
+    ax1.set_xlabel('Epoch')
+    ax1.set_ylabel('Loss')
+    ax1.legend(loc='upper right')
+    ax1.grid(True, alpha=0.4, linestyle='--')
+    
+    # Accuracy plot with different styling approach
+    ax2.plot(epochs, training_history['train_accuracy'], color=primary_color,
+             linewidth=3, alpha=0.8, label='Training Accuracy')
+    ax2.plot(epochs, training_history['val_accuracy'], color=secondary_color,
+             linewidth=3, alpha=0.8, label='Validation Accuracy')
+    ax2.set_title('Model Accuracy', fontsize=16, pad=20)
+    ax2.set_xlabel('Epoch')
+    ax2.set_ylabel('Accuracy')
+    ax2.legend(loc='lower right')
+    ax2.set_ylim(0, 1)
+    ax2.grid(True, alpha=0.4)
+    
+    # Metrics bar chart - different styling again
+    metric_names = list(metrics_data.keys())
+    metric_values = list(metrics_data.values())
+    
+    bars = ax3.bar(metric_names, metric_values, color=primary_color, alpha=0.8, 
+                   edgecolor='black', linewidth=1.5)
+    ax3.set_title('Model Performance Metrics', fontsize=16, pad=20)
+    ax3.set_ylabel('Score')
+    ax3.set_ylim(0, 1)
+    ax3.tick_params(axis='x', rotation=45)
+    
+    # Add value labels on bars - manual positioning
+    for bar, value in zip(bars, metric_values):
+        height = bar.get_height()
+        ax3.text(bar.get_x() + bar.get_width()/2., height + 0.01,
+                f'{value:.3f}', ha='center', va='bottom', fontsize=11, fontweight='bold')
+    
+    # Learning rate plot if available
+    if 'learning_rate' in training_history.columns:
+        ax4.plot(epochs, training_history['learning_rate'], color=secondary_color,
+                linewidth=2, marker='D', markersize=3)
+        ax4.set_title('Learning Rate Schedule', fontsize=16, pad=20)
+        ax4.set_xlabel('Epoch')
+        ax4.set_ylabel('Learning Rate')
+        ax4.set_yscale('log')
+        ax4.grid(True, alpha=0.4)
+    else:
+        ax4.text(0.5, 0.5, 'Learning Rate\nData Not Available', 
+                ha='center', va='center', transform=ax4.transAxes, fontsize=14)
+        ax4.set_title('Learning Rate Schedule', fontsize=16, pad=20)
+    
+    plt.tight_layout(pad=3.0)
+    
+    # Different file management approach - more manual and inconsistent
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # Different format
+    model_name = experiment_config.get('model_name', 'model')
+    
+    # Different output directory structure
+    base_dir = "data/08_reporting"
+    condition_dir = os.path.join(base_dir, f"condition_{condition}")
+    os.makedirs(condition_dir, exist_ok=True)
+    
+    # Yet another filename pattern - inconsistent
+    filename = f"{model_name}_performance_{timestamp}.png"
+    full_path = os.path.join(condition_dir, filename)
+    
+    # Different savefig parameters - inconsistent settings
+    plt.savefig(full_path, dpi=200, bbox_inches='tight', pad_inches=0.2, 
+                facecolor='white', transparent=False)
+    plt.close()
+    
+    print(f"Model performance plot saved to: {full_path}")
+
+
+def create_comparison_plots(baseline_data: pd.DataFrame, 
+                          treatment_data: pd.DataFrame,
+                          experiment_config: Dict[str, Any]) -> None:
+    """Create comparison plots between experimental conditions.
+    
+    Shows even more code duplication and manual styling management.
+    """
+    # Yet another styling approach - no consistency
+    plt.rcParams.update({
+        'font.family': 'serif',  # Different font family
+        'font.size': 10,
+        'axes.labelsize': 12,
+        'axes.titlesize': 14,
+        'xtick.labelsize': 9,
+        'ytick.labelsize': 9,
+        'axes.grid': True,
+        'grid.alpha': 0.3
+    })
+    
+    # Hardcoded colors again - duplicated logic with variations
+    baseline_color = '#1f77b4'
+    treatment_color = '#ff7f0e'
+    
+    # Manual figure creation with different approach
+    fig = plt.figure(figsize=(18, 6))
+    
+    # Side-by-side comparison plots
+    ax1 = plt.subplot(1, 3, 1)
+    ax1.hist(baseline_data['outcome'], bins=25, alpha=0.7, color=baseline_color, 
+             label='Baseline', edgecolor='black', linewidth=1)
+    ax1.hist(treatment_data['outcome'], bins=25, alpha=0.7, color=treatment_color,
+             label='Treatment', edgecolor='black', linewidth=1)
+    ax1.set_title('Outcome Distribution Comparison', fontweight='bold')
+    ax1.set_xlabel('Outcome Value')
+    ax1.set_ylabel('Frequency')
+    ax1.legend()
+    
+    # Box plot comparison with manual styling
+    ax2 = plt.subplot(1, 3, 2)
+    data_to_plot = [baseline_data['outcome'], treatment_data['outcome']]
+    bp = ax2.boxplot(data_to_plot, labels=['Baseline', 'Treatment'], patch_artist=True)
+    bp['boxes'][0].set_facecolor(baseline_color)
+    bp['boxes'][1].set_facecolor(treatment_color)
+    for box in bp['boxes']:
+        box.set_alpha(0.7)
+        box.set_linewidth(2)
+    ax2.set_title('Outcome Distributions', fontweight='bold')
+    ax2.set_ylabel('Outcome Value')
+    
+    # Scatter plot with manual color coding
+    ax3 = plt.subplot(1, 3, 3)
+    ax3.scatter(baseline_data['feature_1'], baseline_data['outcome'], 
+               c=baseline_color, alpha=0.6, s=30, label='Baseline', marker='o')
+    ax3.scatter(treatment_data['feature_1'], treatment_data['outcome'],
+               c=treatment_color, alpha=0.6, s=30, label='Treatment', marker='^')
+    ax3.set_title('Feature vs Outcome', fontweight='bold')
+    ax3.set_xlabel('Feature 1')
+    ax3.set_ylabel('Outcome')
+    ax3.legend()
+    
+    plt.tight_layout()
+    
+    # Yet another file management approach - complete inconsistency
+    now = datetime.now()
+    date_str = now.strftime("%Y%m%d")
+    time_str = now.strftime("%H%M")
+    
+    # Manual directory creation with hardcoded paths
+    output_base = "./outputs/figures"
+    if not os.path.exists(output_base):
+        os.makedirs(output_base)
+    
+    comparison_dir = os.path.join(output_base, "comparisons")
+    if not os.path.exists(comparison_dir):
+        os.makedirs(comparison_dir)
+    
+    # Another filename pattern - no standardization
+    filename = f"comparison_baseline_vs_treatment_{date_str}_{time_str}.png"
+    save_path = os.path.join(comparison_dir, filename)
+    
+    # Different save parameters again
+    plt.savefig(save_path, dpi=150, bbox_inches='tight', 
+                facecolor='w', edgecolor='w', format='png')
+    plt.close()
+    
+    print(f"Comparison plot saved to: {save_path}")
+
+
+def create_publication_figure(results_data: pd.DataFrame,
+                            statistical_tests: Dict[str, float],
+                            experiment_config: Dict[str, Any]) -> None:
+    """Create publication-ready figure with extensive manual styling.
+    
+    Demonstrates the complexity and maintenance burden of manual figure styling
+    for publication-quality outputs.
+    """
+    # Publication-specific styling - completely different approach
+    plt.style.use('classic')
+    plt.rcParams.update({
+        'font.family': 'Times New Roman',
+        'font.size': 8,
+        'axes.labelsize': 10,
+        'axes.titlesize': 12,
+        'xtick.labelsize': 8,
+        'ytick.labelsize': 8,
+        'legend.fontsize': 9,
+        'figure.titlesize': 14,
+        'axes.linewidth': 1.2,
+        'xtick.major.width': 1.2,
+        'ytick.major.width': 1.2,
+        'xtick.minor.width': 0.8,
+        'ytick.minor.width': 0.8,
+        'lines.linewidth': 1.5,
+        'patch.linewidth': 1.2,
+        'figure.facecolor': 'white',
+        'axes.facecolor': 'white'
+    })
+    
+    # Publication color scheme - hardcoded yet again
+    colors = {
+        'baseline': '#2C3E50',      # Dark blue-gray
+        'treatment_a': '#E74C3C',   # Red
+        'treatment_b': '#27AE60',   # Green
+        'treatment_c': '#8E44AD'    # Purple
+    }
+    
+    # Create figure with publication dimensions (manual sizing for specific journal)
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(7, 6))  # Specific journal requirements
+    
+    # Main results plot with extensive manual styling
+    conditions = results_data['condition'].unique()
+    means = []
+    errors = []
+    
+    for condition in conditions:
+        condition_data = results_data[results_data['condition'] == condition]['outcome']
+        means.append(condition_data.mean())
+        errors.append(condition_data.std() / np.sqrt(len(condition_data)))  # SEM
+    
+    x_pos = np.arange(len(conditions))
+    bars = ax1.bar(x_pos, means, yerr=errors, capsize=5, capthick=2,
+                   color=[colors.get(cond, '#7F8C8D') for cond in conditions],
+                   alpha=0.8, edgecolor='black', linewidth=1.2,
+                   error_kw={'linewidth': 1.5, 'ecolor': 'black'})
+    
+    ax1.set_xlabel('Experimental Condition', fontweight='bold')
+    ax1.set_ylabel('Outcome Measure (units)', fontweight='bold')
+    ax1.set_title('A) Primary Results', fontweight='bold', loc='left')
+    ax1.set_xticks(x_pos)
+    ax1.set_xticklabels([cond.replace('_', ' ').title() for cond in conditions], rotation=45)
+    ax1.spines['top'].set_visible(False)
+    ax1.spines['right'].set_visible(False)
+    
+    # Add significance annotations manually
+    if 'p_value_baseline_vs_treatment_a' in statistical_tests:
+        p_val = statistical_tests['p_value_baseline_vs_treatment_a']
+        if p_val < 0.001:
+            sig_text = '***'
+        elif p_val < 0.01:
+            sig_text = '**'
+        elif p_val < 0.05:
+            sig_text = '*'
+        else:
+            sig_text = 'ns'
         
-        # PROBLEM: Format-specific manual parameter settings
-        if fmt == 'pdf':
-            plt.savefig(filepath, format='pdf', dpi=dpi_setting, bbox_inches='tight',
-                       facecolor='white', edgecolor='none', 
-                       metadata={'Creator': 'Manual Figure Management', 
-                                'Subject': f'{condition} analysis'})
-        elif fmt == 'eps':
-            plt.savefig(filepath, format='eps', dpi=dpi_setting, bbox_inches='tight',
-                       facecolor='white', edgecolor='none')
-        elif fmt == 'png':
-            plt.savefig(filepath, format='png', dpi=dpi_setting, bbox_inches='tight',
-                       facecolor='white', edgecolor='none',
-                       optimize=True, pnginfo=None)  # Manual PNG optimization
+        # Manual positioning of significance markers
+        y_max = max(means) + max(errors)
+        ax1.plot([0, 1], [y_max * 1.1, y_max * 1.1], 'k-', linewidth=1)
+        ax1.text(0.5, y_max * 1.15, sig_text, ha='center', va='bottom', fontweight='bold')
+    
+    # Time series plot with manual formatting
+    ax2.errorbar(results_data.groupby('time_point')['outcome'].mean().index,
+                results_data.groupby('time_point')['outcome'].mean().values,
+                yerr=results_data.groupby('time_point')['outcome'].sem().values,
+                marker='o', markersize=6, capsize=4, capthick=2,
+                color=colors['baseline'], linewidth=2, alpha=0.8)
+    ax2.set_xlabel('Time Point (hours)', fontweight='bold')
+    ax2.set_ylabel('Outcome Measure', fontweight='bold')
+    ax2.set_title('B) Time Course', fontweight='bold', loc='left')
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['right'].set_visible(False)
+    ax2.grid(True, alpha=0.3, linestyle='--')
+    
+    # Correlation plot with manual styling
+    feature_cols = [col for col in results_data.columns if col.startswith('feature_')]
+    if len(feature_cols) >= 2:
+        ax3.scatter(results_data[feature_cols[0]], results_data['outcome'],
+                   c=[colors.get(cond, '#7F8C8D') for cond in results_data['condition']],
+                   alpha=0.7, s=40, edgecolors='black', linewidth=0.5)
+        ax3.set_xlabel(f'{feature_cols[0].replace("_", " ").title()}', fontweight='bold')
+        ax3.set_ylabel('Outcome Measure', fontweight='bold')
+        ax3.set_title('C) Feature Correlation', fontweight='bold', loc='left')
+        ax3.spines['top'].set_visible(False)
+        ax3.spines['right'].set_visible(False)
         
+        # Add correlation coefficient manually
+        corr_coef = results_data[feature_cols[0]].corr(results_data['outcome'])
+        ax3.text(0.05, 0.95, f'r = {corr_coef:.3f}', transform=ax3.transAxes,
+                bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+    
+    # Distribution plot with manual density estimation
+    for i, condition in enumerate(conditions):
+        condition_data = results_data[results_data['condition'] == condition]['outcome']
+        ax4.hist(condition_data, bins=15, alpha=0.6, density=True,
+                color=colors.get(condition, '#7F8C8D'), 
+                label=condition.replace('_', ' ').title(),
+                edgecolor='black', linewidth=0.8)
+    
+    ax4.set_xlabel('Outcome Measure', fontweight='bold')
+    ax4.set_ylabel('Density', fontweight='bold')
+    ax4.set_title('D) Distribution by Condition', fontweight='bold', loc='left')
+    ax4.legend(frameon=False, loc='upper right')
+    ax4.spines['top'].set_visible(False)
+    ax4.spines['right'].set_visible(False)
+    
+    plt.tight_layout(pad=2.0)
+    
+    # Publication-specific file management - most complex approach yet
+    date_stamp = datetime.now().strftime("%Y%m%d")
+    version = experiment_config.get('figure_version', 'v1')
+    
+    # Multiple output formats for publication
+    output_formats = ['png', 'pdf', 'svg']
+    
+    # Complex directory structure
+    pub_base = "./outputs/publication"
+    figure_dir = os.path.join(pub_base, f"figure_1_{version}")
+    
+    # Create nested directories manually
+    for fmt in output_formats:
+        fmt_dir = os.path.join(figure_dir, fmt)
+        os.makedirs(fmt_dir, exist_ok=True)
+    
+    # Save in multiple formats with different parameters
+    base_filename = f"figure_1_main_results_{date_stamp}_{version}"
+    
+    for fmt in output_formats:
+        if fmt == 'png':
+            # High DPI for submission
+            save_params = {'dpi': 600, 'bbox_inches': 'tight', 'pad_inches': 0.1,
+                          'facecolor': 'white', 'transparent': False}
+        elif fmt == 'pdf':
+            # Vector format for print
+            save_params = {'bbox_inches': 'tight', 'pad_inches': 0.1,
+                          'facecolor': 'white', 'transparent': False}
+        elif fmt == 'svg':
+            # Editable vector format
+            save_params = {'bbox_inches': 'tight', 'pad_inches': 0.1,
+                          'facecolor': 'white', 'transparent': False}
+        
+        filepath = os.path.join(figure_dir, fmt, f"{base_filename}.{fmt}")
+        plt.savefig(filepath, format=fmt, **save_params)
         print(f"Publication figure saved: {filepath}")
     
     plt.close()
+
+
+def generate_summary_report_figures(all_results: Dict[str, pd.DataFrame],
+                                  experiment_metadata: Dict[str, Any]) -> None:
+    """Generate summary figures for final report with extensive manual management.
     
-    # PROBLEM: Manual rcParams reset - but not to original values
+    This function shows the ultimate complexity of manual figure management
+    when dealing with multiple datasets and complex layouts.
+    """
+    # Report-specific styling - another unique approach
+    plt.style.use('bmh')
     plt.rcParams.update({
-        'font.size': 10,
-        'font.family': 'sans-serif',  # Different reset than what was set
-        # Missing other resets - will affect subsequent plots!
+        'font.family': 'Arial',
+        'font.size': 9,
+        'axes.labelsize': 11,
+        'axes.titlesize': 13,
+        'xtick.labelsize': 8,
+        'ytick.labelsize': 8,
+        'legend.fontsize': 9,
+        'figure.titlesize': 16,
+        'axes.spines.top': False,
+        'axes.spines.right': False,
+        'axes.grid': True,
+        'grid.color': 'gray',
+        'grid.alpha': 0.2,
+        'grid.linewidth': 0.8
     })
-
-
-def quick_diagnostic_plot(data: pd.DataFrame, column: str, save_path: Optional[str] = None) -> None:
-    """
-    Create a quick diagnostic plot with minimal styling - shows inconsistency.
     
-    PROBLEMS DEMONSTRATED:
-    - Minimal styling that doesn't match other functions
-    - Optional save path that's handled differently
-    - Quick-and-dirty approach that creates technical debt
-    - No consideration for systematic styling or branding
-    """
-    # PROBLEM: Minimal figure setup - no consideration for consistency
-    plt.figure(figsize=(8, 6))
+    # Complex figure layout - manual subplot management
+    fig = plt.figure(figsize=(20, 15))
+    gs = fig.add_gridspec(4, 3, height_ratios=[1, 1, 1, 0.5], width_ratios=[1, 1, 1],
+                         hspace=0.3, wspace=0.3)
     
-    # PROBLEM: Basic plot with default matplotlib styling
-    plt.hist(data[column], bins=20, alpha=0.7)  # Default blue color
-    plt.title(f"Quick Diagnostic: {column}")  # Basic title, no styling
-    plt.xlabel(column)
-    plt.ylabel("Frequency")
-    
-    # PROBLEM: Optional manual save with different default behavior
-    if save_path:
-        # User provided path - save directly without any checks
-        plt.savefig(save_path, dpi=150, bbox_inches='tight')
-        print(f"Quick plot saved to: {save_path}")
-    else:
-        # PROBLEM: Yet another different auto-naming convention
-        auto_name = f"quick_diagnostic_{column}_{datetime.datetime.now().strftime('%H%M%S')}.png"
-        plt.savefig(auto_name, dpi=100)  # Lower quality for "quick" plots
-        print(f"Quick plot auto-saved as: {auto_name}")
-    
-    plt.close()
-
-
-# PROBLEM: Utility function with manual styling that doesn't integrate with other functions
-def apply_custom_style(ax, style_type: str = "default"):
-    """
-    Apply custom styling to matplotlib axes - but inconsistent with main functions.
-    
-    This utility function demonstrates the problem of scattered styling logic
-    that doesn't integrate systematically with the main plotting functions.
-    """
-    # PROBLEM: Manual style definitions that don't match main function styling
-    styles = {
-        "default": {"color": "blue", "grid": True, "spines": False},
-        "minimal": {"color": "gray", "grid": False, "spines": True},
-        "bold": {"color": "red", "grid": True, "spines": True}
+    # Color palette management - hardcoded again
+    experiment_colors = {
+        'baseline': '#34495E',
+        'treatment_a': '#E67E22',
+        'treatment_b': '#16A085',
+        'treatment_c': '#9B59B6',
+        'treatment_d': '#E74C3C'
     }
     
-    style = styles.get(style_type, styles["default"])
+    # Summary statistics plot
+    ax1 = fig.add_subplot(gs[0, 0])
+    summary_stats = []
+    conditions = []
     
-    # PROBLEM: Manual application that may conflict with existing styling
-    if style["grid"]:
-        ax.grid(True, alpha=0.3)
+    for condition, data in all_results.items():
+        summary_stats.append([
+            data['outcome'].mean(),
+            data['outcome'].std(),
+            data['outcome'].median(),
+            len(data)
+        ])
+        conditions.append(condition)
     
-    if not style["spines"]:
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
+    summary_df = pd.DataFrame(summary_stats, 
+                             columns=['Mean', 'Std', 'Median', 'N'],
+                             index=conditions)
     
-    # PROBLEM: Color applied generically without context
-    for line in ax.get_lines():
-        line.set_color(style["color"])
-
-
-def batch_plot_generator(datasets: Dict[str, pd.DataFrame], output_base: str) -> None:
-    """
-    Generate multiple plots in batch with manual file management.
+    x_pos = np.arange(len(conditions))
+    width = 0.35
     
-    PROBLEMS DEMONSTRATED:
-    - Manual iteration and file naming
-    - No systematic approach to batch styling
-    - Complex manual directory and file management
-    - Error handling that's inconsistent with other functions
-    """
-    # PROBLEM: Manual timestamp for batch - different format again
-    batch_timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    batch_dir = f"{output_base}/batch_{batch_timestamp}"
+    ax1.bar(x_pos - width/2, summary_df['Mean'], width, 
+           color=[experiment_colors.get(c, '#95A5A6') for c in conditions],
+           alpha=0.8, label='Mean', edgecolor='black')
+    ax1.bar(x_pos + width/2, summary_df['Median'], width,
+           color=[experiment_colors.get(c, '#95A5A6') for c in conditions],
+           alpha=0.5, label='Median', edgecolor='black')
     
-    # PROBLEM: Manual directory creation with basic error handling
-    try:
-        os.makedirs(batch_dir, exist_ok=True)
-    except:
-        print("Failed to create batch directory, using current directory")
-        batch_dir = "."
+    ax1.set_title('Summary Statistics by Condition', fontweight='bold', pad=15)
+    ax1.set_xticks(x_pos)
+    ax1.set_xticklabels([c.replace('_', ' ').title() for c in conditions], rotation=45)
+    ax1.set_ylabel('Outcome Value')
+    ax1.legend()
     
-    # PROBLEM: Manual iteration with inconsistent styling per dataset
-    for i, (name, dataset) in enumerate(datasets.items()):
-        plt.figure(figsize=(10, 6))
-        
-        # PROBLEM: Cycling through hardcoded colors without systematic approach
-        colors = ['red', 'blue', 'green', 'orange', 'purple']
-        color = colors[i % len(colors)]
-        
-        # PROBLEM: Generic plot that doesn't consider data characteristics
-        if 'value' in dataset.columns:
-            plt.plot(dataset['value'], color=color, linewidth=2, alpha=0.8)
-            plt.title(f"Dataset: {name}", fontsize=14, color=color)
-            plt.ylabel("Value")
-            plt.xlabel("Index")
+    # Effect size plot
+    ax2 = fig.add_subplot(gs[0, 1])
+    baseline_mean = all_results.get('baseline', pd.DataFrame()).get('outcome', pd.Series()).mean()
+    effect_sizes = []
+    
+    for condition, data in all_results.items():
+        if condition != 'baseline' and baseline_mean:
+            effect_size = (data['outcome'].mean() - baseline_mean) / data['outcome'].std()
+            effect_sizes.append(effect_size)
         else:
-            plt.text(0.5, 0.5, f"No 'value' column in {name}", 
-                    ha='center', va='center', transform=plt.gca().transAxes)
-        
-        # PROBLEM: Manual file naming that's different from all other functions
-        filename = f"batch_plot_{i:02d}_{name.replace(' ', '_')}_{batch_timestamp}.png"
-        filepath = os.path.join(batch_dir, filename)
-        
-        # PROBLEM: Basic save parameters without consideration for use case
-        plt.savefig(filepath, dpi=200, bbox_inches='tight')
-        plt.close()
-        
-        print(f"Batch plot {i+1}/{len(datasets)}: {filepath}")
+            effect_sizes.append(0)
     
-    print(f"Batch plotting completed. Files saved in: {batch_dir}")
+    bars = ax2.barh(range(len(conditions)), effect_sizes,
+                    color=[experiment_colors.get(c, '#95A5A6') for c in conditions],
+                    alpha=0.8, edgecolor='black')
+    ax2.set_title('Effect Sizes vs Baseline', fontweight='bold', pad=15)
+    ax2.set_yticks(range(len(conditions)))
+    ax2.set_yticklabels([c.replace('_', ' ').title() for c in conditions])
+    ax2.set_xlabel('Cohen\'s d')
+    ax2.axvline(x=0, color='black', linestyle='-', alpha=0.5)
+    ax2.axvline(x=0.2, color='gray', linestyle='--', alpha=0.5, label='Small effect')
+    ax2.axvline(x=0.5, color='gray', linestyle='--', alpha=0.5, label='Medium effect')
+    ax2.axvline(x=0.8, color='gray', linestyle='--', alpha=0.5, label='Large effect')
+    
+    # Sample size plot
+    ax3 = fig.add_subplot(gs[0, 2])
+    sample_sizes = [len(data) for data in all_results.values()]
+    pie_colors = [experiment_colors.get(c, '#95A5A6') for c in conditions]
+    
+    wedges, texts, autotexts = ax3.pie(sample_sizes, labels=conditions, colors=pie_colors,
+                                      autopct='%1.1f%%', startangle=90, 
+                                      textprops={'fontsize': 8})
+    ax3.set_title('Sample Size Distribution', fontweight='bold', pad=15)
+    
+    # Time series comparison
+    ax4 = fig.add_subplot(gs[1, :])
+    for condition, data in all_results.items():
+        if 'time_point' in data.columns:
+            time_series = data.groupby('time_point')['outcome'].agg(['mean', 'sem']).reset_index()
+            ax4.errorbar(time_series['time_point'], time_series['mean'], 
+                        yerr=time_series['sem'], 
+                        color=experiment_colors.get(condition, '#95A5A6'),
+                        marker='o', markersize=5, capsize=3, capthick=1.5,
+                        linewidth=2, alpha=0.8, label=condition.replace('_', ' ').title())
+    
+    ax4.set_title('Outcome Time Series by Condition', fontweight='bold', pad=15)
+    ax4.set_xlabel('Time Point (hours)')
+    ax4.set_ylabel('Outcome Measure')
+    ax4.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    
+    # Feature correlation heatmap
+    ax5 = fig.add_subplot(gs[2, :2])
+    
+    # Combine all data for correlation analysis
+    combined_data = pd.concat(all_results.values(), ignore_index=True)
+    feature_cols = [col for col in combined_data.columns if col.startswith('feature_')]
+    
+    if len(feature_cols) > 1:
+        corr_matrix = combined_data[feature_cols + ['outcome']].corr()
+        im = ax5.imshow(corr_matrix, cmap='RdBu_r', aspect='auto', vmin=-1, vmax=1)
+        
+        ax5.set_xticks(range(len(corr_matrix.columns)))
+        ax5.set_yticks(range(len(corr_matrix.columns)))
+        ax5.set_xticklabels([col.replace('_', ' ').title() for col in corr_matrix.columns], 
+                           rotation=45, ha='right')
+        ax5.set_yticklabels([col.replace('_', ' ').title() for col in corr_matrix.columns])
+        ax5.set_title('Feature Correlation Matrix', fontweight='bold', pad=15)
+        
+        # Add correlation values manually
+        for i in range(len(corr_matrix.columns)):
+            for j in range(len(corr_matrix.columns)):
+                text = ax5.text(j, i, f'{corr_matrix.iloc[i, j]:.2f}',
+                               ha="center", va="center", color="black" if abs(corr_matrix.iloc[i, j]) < 0.5 else "white",
+                               fontsize=8, fontweight='bold')
+        
+        # Add colorbar
+        cbar = plt.colorbar(im, ax=ax5, shrink=0.8)
+        cbar.set_label('Correlation Coefficient', rotation=270, labelpad=15)
+    
+    # Statistical summary table
+    ax6 = fig.add_subplot(gs[2, 2])
+    ax6.axis('off')
+    
+    # Create summary table manually
+    table_data = []
+    for condition, data in all_results.items():
+        table_data.append([
+            condition.replace('_', ' ').title(),
+            f"{data['outcome'].mean():.3f}",
+            f"{data['outcome'].std():.3f}",
+            f"{len(data)}"
+        ])
+    
+    table = ax6.table(cellText=table_data,
+                     colLabels=['Condition', 'Mean', 'Std Dev', 'N'],
+                     cellLoc='center',
+                     loc='center',
+                     bbox=[0, 0, 1, 1])
+    table.auto_set_font_size(False)
+    table.set_fontsize(9)
+    table.scale(1.2, 1.5)
+    
+    # Style the table manually
+    for i in range(len(table_data) + 1):
+        for j in range(4):
+            cell = table[(i, j)]
+            if i == 0:  # Header row
+                cell.set_facecolor('#3498DB')
+                cell.set_text_props(weight='bold', color='white')
+            else:
+                condition = table_data[i-1][0].lower().replace(' ', '_')
+                cell.set_facecolor(experiment_colors.get(condition, '#ECF0F1'))
+    
+    ax6.set_title('Summary Statistics Table', fontweight='bold', pad=15, y=0.95)
+    
+    # Metadata summary
+    ax7 = fig.add_subplot(gs[3, :])
+    ax7.axis('off')
+    
+    # Create metadata text manually
+    metadata_text = f"""
+    Experiment Summary: {experiment_metadata.get('experiment_name', 'Unknown')}
+    Analysis Date: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    Total Samples: {sum(len(data) for data in all_results.values())}
+    Conditions Tested: {len(all_results)}
+    Analysis Version: {experiment_metadata.get('analysis_version', '1.0')}
+    """
+    
+    ax7.text(0.5, 0.5, metadata_text, ha='center', va='center', 
+            transform=ax7.transAxes, fontsize=11, 
+            bbox=dict(boxstyle='round,pad=1', facecolor='lightgray', alpha=0.8))
+    
+    # Complex file management for report figures
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    report_version = experiment_metadata.get('report_version', 'v1')
+    
+    # Multiple output strategies
+    output_strategies = {
+        'draft': {'dpi': 150, 'format': 'png', 'quality': 'medium'},
+        'review': {'dpi': 300, 'format': 'png', 'quality': 'high'},
+        'final': {'dpi': 600, 'format': 'pdf', 'quality': 'publication'}
+    }
+    
+    base_dir = "./outputs/reports"
+    
+    for strategy_name, params in output_strategies.items():
+        strategy_dir = os.path.join(base_dir, strategy_name, report_version)
+        os.makedirs(strategy_dir, exist_ok=True)
+        
+        filename = f"summary_report_{strategy_name}_{timestamp}.{params['format']}"
+        filepath = os.path.join(strategy_dir, filename)
+        
+        # Different save parameters for each strategy
+        if params['format'] == 'png':
+            save_kwargs = {
+                'dpi': params['dpi'],
+                'bbox_inches': 'tight',
+                'pad_inches': 0.2,
+                'facecolor': 'white',
+                'edgecolor': 'none',
+                'transparent': False
+            }
+        else:  # PDF
+            save_kwargs = {
+                'bbox_inches': 'tight',
+                'pad_inches': 0.2,
+                'facecolor': 'white',
+                'edgecolor': 'none',
+                'transparent': False
+            }
+        
+        plt.savefig(filepath, format=params['format'], **save_kwargs)
+        print(f"Summary report saved ({strategy_name}): {filepath}")
+    
+    plt.close()
+    
+    # Additional individual figure exports - more manual management
+    individual_dir = os.path.join(base_dir, "individual_plots", report_version)
+    os.makedirs(individual_dir, exist_ok=True)
+    
+    print(f"Summary report generation complete. All files saved to: {base_dir}")
