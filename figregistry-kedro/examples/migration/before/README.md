@@ -1,308 +1,284 @@
 # Traditional Manual Figure Management in Kedro
 
-## Overview
+This example demonstrates the traditional approach to matplotlib figure management in Kedro projects **before** integrating `figregistry-kedro`. This serves as the "before" state in our migration comparison, showcasing the scattered manual processes, code duplication, and maintenance overhead that `figregistry-kedro` eliminates.
 
-This example demonstrates the **traditional approach** to figure management in Kedro projects, showcasing the manual matplotlib workflows that existed before the introduction of `figregistry-kedro`. This serves as the "before" state in our migration example, highlighting the pain points and maintenance overhead that automated figure management eliminates.
+## Overview: The Manual Approach Problems
 
-> ⚠️ **Warning**: This example intentionally shows problematic practices that have been superseded by the automated `figregistry-kedro` approach. These patterns should **not** be used in production code.
+This traditional Kedro project exemplifies the common pain points that data science teams face when managing matplotlib visualizations in pipeline workflows:
 
-## Problems Demonstrated
+### 🚨 Core Problems Demonstrated
 
-### 1. Scattered `plt.savefig()` Calls
+1. **Scattered `plt.savefig()` Calls**: Manual save operations distributed throughout pipeline nodes
+2. **Hardcoded Styling**: Inconsistent visual formatting copied across multiple functions  
+3. **Manual File Management**: Fragmented path construction and naming conventions
+4. **Code Duplication**: Repeated styling logic across different pipeline stages
+5. **Maintenance Overhead**: Style changes require hunting through multiple files
+6. **Inconsistent Outputs**: No systematic approach to experimental condition visualization
 
-In traditional Kedro projects, figure saving logic is scattered throughout individual node functions, leading to:
+### 📁 Project Structure
 
-- **Code duplication**: Every node that creates figures includes manual save logic
-- **Inconsistent naming**: Each developer implements their own file naming conventions
-- **Hardcoded paths**: File paths are embedded directly in node functions
-- **No centralized configuration**: Styling and output settings distributed across multiple files
+```
+kedro-manual-example/
+├── src/kedro_manual_example/
+│   ├── __init__.py              # Basic package initialization
+│   ├── settings.py              # Standard Kedro settings (no FigRegistry)
+│   ├── pipeline_registry.py     # Traditional pipeline registration
+│   └── nodes.py                 # Nodes with manual figure management
+├── conf/base/
+│   ├── catalog.yml             # Basic dataset definitions
+│   └── parameters.yml          # Pipeline parameters (no style config)
+├── data/                       # Standard Kedro data structure
+├── .kedro.yml                  # Project configuration
+├── pyproject.toml              # Dependencies (no figregistry-kedro)
+└── README.md                   # This documentation
+```
+
+## 🔍 Manual Figure Management Anti-Patterns
+
+### Problem 1: Scattered Save Operations
+
+In the traditional approach, each pipeline node that generates a plot must handle its own saving logic:
 
 ```python
-# Typical problematic pattern found in nodes.py
-def create_data_distribution_plot(data: pd.DataFrame) -> None:
-    """Create distribution plot with manual figure management."""
+def create_scatter_plot(df: pd.DataFrame) -> None:
+    """Node that creates scatter plot with manual save."""
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Hardcoded styling scattered throughout function
-    ax.hist(data['value'], bins=30, color='blue', alpha=0.7)
-    ax.set_title('Data Distribution', fontsize=14, fontweight='bold')
-    ax.set_xlabel('Value', fontsize=12)
-    ax.set_ylabel('Frequency', fontsize=12)
-    ax.grid(True, alpha=0.3)
+    # Hardcoded styling repeated in every node
+    ax.scatter(df['x'], df['y'], 
+              color='blue',           # Hardcoded color
+              alpha=0.7,             # Hardcoded transparency
+              s=50)                  # Hardcoded size
     
-    # Manual file management with hardcoded paths
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"data_distribution_{timestamp}.png"
-    output_path = os.path.join("data", "08_reporting", filename)
+    ax.set_xlabel('X Values')
+    ax.set_ylabel('Y Values')
+    ax.set_title('Data Scatter Plot')
     
-    # Manual directory creation
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    
-    # Scattered plt.savefig() calls throughout codebase
+    # Manual save with hardcoded path
+    output_path = 'data/08_reporting/scatter_plot_20241204_143022.png'
     plt.savefig(output_path, dpi=300, bbox_inches='tight')
     plt.close()
 ```
 
-### 2. Hardcoded Styling Without Systematic Management
+### Problem 2: Duplicated Styling Logic
 
-Each visualization function contains embedded styling code that:
-
-- **Cannot be centrally managed**: Style changes require editing multiple files
-- **Lacks consistency**: Different nodes use different color schemes and styling
-- **No condition-based logic**: Cannot automatically adapt styling based on experimental conditions
-- **Difficult to maintain**: Style updates require touching every visualization function
+Every visualization node contains similar styling code with subtle inconsistencies:
 
 ```python
-# Problematic styling patterns
-def create_comparison_plot(baseline: pd.DataFrame, experimental: pd.DataFrame) -> None:
-    """Comparison plot with hardcoded styling."""
-    fig, ax = plt.subplots(figsize=(12, 8))
+def create_line_chart(df: pd.DataFrame) -> None:
+    """Another node with duplicated styling."""
+    fig, ax = plt.subplots(figsize=(12, 8))  # Different figure size!
     
-    # Hardcoded colors and styling - repeated across functions
-    ax.scatter(baseline['x'], baseline['y'], 
-              color='#1f77b4', alpha=0.6, s=50, label='Baseline')
-    ax.scatter(experimental['x'], experimental['y'], 
-              color='#ff7f0e', alpha=0.6, s=50, label='Experimental')
+    # Similar but slightly different styling
+    ax.plot(df['time'], df['value'],
+           color='red',              # Different color scheme
+           linewidth=2,             # Manual line width
+           alpha=0.8)               # Different alpha value
     
-    # Repeated styling code in every function
-    ax.set_title('Baseline vs Experimental Comparison', 
-                fontsize=16, fontweight='bold', pad=20)
-    ax.set_xlabel('X Variable', fontsize=14)
-    ax.set_ylabel('Y Variable', fontsize=14)
-    ax.legend(fontsize=12, framealpha=0.9)
-    ax.grid(True, alpha=0.3, linestyle='--')
+    # Repeated axis configuration
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Value')
+    ax.set_title('Time Series Analysis')
     
-    # Manual file naming and saving
-    plt.savefig("data/08_reporting/comparison_analysis.png", 
-                dpi=300, bbox_inches='tight', facecolor='white')
+    # Different save path pattern
+    output_path = 'data/08_reporting/timeseries_chart_manual.png'
+    plt.savefig(output_path, dpi=150)  # Different DPI!
     plt.close()
 ```
 
-### 3. Manual File Path Management and Configuration
+### Problem 3: Manual File Path Management
 
-Traditional approaches require manual management of:
-
-- **File naming conventions**: Inconsistent across different developers and projects
-- **Directory structures**: Manual creation and path management
-- **Versioning**: No systematic approach to figure versioning
-- **Output formats**: Hardcoded format selection in each function
+Each node constructs output paths manually, leading to inconsistencies:
 
 ```python
-# Manual path management anti-patterns
-def save_analysis_figure(fig: plt.Figure, analysis_type: str, condition: str) -> None:
-    """Manual figure saving with problematic path management."""
+def create_histogram(df: pd.DataFrame) -> None:
+    """Node with manual path construction."""
+    fig, ax = plt.subplots()
     
-    # Hardcoded base directory
-    base_dir = "data/08_reporting/figures"
+    ax.hist(df['values'], bins=30, 
+           color='green',            # Yet another color scheme
+           alpha=0.6,               # Another alpha value
+           edgecolor='black')
     
-    # Manual timestamp generation
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    # Manual timestamp and path construction
+    from datetime import datetime
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f'histogram_{timestamp}.png'
+    output_dir = 'data/08_reporting/plots'
     
-    # Inconsistent naming conventions
-    if condition == "high_dose":
-        filename = f"{analysis_type}_highdose_{timestamp}.png"
-    elif condition == "low_dose":
-        filename = f"{analysis_type}_lowdose_{timestamp}.png"
-    else:
-        filename = f"{analysis_type}_control_{timestamp}.png"
+    # Directory creation logic in every node
+    import os
+    os.makedirs(output_dir, exist_ok=True)
     
-    # Manual directory creation
-    full_path = os.path.join(base_dir, filename)
-    os.makedirs(os.path.dirname(full_path), exist_ok=True)
-    
-    # Manual format and quality settings
-    fig.savefig(full_path, dpi=300, bbox_inches='tight', 
-                facecolor='white', edgecolor='none')
-    plt.close(fig)
+    full_path = os.path.join(output_dir, filename)
+    plt.savefig(full_path, dpi=300, format='png')
+    plt.close()
 ```
 
-### 4. Code Duplication and Maintenance Overhead
+### Problem 4: No Systematic Condition Handling
 
-The traditional approach leads to significant maintenance burden:
-
-```python
-# Repeated styling code across multiple functions
-COMMON_COLORS = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728']  # Repeated in multiple files
-COMMON_FIGURE_SIZE = (10, 6)  # Duplicated constants
-COMMON_DPI = 300  # Scattered throughout codebase
-
-def style_scatter_plot(ax, title):
-    """Repeated styling function - duplicated across modules."""
-    ax.set_title(title, fontsize=14, fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=10)
-    # ... more repeated styling code
-
-def style_line_plot(ax, title):
-    """Similar styling function - slight variations cause inconsistency."""
-    ax.set_title(title, fontsize=16, fontweight='bold')  # Different fontsize!
-    ax.grid(True, alpha=0.2)  # Different alpha!
-    ax.legend(fontsize=12)  # Different fontsize!
-    # ... inconsistent styling patterns
-```
-
-### 5. No Systematic Condition-Based Styling
-
-Traditional approaches cannot systematically handle experimental conditions:
+Experimental conditions are handled inconsistently across nodes:
 
 ```python
-def plot_experimental_results(data: pd.DataFrame, condition: str) -> None:
-    """Manual condition handling without systematic style management."""
+def create_condition_plot(df: pd.DataFrame, condition: str) -> None:
+    """Node with manual condition styling."""
     fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Manual condition-based styling - error-prone and unmaintainable
-    if condition == "control":
-        color = '#808080'
+    # Manual condition-to-style mapping (repeated everywhere)
+    if condition == 'experimental':
+        color = 'red'
         marker = 'o'
         linestyle = '-'
-    elif condition == "treatment_a":
-        color = '#ff4444'
+    elif condition == 'control':
+        color = 'blue'
         marker = 's'
         linestyle = '--'
-    elif condition == "treatment_b":
-        color = '#4444ff'
-        marker = '^'
-        linestyle = '-.'
     else:
-        # Fallback styling - often forgotten or inconsistent
-        color = 'black'
+        # Default case handling
+        color = 'gray'
         marker = '.'
         linestyle = ':'
     
-    # Plot with manually resolved styling
-    ax.plot(data['x'], data['y'], color=color, marker=marker, 
-            linestyle=linestyle, label=condition)
+    ax.plot(df['x'], df['y'], 
+           color=color, marker=marker, linestyle=linestyle)
     
-    # Manual saving with condition-specific naming
-    output_file = f"results_{condition}_{datetime.now().strftime('%Y%m%d')}.png"
-    plt.savefig(f"data/08_reporting/{output_file}")
+    # Manual path with condition
+    output_path = f'data/08_reporting/condition_{condition}_plot.png'
+    plt.savefig(output_path, dpi=300)
     plt.close()
 ```
 
-## Project Structure
+## 🚧 Maintenance Overhead Issues
 
-```
-kedro_manual_example/
-├── README.md                     # This documentation
-├── pyproject.toml               # Basic Kedro dependencies without figregistry-kedro
-├── .kedro.yml                   # Standard Kedro project configuration
-├── conf/
-│   └── base/
-│       ├── catalog.yml          # Basic catalog without FigureDataSet
-│       └── parameters.yml       # Manual styling parameters
-├── data/
-│   ├── 01_raw/                 # Raw data
-│   ├── 02_intermediate/        # Processed data
-│   ├── 03_primary/            # Primary datasets
-│   └── 08_reporting/          # Manual figure outputs
-└── src/kedro_manual_example/
-    ├── __init__.py
-    ├── settings.py             # Standard Kedro settings
-    ├── pipeline_registry.py    # Basic pipeline registration
-    └── nodes.py               # Nodes with manual figure management
-```
+### Style Update Nightmare
 
-## Pain Points Highlighted
+When you need to change the default color scheme:
 
-### Maintenance Overhead
+1. **❌ Hunt through multiple files** to find all hardcoded color values
+2. **❌ Update each node individually** with new styling parameters  
+3. **❌ Test each pipeline node** to ensure changes work correctly
+4. **❌ Risk introducing inconsistencies** between different visualizations
+5. **❌ Coordinate team updates** when multiple developers modify different nodes
 
-1. **Style Updates**: Changing plot styling requires editing multiple node functions
-2. **Inconsistent Output**: Different developers create figures with different conventions
-3. **File Management**: Manual directory creation and naming leads to organizational chaos
-4. **Code Duplication**: Repeated figure styling and saving logic across the codebase
-5. **Error-Prone**: Manual condition handling leads to styling inconsistencies and bugs
+### File Organization Chaos
 
-### Development Inefficiency
+- **Inconsistent naming**: `scatter_plot_20241204.png`, `timeseries_chart_manual.png`, `histogram_20241204_143022.png`
+- **Mixed directory structures**: Some files in `data/08_reporting/`, others in `data/08_reporting/plots/`
+- **Manual versioning**: Timestamp patterns vary across different nodes
+- **No systematic organization**: Experimental conditions scattered across filenames
 
-1. **Time Waste**: Developers spend significant time on figure management instead of analysis
-2. **Debugging Difficulty**: Figure-related bugs scattered across multiple files
-3. **Testing Complexity**: Manual figure operations difficult to test systematically
-4. **Collaboration Issues**: Team members use different styling and naming conventions
+### Configuration Management Problems
 
-### Production Risks
+- **No central configuration**: Styling parameters hardcoded in each function
+- **Environment inconsistencies**: No support for different styling in dev/staging/prod
+- **Parameter drift**: Subtle differences accumulate over time
+- **Difficult testing**: Hard to validate styling consistency across nodes
 
-1. **Inconsistent Outputs**: Figures vary in quality and styling across pipeline runs
-2. **Missing Files**: Manual path management can lead to missing output directories
-3. **Version Conflicts**: No systematic versioning leads to figure overwrites
-4. **Configuration Drift**: Styling parameters drift apart across different parts of the pipeline
-
-## Running the Traditional Example
+## 🏃‍♂️ Running This Traditional Example
 
 ### Prerequisites
 
 ```bash
-# Install basic dependencies
-pip install kedro[pandas] matplotlib pandas numpy scipy
+# Install basic dependencies (no figregistry-kedro)
+pip install kedro>=0.18.0 matplotlib pandas numpy
 ```
 
-### Setup Instructions
+### Setup and Execution
 
-1. **Initialize the project:**
 ```bash
-cd figregistry-kedro/examples/migration/before
+# Clone and navigate to the project
+cd figregistry-kedro/examples/migration/before/
+
+# Install project dependencies
 pip install -e .
-```
 
-2. **Run the traditional pipeline:**
-```bash
+# Run the pipeline with manual figure management
 kedro run
+
+# View scattered output files
+ls -la data/08_reporting/
+# Output shows inconsistent naming and organization:
+# scatter_plot_20241204_143022.png
+# timeseries_chart_manual.png  
+# plots/histogram_20241204_143055.png
+# condition_experimental_plot.png
 ```
 
-3. **Observe the problems:**
-   - Check multiple files for scattered styling code
-   - Notice inconsistent figure outputs in `data/08_reporting/`
-   - See hardcoded paths and manual timestamp generation
-   - Find repeated styling logic across different nodes
+### Manual Configuration
 
-### Expected Traditional Workflow
+Since there's no automated configuration system, styling changes require:
 
-1. **Manual Setup**: Developers manually configure styling in each function
-2. **Scattered Execution**: plt.savefig() calls embedded throughout pipeline nodes
-3. **Manual Organization**: Developers manually create directory structures
-4. **Inconsistent Output**: Each function applies different styling approaches
-5. **Manual Maintenance**: Style changes require editing multiple files
+```bash
+# 1. Open each node file individually
+vim src/kedro_manual_example/nodes.py
 
-## Migration Benefits
+# 2. Find and replace hardcoded values manually
+# Search for: color='blue'
+# Replace with: color='navy'
 
-After experiencing the traditional approach, compare with the `figregistry-kedro` automated alternative:
+# 3. Repeat for every styling parameter across all nodes
+# 4. Test each node individually to verify changes
+```
 
-### ❌ Before (Traditional Approach)
-- Scattered `plt.savefig()` calls in every node function
-- Hardcoded styling parameters throughout the codebase
-- Manual file path construction and directory management
-- Inconsistent experimental condition handling
-- Code duplication across visualization functions
-- No centralized configuration management
-- Manual versioning and timestamp generation
+## 📊 Impact Analysis: Before vs After
 
-### ✅ After (figregistry-kedro Integration)
-- **Zero manual saves**: Automatic figure persistence through catalog
-- **Centralized styling**: Configuration-driven styling through `figregistry.yaml`
-- **Automated organization**: Systematic file naming and directory structure
-- **Condition-based styling**: Automatic style application based on experimental conditions
-- **DRY principle**: Single configuration source eliminates code duplication
-- **Lifecycle integration**: Automated initialization and context management
-- **Version management**: Integrated with Kedro's catalog versioning system
+### Code Metrics - Traditional Approach
 
-## Key Learnings
+| Metric | Value | Issue |
+|--------|-------|-------|
+| **Lines of styling code** | ~15-25 per node | Massive duplication |
+| **Manual save calls** | 1 per visualization node | Scattered throughout codebase |
+| **Hardcoded parameters** | 8-12 per node | No central configuration |
+| **File path constructions** | Manual in each node | Inconsistent patterns |
+| **Style update effort** | 30+ minutes per change | Hunt-and-replace across files |
+| **Testing complexity** | Test every node individually | No systematic validation |
 
-This example demonstrates why manual figure management becomes unsustainable:
+### Developer Experience Issues
 
-1. **Technical Debt**: Manual approaches accumulate maintenance overhead rapidly
-2. **Consistency Issues**: Without central coordination, outputs become inconsistent
-3. **Developer Productivity**: Significant time waste on figure management tasks
-4. **Quality Risks**: Manual processes are error-prone and difficult to standardize
-5. **Collaboration Friction**: Teams struggle with different styling and naming conventions
+- **❌ Context switching**: Jump between multiple files for simple style changes
+- **❌ Copy-paste errors**: Introduce bugs when duplicating styling logic
+- **❌ Merge conflicts**: Team members modifying the same hardcoded values
+- **❌ Documentation burden**: Must document styling in each node
+- **❌ Onboarding complexity**: New developers must learn each node's conventions
 
-## Next Steps
+### Operational Problems
 
-To see how `figregistry-kedro` solves these problems:
+- **❌ Inconsistent outputs**: Visualizations look different across pipeline stages
+- **❌ Manual file cleanup**: No systematic organization of output files
+- **❌ Version tracking**: Difficult to associate figures with experimental runs
+- **❌ Environment drift**: Styling differs between development and production
+- **❌ Scalability issues**: Adding new visualizations requires extensive boilerplate
 
-1. **Review the automated example**: See `../after/` for the same analysis with figregistry-kedro
-2. **Compare implementations**: Notice the elimination of manual figure management
-3. **Study configuration**: Understand centralized styling through YAML configuration
-4. **Test the improvements**: Experience automated figure generation and management
+## 🎯 What FigRegistry-Kedro Eliminates
+
+This traditional approach demonstrates exactly why `figregistry-kedro` was created. The automated solution addresses every pain point shown here:
+
+### ✅ Automated Figure Management
+- **Single configuration file** instead of scattered hardcoded values
+- **Automatic save operations** through `FigureDataSet` integration
+- **Systematic file organization** with configurable naming patterns
+- **Environment-specific styling** through Kedro's configuration system
+
+### ✅ Zero Code Duplication  
+- **Condition-based styling** automatically applied based on parameters
+- **Centralized style definitions** in `figregistry.yaml`
+- **Consistent application** across all pipeline visualizations
+- **DRY principle compliance** eliminates repeated styling logic
+
+### ✅ Effortless Maintenance
+- **One-line style changes** update all figures simultaneously
+- **Version-controlled configuration** with Git-friendly YAML
+- **Team collaboration** through shared configuration standards
+- **Automated testing** validates styling consistency
+
+## 🔗 Next Steps: Migration Path
+
+After experiencing these traditional approach limitations, see the "after" example to understand how `figregistry-kedro` transforms this workflow:
+
+1. **[View the After Example](../after/README.md)**: See the same pipeline with automated figure management
+2. **[Migration Guide](../README.md)**: Step-by-step conversion instructions
+3. **[FigRegistry Documentation](../../docs/README.md)**: Complete integration guide
 
 ---
 
-> 💡 **Migration Tip**: When converting from manual to automated figure management, start by identifying all `plt.savefig()` calls in your codebase - these represent opportunities for automation through figregistry-kedro integration.
+**Remember**: This example intentionally demonstrates problematic patterns to highlight the value of automated figure management. In production, `figregistry-kedro` eliminates these issues while maintaining the same pipeline logic and improving consistency, maintainability, and developer experience.
