@@ -1,537 +1,387 @@
 # Parameter Extraction Testing Catalog Configuration
+# 
+# This catalog validates dynamic condition parameter extraction from Kedro pipeline context
+# per F-005-RQ-004 requirements. It provides comprehensive test scenarios for parameter
+# injection, template variable substitution, and context-driven styling automation.
 #
-# This catalog defines comprehensive FigureDataSet entries with complex condition 
-# parameter patterns for testing dynamic condition resolution from Kedro pipeline 
-# context. The configurations validate parameter extraction, template variable 
-# substitution, and context injection scenarios for robust condition-based styling 
-# automation.
-#
-# Testing Requirements:
-# - F-005-RQ-004: Support context injection for conditional styling via pipeline-run metadata
-# - Dynamic condition parameter extraction from Kedro pipeline context
-# - Template variable substitution and context injection scenarios
-# - Robust parameter extraction and validation for condition-based styling automation
-# - Parameter propagation from pipeline to dataset styling operations
+# Test Categories:
+# 1. Basic parameter extraction from pipeline parameters
+# 2. Template variable substitution from Kedro context
+# 3. Nested parameter extraction scenarios  
+# 4. Context injection patterns for runtime resolution
+# 5. Parameter validation and error handling scenarios
+# 6. Edge cases for extraction robustness testing
+# 7. Pipeline parameter dependency propagation testing
 
-# ==============================================================================
-# BASIC PARAMETER EXTRACTION SCENARIOS
-# ==============================================================================
+# =============================================================================
+# 1. BASIC PARAMETER EXTRACTION SCENARIOS
+# =============================================================================
 
-# Basic condition parameter extraction from simple pipeline parameters
+# Test basic condition parameter extraction from pipeline parameters
 basic_condition_extraction:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/basic_condition_extraction.png
+  filepath: data/08_reporting/basic_condition_test.png
   purpose: exploratory
   condition_param: experiment_type
   style_params:
-    figure.dpi: 150
-    font.size: 12
-  save_args:
+    linewidth: 2.0
+    alpha: 0.8
+
+# Test purpose-based condition resolution with parameter fallback
+purpose_fallback_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/purpose_fallback.png
+  purpose: presentation
+  condition_param: non_existent_param
+  style_params:
+    color: "#FF6B6B"
+    marker: "s"
+
+# Test condition parameter with validation requirements
+validated_condition_param:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/validated_condition.png
+  purpose: publication
+  condition_param: model_architecture
+  style_params:
+    dpi: 300
     bbox_inches: tight
-    transparent: false
+    facecolor: white
 
-# Pipeline parameter dependency test
-pipeline_parameter_dependency:
+# =============================================================================
+# 2. TEMPLATE VARIABLE SUBSTITUTION SCENARIOS  
+# =============================================================================
+
+# Test Kedro parameter template substitution patterns
+template_experiment_type:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/pipeline_parameter_dependency.png
-  purpose: presentation
-  condition_param: analysis_mode
+  filepath: data/08_reporting/template_${params:experiment_type}_result.png
+  purpose: exploratory
+  condition_param: "${params:experiment_type}"
   style_params:
-    figure.dpi: 200
-    axes.linewidth: 1.5
-  save_args:
-    format: png
-    dpi: 200
+    color: "${params:color_scheme}"
+    linewidth: "${params:line_width}"
 
-# Fallback to purpose when condition parameter is missing
-missing_condition_fallback:
+# Test nested parameter template resolution
+nested_template_resolution:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/missing_condition_fallback.png
+  filepath: data/08_reporting/${params:study_name}/${params:experiment_id}_analysis.png
+  purpose: presentation
+  condition_param: "${params:analysis_type}_${params:dataset_version}"
+  style_params:
+    alpha: "${params:transparency_level}"
+    marker: "${params:marker_style}"
+
+# Test complex template pattern with multiple substitutions
+complex_template_pattern:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/${params:project_name}/${params:experiment_date}/${params:run_id}_final.png
   purpose: publication
-  condition_param: nonexistent_parameter
+  condition_param: "${params:model_type}_${params:feature_set}_${params:optimization_method}"
   style_params:
-    figure.dpi: 300
-    font.family: serif
-  save_args:
-    bbox_inches: tight
-    pad_inches: 0.1
+    color: "${params:primary_color}"
+    linewidth: "${params:line_thickness}"
+    marker: "${params:data_marker}"
+    linestyle: "${params:line_pattern}"
 
-# ==============================================================================
-# TEMPLATE VARIABLE SUBSTITUTION SCENARIOS
-# ==============================================================================
+# =============================================================================
+# 3. NESTED PARAMETER EXTRACTION SCENARIOS
+# =============================================================================
 
-# Template variable extraction from Kedro parameters
-template_variable_basic:
+# Test hierarchical parameter resolution from nested pipeline context
+hierarchical_param_extraction:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/template_variable_basic_${params:experiment_type}.png
+  filepath: data/08_reporting/hierarchical_test.png
   purpose: exploratory
-  condition_param: experiment_type
+  condition_param: "${params:experiments.baseline.condition}"
   style_params:
-    figure.dpi: 150
-    figure.facecolor: white
+    color: "${params:styling.colors.primary}"
+    linewidth: "${params:styling.lines.default_width}"
 
-# Complex template variable substitution with nested parameters
-template_variable_nested:
+# Test multi-level parameter extraction with dot notation
+multilevel_dot_notation:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/nested_${params:experiment.category}_${params:experiment.variant}.png
+  filepath: data/08_reporting/multilevel_extraction.png
   purpose: presentation
-  condition_param: experiment.category
+  condition_param: "${params:study.phases.training.model_variant}"
   style_params:
-    figure.dpi: "${params:output_settings.dpi}"
-    font.size: "${params:styling.font_size}"
-  save_args:
-    format: "${params:output_settings.format}"
-    transparent: "${params:output_settings.transparent}"
+    alpha: "${params:visualization.transparency.default}"
+    marker: "${params:visualization.markers.experiment}"
 
-# Environment-specific template variables
-template_variable_environment:
+# Test complex nested structure with array indexing patterns
+array_indexed_parameters:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/env_${params:environment}_figure.png
-  purpose: "${params:figure_purpose}"
-  condition_param: environment_type
-  style_params:
-    figure.dpi: "${params:env_settings.dpi}"
-    figure.figsize: "${params:env_settings.figsize}"
-
-# Multi-level template variable resolution
-template_variable_multilevel:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/multilevel_${params:project.name}_${params:project.version}_${params:experiment.id}.png
+  filepath: data/08_reporting/array_indexed_params.png
   purpose: publication
-  condition_param: project.experiment_condition
+  condition_param: "${params:experiment_conditions[0].type}"
   style_params:
-    figure.dpi: "${params:project.output.dpi}"
-    font.size: "${params:project.styling.font_size}"
-    axes.labelsize: "${params:project.styling.label_size}"
+    color: "${params:color_palettes.primary[1]}"
+    linewidth: "${params:line_styles.weights[2]}"
 
-# ==============================================================================
-# NESTED PARAMETER EXTRACTION SCENARIOS
-# ==============================================================================
+# =============================================================================
+# 4. CONTEXT INJECTION PATTERNS
+# =============================================================================
 
-# Deep nested parameter extraction
-nested_parameter_deep:
+# Test runtime parameter resolution from Kedro run context
+runtime_context_injection:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/nested_deep_extraction.png
+  filepath: data/08_reporting/runtime_context_test.png
   purpose: exploratory
-  condition_param: experiment.metadata.condition_type
+  condition_param: "${runtime:run_id}"
   style_params:
-    figure.dpi: 200
-    font.size: 14
+    color: "${runtime:session_color}"
+    timestamp: "${runtime:execution_time}"
 
-# Nested parameter with array index resolution
-nested_parameter_array:
+# Test environment-specific parameter injection
+environment_context_injection:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/nested_array_extraction.png
+  filepath: data/08_reporting/env_specific_test.png
   purpose: presentation
-  condition_param: experiments[0].condition
+  condition_param: "${env:KEDRO_ENV}_${params:experiment_type}"
   style_params:
-    figure.dpi: 250
-    axes.linewidth: 2.0
+    dpi: "${env:OUTPUT_DPI}"
+    format: "${env:OUTPUT_FORMAT}"
 
-# Complex nested structure parameter extraction
-nested_parameter_complex:
+# Test pipeline metadata context injection
+pipeline_metadata_injection:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/nested_complex_extraction.png
+  filepath: data/08_reporting/pipeline_metadata.png
   purpose: publication
-  condition_param: analysis.visualization.condition_mapping.primary
+  condition_param: "${pipeline:name}_${pipeline:version}"
   style_params:
-    figure.dpi: 300
-    font.family: serif
-    mathtext.fontset: dejavuserif
+    color: "${pipeline:config.default_color}"
+    linewidth: "${pipeline:config.line_weight}"
 
-# Nested parameter with conditional extraction
-nested_parameter_conditional:
+# =============================================================================
+# 5. PARAMETER VALIDATION SCENARIOS
+# =============================================================================
+
+# Test parameter validation with type checking
+type_validated_parameters:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/nested_conditional_extraction.png
+  filepath: data/08_reporting/type_validated.png
   purpose: exploratory
-  condition_param: workflow.stages.visualization.condition
+  condition_param: "${params:numeric_condition|int}"
   style_params:
-    figure.dpi: 180
-    grid.alpha: 0.3
+    linewidth: "${params:line_width|float}"
+    alpha: "${params:alpha_value|float}"
+    dpi: "${params:resolution|int}"
 
-# ==============================================================================
-# CONTEXT INJECTION SCENARIOS
-# ==============================================================================
-
-# Runtime context injection from pipeline metadata
-context_injection_runtime:
+# Test parameter validation with default values
+default_fallback_parameters:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/context_injection_runtime.png
+  filepath: data/08_reporting/default_fallback.png
   purpose: presentation
-  condition_param: run_metadata.execution_context
+  condition_param: "${params:experiment_type|default:'baseline'}"
   style_params:
-    figure.dpi: 200
-    timestamp_annotation: true
-  save_args:
-    bbox_inches: tight
-    metadata:
-      run_id: "${context:run_id}"
-      timestamp: "${context:timestamp}"
+    color: "${params:primary_color|default:'#1f77b4'}"
+    linewidth: "${params:line_width|default:2.0}"
+    marker: "${params:marker_style|default:'o'}"
 
-# Pipeline context injection with experiment tracking
-context_injection_experiment:
+# Test parameter validation with constraint checking
+constraint_validated_parameters:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/context_injection_experiment.png
+  filepath: data/08_reporting/constraint_validated.png
   purpose: publication
-  condition_param: experiment_tracking.current_condition
+  condition_param: "${params:validated_condition|required}"
   style_params:
-    figure.dpi: 300
-    experiment_id_watermark: true
-  save_args:
-    metadata:
-      experiment_id: "${context:experiment_id}"
-      pipeline_version: "${context:pipeline_version}"
+    linewidth: "${params:line_width|min:0.5|max:5.0}"
+    alpha: "${params:alpha_level|min:0.0|max:1.0}"
+    dpi: "${params:output_dpi|min:72|max:600}"
 
-# Multi-source context injection
-context_injection_multisource:
+# =============================================================================
+# 6. EDGE CASE PARAMETER PATTERNS
+# =============================================================================
+
+# Test missing parameter handling with graceful fallback
+missing_parameter_fallback:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/context_injection_multisource.png
+  filepath: data/08_reporting/missing_param_test.png
   purpose: exploratory
-  condition_param: multi_context.condition_resolution
+  condition_param: "${params:non_existent_parameter}"
   style_params:
-    figure.dpi: "${context:dynamic_dpi}"
-    font.size: "${params:base_font_size}"
-  save_args:
-    format: "${context:output_format}"
-    dpi: "${context:dynamic_dpi}"
+    color: "${params:missing_color|default:'#FF0000'}"
+    linewidth: 1.5
 
-# Dynamic context resolution with fallback chain
-context_injection_fallback:
+# Test malformed parameter template handling
+malformed_template_handling:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/context_injection_fallback.png
+  filepath: data/08_reporting/malformed_template.png
   purpose: presentation
-  condition_param: context_chain.primary_condition
+  condition_param: "${params:unclosed_template"
   style_params:
-    figure.dpi: 220
-    fallback_enabled: true
+    color: "#FFA500"
+    alpha: 0.7
 
-# ==============================================================================
-# PARAMETER VALIDATION SCENARIOS
-# ==============================================================================
-
-# Parameter validation with type checking
-parameter_validation_types:
+# Test circular parameter reference detection
+circular_reference_detection:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/parameter_validation_types.png
-  purpose: exploratory
-  condition_param: validation_test.condition_with_types
-  style_params:
-    figure.dpi: 150
-    parameter_validation: strict
-  save_args:
-    validate_params: true
-
-# Parameter validation with range checking
-parameter_validation_ranges:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/parameter_validation_ranges.png
-  purpose: presentation
-  condition_param: validation_test.condition_with_ranges
-  style_params:
-    figure.dpi: 200
-    range_validation: enabled
-  save_args:
-    validate_ranges: true
-
-# Parameter validation with custom validators
-parameter_validation_custom:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/parameter_validation_custom.png
+  filepath: data/08_reporting/circular_reference.png
   purpose: publication
-  condition_param: validation_test.condition_with_custom
+  condition_param: "${params:param_a}"
   style_params:
-    figure.dpi: 300
-    custom_validation: true
+    color: "${params:color_ref}"
+    marker: "${params:marker_ref}"
 
-# Parameter validation with dependency checking
-parameter_validation_dependencies:
+# Test special character handling in parameter names
+special_character_parameters:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/parameter_validation_dependencies.png
+  filepath: data/08_reporting/special_chars.png
   purpose: exploratory
-  condition_param: validation_test.condition_with_deps
+  condition_param: "${params:experiment-type_v2.1}"
   style_params:
-    figure.dpi: 180
-    dependency_validation: enabled
+    color: "${params:color_scheme-primary}"
+    linewidth: "${params:line_width.default}"
 
-# ==============================================================================
-# EDGE CASE PARAMETER PATTERNS
-# ==============================================================================
+# =============================================================================
+# 7. PIPELINE PARAMETER DEPENDENCY SCENARIOS
+# =============================================================================
 
-# Edge case: null/none parameter handling
-edge_case_null_parameter:
+# Test parameter propagation from pipeline to dataset styling
+pipeline_parameter_propagation:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/edge_case_null_parameter.png
+  filepath: data/08_reporting/param_propagation.png
   purpose: exploratory
-  condition_param: null_test.nullable_condition
+  condition_param: "${params:upstream_condition}"
   style_params:
-    figure.dpi: 150
-    null_handling: graceful
-  save_args:
-    error_handling: fallback
+    color: "${params:derived_from_upstream}"
+    linewidth: "${params:calculated_width}"
+  dependencies:
+    - upstream_node_output
+    - parameter_calculation_output
 
-# Edge case: numeric condition parameter
-edge_case_numeric_condition:
+# Test cross-pipeline parameter sharing
+cross_pipeline_sharing:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/edge_case_numeric_condition.png
+  filepath: data/08_reporting/cross_pipeline.png
   purpose: presentation
-  condition_param: numeric_test.experiment_id
+  condition_param: "${params:shared_experiment_id}"
   style_params:
-    figure.dpi: 200
-    numeric_conversion: automatic
+    color: "${params:global_color_scheme}"
+    marker: "${params:consistent_marker}"
 
-# Edge case: boolean condition parameter
-edge_case_boolean_condition:
+# Test dynamic parameter dependency resolution
+dynamic_dependency_resolution:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/edge_case_boolean_condition.png
-  purpose: exploratory
-  condition_param: boolean_test.is_enhanced_mode
-  style_params:
-    figure.dpi: 180
-    boolean_conversion: string
-
-# Edge case: empty string condition parameter
-edge_case_empty_condition:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/edge_case_empty_condition.png
-  purpose: presentation
-  condition_param: empty_test.empty_condition
-  style_params:
-    figure.dpi: 190
-    empty_handling: fallback_to_purpose
-
-# Edge case: special characters in condition parameter
-edge_case_special_chars:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/edge_case_special_chars.png
-  purpose: exploratory
-  condition_param: special_test.condition_with_special_chars
-  style_params:
-    figure.dpi: 160
-    special_char_handling: sanitize
-
-# ==============================================================================
-# ERROR HANDLING AND FALLBACK PATTERNS
-# ==============================================================================
-
-# Error handling: missing parameter graceful degradation
-error_handling_missing_param:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/error_handling_missing_param.png
-  purpose: presentation
-  condition_param: missing.parameter.path
-  style_params:
-    figure.dpi: 200
-    error_handling: graceful
-  save_args:
-    fallback_enabled: true
-
-# Error handling: malformed parameter path
-error_handling_malformed_path:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/error_handling_malformed_path.png
-  purpose: exploratory
-  condition_param: malformed..parameter..path
-  style_params:
-    figure.dpi: 170
-    path_validation: strict
-
-# Error handling: circular parameter reference
-error_handling_circular_reference:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/error_handling_circular_reference.png
-  purpose: presentation
-  condition_param: circular.reference.test
-  style_params:
-    figure.dpi: 190
-    circular_detection: enabled
-
-# Error handling: parameter type mismatch
-error_handling_type_mismatch:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/error_handling_type_mismatch.png
-  purpose: exploratory
-  condition_param: type_mismatch.condition
-  style_params:
-    figure.dpi: 180
-    type_coercion: automatic
-
-# ==============================================================================
-# PERFORMANCE TESTING PARAMETER PATTERNS
-# ==============================================================================
-
-# Performance test: rapid parameter changes
-performance_rapid_changes:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/performance_rapid_changes.png
-  purpose: exploratory
-  condition_param: performance.rapid_condition
-  style_params:
-    figure.dpi: 150
-    performance_monitoring: enabled
-
-# Performance test: deep parameter nesting
-performance_deep_nesting:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/performance_deep_nesting.png
-  purpose: presentation
-  condition_param: deep.nested.parameter.chain.with.many.levels.condition
-  style_params:
-    figure.dpi: 200
-    nesting_depth_limit: 10
-
-# Performance test: large parameter payloads
-performance_large_payload:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/performance_large_payload.png
-  purpose: exploratory
-  condition_param: large_payload.massive_parameter_set.condition
-  style_params:
-    figure.dpi: 180
-    payload_size_monitoring: enabled
-
-# Performance test: concurrent parameter access
-performance_concurrent_access:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/performance_concurrent_access.png
-  purpose: presentation
-  condition_param: concurrent.access.test.condition
-  style_params:
-    figure.dpi: 220
-    concurrency_safety: enabled
-
-# ==============================================================================
-# INTEGRATION TESTING PATTERNS
-# ==============================================================================
-
-# Integration test: Kedro versioning with parameter extraction
-integration_versioning_parameters:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/integration_versioning_parameters.png
+  filepath: data/08_reporting/dynamic_dependency.png
   purpose: publication
-  condition_param: versioning_test.condition_with_version
+  condition_param: "${params:dynamic_condition_${params:condition_selector}}"
+  style_params:
+    color: "${params:colors[${params:color_index}]}"
+    linewidth: "${params:weights[${params:weight_index}]}"
+
+# =============================================================================
+# 8. PERFORMANCE AND ROBUSTNESS TESTING
+# =============================================================================
+
+# Test large parameter set extraction performance
+large_parameter_set:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/large_param_set.png
+  purpose: exploratory
+  condition_param: "${params:experiment_matrix.conditions[${params:current_index}].type}"
+  style_params:
+    color: "${params:color_matrix[${params:row}][${params:col}]}"
+    linewidth: "${params:line_weights[${params:weight_index}]}"
+    marker: "${params:marker_library[${params:marker_id}]}"
+    alpha: "${params:transparency_levels[${params:alpha_index}]}"
+
+# Test concurrent parameter access stress testing
+concurrent_parameter_access:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/concurrent_access.png
+  purpose: presentation
+  condition_param: "${params:thread_safe_condition}"
+  style_params:
+    color: "${params:concurrent_colors[${params:thread_id}]}"
+    linewidth: "${params:thread_weights[${params:thread_id}]}"
+
+# Test parameter caching and invalidation
+parameter_caching_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/caching_test.png
+  purpose: publication
+  condition_param: "${params:cached_condition}"
+  style_params:
+    color: "${params:cached_color_value}"
+    linewidth: "${params:cached_line_width}"
+  cache_settings:
+    enable_parameter_caching: true
+    cache_timeout: 300
+
+# =============================================================================
+# 9. INTEGRATION TESTING SCENARIOS
+# =============================================================================
+
+# Test FigRegistry styling integration with parameter extraction
+figregistry_integration_test:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/figregistry_integration.png
+  purpose: exploratory
+  condition_param: "${params:figregistry_condition}"
+  style_params:
+    # Override FigRegistry styles with dynamic parameters
+    color: "${params:override_color}"
+    linewidth: "${params:override_linewidth}"
+  figregistry_config:
+    enable_styling: true
+    fallback_to_purpose: true
+
+# Test versioned dataset with parameter extraction
+versioned_parameter_extraction:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/versioned_param_test.png
   versioned: true
-  style_params:
-    figure.dpi: 300
-    version_awareness: enabled
-
-# Integration test: Pipeline hooks with parameter injection
-integration_hooks_parameters:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/integration_hooks_parameters.png
-  purpose: exploratory
-  condition_param: hooks_test.injected_condition
-  style_params:
-    figure.dpi: 170
-    hook_integration: enabled
-
-# Integration test: Multi-environment parameter resolution
-integration_multienv_parameters:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/integration_multienv_parameters.png
   purpose: presentation
-  condition_param: multienv_test.environment_specific_condition
+  condition_param: "${params:versioned_condition}_v${params:version_number}"
   style_params:
-    figure.dpi: 210
-    environment_awareness: enabled
+    color: "${params:version_colors[${params:version_number}]}"
+    linewidth: "${params:version_weights[${params:version_number}]}"
 
-# Integration test: Configuration bridge parameter merging
-integration_config_bridge:
+# Test error recovery and logging integration
+error_recovery_logging:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/integration_config_bridge.png
+  filepath: data/08_reporting/error_recovery.png
   purpose: publication
-  condition_param: config_bridge.merged_condition
+  condition_param: "${params:potentially_missing_param}"
   style_params:
-    figure.dpi: 280
-    config_merging: enabled
+    color: "${params:backup_color|default:'#000000'}"
+    linewidth: "${params:backup_width|default:1.0}"
+  error_handling:
+    log_parameter_errors: true
+    continue_on_param_error: true
+    fallback_to_defaults: true
 
-# ==============================================================================
-# ADVANCED PARAMETER RESOLUTION PATTERNS
-# ==============================================================================
+# =============================================================================
+# 10. ADVANCED TEMPLATE PATTERNS
+# =============================================================================
 
-# Advanced: Dynamic parameter composition
-advanced_dynamic_composition:
+# Test conditional parameter patterns
+conditional_parameter_patterns:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/advanced_dynamic_composition.png
+  filepath: data/08_reporting/conditional_params.png
   purpose: exploratory
-  condition_param: dynamic.composition.${params:dynamic_component}.condition
+  condition_param: "${params:experiment_type if params:use_experiment_type else 'default'}"
   style_params:
-    figure.dpi: 190
-    dynamic_resolution: enabled
+    color: "${params:primary_color if params:use_primary else params:secondary_color}"
+    linewidth: "${params:thick_lines if params:high_quality else params:thin_lines}"
 
-# Advanced: Conditional parameter selection
-advanced_conditional_selection:
+# Test mathematical expressions in parameters
+mathematical_parameter_expressions:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/advanced_conditional_selection.png
+  filepath: data/08_reporting/math_expressions.png
   purpose: presentation
-  condition_param: conditional.${params:selection_mode}.selected_condition
+  condition_param: "${params:base_condition}_${params:iteration_count + 1}"
   style_params:
-    figure.dpi: 210
-    conditional_logic: enabled
+    linewidth: "${params:base_width * params:scale_factor}"
+    alpha: "${params:max_alpha - (params.iteration * params.alpha_decay)}"
 
-# Advanced: Parameter inheritance and overrides
-advanced_parameter_inheritance:
+# Test string manipulation in parameter templates
+string_manipulation_templates:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/advanced_parameter_inheritance.png
+  filepath: data/08_reporting/string_manipulation.png
   purpose: publication
-  condition_param: inheritance.base.${params:override_level}.condition
+  condition_param: "${params:experiment_type.upper()}_${params:dataset_name.replace('-', '_')}"
   style_params:
-    figure.dpi: 290
-    inheritance_chain: enabled
-
-# Advanced: Runtime parameter modification
-advanced_runtime_modification:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/advanced_runtime_modification.png
-  purpose: exploratory
-  condition_param: runtime.modifiable.condition
-  style_params:
-    figure.dpi: 185
-    runtime_modification: enabled
-
-# ==============================================================================
-# VALIDATION AND COMPLIANCE TESTING
-# ==============================================================================
-
-# Compliance test: F-005-RQ-004 parameter injection validation
-compliance_f005_rq004:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/compliance_f005_rq004.png
-  purpose: presentation
-  condition_param: compliance.f005_rq004.context_injection
-  style_params:
-    figure.dpi: 200
-    compliance_validation: f005_rq004
-  save_args:
-    compliance_metadata:
-      requirement: F-005-RQ-004
-      test_scenario: context_injection_validation
-
-# Compliance test: Parameter propagation validation
-compliance_parameter_propagation:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/compliance_parameter_propagation.png
-  purpose: exploratory
-  condition_param: compliance.parameter_propagation.test
-  style_params:
-    figure.dpi: 180
-    propagation_validation: enabled
-
-# Compliance test: Robust extraction validation
-compliance_robust_extraction:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/compliance_robust_extraction.png
-  purpose: publication
-  condition_param: compliance.robust_extraction.validation
-  style_params:
-    figure.dpi: 300
-    extraction_robustness: maximum
-
-# Compliance test: Template substitution validation
-compliance_template_substitution:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/compliance_template_substitution_${params:test_id}.png
-  purpose: presentation
-  condition_param: compliance.template_substitution.${params:substitution_test}
-  style_params:
-    figure.dpi: "${params:compliance_dpi}"
-    substitution_validation: complete
+    color: "${params:color_prefix + params:color_suffix}"
+    marker: "${params:marker_map[params:experiment_type.lower()]}"
