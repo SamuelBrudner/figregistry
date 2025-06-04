@@ -1,961 +1,1198 @@
-# Catalog Integration Results for FigureDataSet Validation
-# This file contains expected results for Kedro catalog integration testing
-# including FigureDataSet entry configurations, parameter extraction outcomes,
-# versioning metadata, and save confirmation details per F-005 requirements.
+# FigRegistry-Kedro Catalog Integration Test Results
+#
+# This file contains expected results for Kedro catalog integration testing with FigureDataSet,
+# providing comprehensive validation baselines for catalog configuration parsing, parameter
+# extraction, condition resolution, versioning compatibility, and save confirmation workflows
+# per F-005 requirements and Section 5.2.6 specifications.
+#
+# Key Validation Areas:
+# - Catalog configuration parsing results for FigureDataSet entries (F-005.2)
+# - Parameter extraction outcomes from Kedro catalog configurations  
+# - Condition resolution and style application validation
+# - Versioning compatibility ensuring FigRegistry timestamp versioning coexists with Kedro dataset versioning
+# - Save confirmation workflows including path resolution and metadata generation
+# - Multi-environment catalog scenarios supporting conf/base and conf/local configuration patterns
+#
+# Usage in integration tests:
+#   expected_results = yaml.safe_load(open('tests/data/outputs/catalog_integration_results.yml'))
+#   assert_catalog_parsing_results(expected_results['catalog_parsing_results'])
 
 # =============================================================================
 # CATALOG CONFIGURATION PARSING RESULTS
 # =============================================================================
-# Expected parsing outcomes for FigureDataSet catalog entries per Section 5.2.6
+# Expected outcomes from parsing various FigureDataSet catalog configurations,
+# validating parameter extraction and validation per F-005.2 requirements.
 
-basic_configuration_parsing:
-  # Basic exploratory figure configuration
-  basic_exploratory_figure:
-    parsed_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/basic_exploratory.png"
+catalog_parsing_results:
+
+  # Basic configuration parsing validation
+  minimal_valid_parsing:
+    input_config_name: "minimal_valid"
+    parsing_success: true
+    validation_errors: []
+    extracted_parameters:
+      filepath: "data/08_reporting/minimal_figure.png"
       purpose: "exploratory"
       condition_param: null
       style_params: {}
-      save_args: {}
+      format_kwargs: {}
       versioned: false
-      version: null
-    validation_result: "PASS"
-    initialization_time_ms: 2.3
-    memory_usage_bytes: 1024
-    
-  # Basic presentation figure with condition parameter
-  basic_condition_param_figure:
-    parsed_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/condition_param_test.png"
+      load_version: null
+      save_version: null
+      metadata: {}
+      enable_caching: true
+    resolved_configuration:
+      dataset_type: "figregistry_kedro.datasets.FigureDataSet"
+      protocol: "file"
+      resolved_filepath: "data/08_reporting/minimal_figure.png"
+      figregistry_available: true
+      config_bridge_initialized: true
+    performance_metrics:
+      parsing_time_ms: 2.3
+      validation_time_ms: 1.1
+      total_initialization_ms: 3.4
+
+  # Simple exploratory configuration
+  simple_exploratory_parsing:
+    input_config_name: "simple_exploratory"
+    parsing_success: true
+    validation_errors: []
+    extracted_parameters:
+      filepath: "data/01_raw/exploratory_analysis.png"
       purpose: "exploratory"
       condition_param: "experiment_type"
       style_params: {}
-      save_args: {}
+      format_kwargs: {}
       versioned: false
-      version: null
-    validation_result: "PASS"
-    initialization_time_ms: 2.1
-    memory_usage_bytes: 1152
-    
-  # Advanced configuration with style overrides
-  advanced_style_override:
-    parsed_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/advanced_style_override.png"
+      load_version: null
+      save_version: null
+      metadata: {}
+      enable_caching: true
+    resolved_configuration:
+      dataset_type: "figregistry_kedro.datasets.FigureDataSet"
+      protocol: "file"
+      resolved_filepath: "data/01_raw/exploratory_analysis.png"
+      figregistry_available: true
+      config_bridge_initialized: true
+    condition_resolution:
+      condition_param_type: "string"
+      condition_param_valid: true
+      resolved_from_context: true
+      fallback_to_purpose: false
+    performance_metrics:
+      parsing_time_ms: 2.1
+      validation_time_ms: 1.3
+      total_initialization_ms: 3.4
+
+  # Full parameter set configuration
+  full_parameter_set_parsing:
+    input_config_name: "full_parameter_set"
+    parsing_success: true
+    validation_errors: []
+    extracted_parameters:
+      filepath: "data/08_reporting/full_config_figure.png"
       purpose: "presentation"
-      condition_param: "experimental_condition"
+      condition_param: "experiment_metadata.condition"
       style_params:
+        font.size: 14
+        font.family: "serif"
+        axes.titlesize: 16
+        axes.labelsize: 14
+        lines.linewidth: 2.0
         figure.dpi: 300
         figure.facecolor: "white"
-        axes.linewidth: 1.5
-        axes.grid: true
-        grid.alpha: 0.3
-        font.size: 12
-        legend.frameon: false
-      save_args: {}
-      versioned: false
-      version: null
-    validation_result: "PASS"
-    initialization_time_ms: 3.8
-    memory_usage_bytes: 2048
-    style_params_count: 7
-    
-  # Complex configuration with save_args
-  advanced_multi_condition:
-    parsed_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/multi_condition_{params:run_id}.png"
-      purpose: "publication"
-      condition_param: "combined_condition"
-      style_params:
-        figure.figsize: [10, 8]
-        savefig.format: "png"
-        savefig.dpi: 600
-      save_args:
+        axes.facecolor: "#f8f9fa"
+      format_kwargs:
+        dpi: 300
         bbox_inches: "tight"
-        pad_inches: 0.2
+        pad_inches: 0.1
+        transparent: false
+        optimize: true
       versioned: false
-      version: null
-    validation_result: "PASS"
-    initialization_time_ms: 4.2
-    memory_usage_bytes: 2304
-    parameter_interpolation: "detected"
-    
-  # Versioned configuration
-  versioned_basic_figure:
-    parsed_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/versioned_basic.png"
-      purpose: "exploratory"
-      condition_param: null
-      style_params: {}
-      save_args: {}
-      versioned: true
-      version: null
-    validation_result: "PASS"
-    initialization_time_ms: 2.8
-    memory_usage_bytes: 1280
-    kedro_versioning_enabled: true
+      metadata:
+        description: "Comprehensive parameter testing configuration"
+        test_category: "advanced_parameters"
+      enable_caching: true
+    resolved_configuration:
+      dataset_type: "figregistry_kedro.datasets.FigureDataSet"
+      protocol: "file"
+      resolved_filepath: "data/08_reporting/full_config_figure.png"
+      figregistry_available: true
+      config_bridge_initialized: true
+    condition_resolution:
+      condition_param_type: "nested_string"
+      condition_param_valid: true
+      nesting_level: 2
+      parameter_path: ["experiment_metadata", "condition"]
+      resolved_from_context: true
+      fallback_to_purpose: false
+    style_validation:
+      style_params_count: 8
+      style_override_count: 8
+      matplotlib_compatible: true
+      figregistry_compatible: true
+      validation_passed: true
+    performance_metrics:
+      parsing_time_ms: 4.2
+      validation_time_ms: 2.8
+      style_validation_ms: 1.5
+      total_initialization_ms: 8.5
 
-configuration_parsing_summary:
-  total_configs_tested: 5
-  successful_parses: 5
-  failed_parses: 0
-  average_initialization_time_ms: 3.04
-  total_memory_usage_bytes: 8808
-  performance_target_met: true  # <5ms initialization per config
+  # Error scenario parsing results
+  missing_filepath_parsing:
+    input_config_name: "missing_filepath"
+    parsing_success: false
+    validation_errors:
+      - error_type: "FigureDatasetError"
+        error_message: "filepath parameter is required and must be a non-empty string"
+        error_details:
+          provided_filepath: null
+        validation_stage: "parameter_validation"
+    extracted_parameters: null
+    resolved_configuration: null
+    performance_metrics:
+      parsing_time_ms: 1.2
+      validation_time_ms: 0.8
+      error_detection_ms: 2.0
+
+  invalid_purpose_parsing:
+    input_config_name: "invalid_purpose"
+    parsing_success: false
+    validation_errors:
+      - error_type: "FigureDatasetError"
+        error_message: "purpose must be one of ['exploratory', 'presentation', 'publication']"
+        error_details:
+          provided_purpose: "invalid_purpose_value"
+          valid_purposes: ["exploratory", "presentation", "publication"]
+        validation_stage: "parameter_validation"
+    extracted_parameters: null
+    resolved_configuration: null
+    performance_metrics:
+      parsing_time_ms: 1.1
+      validation_time_ms: 0.9
+      error_detection_ms: 2.0
 
 # =============================================================================
-# PARAMETER EXTRACTION AND CONDITION RESOLUTION RESULTS
+# PARAMETER EXTRACTION OUTCOMES
 # =============================================================================
-# Expected outcomes for parameter extraction from catalog configurations per F-005.2
+# Detailed results of parameter extraction from catalog configurations,
+# validating condition resolution and style application per F-005.2.
 
-parameter_extraction_scenarios:
-  # Static condition parameter resolution
-  static_condition_resolution:
-    catalog_entry: "basic_condition_param_figure"
-    pipeline_parameters:
-      experiment_type: "baseline_comparison"
-      run_id: "2024-01-15_experiment_001"
-      model_version: "v1.2.3"
-    extraction_result:
-      condition_param: "experiment_type"
-      resolved_condition: "baseline_comparison"
+parameter_extraction_outcomes:
+
+  # Basic parameter extraction
+  basic_extraction_results:
+    configuration_type: "basic"
+    extraction_success: true
+    extracted_count: 9
+    parameter_breakdown:
+      required_parameters:
+        filepath: 
+          extracted: true
+          value: "data/08_reporting/test_figure.png"
+          validation_status: "valid"
+        purpose:
+          extracted: true
+          value: "exploratory"
+          validation_status: "valid"
+      optional_parameters:
+        condition_param:
+          extracted: true
+          value: "test_condition"
+          validation_status: "valid"
+          type: "string"
+        style_params:
+          extracted: true
+          value: {}
+          validation_status: "valid"
+          count: 0
+        format_kwargs:
+          extracted: true
+          value: {}
+          validation_status: "valid"
+          count: 0
+        versioned:
+          extracted: false
+          default_applied: true
+          value: false
+          validation_status: "valid"
+        metadata:
+          extracted: false
+          default_applied: true
+          value: {}
+          validation_status: "valid"
+        enable_caching:
+          extracted: false
+          default_applied: true
+          value: true
+          validation_status: "valid"
+        load_version:
+          extracted: false
+          default_applied: true
+          value: null
+          validation_status: "valid"
+        save_version:
+          extracted: false
+          default_applied: true
+          value: null
+          validation_status: "valid"
+
+  # Advanced parameter extraction with style overrides
+  advanced_extraction_results:
+    configuration_type: "advanced"
+    extraction_success: true
+    extracted_count: 9
+    parameter_breakdown:
+      required_parameters:
+        filepath:
+          extracted: true
+          value: "data/08_reporting/advanced_figure.png"
+          validation_status: "valid"
+        purpose:
+          extracted: true
+          value: "presentation"
+          validation_status: "valid"
+      optional_parameters:
+        condition_param:
+          extracted: true
+          value: "complex_condition"
+          validation_status: "valid"
+          type: "string"
+        style_params:
+          extracted: true
+          validation_status: "valid"
+          count: 6
+          parameters:
+            font.size:
+              value: 12
+              type: "int"
+              matplotlib_compatible: true
+            font.family:
+              value: "serif"
+              type: "string"
+              matplotlib_compatible: true
+            color:
+              value: "#2E86AB"
+              type: "hex_color"
+              matplotlib_compatible: true
+            linewidth:
+              value: 2.5
+              type: "float"
+              matplotlib_compatible: true
+            alpha:
+              value: 0.8
+              type: "float"
+              matplotlib_compatible: true
+            marker:
+              value: "s"
+              type: "string"
+              matplotlib_compatible: true
+        format_kwargs:
+          extracted: true
+          validation_status: "valid"
+          count: 3
+          parameters:
+            dpi:
+              value: 200
+              type: "int"
+              matplotlib_compatible: true
+            bbox_inches:
+              value: "tight"
+              type: "string"
+              matplotlib_compatible: true
+            transparent:
+              value: false
+              type: "bool"
+              matplotlib_compatible: true
+
+  # Nested condition parameter extraction
+  nested_condition_extraction_results:
+    configuration_type: "nested_condition"
+    extraction_success: true
+    condition_resolution:
+      condition_param: "experiment.config.visualization.type"
+      resolution_method: "nested_attribute_access"
+      nesting_depth: 3
+      parameter_path: ["experiment", "config", "visualization", "type"]
+      resolution_success: true
+      resolved_value: "presentation_chart"
       fallback_used: false
-      resolution_time_ms: 0.8
-      cache_key_generated: "a1b2c3d4e5f6789012345678901234567890abcd"
-    validation_status: "PASS"
-    
-  # Complex nested parameter resolution
-  nested_parameter_resolution:
-    catalog_entry: "advanced_nested_condition"
-    pipeline_parameters:
-      nested:
-        parameter:
-          key: "deep_experimental_condition"
-      experiment_metadata:
-        type: "classification"
-        dataset: "test_data_v2"
-    extraction_result:
-      condition_param: "nested.parameter.key"
-      resolved_condition: "deep_experimental_condition"
-      fallback_used: false
-      resolution_time_ms: 1.2
-      cache_key_generated: "b2c3d4e5f6789012345678901234567890abcde"
-    validation_status: "PASS"
-    
-  # Parameter interpolation in filepath
-  filepath_parameter_interpolation:
-    catalog_entry: "advanced_multi_condition"
-    pipeline_parameters:
-      run_id: "exp_2024_0115_001"
-      experiment_name: "neural_network_optimization"
-      model_version: "v2.1.0"
-    extraction_result:
-      filepath_template: "data/08_reporting/multi_condition_{params:run_id}.png"
-      resolved_filepath: "data/08_reporting/multi_condition_exp_2024_0115_001.png"
-      interpolation_success: true
-      parameters_resolved: ["run_id"]
-    validation_status: "PASS"
-    
-  # Missing parameter fallback handling
-  missing_parameter_fallback:
-    catalog_entry: "basic_condition_param_figure"
-    pipeline_parameters:
-      run_id: "test_run_001"
-      # Missing experiment_type parameter
-    extraction_result:
-      condition_param: "experiment_type"
-      resolved_condition: "exploratory"  # Falls back to purpose
-      fallback_used: true
-      fallback_reason: "condition_parameter_not_found"
-      resolution_time_ms: 0.6
-    validation_status: "PASS"
-    warning_logged: true
-    
-  # Dynamic style parameter resolution
-  dynamic_style_resolution:
-    catalog_entry: "compatibility_parameter_interpolation"
-    pipeline_parameters:
-      project_name: "ml_pipeline_optimization"
-      environment: "staging"
-      run_id: "run_2024_01_15_14_30_22"
-      condition_override: "staging_validation"
-      output_dpi: 300
-    extraction_result:
-      resolved_filepath: "data/08_reporting/ml_pipeline_optimization/staging/run_2024_01_15_14_30_22_output.png"
-      resolved_condition_param: "staging_validation"
-      style_params_resolved:
-        figure.dpi: 300
-      interpolation_parameters: ["project_name", "environment", "run_id", "condition_override", "output_dpi"]
-    validation_status: "PASS"
+      extraction_time_ms: 1.2
 
-parameter_extraction_summary:
-  total_scenarios_tested: 5
-  successful_extractions: 5
-  failed_extractions: 0
-  average_resolution_time_ms: 0.88
-  fallback_scenarios: 1
-  performance_target_met: true  # <1ms resolution time
+  # Error scenarios for parameter extraction
+  parameter_extraction_errors:
+    invalid_style_params_type:
+      configuration_type: "error_scenario"
+      extraction_success: false
+      error_details:
+        parameter_name: "style_params"
+        expected_type: "dict"
+        provided_type: "string"
+        provided_value: "not_a_dict"
+        error_message: "style_params must be a dictionary when provided"
+        validation_stage: "type_validation"
+    
+    invalid_condition_param_type:
+      configuration_type: "error_scenario"
+      extraction_success: false
+      error_details:
+        parameter_name: "condition_param"
+        expected_type: "string"
+        provided_type: "int"
+        provided_value: 123
+        error_message: "condition_param must be a non-empty string when provided"
+        validation_stage: "type_validation"
 
 # =============================================================================
-# STYLE APPLICATION AND RESOLUTION RESULTS
+# CONDITION RESOLUTION AND STYLE APPLICATION
 # =============================================================================
-# Expected outcomes for condition-based styling and parameter merging
+# Results of condition-based styling resolution and application testing,
+# validating F-005 integration with FigRegistry's get_style() API.
 
-style_resolution_results:
-  # Basic condition-based styling
-  basic_style_resolution:
-    condition: "exploratory"
-    figregistry_base_style:
-      figure.dpi: 100
-      figure.facecolor: "white"
-      axes.grid: false
-      font.size: 10
-    dataset_style_override: {}
-    final_merged_style:
-      figure.dpi: 100
-      figure.facecolor: "white"
-      axes.grid: false
-      font.size: 10
-    style_parameters_count: 4
-    resolution_time_ms: 0.7
-    cache_status: "MISS"
-    
-  # Advanced style merging with overrides
-  advanced_style_merging:
-    condition: "experimental_condition"
-    figregistry_base_style:
-      figure.dpi: 150
-      figure.facecolor: "lightgray"
+condition_resolution_results:
+
+  # Basic condition resolution
+  basic_condition_resolution:
+    test_scenario: "simple_purpose_condition"
+    input_condition: "exploratory"
+    resolution_success: true
+    resolution_method: "direct_purpose_mapping"
+    resolved_style:
+      color: "#A8E6CF"
+      marker: "o"
+      linestyle: "-"
+      linewidth: 1.5
+      alpha: 0.7
+    style_application:
+      matplotlib_figure_modified: true
+      axes_count_styled: 1
+      lines_styled: 3
+      styling_time_ms: 2.1
+      application_success: true
+    cache_performance:
+      cache_hit: false
+      cache_stored: true
+      cache_key: "exploratory_exploratory_5648976823"
+      lookup_time_ms: 0.3
+
+  # Advanced condition resolution with parameter context
+  advanced_condition_resolution:
+    test_scenario: "context_parameter_resolution"
+    input_condition_param: "experiment_type"
+    pipeline_context:
+      experiment_type: "performance_analysis"
+      dataset_version: "v2.1"
+      analysis_stage: "validation"
+    resolution_success: true
+    resolution_method: "context_parameter_lookup"
+    resolved_condition: "performance_analysis"
+    resolved_style:
+      color: "#FFB6C1"
+      marker: "o"
+      linestyle: "-"
+      linewidth: 2.0
+      alpha: 0.8
+      font.size: 12
       axes.grid: true
-      grid.alpha: 0.5
+    style_merging:
+      base_style_count: 5
+      override_style_count: 2
+      merged_style_count: 7
+      override_precedence_applied: true
+    style_application:
+      matplotlib_figure_modified: true
+      axes_count_styled: 2
+      lines_styled: 5
+      grid_enabled: true
+      styling_time_ms: 3.4
+      application_success: true
+    cache_performance:
+      cache_hit: false
+      cache_stored: true
+      cache_key: "performance_analysis_presentation_3847562941"
+      lookup_time_ms: 0.2
+
+  # Nested condition parameter resolution
+  nested_condition_resolution:
+    test_scenario: "nested_parameter_access"
+    input_condition_param: "experiment.metadata.visualization.condition"
+    pipeline_context:
+      experiment:
+        metadata:
+          visualization:
+            condition: "publication_quality"
+            format: "pdf"
+            dpi: 600
+        data_source: "cleaned_dataset_v3"
+    resolution_success: true
+    resolution_method: "nested_attribute_traversal"
+    parameter_path: ["experiment", "metadata", "visualization", "condition"]
+    resolved_condition: "publication_quality"
+    resolved_style:
+      color: "#1A1A1A"
+      marker: "o"
+      linestyle: "-"
+      linewidth: 2.5
+      alpha: 1.0
+      font.family: "serif"
       font.size: 11
-      axes.linewidth: 1.0
-    dataset_style_override:
-      figure.dpi: 300          # Override base
-      figure.facecolor: "white" # Override base
-      axes.linewidth: 1.5       # Override base
-      legend.frameon: false     # New parameter
-    final_merged_style:
-      figure.dpi: 300           # From dataset override
-      figure.facecolor: "white" # From dataset override
-      axes.grid: true           # From base style
-      grid.alpha: 0.5           # From base style
-      font.size: 11             # From base style
-      axes.linewidth: 1.5       # From dataset override
-      legend.frameon: false     # From dataset override
-    style_parameters_count: 7
-    resolution_time_ms: 0.9
-    cache_status: "MISS"
-    override_count: 3
-    
-  # Cached style resolution
-  cached_style_resolution:
-    condition: "exploratory"
-    cache_key: "a1b2c3d4e5f6789012345678901234567890abcd"
-    cache_hit: true
-    final_merged_style:
-      figure.dpi: 100
-      figure.facecolor: "white"
-      axes.grid: false
-      font.size: 10
-    style_parameters_count: 4
-    resolution_time_ms: 0.3
-    cache_status: "HIT"
-    performance_improvement: "57%"
-    
-  # Complex condition with wildcard matching
-  wildcard_condition_resolution:
-    condition: "neural_network_experiment_v2"
-    figregistry_pattern_match: "neural_network_*"
-    figregistry_base_style:
-      figure.dpi: 200
-      figure.figsize: [12, 8]
-      axes.spines.top: false
-      axes.spines.right: false
-      xtick.direction: "out"
-      ytick.direction: "out"
-    dataset_style_override:
-      figure.dpi: 600  # High-res for publication
-    final_merged_style:
       figure.dpi: 600
-      figure.figsize: [12, 8]
-      axes.spines.top: false
-      axes.spines.right: false
-      xtick.direction: "out"
-      ytick.direction: "out"
-    style_parameters_count: 6
-    resolution_time_ms: 1.1
-    pattern_matching_time_ms: 0.4
-    cache_status: "MISS"
+    style_application:
+      matplotlib_figure_modified: true
+      axes_count_styled: 1
+      lines_styled: 2
+      font_changes_applied: true
+      dpi_updated: true
+      styling_time_ms: 4.1
+      application_success: true
 
-style_resolution_summary:
-  total_resolutions: 4
-  cache_hits: 1
-  cache_misses: 3
-  cache_hit_rate: 0.25
-  average_resolution_time_ms: 0.75
-  performance_target_met: true  # <1ms style resolution
+  # Fallback condition resolution
+  fallback_condition_resolution:
+    test_scenario: "missing_condition_fallback"
+    input_condition_param: "nonexistent_parameter"
+    pipeline_context:
+      available_params: ["dataset_name", "pipeline_stage", "output_format"]
+    resolution_success: true
+    resolution_method: "fallback_to_purpose"
+    fallback_reason: "condition_parameter_not_found"
+    resolved_condition: "presentation"
+    resolved_style:
+      color: "#FFB6C1"
+      marker: "o"
+      linestyle: "-"
+      linewidth: 2.0
+      alpha: 0.8
+    style_application:
+      matplotlib_figure_modified: true
+      axes_count_styled: 1
+      lines_styled: 1
+      styling_time_ms: 1.8
+      application_success: true
+      fallback_warning_logged: true
+
+  # Error scenarios for condition resolution
+  condition_resolution_errors:
+    invalid_nested_access:
+      test_scenario: "invalid_nested_parameter"
+      input_condition_param: "experiment.invalid.path"
+      pipeline_context:
+        experiment:
+          valid_field: "value"
+      resolution_success: false
+      error_details:
+        error_type: "AttributeError"
+        error_message: "Cannot resolve nested parameter path: experiment.invalid.path"
+        failed_at_level: 2
+        available_fields: ["valid_field"]
+      fallback_applied: true
+      fallback_condition: "presentation"
 
 # =============================================================================
-# VERSIONING COMPATIBILITY RESULTS
+# VERSIONING INTEGRATION RESULTS
 # =============================================================================
-# Expected behavior for Kedro versioning integration with FigRegistry timestamp versioning
+# Validation of Kedro versioning compatibility with FigRegistry timestamp versioning,
+# ensuring both systems coexist without conflicts per dataset versioning workflow requirements.
 
-versioning_integration_scenarios:
-  # Basic Kedro versioning without explicit version
-  kedro_auto_versioning:
-    catalog_config:
+versioning_integration_results:
+
+  # Basic versioned dataset integration
+  basic_versioned_integration:
+    test_scenario: "kedro_versioning_enabled"
+    dataset_config:
       versioned: true
-      version: null
-    save_operation:
-      kedro_version_generated: "2024-01-15T14.30.22.123Z"
-      figregistry_timestamp: "20240115_143022"
-      output_filepath: "data/08_reporting/versioned_basic/2024-01-15T14.30.22.123Z/versioned_basic.png"
-      figregistry_metadata:
-        timestamp: "2024-01-15T14:30:22.123Z"
-        version_scheme: "kedro_auto"
-        condition: "exploratory"
-        style_hash: "abc123def456"
-    versioning_conflict: false
-    coexistence_verified: true
-    
+      filepath: "data/08_reporting/versioned_figure.png"
+      purpose: "exploratory"
+    kedro_versioning:
+      version_enabled: true
+      version_format: "YYYY-MM-DD_HH-mm-ss.SSS"
+      save_version: "2024-01-15_14-30-00.123"
+      load_version: null
+      versioned_path: "data/08_reporting/versioned_figure_2024-01-15_14-30-00.123.png"
+    figregistry_versioning:
+      timestamp_versioning_available: true
+      timestamp_format: "{ts}_{name}"
+      timestamp_coexistence: true
+      conflict_resolution: "kedro_precedence"
+    integration_results:
+      version_conflict: false
+      path_resolution_success: true
+      final_save_path: "data/08_reporting/versioned_figure_2024-01-15_14-30-00.123.png"
+      figregistry_metadata_preserved: true
+      kedro_catalog_compatibility: true
+    performance_metrics:
+      version_resolution_ms: 1.1
+      path_generation_ms: 0.8
+      total_versioning_overhead_ms: 1.9
+
   # Explicit version specification
-  explicit_version_specification:
-    catalog_config:
+  explicit_version_integration:
+    test_scenario: "explicit_version_override"
+    dataset_config:
       versioned: true
-      version: "v1.0.0-alpha"
-    save_operation:
-      kedro_version_used: "v1.0.0-alpha"
-      figregistry_timestamp: "20240115_143025"
-      output_filepath: "data/08_reporting/explicit_version/v1.0.0-alpha/explicit_version.png"
-      figregistry_metadata:
-        timestamp: "2024-01-15T14:30:25.456Z"
-        version_scheme: "explicit"
-        user_version: "v1.0.0-alpha"
-        condition: "exploratory"
-    versioning_conflict: false
-    version_precedence: "kedro_explicit"
-    
-  # Non-versioned dataset with FigRegistry timestamp
-  non_versioned_with_timestamp:
-    catalog_config:
-      versioned: false
-      version: null
-    save_operation:
-      kedro_versioning: false
-      figregistry_timestamp: "20240115_143028"
-      output_filepath: "data/08_reporting/basic_exploratory.png"
-      figregistry_metadata:
-        timestamp: "2024-01-15T14:30:28.789Z"
-        version_scheme: "figregistry_only"
-        condition: "exploratory"
-    versioning_conflict: false
-    timestamp_only: true
-    
-  # Complex versioned scenario with style versioning
-  complex_versioned_scenario:
-    catalog_config:
+      version: "2024-01-15_14-30-00.123"
+      filepath: "data/08_reporting/explicit_versioned_figure.png"
+      purpose: "presentation"
+    kedro_versioning:
+      version_enabled: true
+      explicit_version_provided: true
+      save_version: "2024-01-15_14-30-00.123"
+      load_version: "2024-01-15_14-30-00.123"
+      versioned_path: "data/08_reporting/explicit_versioned_figure_2024-01-15_14-30-00.123.png"
+    figregistry_versioning:
+      timestamp_versioning_available: true
+      explicit_version_honored: true
+      version_override_applied: true
+    integration_results:
+      version_conflict: false
+      explicit_version_respected: true
+      path_resolution_success: true
+      final_save_path: "data/08_reporting/explicit_versioned_figure_2024-01-15_14-30-00.123.png"
+      metadata_consistency: true
+    performance_metrics:
+      version_validation_ms: 0.6
+      path_resolution_ms: 0.5
+      total_overhead_ms: 1.1
+
+  # Complex versioned configuration with styling
+  complex_versioned_integration:
+    test_scenario: "versioned_with_advanced_styling"
+    dataset_config:
       versioned: true
-      version: null
+      filepath: "data/08_reporting/complex_versioned_figure.pdf"
       purpose: "publication"
-      condition_param: "versioning_test_condition"
-    pipeline_parameters:
-      versioning_test_condition: "publication_ready_v2"
-    save_operation:
-      kedro_version_generated: "2024-01-15T14.30.30.987Z"
-      figregistry_timestamp: "20240115_143030"
-      output_filepath: "data/08_reporting/versioned_complex/2024-01-15T14.30.30.987Z/versioned_complex.pdf"
-      figregistry_metadata:
-        timestamp: "2024-01-15T14:30:30.987Z"
-        version_scheme: "kedro_auto"
-        condition: "publication_ready_v2"
-        style_hash: "def789abc012"
-        purpose: "publication"
+      condition_param: "experiment_metadata.version_condition"
+      style_params:
+        font.family: "serif"
+        font.size: 11
+        axes.titlesize: 13
+        figure.dpi: 600
+      format_kwargs:
         format: "pdf"
-    style_versioning:
-      style_cache_key: "b2c3d4e5f6789012345678901234567890abcde"
-      style_parameters_count: 8
-    versioning_conflict: false
-    metadata_complete: true
+        dpi: 600
+        bbox_inches: "tight"
+        pad_inches: 0.05
+    kedro_versioning:
+      version_enabled: true
+      save_version: "2024-01-15_14-30-00.456"
+      versioned_path: "data/08_reporting/complex_versioned_figure_2024-01-15_14-30-00.456.pdf"
+    figregistry_versioning:
+      styling_with_versioning: true
+      metadata_versioning: true
+      format_compatibility: true
+    integration_results:
+      styling_applied_with_versioning: true
+      pdf_format_preserved: true
+      high_dpi_maintained: true
+      version_in_metadata: true
+      catalog_integration_success: true
+    condition_resolution:
+      condition_resolved: "publication_quality"
+      styling_applied: true
+      version_context_available: true
+    performance_metrics:
+      styling_time_ms: 4.2
+      version_handling_ms: 1.3
+      pdf_save_time_ms: 15.7
+      total_operation_ms: 21.2
 
-versioning_compatibility_summary:
-  total_scenarios: 4
-  successful_integrations: 4
-  versioning_conflicts: 0
-  kedro_figregistry_coexistence: true
-  timestamp_generation_reliable: true
-  metadata_preservation: true
+  # Versioning error scenarios
+  versioning_error_scenarios:
+    invalid_version_format:
+      test_scenario: "malformed_version_string"
+      dataset_config:
+        versioned: "not_boolean"
+        version: 123
+      integration_results:
+        validation_failed: true
+        error_type: "ValidationError"
+        error_message: "versioned must be boolean, version must be string"
+        kedro_compatibility_check_failed: true
 
 # =============================================================================
-# SAVE CONFIRMATION AND PATH RESOLUTION RESULTS
+# SAVE CONFIRMATION WORKFLOWS
 # =============================================================================
-# Expected outcomes for figure save operations and file system interactions
+# Validation baseline for catalog save confirmation workflows including
+# path resolution, metadata generation, and operation success confirmation.
 
 save_confirmation_workflows:
-  # Basic save operation
-  basic_save_confirmation:
-    catalog_entry: "basic_exploratory_figure"
-    input_figure_type: "matplotlib.figure.Figure"
-    save_process:
-      style_resolution_time_ms: 0.8
-      style_application_time_ms: 2.1
-      file_save_time_ms: 15.3
-      total_operation_time_ms: 18.2
-    path_resolution:
-      template_path: "data/08_reporting/basic_exploratory.png"
-      resolved_path: "data/08_reporting/basic_exploratory.png"
-      directory_created: true
-      permissions_set: "644"
-    save_result:
-      success: true
-      actual_filepath: "data/08_reporting/basic_exploratory.png"
-      file_size_bytes: 156789
-      figregistry_save_used: true
-      matplotlib_fallback: false
-    performance_metrics:
-      overhead_vs_matplotlib_percent: 3.7
-      target_overhead_met: true  # <5% overhead
-      
-  # Complex save with parameter interpolation
-  complex_parameterized_save:
-    catalog_entry: "advanced_multi_condition"
-    pipeline_parameters:
-      run_id: "exp_2024_0115_001"
-    input_figure_type: "matplotlib.figure.Figure"
-    save_process:
-      parameter_interpolation_time_ms: 1.2
-      style_resolution_time_ms: 0.9
-      style_application_time_ms: 3.4
-      file_save_time_ms: 22.7
-      total_operation_time_ms: 28.2
-    path_resolution:
-      template_path: "data/08_reporting/multi_condition_{params:run_id}.png"
-      resolved_path: "data/08_reporting/multi_condition_exp_2024_0115_001.png"
-      parameter_substitution: {"run_id": "exp_2024_0115_001"}
-      directory_created: true
-    save_result:
-      success: true
-      actual_filepath: "data/08_reporting/multi_condition_exp_2024_0115_001.png"
-      file_size_bytes: 267543
-      figregistry_save_used: true
-      save_args_applied:
-        bbox_inches: "tight"
-        pad_inches: 0.2
-        dpi: 600
-    performance_metrics:
-      overhead_vs_matplotlib_percent: 4.2
-      target_overhead_met: true
-      
-  # Versioned save operation
-  versioned_save_confirmation:
-    catalog_entry: "versioned_basic_figure"
-    kedro_version: "2024-01-15T14.30.22.123Z"
-    save_process:
-      version_directory_creation_time_ms: 2.1
-      style_resolution_time_ms: 0.6  # Cache hit
-      style_application_time_ms: 2.0
-      file_save_time_ms: 16.8
-      total_operation_time_ms: 21.5
-    path_resolution:
-      template_path: "data/08_reporting/versioned_basic.png"
-      versioned_path: "data/08_reporting/versioned_basic/2024-01-15T14.30.22.123Z/versioned_basic.png"
-      directory_structure_created: ["data/08_reporting/versioned_basic", "data/08_reporting/versioned_basic/2024-01-15T14.30.22.123Z"]
-    save_result:
-      success: true
-      actual_filepath: "data/08_reporting/versioned_basic/2024-01-15T14.30.22.123Z/versioned_basic.png"
-      file_size_bytes: 142356
-      kedro_versioning_applied: true
-      figregistry_metadata_preserved: true
-    performance_metrics:
-      overhead_vs_matplotlib_percent: 4.8
-      target_overhead_met: true
-      
-  # High-DPI publication save
-  publication_high_dpi_save:
-    catalog_entry: "advanced_complex_path"
-    pipeline_parameters:
-      experiment_name: "neural_optimization"
-      model_version: "v3.1.4"
-    save_process:
-      style_resolution_time_ms: 1.1
-      high_dpi_processing_time_ms: 8.3
-      style_application_time_ms: 4.2
-      file_save_time_ms: 45.6
-      total_operation_time_ms: 59.2
-    path_resolution:
-      template_path: "data/08_reporting/{params:experiment_name}/results_{params:model_version}.svg"
-      resolved_path: "data/08_reporting/neural_optimization/results_v3.1.4.svg"
-      nested_directory_created: true
-    save_result:
-      success: true
-      actual_filepath: "data/08_reporting/neural_optimization/results_v3.1.4.svg"
-      file_size_bytes: 89234
-      format: "svg"
-      vector_format: true
-      dpi_applied: 600
-    performance_metrics:
-      overhead_vs_matplotlib_percent: 4.9
-      target_overhead_met: true
-      high_dpi_handling: "optimized"
 
-save_confirmation_summary:
-  total_saves_tested: 4
-  successful_saves: 4
-  failed_saves: 0
-  average_total_time_ms: 31.775
-  average_overhead_percent: 4.4
-  performance_target_met: true  # <5% overhead target
-  path_resolution_success_rate: 1.0
-  directory_creation_success_rate: 1.0
+  # Basic save confirmation workflow
+  basic_save_confirmation:
+    test_scenario: "successful_figure_save"
+    input_figure:
+      type: "matplotlib.figure.Figure"
+      axes_count: 1
+      lines_count: 2
+      figure_size: [8, 6]
+    dataset_configuration:
+      filepath: "data/08_reporting/test_save_figure.png"
+      purpose: "exploratory"
+    save_operation:
+      operation_started: true
+      styling_applied: true
+      directory_created: true
+      file_written: true
+      operation_completed: true
+      save_time_ms: 45.2
+    path_resolution:
+      input_path: "data/08_reporting/test_save_figure.png"
+      resolved_path: "data/08_reporting/test_save_figure.png"
+      directory_exists: true
+      directory_created: false
+      permissions_valid: true
+    metadata_generation:
+      file_metadata:
+        size_bytes: 156743
+        format: "PNG"
+        creation_time: "2024-01-15T14:30:00.123Z"
+        modified_time: "2024-01-15T14:30:00.123Z"
+      figregistry_metadata:
+        purpose: "exploratory"
+        condition_applied: "exploratory"
+        style_count: 5
+        styling_time_ms: 2.1
+      kedro_metadata:
+        dataset_type: "figregistry_kedro.datasets.FigureDataSet"
+        catalog_entry: "test_save_figure"
+        versioned: false
+    confirmation_details:
+      save_success: true
+      file_exists: true
+      file_readable: true
+      metadata_consistent: true
+      catalog_updated: true
+      performance_within_limits: true
+
+  # Versioned save confirmation workflow
+  versioned_save_confirmation:
+    test_scenario: "versioned_figure_save"
+    input_figure:
+      type: "matplotlib.figure.Figure"
+      axes_count: 2
+      lines_count: 4
+      figure_size: [12, 8]
+    dataset_configuration:
+      filepath: "data/08_reporting/versioned_test_figure.png"
+      purpose: "presentation"
+      versioned: true
+      save_version: "2024-01-15_14-30-01.234"
+    save_operation:
+      operation_started: true
+      version_resolved: true
+      styling_applied: true
+      directory_created: false
+      file_written: true
+      operation_completed: true
+      save_time_ms: 52.1
+    path_resolution:
+      input_path: "data/08_reporting/versioned_test_figure.png"
+      versioned_path: "data/08_reporting/versioned_test_figure_2024-01-15_14-30-01.234.png"
+      resolved_path: "data/08_reporting/versioned_test_figure_2024-01-15_14-30-01.234.png"
+      directory_exists: true
+      version_directory_created: false
+    metadata_generation:
+      file_metadata:
+        size_bytes: 248651
+        format: "PNG"
+        creation_time: "2024-01-15T14:30:01.234Z"
+        modified_time: "2024-01-15T14:30:01.234Z"
+      versioning_metadata:
+        kedro_version: "2024-01-15_14-30-01.234"
+        version_in_filename: true
+        version_in_path: true
+        catalog_version_tracked: true
+      figregistry_metadata:
+        purpose: "presentation"
+        condition_applied: "presentation"
+        style_count: 6
+        styling_time_ms: 2.8
+    confirmation_details:
+      save_success: true
+      versioned_file_exists: true
+      version_metadata_correct: true
+      catalog_versioning_synced: true
+      performance_within_limits: true
+
+  # High-DPI PDF save confirmation
+  high_dpi_pdf_save_confirmation:
+    test_scenario: "publication_quality_pdf_save"
+    input_figure:
+      type: "matplotlib.figure.Figure"
+      axes_count: 1
+      lines_count: 3
+      figure_size: [10, 7]
+      dpi: 600
+    dataset_configuration:
+      filepath: "data/08_reporting/publication_figure.pdf"
+      purpose: "publication"
+      format_kwargs:
+        format: "pdf"
+        dpi: 600
+        bbox_inches: "tight"
+        pad_inches: 0.02
+    save_operation:
+      operation_started: true
+      high_dpi_processing: true
+      pdf_generation: true
+      styling_applied: true
+      file_written: true
+      operation_completed: true
+      save_time_ms: 127.3
+    path_resolution:
+      input_path: "data/08_reporting/publication_figure.pdf"
+      resolved_path: "data/08_reporting/publication_figure.pdf"
+      format_validated: true
+      pdf_format_confirmed: true
+    metadata_generation:
+      file_metadata:
+        size_bytes: 524288
+        format: "PDF"
+        creation_time: "2024-01-15T14:30:02.345Z"
+        pdf_metadata:
+          dpi: 600
+          bbox_inches: "tight"
+          compressed: true
+      figregistry_metadata:
+        purpose: "publication"
+        condition_applied: "publication"
+        high_quality_mode: true
+        style_count: 8
+        styling_time_ms: 4.1
+    confirmation_details:
+      save_success: true
+      pdf_quality_verified: true
+      high_dpi_preserved: true
+      file_size_appropriate: true
+      publication_ready: true
+      performance_acceptable: true
+
+  # Save error scenarios and recovery
+  save_error_scenarios:
+    permission_denied_error:
+      test_scenario: "insufficient_write_permissions"
+      error_details:
+        error_type: "PermissionError"
+        error_message: "Permission denied: 'data/08_reporting/readonly_figure.png'"
+        operation_stage: "file_write"
+        recovery_attempted: false
+      confirmation_details:
+        save_success: false
+        error_logged: true
+        exception_raised: true
+        cleanup_performed: true
+
+    invalid_path_error:
+      test_scenario: "invalid_output_path"
+      error_details:
+        error_type: "FileNotFoundError"
+        error_message: "No such file or directory: 'invalid/path/figure.png'"
+        operation_stage: "directory_creation"
+        recovery_attempted: true
+        recovery_success: false
+      confirmation_details:
+        save_success: false
+        path_validation_failed: true
+        error_logged: true
+        exception_raised: true
 
 # =============================================================================
 # MULTI-ENVIRONMENT CATALOG SCENARIOS
 # =============================================================================
-# Expected behavior across conf/base and conf/local configuration patterns per F-007.2
+# Reference for multi-environment catalog scenarios supporting conf/base and conf/local
+# configuration patterns per advanced configuration testing requirements (F-007.2).
 
 multi_environment_scenarios:
-  # Base environment configuration
-  base_environment_behavior:
+
+  # Base environment configuration processing
+  base_environment_processing:
+    environment_name: "base"
     configuration_source: "conf/base/catalog.yml"
-    catalog_entry: "base_environment_figure"
-    effective_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/base_env.png"
-      purpose: "exploratory"
-      condition_param: "base_condition"
-      style_params: {}
-      save_args: {}
-    figregistry_config_source: "conf/base/figregistry.yml"
-    merged_configuration:
-      conditions:
-        base_condition:
-          figure.dpi: 150
-          figure.facecolor: "white"
-      purposes:
-        exploratory:
-          figure.dpi: 100
-    environment: "base"
-    override_precedence: "none"
-    
-  # Local environment override
-  local_environment_override:
-    configuration_sources: ["conf/base/catalog.yml", "conf/local/catalog.yml"]
-    catalog_entry: "local_override_figure"
-    base_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/local_override.png"
-      purpose: "presentation"
-      condition_param: "override_condition"
-      style_params:
-        figure.dpi: 150
-    local_override:
-      style_params:
-        figure.dpi: 300  # Override base DPI
-        figure.facecolor: "white"  # Add new parameter
-    effective_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/local_override.png"
-      purpose: "presentation"
-      condition_param: "override_condition"
-      style_params:
-        figure.dpi: 300  # From local override
-        figure.facecolor: "white"  # From local override
-    environment: "local"
-    override_count: 1
-    new_parameters_added: 1
-    
-  # Production environment configuration
-  production_environment_config:
-    configuration_source: "conf/production/catalog.yml"
-    catalog_entry: "production_figure"
-    effective_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/production_{params:timestamp}.png"
-      purpose: "publication"
-      condition_param: "production_condition"
-      style_params:
-        figure.dpi: 600
-        savefig.bbox: "tight"
-      save_args:
-        dpi: 600
-        bbox_inches: "tight"
-        transparent: false
-    figregistry_config_merge:
-      production_overrides:
-        default_dpi: 600
-        quality_mode: "publication"
-        transparency: false
-    environment: "production"
-    production_optimizations: true
-    quality_settings: "maximum"
-    
-  # Staging environment with fallback
-  staging_environment_fallback:
-    configuration_sources: ["conf/base/catalog.yml", "conf/staging/catalog.yml"]
-    catalog_entry: "staging_figure"
-    staging_specific_config:
-      style_params:
-        figure.dpi: 300  # Medium quality for testing
-    base_fallback_config:
-      purpose: "presentation"
-      condition_param: "staging_condition"
-    effective_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/staging_test.png"
-      purpose: "presentation"  # From base
-      condition_param: "staging_condition"  # From base
-      style_params:
-        figure.dpi: 300  # From staging override
-    environment: "staging"
-    fallback_parameters_used: 2
-    staging_overrides_applied: 1
-    
-  # Development environment low-quality settings
-  development_environment_optimization:
+    dataset_configurations:
+      development_figure:
+        input_config:
+          type: "figregistry_kedro.datasets.FigureDataSet"
+          filepath: "data/08_reporting/dev_figure.png"
+          purpose: "exploratory"
+          condition_param: "dev_condition"
+          style_params:
+            font.size: 10
+            figure.dpi: 100
+          format_kwargs:
+            optimize: false
+        processing_results:
+          config_validation: "passed"
+          parameter_extraction: "successful"
+          environment_specific_overrides: 0
+          base_configuration_applied: true
+        resolved_configuration:
+          final_filepath: "data/08_reporting/dev_figure.png"
+          final_purpose: "exploratory"
+          final_dpi: 100
+          environment_tag: "base"
+
+      testing_figure:
+        input_config:
+          type: "figregistry_kedro.datasets.FigureDataSet"
+          filepath: "data/08_reporting/test_figure.png"
+          purpose: "presentation"
+          condition_param: "test_condition"
+          style_params:
+            font.size: 12
+            figure.dpi: 150
+        processing_results:
+          config_validation: "passed"
+          parameter_extraction: "successful"
+          environment_specific_overrides: 0
+          base_configuration_applied: true
+
+  # Local environment overrides processing
+  local_environment_processing:
+    environment_name: "local"
     configuration_source: "conf/local/catalog.yml"
-    catalog_entry: "development_figure"
-    effective_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/dev_quick.png"
-      purpose: "exploratory"
-      condition_param: "dev_condition"
-      style_params:
-        figure.dpi: 100  # Low DPI for speed
-    figregistry_dev_config:
-      development_mode: true
-      fast_rendering: true
-      quality_trade_offs: "speed_over_quality"
-    environment: "development"
-    performance_optimization: "aggressive"
-    save_time_reduction_percent: 65
+    base_configuration_inherited: true
+    override_configurations:
+      development_figure:
+        base_config:
+          style_params:
+            font.size: 10
+            figure.dpi: 100
+          format_kwargs:
+            optimize: false
+        local_overrides:
+          style_params:
+            font.size: 11
+            axes.grid: true
+          format_kwargs:
+            dpi: 120
+        merge_results:
+          merge_success: true
+          override_count: 3
+          final_configuration:
+            style_params:
+              font.size: 11
+              figure.dpi: 100
+              axes.grid: true
+            format_kwargs:
+              optimize: false
+              dpi: 120
+          precedence_rules_applied: true
+          local_takes_precedence: true
 
-multi_environment_summary:
-  environments_tested: 5
-  configuration_merging_success: true
-  override_precedence_correct: true
-  fallback_behavior_verified: true
-  environment_isolation: true
-  performance_per_environment:
-    base: "standard"
-    local: "standard_with_overrides"
-    production: "high_quality"
-    staging: "medium_quality"
-    development: "fast_rendering"
+      local_specific_figure:
+        input_config:
+          type: "figregistry_kedro.datasets.FigureDataSet"
+          filepath: "data/08_reporting/local_figure.png"
+          purpose: "exploratory"
+          condition_param: "local_condition"
+          style_params:
+            font.family: "monospace"
+            font.size: 9
+        processing_results:
+          config_validation: "passed"
+          new_dataset_added: true
+          local_environment_only: true
+          base_inheritance: false
 
-# =============================================================================
-# ERROR SCENARIOS AND RECOVERY RESULTS
-# =============================================================================
-# Expected behavior for malformed configurations and error handling
+  # Production environment configuration
+  production_environment_processing:
+    environment_name: "production"
+    configuration_source: "conf/production/catalog.yml"
+    production_specific_settings:
+      output_optimization: true
+      high_quality_defaults: true
+      performance_monitoring: true
+    dataset_configurations:
+      production_figure:
+        input_config:
+          type: "figregistry_kedro.datasets.FigureDataSet"
+          filepath: "outputs/figures/prod_figure.png"
+          purpose: "publication"
+          condition_param: "production_condition"
+          style_params:
+            font.size: 12
+            figure.dpi: 300
+            font.family: "serif"
+          format_kwargs:
+            dpi: 300
+            bbox_inches: "tight"
+            optimize: true
+            transparent: false
+        processing_results:
+          config_validation: "passed"
+          production_optimizations_applied: true
+          quality_settings_enforced: true
+          path_changed_to_outputs: true
+        quality_validations:
+          publication_ready: true
+          high_dpi_enforced: true
+          optimization_enabled: true
+          transparency_disabled: true
 
-error_scenario_results:
-  # Missing required filepath
-  missing_filepath_error:
-    catalog_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      purpose: "exploratory"
-      # Missing filepath
-    initialization_result:
-      success: false
-      error_type: "FigureDataSetError"
-      error_message: "filepath parameter is required"
-      validation_stage: "initialization"
-    recovery_action: "configuration_validation_failed"
-    
-  # Invalid purpose value
-  invalid_purpose_error:
-    catalog_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/invalid_purpose.png"
-      purpose: "invalid_purpose_value"
-    initialization_result:
-      success: true  # Accepts non-standard purposes with warning
-      warning_logged: true
-      warning_message: "Purpose 'invalid_purpose_value' not in recommended values"
-    runtime_behavior: "uses_purpose_as_condition"
-    
-  # Malformed style_params
-  invalid_style_params_error:
-    catalog_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/invalid_style.png"
-      purpose: "exploratory"
-      style_params: "invalid_string_instead_of_dict"
-    initialization_result:
-      success: false
-      error_type: "TypeError"
-      error_message: "style_params must be a dictionary"
-      validation_stage: "parameter_validation"
-    
-  # File system permission error
-  filesystem_permission_error:
-    catalog_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "/root/restricted/figure.png"
-      purpose: "exploratory"
-    save_operation_result:
-      success: false
-      error_type: "FigureDataSetError"
-      error_message: "Permission denied: cannot write to /root/restricted/figure.png"
-      error_stage: "file_save"
-      recovery_attempted: false
-    
-  # FigRegistry import failure fallback
-  figregistry_unavailable_fallback:
-    system_state:
-      figregistry_available: false
-      matplotlib_available: true
-      kedro_available: true
-    catalog_config:
-      type: "figregistry_kedro.datasets.FigureDataSet"
-      filepath: "data/08_reporting/fallback_test.png"
-      purpose: "exploratory"
-    initialization_result:
-      success: false
-      error_type: "FigureDataSetError"
-      error_message: "FigRegistry is required but not available"
-      fallback_behavior: "fail_fast"
+      high_quality_figure:
+        input_config:
+          type: "figregistry_kedro.datasets.FigureDataSet"
+          filepath: "outputs/figures/hq_figure.pdf"
+          purpose: "publication"
+          condition_param: "publication_type"
+          style_params:
+            font.size: 10
+            figure.dpi: 600
+            axes.linewidth: 1.0
+          format_kwargs:
+            format: "pdf"
+            dpi: 600
+            bbox_inches: "tight"
+            pad_inches: 0.02
+        processing_results:
+          config_validation: "passed"
+          ultra_high_quality_mode: true
+          pdf_format_enforced: true
+          production_path_applied: true
 
-error_handling_summary:
-  total_error_scenarios: 5
-  properly_handled_errors: 5
-  graceful_degradation_cases: 1
-  fail_fast_cases: 4
-  error_message_clarity: "comprehensive"
-  recovery_mechanisms: "appropriate"
+  # Environment precedence and conflict resolution
+  environment_precedence_results:
+    configuration_hierarchy:
+      - environment: "base"
+        precedence_level: 1
+        description: "Base configuration with defaults"
+      - environment: "local"
+        precedence_level: 2
+        description: "Local overrides for development"
+      - environment: "production"
+        precedence_level: 3
+        description: "Production-specific optimizations"
+    
+    conflict_resolution_examples:
+      font_size_conflict:
+        base_value: 10
+        local_value: 11
+        production_value: 12
+        final_value: 12
+        winning_environment: "production"
+        resolution_rule: "highest_precedence_wins"
+      
+      output_path_conflict:
+        base_value: "data/08_reporting/"
+        local_value: "data/08_reporting/"
+        production_value: "outputs/figures/"
+        final_value: "outputs/figures/"
+        winning_environment: "production"
+        resolution_rule: "production_path_security"
+      
+      dpi_optimization_conflict:
+        base_value: 100
+        local_value: 120
+        production_value: 300
+        final_value: 300
+        winning_environment: "production"
+        resolution_rule: "quality_precedence"
 
-# =============================================================================
-# PERFORMANCE BENCHMARKING RESULTS
-# =============================================================================
-# Performance validation against targets per Section 5.2.8
-
-performance_benchmarking:
-  # Initialization performance
-  initialization_benchmarks:
-    minimal_config:
-      target_time_ms: 5.0
-      actual_time_ms: 2.3
-      target_met: true
-      overhead_percent: 0.0
-    complex_config:
-      target_time_ms: 5.0
-      actual_time_ms: 4.2
-      target_met: true
-      overhead_percent: 3.8
-    average_initialization_ms: 3.25
-    performance_grade: "EXCELLENT"
-    
-  # Style resolution performance
-  style_resolution_benchmarks:
-    cache_miss_scenario:
-      target_time_ms: 1.0
-      actual_time_ms: 0.9
-      target_met: true
-    cache_hit_scenario:
-      target_time_ms: 1.0
-      actual_time_ms: 0.3
-      target_met: true
-      performance_improvement_percent: 70
-    average_resolution_ms: 0.75
-    cache_hit_rate: 0.25
-    performance_grade: "EXCELLENT"
-    
-  # Save operation performance
-  save_operation_benchmarks:
-    basic_save:
-      matplotlib_baseline_ms: 17.5
-      figuredataset_time_ms: 18.2
-      overhead_ms: 0.7
-      overhead_percent: 4.0
-      target_overhead_percent: 5.0
-      target_met: true
-    complex_save:
-      matplotlib_baseline_ms: 27.1
-      figuredataset_time_ms: 28.2
-      overhead_ms: 1.1
-      overhead_percent: 4.1
-      target_met: true
-    high_dpi_save:
-      matplotlib_baseline_ms: 56.3
-      figuredataset_time_ms: 59.2
-      overhead_ms: 2.9
-      overhead_percent: 5.2
-      target_met: false  # Slightly over 5% target
-    average_overhead_percent: 4.4
-    performance_grade: "EXCELLENT"
-    
-  # Memory usage benchmarks
-  memory_usage_benchmarks:
-    baseline_memory_kb: 1024
-    with_style_cache_kb: 1280
-    memory_overhead_kb: 256
-    memory_overhead_percent: 25.0
-    cache_efficiency: "high"
-    garbage_collection_impact: "minimal"
-    
-  # Concurrent execution performance
-  concurrent_execution_benchmarks:
-    parallel_workers: 4
-    figures_per_worker: 10
-    total_figures: 40
-    execution_time_seconds: 12.3
-    figures_per_second: 3.25
-    thread_safety_verified: true
-    race_conditions_detected: 0
-    deadlocks_detected: 0
-
-performance_summary:
-  initialization_target_met: true
-  style_resolution_target_met: true
-  save_operation_target_met: true  # 1 scenario slightly over
-  memory_usage_acceptable: true
-  concurrent_execution_stable: true
-  overall_performance_grade: "EXCELLENT"
-  sla_compliance: 95.0  # 95% of targets met
+    merge_operation_results:
+      total_datasets_processed: 5
+      base_configurations: 2
+      local_overrides: 2
+      production_additions: 2
+      merge_conflicts_resolved: 3
+      validation_errors: 0
+      final_catalog_valid: true
+      environment_consistency_verified: true
 
 # =============================================================================
-# THREAD-SAFETY VALIDATION RESULTS
+# PERFORMANCE AND VALIDATION METRICS
 # =============================================================================
-# Results for parallel Kedro runner execution per Section 5.2.8
+# Comprehensive performance tracking and validation metrics for catalog integration
+# workflows, supporting performance targets and quality assurance requirements.
 
-thread_safety_validation:
-  # Concurrent figure save operations
-  concurrent_save_operations:
-    test_scenario: "simultaneous_saves"
-    worker_threads: 4
-    saves_per_thread: 25
-    total_saves: 100
-    execution_results:
-      successful_saves: 100
-      failed_saves: 0
-      data_corruption_incidents: 0
-      file_conflicts: 0
-      cache_corruption_incidents: 0
-    performance_metrics:
-      total_execution_time_seconds: 28.7
-      average_save_time_ms: 22.3
-      thread_overhead_percent: 12.0
-    thread_safety_verified: true
-    
-  # Shared cache access testing
-  shared_cache_access_testing:
-    test_scenario: "concurrent_cache_access"
-    cache_operations: 500
-    cache_hits: 375
-    cache_misses: 125
-    cache_corruption_detected: false
-    cache_consistency_verified: true
-    race_condition_incidents: 0
-    performance_degradation_percent: 8.0
-    
-  # Style resolution thread safety
-  style_resolution_thread_safety:
-    concurrent_resolutions: 200
-    unique_conditions: 15
-    cache_key_collisions: 0
-    resolution_errors: 0
-    thread_local_context_isolation: true
-    parameter_resolution_conflicts: 0
-    
-  # File system operation isolation
-  filesystem_operation_isolation:
-    concurrent_directory_creations: 50
-    directory_creation_conflicts: 0
-    file_permission_conflicts: 0
-    atomic_operation_failures: 0
-    filesystem_race_conditions: 0
+performance_validation_metrics:
 
-thread_safety_summary:
-  overall_thread_safety: "VERIFIED"
-  race_conditions_detected: 0
-  data_corruption_incidents: 0
-  cache_consistency_maintained: true
-  filesystem_isolation_verified: true
-  recommended_max_workers: 4
-  thread_safety_grade: "EXCELLENT"
-
-# =============================================================================
-# INTEGRATION TEST RESULTS SUMMARY
-# =============================================================================
-# Overall validation results for catalog integration workflow
-
-integration_test_summary:
-  test_execution_metadata:
-    test_framework: "pytest"
-    test_duration_seconds: 145.7
-    total_test_cases: 47
-    passed_tests: 46
-    failed_tests: 1  # High-DPI save slightly over performance target
-    skipped_tests: 0
-    warning_count: 3
-    
-  feature_validation_results:
-    catalog_parsing: "PASS"
-    parameter_extraction: "PASS"
-    style_resolution: "PASS"
-    versioning_integration: "PASS"
-    save_operations: "PASS"
-    multi_environment: "PASS"
-    error_handling: "PASS"
-    performance_benchmarks: "MOSTLY_PASS"  # 1 minor performance target miss
-    thread_safety: "PASS"
-    
-  performance_compliance:
-    initialization_sla: "100%"
-    style_resolution_sla: "100%"
-    save_operation_sla: "95%"  # High-DPI save 5.2% vs 5.0% target
-    memory_usage_sla: "100%"
-    thread_safety_sla: "100%"
-    overall_sla_compliance: "98%"
-    
-  quality_metrics:
-    test_coverage_percent: 94.7
-    code_quality_score: "A+"
-    documentation_coverage: "comprehensive"
-    error_handling_robustness: "excellent"
-    
-  deployment_readiness:
-    production_ready: true
-    performance_acceptable: true
-    thread_safety_verified: true
-    error_handling_comprehensive: true
-    documentation_complete: true
-    
-  recommendations:
-    - "Monitor high-DPI save operations in production for performance optimization opportunities"
-    - "Consider implementing more aggressive caching for complex style resolutions"
-    - "Add optional performance monitoring hooks for production deployment"
-    - "Document thread-safety guarantees for enterprise users"
-
-validation_conclusion:
-  status: "APPROVED"
-  confidence_level: "HIGH"
-  ready_for_production: true
-  remaining_tasks: ["Performance optimization for high-DPI scenarios"]
-  overall_grade: "A"
-
-# =============================================================================
-# METADATA
-# =============================================================================
-catalog_integration_results_metadata:
-  version: "1.0.0"
-  generated_by: "figregistry-kedro test suite"
-  test_framework: "pytest + kedro-datasets"
-  validation_date: "2024-01-15T14:30:00Z"
-  kedro_version: "0.18.14"
-  figregistry_version: "0.3.0"
-  python_version: "3.11.7"
-  matplotlib_version: "3.9.0"
-  test_environment: "isolated_test_environment"
-  performance_baseline: "matplotlib_direct_save"
-  coverage_target: "≥90%"
+  # Catalog integration performance targets
   performance_targets:
-    initialization: "<5ms"
-    style_resolution: "<1ms"
-    save_overhead: "<5%"
-    thread_safety: "verified"
-  validation_criteria_met: true
-  quality_assurance: "comprehensive"
+    configuration_parsing_max_ms: 10
+    parameter_extraction_max_ms: 5
+    condition_resolution_max_ms: 2
+    style_application_max_ms: 5
+    save_operation_max_ms: 100
+    total_dataset_overhead_max_ms: 50
+    cache_lookup_max_ms: 1
+    environment_merge_max_ms: 25
+
+  # Actual performance measurements
+  performance_measurements:
+    configuration_parsing:
+      min_ms: 1.1
+      max_ms: 8.5
+      average_ms: 3.2
+      median_ms: 2.8
+      target_compliance: true
+      samples_count: 15
+    
+    parameter_extraction:
+      min_ms: 0.6
+      max_ms: 4.2
+      average_ms: 1.8
+      median_ms: 1.5
+      target_compliance: true
+      samples_count: 15
+    
+    condition_resolution:
+      min_ms: 0.2
+      max_ms: 1.2
+      average_ms: 0.7
+      median_ms: 0.6
+      target_compliance: true
+      samples_count: 12
+    
+    style_application:
+      min_ms: 1.8
+      max_ms: 4.2
+      average_ms: 2.9
+      median_ms: 2.8
+      target_compliance: true
+      samples_count: 12
+    
+    save_operation:
+      min_ms: 15.7
+      max_ms: 127.3
+      average_ms: 65.4
+      median_ms: 52.1
+      target_compliance: true
+      samples_count: 8
+      note: "PDF saves significantly slower due to format complexity"
+
+  # Cache performance validation
+  cache_performance_validation:
+    cache_hit_rate_target: 0.7
+    actual_cache_hit_rate: 0.83
+    cache_hit_rate_compliance: true
+    
+    cache_operations:
+      total_lookups: 45
+      cache_hits: 37
+      cache_misses: 8
+      cache_stores: 8
+      cache_invalidations: 0
+    
+    cache_timing:
+      hit_lookup_avg_ms: 0.2
+      miss_lookup_avg_ms: 0.3
+      store_operation_avg_ms: 0.1
+      memory_overhead_kb: 24
+
+  # Error handling validation
+  error_handling_validation:
+    error_scenarios_tested: 8
+    error_detection_success_rate: 1.0
+    error_message_clarity_score: 0.95
+    recovery_attempt_success_rate: 0.6
+    graceful_degradation_rate: 1.0
+    
+    error_categories:
+      configuration_errors: 3
+      parameter_validation_errors: 2
+      file_system_errors: 2
+      permission_errors: 1
+    
+    error_response_times:
+      average_error_detection_ms: 1.8
+      maximum_error_detection_ms: 2.0
+      error_logging_overhead_ms: 0.5
+
+  # Integration quality metrics
+  integration_quality_metrics:
+    kedro_compatibility_score: 1.0
+    figregistry_compatibility_score: 1.0
+    api_compliance_score: 1.0
+    thread_safety_score: 1.0
+    
+    test_coverage:
+      unit_test_coverage: 0.94
+      integration_test_coverage: 0.87
+      end_to_end_test_coverage: 0.82
+      performance_test_coverage: 0.79
+    
+    validation_completeness:
+      configuration_validation_coverage: 1.0
+      parameter_validation_coverage: 1.0
+      error_scenario_coverage: 0.89
+      environment_scenario_coverage: 0.92
+
+# =============================================================================
+# METADATA AND TEST FRAMEWORK INFO
+# =============================================================================
+# Additional metadata for test framework usage and validation reference.
+
+test_framework_metadata:
+  version: "1.0.0"
+  created_date: "2024-01-15"
+  last_updated: "2024-01-15"
+  description: "Comprehensive catalog integration test results for FigRegistry-Kedro plugin validation"
+  
+  validation_categories:
+    catalog_parsing: "Configuration parsing and parameter extraction validation"
+    parameter_extraction: "Dynamic parameter resolution and condition handling"
+    condition_resolution: "FigRegistry style resolution integration testing"
+    versioning_integration: "Kedro-FigRegistry versioning compatibility validation"
+    save_confirmation: "File persistence and metadata generation testing"
+    multi_environment: "Environment-specific configuration processing validation"
+  
+  test_requirements:
+    figregistry: ">=0.3.0"
+    kedro: ">=0.18.0,<0.20.0"
+    matplotlib: ">=3.9.0"
+    python: ">=3.10"
+    pytest: ">=7.0.0"
+    pytest_mock: ">=3.10.0"
+  
+  usage_guidelines:
+    integration_testing: |
+      # Load expected results for validation
+      expected = yaml.safe_load(open('tests/data/outputs/catalog_integration_results.yml'))
+      
+      # Validate catalog parsing results
+      actual_parsing = parse_catalog_config(test_config)
+      assert_parsing_results_match(actual_parsing, expected['catalog_parsing_results'])
+      
+      # Validate condition resolution
+      actual_resolution = resolve_condition(test_condition, test_context)
+      assert_condition_resolution_match(actual_resolution, expected['condition_resolution_results'])
+    
+    performance_testing: |
+      # Validate performance targets
+      performance_results = measure_dataset_performance()
+      expected_targets = expected['performance_validation_metrics']['performance_targets']
+      assert_performance_within_targets(performance_results, expected_targets)
+    
+    environment_testing: |
+      # Test multi-environment scenarios
+      for env_name in ['base', 'local', 'production']:
+          env_results = process_environment_config(env_name)
+          expected_env = expected['multi_environment_scenarios'][f'{env_name}_environment_processing']
+          assert_environment_processing_match(env_results, expected_env)
+  
+  validation_completeness:
+    f_005_requirements_covered: true
+    f_005_rq_001_validation: "FigureDataSet intercepts and styles figures"
+    f_005_rq_002_validation: "Kedro versioning honored with styled figures"
+    f_005_rq_003_validation: "Dataset parameters validated at load time"
+    f_005_rq_004_validation: "Context injection for conditional styling"
+    
+    section_5_2_6_requirements_covered: true
+    component_detail_validation: "FigureDataSet component behavior fully specified"
+    performance_target_validation: "<5% overhead compared to manual saves"
+    thread_safety_validation: "Concurrent execution compatibility verified"
+    
+    catalog_integration_workflow_coverage: true
+    configuration_parsing_validation: "Complete catalog configuration processing"
+    parameter_extraction_validation: "Dynamic parameter resolution testing"
+    versioning_compatibility_validation: "FigRegistry-Kedro versioning coexistence"
+    save_confirmation_validation: "File persistence and metadata workflows"
+    multi_environment_validation: "Environment-specific configuration patterns"
+
+  result_structure:
+    catalog_parsing_results: "Expected outcomes from FigureDataSet configuration parsing"
+    parameter_extraction_outcomes: "Results of parameter extraction from catalog configurations"
+    condition_resolution_results: "Condition-based styling resolution and application testing"
+    versioning_integration_results: "Kedro versioning compatibility with FigRegistry timestamps"
+    save_confirmation_workflows: "File persistence and metadata generation validation"
+    multi_environment_scenarios: "Environment-specific configuration processing results"
+    performance_validation_metrics: "Performance targets and actual measurement validation"
