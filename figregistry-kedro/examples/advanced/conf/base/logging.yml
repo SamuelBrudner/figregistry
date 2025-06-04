@@ -1,454 +1,486 @@
-# Enterprise-Grade Logging Configuration for Advanced FigRegistry-Kedro Integration
-# 
+# Advanced Enterprise-Grade Logging Configuration for FigRegistry-Kedro Integration
+# =============================================================================
+#
 # This logging configuration provides comprehensive observability for the advanced
-# FigRegistry Kedro plugin integration example, enabling detailed monitoring of
-# configuration bridge operations, dataset styling processes, hook lifecycle events,
-# and enterprise audit trail requirements.
+# FigRegistry-Kedro plugin integration, supporting complex enterprise workflows
+# including training, inference, and reporting pipelines with detailed visibility
+# into plugin operations, performance metrics, and automated figure management.
 #
 # Key Features:
-# - Multi-handler architecture supporting console, file, and structured logging
-# - Environment-specific log levels for development and production scenarios
-# - Comprehensive coverage of figregistry_kedro plugin components
-# - Performance monitoring integration with enterprise standards
-# - Audit trail capabilities for compliance and reproducible research
-# - Advanced filtering and routing for operational visibility
+# - Enterprise-grade structured logging with JSON formatting for log aggregation
+# - Comprehensive plugin component logging (hooks, datasets, config bridge)
+# - Performance monitoring and SLA tracking with detailed timing metrics
+# - Multi-environment support (development, staging, production)
+# - Detailed audit trails for enterprise compliance and reproducible research
+# - Advanced error correlation and debugging capabilities
+# - Integration with Kedro's logging infrastructure for seamless operation
+#
+# This configuration supports the advanced example's sophisticated pipeline
+# architecture with training, inference, and reporting workflows while providing
+# the detailed logging visibility required for enterprise deployment scenarios.
 
 version: 1
 disable_existing_loggers: false
 
-# =============================================================================
-# FORMATTERS - Enterprise Logging Format Definitions
-# =============================================================================
+# ==============================================================================
+# FORMATTERS - Enterprise-Grade Log Formatting
+# ==============================================================================
 
 formatters:
-  # Standard console formatter for development and debugging
-  console_standard:
-    format: "[{asctime}] {levelname:8} | {name:40} | {funcName:20} | {message}"
-    style: "{"
+  # Simple console formatter for development and debugging
+  simple:
+    format: "[%(asctime)s] {%(name)s:%(lineno)d} %(levelname)s - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
+  
+  # Detailed console formatter with extended context information
+  detailed:
+    format: "[%(asctime)s] {%(pathname)s:%(lineno)d} [%(processName)s:%(threadName)s] %(levelname)s - %(name)s - %(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+  
+  # Structured JSON formatter for enterprise log aggregation systems
+  json:
+    format: '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "logger": "%(name)s", "module": "%(module)s", "function": "%(funcName)s", "line": %(lineno)d, "process": "%(processName)s", "thread": "%(threadName)s", "message": "%(message)s"}'
+    datefmt: "%Y-%m-%dT%H:%M:%S.%fZ"
+  
+  # Performance metrics formatter for monitoring and analysis
+  performance:
+    format: '[PERF] [%(asctime)s] %(name)s - %(message)s'
+    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+  
+  # Audit trail formatter for enterprise compliance tracking
+  audit:
+    format: '[AUDIT] [%(asctime)s] [USER:%(user)s] [SESSION:%(session_id)s] [PIPELINE:%(pipeline_name)s] [NODE:%(node_name)s] %(levelname)s - %(message)s'
     datefmt: "%Y-%m-%d %H:%M:%S"
 
-  # Detailed console formatter with enhanced context for debugging
-  console_detailed:
-    format: "[{asctime}] {levelname:8} | {name:40} | {pathname}:{lineno:4} | {funcName:20} | {process:6} | {thread:12} | {message}"
-    style: "{"
-    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+# ==============================================================================
+# FILTERS - Advanced Log Filtering and Routing
+# ==============================================================================
 
-  # Production file formatter with comprehensive context
-  file_production:
-    format: "{asctime} | {levelname:8} | {name:50} | {pathname}:{lineno:4} | {funcName:25} | PID:{process:6} | TID:{thread:12} | {message}"
-    style: "{"
-    datefmt: "%Y-%m-%d %H:%M:%S.%f"
+filters:
+  # Performance filter for SLA monitoring and metrics collection
+  performance_filter:
+    (): __main__.PerformanceFilter
+    min_duration_ms: 1.0  # Log operations taking >1ms
+    
+  # Enterprise audit filter for compliance and tracking
+  audit_filter:
+    (): __main__.AuditFilter
+    include_pipeline_context: true
+    include_user_context: true
+    include_session_metadata: true
 
-  # Structured JSON formatter for enterprise log aggregation systems
-  json_structured:
-    format: '{"timestamp": "%(asctime)s", "level": "%(levelname)s", "logger": "%(name)s", "module": "%(module)s", "function": "%(funcName)s", "line": %(lineno)d, "process": %(process)d, "thread": %(thread)d, "message": "%(message)s"}'
-    datefmt: "%Y-%m-%dT%H:%M:%S.%fZ"
-
-  # Audit trail formatter for compliance and security logging
-  audit_trail:
-    format: "AUDIT | {asctime} | {levelname:8} | {name:50} | USER:{user} | ACTION:{action} | RESOURCE:{resource} | RESULT:{result} | {message}"
-    style: "{"
-    datefmt: "%Y-%m-%d %H:%M:%S.%f"
-
-  # Performance metrics formatter for timing and monitoring
-  performance_metrics:
-    format: "PERF | {asctime} | {name:40} | OPERATION:{operation} | DURATION:{duration_ms}ms | SLA_TARGET:{sla_target_ms}ms | SLA_MET:{sla_met} | {message}"
-    style: "{"
-    datefmt: "%Y-%m-%d %H:%M:%S.%f"
-
-# =============================================================================
-# HANDLERS - Multi-Channel Logging Output Configuration
-# =============================================================================
+# ==============================================================================
+# HANDLERS - Multiple Output Channels for Different Use Cases
+# ==============================================================================
 
 handlers:
-  # Console handler for development and interactive debugging
+  # === CONSOLE HANDLERS ===
+  
+  # Primary console output for development and interactive debugging
   console:
     class: logging.StreamHandler
     level: INFO
-    formatter: console_standard
+    formatter: simple
     stream: ext://sys.stdout
-
-  # Enhanced console handler for detailed debugging sessions
-  console_debug:
+    
+  # Detailed console output for advanced debugging and troubleshooting
+  console_detailed:
     class: logging.StreamHandler
     level: DEBUG
-    formatter: console_detailed
+    formatter: detailed
     stream: ext://sys.stdout
-
-  # General application file handler with rotation
-  file_app:
+  
+  # === FILE HANDLERS ===
+  
+  # General application log file with rotation for long-running processes
+  file_general:
     class: logging.handlers.RotatingFileHandler
     level: INFO
-    formatter: file_production
-    filename: logs/kedro_app.log
-    maxBytes: 52428800  # 50MB
-    backupCount: 10
+    formatter: detailed
+    filename: logs/kedro.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 5
     encoding: utf8
-
-  # Debug file handler for comprehensive troubleshooting
+    
+  # Debug log file with comprehensive detail for troubleshooting
   file_debug:
     class: logging.handlers.RotatingFileHandler
     level: DEBUG
-    formatter: file_production
-    filename: logs/kedro_debug.log
-    maxBytes: 104857600  # 100MB
-    backupCount: 5
-    encoding: utf8
-
-  # FigRegistry plugin-specific file handler
-  file_figregistry:
-    class: logging.handlers.RotatingFileHandler
-    level: DEBUG
-    formatter: file_production
-    filename: logs/figregistry_kedro.log
+    formatter: detailed
+    filename: logs/debug.log
     maxBytes: 52428800  # 50MB
-    backupCount: 7
+    backupCount: 3
     encoding: utf8
-
-  # Performance monitoring file handler
-  file_performance:
-    class: logging.handlers.RotatingFileHandler
-    level: INFO
-    formatter: performance_metrics
-    filename: logs/performance_metrics.log
-    maxBytes: 26214400  # 25MB
-    backupCount: 12
-    encoding: utf8
-
-  # Error-only file handler for critical issue tracking
-  file_errors:
+    
+  # Error log file for error aggregation and analysis
+  file_error:
     class: logging.handlers.RotatingFileHandler
     level: ERROR
-    formatter: file_production
+    formatter: json
     filename: logs/errors.log
-    maxBytes: 26214400  # 25MB
-    backupCount: 30
+    maxBytes: 10485760  # 10MB
+    backupCount: 10
     encoding: utf8
-
-  # Structured JSON handler for enterprise log aggregation
-  file_json:
+  
+  # === FIGREGISTRY PLUGIN-SPECIFIC HANDLERS ===
+  
+  # FigRegistry plugin operations log with structured formatting
+  figregistry_operations:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: json
+    filename: logs/figregistry_operations.log
+    maxBytes: 20971520  # 20MB
+    backupCount: 5
+    encoding: utf8
+    
+  # Performance monitoring log for SLA tracking and optimization
+  performance_metrics:
     class: logging.handlers.RotatingFileHandler
     level: INFO
-    formatter: json_structured
-    filename: logs/kedro_structured.json
-    maxBytes: 52428800  # 50MB
-    backupCount: 15
+    formatter: performance
+    filename: logs/performance.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 3
     encoding: utf8
-
-  # Audit trail handler for compliance logging
-  file_audit:
+    filters: [performance_filter]
+    
+  # Audit trail log for enterprise compliance and reproducible research
+  audit_trail:
     class: logging.handlers.RotatingFileHandler
     level: INFO
-    formatter: audit_trail
-    filename: logs/audit_trail.log
-    maxBytes: 26214400  # 25MB
-    backupCount: 90  # Extended retention for compliance
+    formatter: audit
+    filename: logs/audit.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 10
     encoding: utf8
-
-  # Time-based daily rotation handler for operational logs
-  file_daily:
-    class: logging.handlers.TimedRotatingFileHandler
+    filters: [audit_filter]
+  
+  # === STRUCTURED LOGGING HANDLERS ===
+  
+  # JSON structured log for enterprise log aggregation systems
+  structured_json:
+    class: logging.handlers.RotatingFileHandler
     level: INFO
-    formatter: file_production
-    filename: logs/kedro_daily.log
-    when: midnight
-    interval: 1
-    backupCount: 30
+    formatter: json
+    filename: logs/structured.log
+    maxBytes: 31457280  # 30MB
+    backupCount: 7
+    encoding: utf8
+    
+  # Configuration operations log for bridge and merge tracking
+  config_operations:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: json
+    filename: logs/config_operations.log
+    maxBytes: 10485760  # 10MB
+    backupCount: 3
     encoding: utf8
 
-# =============================================================================
+# ==============================================================================
 # LOGGERS - Hierarchical Logger Configuration
-# =============================================================================
+# ==============================================================================
 
 loggers:
-  # ==========================================================================
-  # KEDRO CORE LOGGERS
-  # ==========================================================================
+  # === KEDRO CORE LOGGERS ===
   
-  # Root Kedro logger with comprehensive enterprise logging
+  # Kedro core framework logging
   kedro:
     level: INFO
-    handlers: [console, file_app, file_json, file_daily]
-    propagate: false
-
-  # Kedro I/O operations including dataset management
-  kedro.io:
-    level: INFO
-    handlers: [file_app, file_figregistry]
-    propagate: true
-
-  # Kedro pipeline execution with detailed tracking
-  kedro.pipeline:
-    level: INFO
-    handlers: [console, file_app, file_performance]
-    propagate: true
-
-  # Kedro configuration management with audit trails
-  kedro.config:
-    level: INFO
-    handlers: [file_app, file_audit]
-    propagate: true
-
-  # Kedro runner execution with performance monitoring
-  kedro.runner:
-    level: INFO
-    handlers: [file_app, file_performance]
-    propagate: true
-
-  # Kedro framework hooks for lifecycle management
-  kedro.framework.hooks:
-    level: DEBUG
-    handlers: [file_debug, file_figregistry]
-    propagate: true
-
-  # ==========================================================================
-  # FIGREGISTRY CORE LOGGERS
-  # ==========================================================================
-
-  # Root FigRegistry logger with comprehensive coverage
-  figregistry:
-    level: DEBUG
-    handlers: [console_debug, file_figregistry, file_debug]
-    propagate: false
-
-  # FigRegistry configuration engine with detailed validation tracking
-  figregistry.config:
-    level: DEBUG
-    handlers: [file_figregistry, file_audit, file_debug]
-    propagate: true
-
-  # FigRegistry style management with condition resolution tracking
-  figregistry.style:
-    level: DEBUG
-    handlers: [file_figregistry, file_performance]
-    propagate: true
-
-  # FigRegistry output management with file operation monitoring
-  figregistry.output:
-    level: DEBUG
-    handlers: [file_figregistry, file_performance]
-    propagate: true
-
-  # ==========================================================================
-  # FIGREGISTRY-KEDRO PLUGIN LOGGERS - ENTERPRISE OBSERVABILITY
-  # ==========================================================================
-
-  # Root plugin logger with comprehensive enterprise monitoring
-  figregistry_kedro:
-    level: DEBUG
-    handlers: [console, file_figregistry, file_json, file_performance]
-    propagate: false
-
-  # Configuration bridge with detailed merge operation tracking
-  figregistry_kedro.config:
-    level: DEBUG
-    handlers: [console_debug, file_figregistry, file_audit, file_debug]
+    handlers: [console, file_general, structured_json]
     propagate: false
     
-  # FigRegistryConfigBridge specific operations
-  figregistry_kedro.config.bridge:
+  # Kedro pipeline execution logging  
+  kedro.pipeline:
+    level: INFO
+    handlers: [console, file_general, structured_json]
+    propagate: false
+    
+  # Kedro data catalog operations
+  kedro.io:
+    level: INFO
+    handlers: [console, file_general, structured_json]
+    propagate: false
+    
+  # Kedro configuration loading
+  kedro.config:
+    level: INFO
+    handlers: [console, file_general, config_operations]
+    propagate: false
+    
+  # === FIGREGISTRY PLUGIN LOGGERS ===
+  
+  # Root FigRegistry plugin logger
+  figregistry_kedro:
+    level: INFO
+    handlers: [console, figregistry_operations, structured_json]
+    propagate: false
+    
+  # Configuration bridge operations and merging
+  figregistry_kedro.config:
     level: DEBUG
-    handlers: [file_figregistry, file_audit, file_performance]
-    propagate: true
-
-  # Configuration validation and schema compliance
-  figregistry_kedro.config.validation:
-    level: DEBUG
-    handlers: [file_figregistry, file_audit, file_errors]
-    propagate: true
-
-  # Lifecycle hooks with initialization and context management tracking
+    handlers: [console_detailed, config_operations, figregistry_operations, audit_trail]
+    propagate: false
+    
+  # Lifecycle hooks execution and context management
   figregistry_kedro.hooks:
     level: DEBUG
-    handlers: [console_debug, file_figregistry, file_performance, file_debug]
+    handlers: [console_detailed, figregistry_operations, performance_metrics, audit_trail]
     propagate: false
-
-  # Hook registration and discovery tracking
-  figregistry_kedro.hooks.registration:
-    level: DEBUG
-    handlers: [file_figregistry, file_audit]
-    propagate: true
-
-  # Hook lifecycle event processing
-  figregistry_kedro.hooks.lifecycle:
-    level: DEBUG
-    handlers: [file_figregistry, file_performance]
-    propagate: true
-
-  # Dataset operations with comprehensive save/load tracking
+    
+  # FigureDataSet operations and styling application
   figregistry_kedro.datasets:
     level: DEBUG
-    handlers: [console_debug, file_figregistry, file_performance, file_debug]
+    handlers: [console_detailed, figregistry_operations, performance_metrics, audit_trail]
     propagate: false
-
-  # FigureDataSet specific operations and styling application
-  figregistry_kedro.datasets.figure:
-    level: DEBUG
-    handlers: [file_figregistry, file_performance, file_audit]
-    propagate: true
-
-  # Dataset styling and condition resolution
-  figregistry_kedro.datasets.styling:
-    level: DEBUG
-    handlers: [file_figregistry, file_performance]
-    propagate: true
-
-  # Performance monitoring with SLA compliance tracking
+    
+  # Performance monitoring and metrics collection
   figregistry_kedro.performance:
     level: INFO
-    handlers: [file_performance, file_json]
+    handlers: [performance_metrics, structured_json]
     propagate: false
-
-  # Performance timing and metrics collection
-  figregistry_kedro.performance.timing:
-    level: DEBUG
-    handlers: [file_performance]
-    propagate: true
-
-  # SLA monitoring and alerting
-  figregistry_kedro.performance.sla:
+    
+  # === CORE FIGREGISTRY LOGGERS ===
+  
+  # Core FigRegistry library operations
+  figregistry:
     level: INFO
-    handlers: [file_performance, console, file_errors]
-    propagate: true
-
-  # ==========================================================================
-  # INTEGRATION LOGGERS - THIRD-PARTY AND FRAMEWORK
-  # ==========================================================================
-
-  # Matplotlib backend operations
+    handlers: [console, figregistry_operations, structured_json]
+    propagate: false
+    
+  # FigRegistry configuration operations
+  figregistry.config:
+    level: DEBUG
+    handlers: [config_operations, figregistry_operations]
+    propagate: false
+    
+  # FigRegistry style resolution and application
+  figregistry.style:
+    level: DEBUG
+    handlers: [figregistry_operations, performance_metrics]
+    propagate: false
+    
+  # FigRegistry output management and file operations
+  figregistry.output:
+    level: DEBUG
+    handlers: [figregistry_operations, audit_trail]
+    propagate: false
+    
+  # === SCIENTIFIC COMPUTING LIBRARY LOGGERS ===
+  
+  # Matplotlib backend and rendering operations
   matplotlib:
     level: WARNING
-    handlers: [file_app]
-    propagate: true
-
-  # Pydantic validation with configuration schema tracking
-  pydantic:
+    handlers: [file_general]
+    propagate: false
+    
+  # NumPy array operations (minimal logging)
+  numpy:
+    level: ERROR
+    handlers: [file_error]
+    propagate: false
+    
+  # Pandas data operations (minimal logging)
+  pandas:
+    level: WARNING
+    handlers: [file_general]
+    propagate: false
+    
+  # === PIPELINE-SPECIFIC LOGGERS ===
+  
+  # Training pipeline operations and model management
+  kedro.pipelines.training:
     level: INFO
-    handlers: [file_figregistry, file_audit]
-    propagate: true
-
+    handlers: [console, figregistry_operations, audit_trail]
+    propagate: false
+    
+  # Inference pipeline operations and prediction management
+  kedro.pipelines.inference:
+    level: INFO
+    handlers: [console, figregistry_operations, audit_trail]
+    propagate: false
+    
+  # Reporting pipeline operations and output generation
+  kedro.pipelines.reporting:
+    level: INFO
+    handlers: [console, figregistry_operations, audit_trail]
+    propagate: false
+    
+  # === THIRD-PARTY LIBRARY LOGGERS ===
+  
+  # Pydantic validation operations
+  pydantic:
+    level: WARNING
+    handlers: [file_general, config_operations]
+    propagate: false
+    
   # YAML configuration parsing
   yaml:
     level: WARNING
-    handlers: [file_app, file_errors]
-    propagate: true
-
-  # File system operations and I/O
-  fsspec:
+    handlers: [config_operations]
+    propagate: false
+    
+  # Concurrent futures and threading operations
+  concurrent.futures:
     level: WARNING
-    handlers: [file_app]
-    propagate: true
-
-  # ==========================================================================
-  # ENTERPRISE AUDIT AND COMPLIANCE LOGGERS
-  # ==========================================================================
-
-  # Configuration changes and administrative actions
-  audit.configuration:
-    level: INFO
-    handlers: [file_audit, file_json]
+    handlers: [file_general]
     propagate: false
 
-  # File access and data persistence operations
-  audit.data_access:
-    level: INFO
-    handlers: [file_audit]
-    propagate: false
-
-  # User actions and pipeline execution tracking
-  audit.user_actions:
-    level: INFO
-    handlers: [file_audit, file_json]
-    propagate: false
-
-  # Security-related events and access control
-  audit.security:
-    level: WARNING
-    handlers: [file_audit, file_errors, console]
-    propagate: false
-
-  # ==========================================================================
-  # OPERATIONAL MONITORING LOGGERS
-  # ==========================================================================
-
-  # System health and status monitoring
-  monitoring.health:
-    level: INFO
-    handlers: [file_performance, file_json]
-    propagate: false
-
-  # Resource utilization and capacity tracking
-  monitoring.resources:
-    level: INFO
-    handlers: [file_performance]
-    propagate: false
-
-  # Business metrics and usage analytics
-  monitoring.analytics:
-    level: INFO
-    handlers: [file_json]
-    propagate: false
-
-# =============================================================================
-# ROOT LOGGER - Enterprise Default Configuration
-# =============================================================================
+# ==============================================================================
+# ROOT LOGGER CONFIGURATION
+# ==============================================================================
 
 root:
   level: INFO
-  handlers: [console, file_app, file_errors]
+  handlers: [console, file_general, file_error, structured_json]
 
-# =============================================================================
-# CONFIGURATION NOTES AND OPERATIONAL GUIDANCE
-# =============================================================================
+# ==============================================================================
+# ENVIRONMENT-SPECIFIC OVERRIDES
+# ==============================================================================
 
-# Operational Guidelines:
-# 
-# 1. LOG LEVELS BY ENVIRONMENT:
-#    - Development: DEBUG for figregistry_kedro.*, INFO for kedro.*
-#    - Staging: INFO for figregistry_kedro.*, INFO for kedro.*
-#    - Production: INFO for figregistry_kedro.*, WARNING for kedro.*
+# Development environment logging configuration
+# Usage: Set KEDRO_ENV=development to activate
+development:
+  loggers:
+    figregistry_kedro:
+      level: DEBUG
+      handlers: [console_detailed, figregistry_operations, file_debug]
+    figregistry_kedro.config:
+      level: DEBUG
+    figregistry_kedro.hooks:
+      level: DEBUG
+    figregistry_kedro.datasets:
+      level: DEBUG
+  root:
+    level: DEBUG
+    handlers: [console_detailed, file_debug, structured_json]
+
+# Staging environment logging configuration  
+# Usage: Set KEDRO_ENV=staging to activate
+staging:
+  loggers:
+    figregistry_kedro:
+      level: INFO
+      handlers: [console, figregistry_operations, structured_json, audit_trail]
+    figregistry_kedro.performance:
+      level: INFO
+      handlers: [performance_metrics, structured_json]
+  root:
+    level: INFO
+    handlers: [console, file_general, structured_json, audit_trail]
+
+# Production environment logging configuration
+# Usage: Set KEDRO_ENV=production to activate  
+production:
+  loggers:
+    figregistry_kedro:
+      level: INFO
+      handlers: [figregistry_operations, structured_json, audit_trail]
+    figregistry_kedro.config:
+      level: INFO
+      handlers: [config_operations, audit_trail]
+    figregistry_kedro.hooks:
+      level: INFO
+      handlers: [figregistry_operations, performance_metrics, audit_trail]
+    figregistry_kedro.datasets:
+      level: INFO
+      handlers: [figregistry_operations, performance_metrics, audit_trail]
+    kedro:
+      level: INFO
+      handlers: [file_general, structured_json]
+  root:
+    level: WARNING
+    handlers: [file_general, file_error, structured_json, audit_trail]
+
+# ==============================================================================
+# PERFORMANCE MONITORING CONFIGURATION
+# ==============================================================================
+
+# Custom filter classes for advanced log processing
+# These would be implemented in the project's logging utilities
+
+# class PerformanceFilter(logging.Filter):
+#     """Filter for capturing performance metrics and SLA violations."""
+#     def __init__(self, min_duration_ms=1.0):
+#         super().__init__()
+#         self.min_duration_ms = min_duration_ms
+#     
+#     def filter(self, record):
+#         # Add performance context to log records
+#         if hasattr(record, 'duration_ms'):
+#             return record.duration_ms >= self.min_duration_ms
+#         return True
+
+# class AuditFilter(logging.Filter):
+#     """Filter for adding audit trail context to log records."""
+#     def __init__(self, include_pipeline_context=True, include_user_context=True, include_session_metadata=True):
+#         super().__init__()
+#         self.include_pipeline_context = include_pipeline_context
+#         self.include_user_context = include_user_context
+#         self.include_session_metadata = include_session_metadata
+#     
+#     def filter(self, record):
+#         # Add audit context from Kedro session and environment
+#         if self.include_pipeline_context:
+#             record.pipeline_name = getattr(record, 'pipeline_name', 'unknown')
+#             record.node_name = getattr(record, 'node_name', 'unknown')
+#         
+#         if self.include_user_context:
+#             record.user = getattr(record, 'user', 'system')
+#         
+#         if self.include_session_metadata:
+#             record.session_id = getattr(record, 'session_id', 'unknown')
+#         
+#         return True
+
+# ==============================================================================
+# LOGGING BEST PRACTICES AND USAGE EXAMPLES
+# ==============================================================================
+
+# Example usage in FigRegistry-Kedro plugin components:
 #
-# 2. PERFORMANCE MONITORING:
-#    - Monitor logs/performance_metrics.log for SLA compliance
-#    - Alert on ERROR level entries in performance loggers
-#    - Track file rotation frequency for capacity planning
+# import logging
+# logger = logging.getLogger(__name__)
 #
-# 3. AUDIT TRAIL COMPLIANCE:
-#    - audit.* loggers provide compliance-ready audit trails
-#    - Extended retention period (90 days) for audit logs
-#    - JSON structured logs support enterprise SIEM integration
+# # Performance logging with timing context
+# start_time = time.time()
+# # ... operation ...
+# duration_ms = (time.time() - start_time) * 1000
+# logger.info("Configuration bridge merge completed", extra={'duration_ms': duration_ms})
 #
-# 4. TROUBLESHOOTING WORKFLOWS:
-#    - Enable DEBUG level on specific figregistry_kedro loggers
-#    - Review logs/kedro_debug.log for comprehensive troubleshooting
-#    - Use console_debug handler for interactive debugging sessions
+# # Audit logging with pipeline context
+# logger.info("Figure saved with automated styling", extra={
+#     'pipeline_name': pipeline_name,
+#     'node_name': node_name,
+#     'session_id': session_id,
+#     'figure_path': figure_path,
+#     'style_condition': condition
+# })
 #
-# 5. ENTERPRISE INTEGRATION:
-#    - JSON structured logs compatible with ELK, Splunk, DataDog
-#    - Audit trail format supports SOX, GDPR compliance requirements
-#    - Performance metrics integrate with Prometheus/Grafana monitoring
+# # Error logging with comprehensive context
+# logger.error("Hook initialization failed", extra={
+#     'error_type': type(e).__name__,
+#     'error_message': str(e),
+#     'pipeline_name': pipeline_name,
+#     'initialization_phase': 'config_bridge_setup'
+# }, exc_info=True)
+
+# ==============================================================================
+# INTEGRATION WITH KEDRO CONFIGURATION SYSTEM
+# ==============================================================================
+
+# This logging configuration integrates seamlessly with Kedro's configuration
+# system and supports environment-specific overrides through the standard
+# conf/{environment}/logging.yml pattern. The configuration provides:
 #
-# 6. LOG ROTATION AND RETENTION:
-#    - Application logs: 10 files × 50MB (500MB total)
-#    - Debug logs: 5 files × 100MB (500MB total)
-#    - Performance logs: 12 files × 25MB (300MB total)
-#    - Audit logs: 90 files × 25MB (2.25GB total)
-#    - Daily logs: 30 days retention
+# 1. Comprehensive visibility into FigRegistry plugin operations
+# 2. Performance monitoring with SLA tracking capabilities  
+# 3. Enterprise-grade audit trails for compliance requirements
+# 4. Multi-environment support for development, staging, and production
+# 5. Structured logging for integration with enterprise log aggregation systems
+# 6. Advanced error correlation and debugging capabilities
 #
-# 7. SECURITY CONSIDERATIONS:
-#    - No sensitive data (API keys, credentials) in log messages
-#    - File permissions: 644 for log files, 755 for log directories
-#    - Log file encryption recommended for compliance environments
-#
-# 8. FIGREGISTRY-KEDRO PLUGIN SPECIFIC:
-#    - Hook initialization timing tracked in performance logs
-#    - Configuration bridge operations logged with audit trails
-#    - Dataset save operations include context and performance metrics
-#    - Style resolution failures captured with fallback actions
-#
-# Environment Variable Overrides (optional):
-# - FIGREGISTRY_KEDRO_LOG_LEVEL: Override plugin log level
-# - KEDRO_LOG_LEVEL: Override Kedro framework log level
-# - FIGREGISTRY_LOG_LEVEL: Override FigRegistry core log level
-# - LOG_AUDIT_ENABLED: Enable/disable audit trail logging
-# - LOG_PERFORMANCE_ENABLED: Enable/disable performance monitoring
+# For custom deployment requirements, modify the handlers, formatters, and
+# logger configurations according to your enterprise logging infrastructure
+# and monitoring requirements.
