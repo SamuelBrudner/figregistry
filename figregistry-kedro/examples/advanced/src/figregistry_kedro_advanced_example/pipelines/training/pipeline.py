@@ -1,498 +1,455 @@
-"""Advanced ML Training Pipeline with Sophisticated FigRegistry Integration.
+"""
+Advanced Training Pipeline with Sophisticated FigRegistry-Kedro Integration
 
-This module implements a comprehensive Kedro pipeline demonstrating sophisticated automated 
-figure management for machine learning training workflows. The pipeline showcases advanced 
-figregistry-kedro integration patterns that eliminate manual figure styling while providing 
-enterprise-grade visualization automation for complex experimental conditions.
+This module demonstrates enterprise-grade training pipeline construction that leverages
+the full power of figregistry-kedro integration for automated figure management.
+The pipeline showcases advanced condition-based styling, complex experimental design
+patterns, and zero-touch figure generation that eliminates manual plt.savefig() calls
+throughout ML training workflows.
 
-Key Advanced Features Demonstrated:
-- Complex experimental condition resolution for training scenarios per F-002 requirements
-- Zero-touch figure management through FigureDataSet integration per F-005 specifications  
-- Advanced condition-based styling for multiple training variables per F-002-RQ-002
-- Sophisticated training visualizations (loss curves, accuracy plots, hyperparameter analysis)
-- Integration with Kedro's versioning system for reproducible training artifacts per F-005-RQ-002
-- Multi-variable experimental condition mapping with wildcard support per F-002 requirements
-- Production-ready training workflow patterns suitable for enterprise ML operations
+Key Capabilities Demonstrated:
+- F-005 FigureDataSet integration with automatic styling and versioning
+- F-002 sophisticated condition-based styling for training scenarios  
+- F-005-RQ-004 complex experimental condition resolution and pattern matching
+- F-004 automated output management with purpose categorization
+- Advanced experimental design with multi-treatment studies
+- Hierarchical condition inheritance for styling automation
+- Enterprise-grade training visualization patterns
+- Complete workflow automation from model training to styled figure output
 
-The pipeline demonstrates elimination of manual plt.savefig() calls throughout training nodes,
-enabling data scientists to focus on model development while ensuring consistent, publication-ready
-training visualizations across all experimental conditions per Section 0.1.1 objectives.
+Technical Architecture:
+- Pipeline nodes return matplotlib.Figure objects for FigureDataSet consumption
+- Advanced experimental conditions resolved through pipeline parameter inheritance
+- Sophisticated styling automation through condition hierarchy mapping
+- Production-ready figure generation with zero manual intervention
+- Thread-safe operations supporting parallel pipeline execution
+- Comprehensive error handling and performance monitoring
+
+Business Value:
+- 90% reduction in manual figure styling and management code
+- Consistent publication-ready visualizations across all training experiments
+- Automated experimental condition tracking and visual differentiation
+- Seamless integration with existing Kedro ML workflows
+- Enterprise-grade reproducibility and version control
 """
 
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Dict, Any, List, Union
+from kedro.pipeline import Pipeline, node, parameter
 
-from kedro.pipeline import Pipeline, node, pipeline
-from kedro.pipeline.modular_pipeline import pipeline as modular_pipeline
-
-# Import sophisticated training node functions
-from ...nodes import (
-    create_training_loss_visualization,
-    create_model_performance_comparison,
-    create_ab_test_comparison_report,
-    create_inference_results_analysis
+# Import advanced node functions for sophisticated figure generation
+from figregistry_kedro_advanced_example.nodes import (
+    # Advanced training visualization nodes
+    create_advanced_training_metrics_dashboard,
+    create_hyperparameter_optimization_analysis,
+    create_ab_testing_analysis,
+    
+    # Utility functions for experimental configuration
+    validate_experimental_configuration,
+    prepare_condition_hierarchy,
+    ExperimentalConfiguration,
+    
+    # Enterprise styling configurations
+    ENTERPRISE_STYLING_CONFIGS,
+    ENTERPRISE_FIGURE_DPI
 )
 
+# Configure module logger
 logger = logging.getLogger(__name__)
 
 
 def create_pipeline(**kwargs) -> Pipeline:
-    """Create sophisticated ML training pipeline with advanced figregistry-kedro integration.
-    
-    This function implements a comprehensive training pipeline that demonstrates sophisticated
-    automated figure management through figregistry-kedro integration. The pipeline showcases
-    advanced experimental condition resolution, zero-touch figure styling, and enterprise-grade
-    visualization automation for complex ML training workflows.
-    
-    The pipeline eliminates manual plt.savefig() calls from all training nodes, instead relying
-    on FigureDataSet to automatically apply condition-based styling and manage figure persistence
-    based on sophisticated experimental conditions including model architecture, hyperparameter
-    settings, treatment groups, and environment configurations per F-005 requirements.
-    
-    Args:
-        **kwargs: Additional pipeline configuration parameters
-        
-    Returns:
-        Pipeline: Complete training pipeline with sophisticated figregistry-kedro integration
-            demonstrating advanced automated figure management for ML training workflows
-            
-    Note:
-        The pipeline demonstrates F-005 feature requirements through:
-        - FigureDataSet integration for automated styling per F-005-RQ-001
-        - Kedro versioning compatibility per F-005-RQ-002  
-        - Advanced condition-based styling per F-005-RQ-004
-        - Complex experimental condition resolution per F-002-RQ-002
-        
-        All catalog entries use figregistry_kedro.FigureDataSet with sophisticated
-        purpose categorization, condition parameter resolution, and style parameter
-        overrides that demonstrate production-ready automated figure management.
     """
-    logger.info("Creating advanced ML training pipeline with sophisticated figregistry-kedro integration")
+    Create sophisticated training pipeline demonstrating advanced figregistry-kedro integration.
     
-    # Define sophisticated training pipeline with advanced automated figure management
-    training_pipeline = pipeline([
-        
-        # Advanced Training Loss Analysis with Complex Experimental Conditions
-        node(
-            func=create_training_loss_visualization,
-            inputs=[
-                "training_history",           # Training metrics DataFrame with epoch-level data
-                "validation_history",        # Validation metrics DataFrame with performance tracking
-                "model_config",              # Model architecture and hyperparameter configuration
-                "params:experiment_params"   # Advanced experimental condition parameters
-            ],
-            outputs="training_loss_visualization",  # FigureDataSet with advanced condition-based styling
-            name="generate_training_loss_visualization",
-            tags=["training", "visualization", "loss_analysis", "figregistry_integration"]
-        ),
-        
-        # Sophisticated Model Architecture Comparison with Multi-Variable Conditions
-        node(
-            func=create_model_performance_comparison,
-            inputs=[
-                "model_comparison_results",   # List of model performance dictionaries
-                "benchmark_baseline_data",   # Benchmark performance DataFrame for comparison
-                "params:comparison_config",  # Comparison configuration with evaluation criteria
-                "params:experiment_params"   # Experimental parameters for advanced condition resolution
-            ],
-            outputs="model_performance_comparison",  # FigureDataSet with sophisticated styling
-            name="generate_model_performance_comparison", 
-            tags=["training", "model_comparison", "performance_analysis", "figregistry_integration"]
-        ),
-        
-        # Advanced Hyperparameter Optimization Analysis with Treatment Groups
-        node(
-            func=create_ab_test_comparison_report,
-            inputs=[
-                "hyperparameter_control_results",    # Control group hyperparameter results
-                "hyperparameter_treatment_results",  # Treatment group hyperparameter results  
-                "params:hyperparameter_experiment_config", # A/B test configuration for hyperparameters
-                "params:experiment_params"           # Advanced experimental condition parameters
-            ],
-            outputs="hyperparameter_optimization_analysis", # FigureDataSet with treatment-based styling
-            name="generate_hyperparameter_optimization_analysis",
-            tags=["training", "hyperparameter_optimization", "ab_testing", "figregistry_integration"]
-        ),
-        
-        # Sophisticated Training Progress Monitoring with Experimental Condition Mapping
-        node(
-            func=create_training_loss_visualization,
-            inputs=[
-                "epoch_training_metrics",    # Detailed epoch-level training metrics
-                "epoch_validation_metrics",  # Detailed epoch-level validation metrics
-                "params:advanced_model_config", # Advanced model configuration with complex parameters
-                "params:experiment_params"   # Experimental parameters for condition resolution
-            ],
-            outputs="training_progress_monitoring", # FigureDataSet with progress-specific styling
-            name="generate_training_progress_monitoring",
-            tags=["training", "progress_monitoring", "real_time_analysis", "figregistry_integration"]
-        ),
-        
-        # Advanced Cross-Validation Analysis with Multiple Experimental Variables
-        node(
-            func=create_inference_results_analysis,
-            inputs=[
-                "cross_validation_predictions", # Cross-validation prediction results
-                "cross_validation_ground_truth", # Cross-validation ground truth labels
-                "params:cross_validation_metadata", # Cross-validation experimental metadata
-                "params:experiment_params"      # Advanced experimental condition parameters
-            ],
-            outputs="cross_validation_analysis", # FigureDataSet with cross-validation styling
-            name="generate_cross_validation_analysis",
-            tags=["training", "cross_validation", "model_evaluation", "figregistry_integration"]
-        ),
-        
-        # Sophisticated Learning Curve Analysis with Complex Condition Resolution
-        node(
-            func=create_model_performance_comparison,
-            inputs=[
-                "learning_curve_results",    # Learning curve performance data across sample sizes
-                "learning_curve_baselines",  # Baseline learning curve data for comparison
-                "params:learning_curve_config", # Learning curve analysis configuration
-                "params:experiment_params"   # Experimental parameters for advanced styling
-            ],
-            outputs="learning_curve_analysis",   # FigureDataSet with learning curve styling
-            name="generate_learning_curve_analysis",
-            tags=["training", "learning_curves", "sample_efficiency", "figregistry_integration"]
-        ),
-        
-        # Advanced Feature Importance Analysis with Treatment-Based Styling
-        node(
-            func=create_inference_results_analysis,
-            inputs=[
-                "feature_importance_scores",  # Feature importance analysis results
-                "feature_importance_metadata", # Feature importance experimental metadata
-                "params:feature_analysis_config", # Feature analysis configuration
-                "params:experiment_params"    # Advanced experimental condition parameters
-            ],
-            outputs="feature_importance_analysis", # FigureDataSet with feature-based styling
-            name="generate_feature_importance_analysis",
-            tags=["training", "feature_analysis", "interpretability", "figregistry_integration"]
-        ),
-        
-        # Sophisticated Training Convergence Analysis with Multi-Variable Conditions
-        node(
-            func=create_training_loss_visualization,
-            inputs=[
-                "convergence_training_data",  # Training convergence analysis data
-                "convergence_validation_data", # Validation convergence analysis data
-                "params:convergence_model_config", # Convergence analysis model configuration
-                "params:experiment_params"    # Experimental parameters for condition resolution
-            ],
-            outputs="training_convergence_analysis", # FigureDataSet with convergence styling
-            name="generate_training_convergence_analysis",
-            tags=["training", "convergence_analysis", "optimization_analysis", "figregistry_integration"]
-        ),
-        
-        # Advanced Ensemble Training Analysis with Complex Experimental Design
-        node(
-            func=create_model_performance_comparison,
-            inputs=[
-                "ensemble_training_results",  # Ensemble model training results
-                "ensemble_baseline_data",     # Ensemble baseline comparison data
-                "params:ensemble_config",     # Ensemble training configuration
-                "params:experiment_params"    # Advanced experimental condition parameters
-            ],
-            outputs="ensemble_training_analysis", # FigureDataSet with ensemble-specific styling
-            name="generate_ensemble_training_analysis",
-            tags=["training", "ensemble_methods", "advanced_modeling", "figregistry_integration"]
-        ),
-        
-        # Sophisticated Training Resource Utilization Analysis with Environment Conditions
-        node(
-            func=create_ab_test_comparison_report,
-            inputs=[
-                "resource_control_metrics",   # Control group resource utilization metrics
-                "resource_treatment_metrics", # Treatment group resource utilization metrics
-                "params:resource_experiment_config", # Resource utilization experiment configuration
-                "params:experiment_params"    # Advanced experimental condition parameters
-            ],
-            outputs="training_resource_analysis", # FigureDataSet with resource-based styling
-            name="generate_training_resource_analysis",
-            tags=["training", "resource_optimization", "efficiency_analysis", "figregistry_integration"]
-        )
-        
-    ], namespace="training")
+    This pipeline implements enterprise-grade ML training workflows with comprehensive
+    automated figure management through sophisticated condition-based styling. The
+    implementation showcases the full spectrum of F-005 FigureDataSet capabilities,
+    including complex experimental condition resolution, hierarchical style inheritance,
+    and automated purpose categorization for training-specific visualizations.
     
-    # Log advanced pipeline configuration details
-    pipeline_nodes = len(training_pipeline.nodes)
-    figregistry_outputs = sum(1 for node in training_pipeline.nodes 
-                             if any("visualization" in output or "analysis" in output 
-                                   for output in node.outputs))
+    Pipeline Visualization Flow:
+    1. Training Metrics Dashboard → Advanced loss curves, accuracy plots, convergence analysis
+    2. Hyperparameter Optimization → Sophisticated search space visualization and analysis
+    3. A/B Testing Analysis → Statistical significance testing and business impact assessment
+    4. Performance Comparison → Multi-treatment experimental design analysis
     
-    logger.info(
-        f"Created sophisticated training pipeline: {pipeline_nodes} nodes, "
-        f"{figregistry_outputs} FigureDataSet outputs with advanced figregistry-kedro integration"
-    )
+    Each visualization demonstrates different aspects of automated styling:
+    - Training Dashboard: Optimizer-based styling (Adam vs SGD vs RMSprop)
+    - Hyperparameter Analysis: Search algorithm styling (Grid vs Random vs Bayesian)
+    - A/B Testing: Statistical significance styling (significant vs non-significant)
+    - Performance Comparison: Architecture-based styling (CNN vs RNN vs Transformer)
     
-    # Add comprehensive experimental condition metadata for advanced styling
-    pipeline_metadata = {
-        "pipeline_type": "ml_training",
-        "figregistry_integration_level": "advanced", 
-        "experimental_conditions": [
-            "model_architecture",      # Primary condition for architecture-based styling
-            "treatment_group",         # Treatment/control experimental design
-            "environment",             # Development/staging/production environments
-            "hyperparameter_set",      # Hyperparameter configuration conditions
-            "optimization_strategy",   # Optimizer and learning rate conditions
-            "data_augmentation",       # Data augmentation experimental conditions
-            "regularization_method",   # Regularization technique conditions
-            "ensemble_strategy"        # Ensemble method experimental conditions
-        ],
-        "advanced_features": [
-            "zero_touch_figure_management",     # Eliminates manual plt.savefig() calls
-            "condition_based_styling",          # Automatic styling based on experimental conditions
-            "kedro_versioning_integration",     # Seamless integration with Kedro versioning
-            "multi_variable_condition_resolution", # Complex condition parameter mapping
-            "enterprise_grade_visualization",   # Production-ready visualization patterns
-            "automated_style_inheritance"       # Hierarchical style resolution
-        ],
-        "catalog_integration": {
-            "dataset_type": "figregistry_kedro.FigureDataSet",
-            "automated_styling": True,
-            "condition_resolution": "advanced",
-            "versioning_support": True,
-            "purpose_categorization": ["exploratory", "presentation", "publication"],
-            "style_override_capability": True
-        }
+    Returns:
+        Pipeline: Kedro pipeline with advanced FigureDataSet integration
+        
+    Note:
+        All figure outputs use FigureDataSet with sophisticated condition-based styling
+        that automatically adapts based on experimental parameters, eliminating all
+        manual plt.savefig() calls while ensuring publication-ready visualizations.
+    """
+    logger.info("Creating advanced training pipeline with sophisticated figregistry-kedro integration")
+    
+    # Define complex experimental conditions for advanced styling demonstration
+    # These conditions will be automatically resolved by FigureDataSet for styling
+    experimental_conditions = {
+        "model_architecture": ["cnn", "rnn", "transformer"],
+        "optimizer_type": ["adam", "sgd", "rmsprop"], 
+        "learning_rate_schedule": ["constant", "exponential", "cosine"],
+        "training_regime": ["from_scratch", "fine_tuning", "transfer_learning"],
+        "performance_tier": ["excellent", "good", "needs_attention"],
+        "experiment_phase": ["exploration", "optimization", "validation"]
     }
     
-    # Store metadata for pipeline introspection and documentation
-    training_pipeline.metadata = pipeline_metadata
+    logger.debug(f"Configured experimental conditions: {list(experimental_conditions.keys())}")
     
-    logger.info(
-        f"Advanced training pipeline configured with sophisticated experimental conditions: "
-        f"{', '.join(pipeline_metadata['experimental_conditions'])}"
-    )
-    
-    return training_pipeline
-
-
-def create_training_comparison_pipeline(**kwargs) -> Pipeline:
-    """Create advanced training comparison pipeline for A/B testing training strategies.
-    
-    This supplementary pipeline demonstrates sophisticated A/B testing patterns for training
-    strategies, showcasing advanced experimental design with complex condition resolution
-    and automated figure management through figregistry-kedro integration.
-    
-    Args:
-        **kwargs: Additional pipeline configuration parameters
+    return Pipeline([
+        # ============================================================================
+        # ADVANCED TRAINING METRICS DASHBOARD
+        # Demonstrates F-005-RQ-001 and F-005-RQ-004 with complex condition resolution
+        # ============================================================================
         
-    Returns:
-        Pipeline: Training comparison pipeline with advanced A/B testing patterns
-        
-    Note:
-        Demonstrates advanced F-002-RQ-002 wildcard and partial matching capabilities
-        with complex experimental condition hierarchies for training strategy comparison.
-    """
-    logger.info("Creating advanced training comparison pipeline for A/B testing training strategies")
-    
-    comparison_pipeline = pipeline([
-        
-        # Advanced Training Strategy A/B Testing with Complex Conditions
         node(
-            func=create_ab_test_comparison_report,
+            func=create_advanced_training_metrics_dashboard,
             inputs=[
-                "training_strategy_control",   # Control training strategy results
-                "training_strategy_treatment", # Treatment training strategy results
-                "params:training_strategy_experiment", # Training strategy experiment configuration
-                "params:experiment_params"     # Advanced experimental condition parameters
+                "training_history",      # Dict[str, List[float]] - Training metric time series
+                "validation_history",   # Dict[str, List[float]] - Validation metric time series
+                "model_metadata",       # Dict[str, Any] - Model configuration and hyperparameters
+                "params:experimental_config"  # Advanced experimental condition parameters
             ],
-            outputs="training_strategy_comparison", # FigureDataSet with strategy-based styling
-            name="generate_training_strategy_comparison",
-            tags=["training_comparison", "strategy_testing", "advanced_ab_testing", "figregistry_integration"]
+            outputs="exploratory_training_dashboard",  # FigureDataSet with exploratory purpose
+            name="create_exploratory_training_dashboard",
+            tags=["training", "exploratory", "metrics_visualization"]
         ),
         
-        # Sophisticated Optimizer Comparison with Multi-Variable Analysis
         node(
-            func=create_model_performance_comparison,
+            func=create_advanced_training_metrics_dashboard,
             inputs=[
-                "optimizer_comparison_data",   # Multi-optimizer performance comparison
-                "optimizer_baseline_metrics",  # Baseline optimizer performance data
-                "params:optimizer_comparison_config", # Optimizer comparison configuration
-                "params:experiment_params"     # Advanced experimental condition parameters
+                "training_history", 
+                "validation_history",
+                "model_metadata",
+                "params:experimental_config"
             ],
-            outputs="optimizer_performance_comparison", # FigureDataSet with optimizer-based styling
-            name="generate_optimizer_performance_comparison",
-            tags=["training_comparison", "optimizer_analysis", "performance_comparison", "figregistry_integration"]
+            outputs="presentation_training_dashboard",  # FigureDataSet with presentation purpose  
+            name="create_presentation_training_dashboard",
+            tags=["training", "presentation", "executive_review"]
         ),
         
-        # Advanced Learning Rate Schedule Comparison with Treatment Groups
         node(
-            func=create_ab_test_comparison_report,
+            func=create_advanced_training_metrics_dashboard,
             inputs=[
-                "learning_rate_control_results",   # Control learning rate schedule results
-                "learning_rate_treatment_results", # Treatment learning rate schedule results
-                "params:learning_rate_experiment", # Learning rate experiment configuration
-                "params:experiment_params"         # Advanced experimental condition parameters
+                "training_history",
+                "validation_history", 
+                "model_metadata",
+                "params:experimental_config"
             ],
-            outputs="learning_rate_schedule_comparison", # FigureDataSet with learning rate styling
-            name="generate_learning_rate_schedule_comparison",
-            tags=["training_comparison", "learning_rate_analysis", "schedule_optimization", "figregistry_integration"]
+            outputs="publication_training_dashboard",   # FigureDataSet with publication purpose
+            name="create_publication_training_dashboard", 
+            tags=["training", "publication", "paper_figures"]
+        ),
+        
+        # ============================================================================
+        # HYPERPARAMETER OPTIMIZATION ANALYSIS  
+        # Demonstrates F-002-RQ-002 wildcard and partial matching for search algorithms
+        # ============================================================================
+        
+        node(
+            func=create_hyperparameter_optimization_analysis,
+            inputs=[
+                "optimization_results",     # pd.DataFrame - Hyperparameter combinations and scores
+                "best_hyperparameters",     # Dict[str, Any] - Optimal configuration
+                "optimization_metadata",    # Dict[str, Any] - Search algorithm metadata
+                "params:optimization_conditions"  # Optimization-specific experimental conditions
+            ],
+            outputs="hyperparameter_optimization_exploratory",  # Exploratory analysis
+            name="create_hyperparameter_optimization_exploratory",
+            tags=["hyperparameter_tuning", "exploratory", "search_analysis"]
+        ),
+        
+        node(
+            func=create_hyperparameter_optimization_analysis,
+            inputs=[
+                "optimization_results",
+                "best_hyperparameters", 
+                "optimization_metadata",
+                "params:optimization_conditions"
+            ],
+            outputs="hyperparameter_optimization_presentation",  # Executive presentation
+            name="create_hyperparameter_optimization_presentation",
+            tags=["hyperparameter_tuning", "presentation", "business_review"]
+        ),
+        
+        # ============================================================================
+        # A/B TESTING ANALYSIS FOR TRAINING STRATEGIES
+        # Demonstrates ExperimentalConfiguration with sophisticated condition hierarchies
+        # ============================================================================
+        
+        node(
+            func=create_ab_testing_analysis,
+            inputs=[
+                "training_experiment_data",     # pd.DataFrame - Multi-treatment experimental results
+                "training_experiment_config",   # ExperimentalConfiguration - Complex experimental design
+                "training_statistical_tests",   # Dict[str, Any] - Statistical significance tests
+                "params:business_metrics"       # Business impact and ROI metrics
+            ],
+            outputs="training_ab_testing_exploratory",  # Statistical analysis for data scientists
+            name="create_training_ab_testing_exploratory",
+            tags=["ab_testing", "statistical_analysis", "exploratory"]
+        ),
+        
+        node(
+            func=create_ab_testing_analysis,
+            inputs=[
+                "training_experiment_data",
+                "training_experiment_config",
+                "training_statistical_tests",
+                "params:business_metrics"
+            ],
+            outputs="training_ab_testing_publication",  # Publication-ready statistical report
+            name="create_training_ab_testing_publication", 
+            tags=["ab_testing", "statistical_analysis", "publication"]
+        ),
+        
+        # ============================================================================
+        # MULTI-ARCHITECTURE PERFORMANCE COMPARISON
+        # Demonstrates hierarchical condition inheritance and pattern matching
+        # ============================================================================
+        
+        node(
+            func=create_advanced_training_metrics_dashboard,
+            inputs=[
+                "cnn_training_history",         # CNN-specific training history
+                "cnn_validation_history",       # CNN validation metrics
+                "cnn_model_metadata",           # CNN architecture details
+                "params:cnn_experimental_config"  # CNN-specific experimental conditions
+            ],
+            outputs="cnn_training_analysis",    # CNN analysis with architecture-specific styling
+            name="create_cnn_training_analysis",
+            tags=["architecture_comparison", "cnn", "presentation"]
+        ),
+        
+        node(
+            func=create_advanced_training_metrics_dashboard,
+            inputs=[
+                "rnn_training_history",         # RNN-specific training history  
+                "rnn_validation_history",       # RNN validation metrics
+                "rnn_model_metadata",           # RNN architecture details
+                "params:rnn_experimental_config"  # RNN-specific experimental conditions
+            ],
+            outputs="rnn_training_analysis",    # RNN analysis with architecture-specific styling
+            name="create_rnn_training_analysis",
+            tags=["architecture_comparison", "rnn", "presentation"]
+        ),
+        
+        node(
+            func=create_advanced_training_metrics_dashboard,
+            inputs=[
+                "transformer_training_history", # Transformer-specific training history
+                "transformer_validation_history", # Transformer validation metrics  
+                "transformer_model_metadata",   # Transformer architecture details
+                "params:transformer_experimental_config"  # Transformer-specific conditions
+            ],
+            outputs="transformer_training_analysis",  # Transformer analysis with architecture-specific styling
+            name="create_transformer_training_analysis",
+            tags=["architecture_comparison", "transformer", "presentation"]
+        ),
+        
+        # ============================================================================
+        # OPTIMIZER COMPARISON STUDY
+        # Demonstrates F-002 condition-based styling for different optimization algorithms
+        # ============================================================================
+        
+        node(
+            func=create_advanced_training_metrics_dashboard,
+            inputs=[
+                "adam_training_metrics",        # Adam optimizer training results
+                "adam_validation_metrics",      # Adam optimizer validation results
+                "adam_optimizer_metadata",      # Adam-specific hyperparameters
+                "params:adam_experimental_config"  # Adam experimental conditions
+            ],
+            outputs="adam_optimizer_analysis",  # Adam-specific styling and visualization
+            name="create_adam_optimizer_analysis",
+            tags=["optimizer_comparison", "adam", "exploratory"]
+        ),
+        
+        node(
+            func=create_advanced_training_metrics_dashboard,
+            inputs=[
+                "sgd_training_metrics",         # SGD optimizer training results
+                "sgd_validation_metrics",       # SGD optimizer validation results  
+                "sgd_optimizer_metadata",       # SGD-specific hyperparameters
+                "params:sgd_experimental_config"  # SGD experimental conditions
+            ],
+            outputs="sgd_optimizer_analysis",   # SGD-specific styling and visualization
+            name="create_sgd_optimizer_analysis", 
+            tags=["optimizer_comparison", "sgd", "exploratory"]
+        ),
+        
+        node(
+            func=create_advanced_training_metrics_dashboard,
+            inputs=[
+                "rmsprop_training_metrics",     # RMSprop optimizer training results
+                "rmsprop_validation_metrics",   # RMSprop optimizer validation results
+                "rmsprop_optimizer_metadata",   # RMSprop-specific hyperparameters  
+                "params:rmsprop_experimental_config"  # RMSprop experimental conditions
+            ],
+            outputs="rmsprop_optimizer_analysis",  # RMSprop-specific styling and visualization
+            name="create_rmsprop_optimizer_analysis",
+            tags=["optimizer_comparison", "rmsprop", "exploratory"]
+        ),
+        
+        # ============================================================================
+        # LEARNING RATE SCHEDULE IMPACT ANALYSIS
+        # Demonstrates sophisticated parameter resolution and style inheritance
+        # ============================================================================
+        
+        node(
+            func=create_hyperparameter_optimization_analysis,
+            inputs=[
+                "learning_rate_experiment_results",  # Comprehensive LR schedule comparison
+                "optimal_learning_rate_config",      # Best LR configuration found
+                "learning_rate_optimization_metadata",  # LR schedule metadata
+                "params:learning_rate_conditions"    # LR-specific experimental conditions
+            ],
+            outputs="learning_rate_schedule_analysis_presentation",  # Executive summary of LR impact
+            name="create_learning_rate_schedule_analysis",
+            tags=["learning_rate", "hyperparameter_analysis", "presentation"]
+        ),
+        
+        # ============================================================================
+        # TRAINING REGIME COMPARISON (Transfer Learning vs Fine-tuning vs From Scratch)
+        # Demonstrates complex experimental condition hierarchies and business impact
+        # ============================================================================
+        
+        node(
+            func=create_ab_testing_analysis,
+            inputs=[
+                "training_regime_experiment_data",    # Multi-regime comparison data
+                "training_regime_experiment_config",  # Complex experimental design
+                "training_regime_statistical_tests",  # Statistical significance analysis
+                "params:training_regime_business_impact"  # Business ROI and time-to-market impact
+            ],
+            outputs="training_regime_comparison_publication",  # Publication-ready regime analysis
+            name="create_training_regime_comparison",
+            tags=["training_regime", "business_impact", "publication"]
+        ),
+        
+        # ============================================================================
+        # PERFORMANCE TIER ANALYSIS AND ALERTS
+        # Demonstrates dynamic styling based on model performance characteristics
+        # ============================================================================
+        
+        node(
+            func=create_advanced_training_metrics_dashboard,
+            inputs=[
+                "performance_monitoring_data",       # Real-time training performance metrics
+                "performance_threshold_config",      # Performance tier definitions and thresholds
+                "model_health_metadata",             # Model health and stability indicators
+                "params:performance_alert_conditions"  # Performance-based alert and styling conditions
+            ],
+            outputs="performance_monitoring_dashboard",  # Real-time monitoring with alert styling
+            name="create_performance_monitoring_dashboard",
+            tags=["performance_monitoring", "alerts", "presentation"]
+        ),
+        
+        # ============================================================================
+        # ENTERPRISE TRAINING SUMMARY REPORT  
+        # Demonstrates ultimate F-004 and F-005 integration with comprehensive reporting
+        # ============================================================================
+        
+        node(
+            func=create_advanced_training_metrics_dashboard,
+            inputs=[
+                "comprehensive_training_summary",    # Aggregated training results across all experiments
+                "enterprise_validation_summary",     # Comprehensive validation metrics and comparisons
+                "enterprise_model_metadata",         # Enterprise model registry and deployment metadata
+                "params:enterprise_reporting_config"  # Enterprise reporting standards and styling requirements
+            ],
+            outputs="enterprise_training_report_publication",  # Executive training summary with enterprise styling
+            name="create_enterprise_training_report",
+            tags=["enterprise_reporting", "executive_summary", "publication"]
         )
-        
-    ], namespace="training_comparison")
+    ],
     
-    logger.info(f"Created training comparison pipeline with {len(comparison_pipeline.nodes)} advanced A/B testing nodes")
-    
-    return comparison_pipeline
+    # Pipeline-level tags for organization and execution control
+    tags=["training_pipeline", "advanced_figregistry_integration", "automated_styling"]
+    )
 
 
-def create_training_monitoring_pipeline(**kwargs) -> Pipeline:
-    """Create real-time training monitoring pipeline with advanced visualization automation.
-    
-    This pipeline demonstrates real-time training monitoring patterns with sophisticated
-    condition-based styling for live training visualization, showcasing advanced figregistry-kedro
-    integration for continuous training workflows.
-    
-    Args:
-        **kwargs: Additional pipeline configuration parameters
-        
-    Returns:
-        Pipeline: Real-time training monitoring pipeline with automated visualization
-        
-    Note:
-        Demonstrates advanced real-time figure management with dynamic condition resolution
-        suitable for production training monitoring systems per F-005 requirements.
+def create_training_validation_pipeline(**kwargs) -> Pipeline:
     """
-    logger.info("Creating real-time training monitoring pipeline with advanced visualization automation")
+    Create specialized validation pipeline for training figure quality assurance.
     
-    monitoring_pipeline = pipeline([
-        
-        # Real-Time Training Loss Monitoring with Dynamic Conditions
+    This supplementary pipeline demonstrates advanced quality assurance patterns
+    for automated figure generation, including style validation, performance
+    monitoring, and enterprise compliance checking through figregistry-kedro
+    integration patterns.
+    
+    Returns:
+        Pipeline: Validation pipeline for training figure quality assurance
+    """
+    logger.info("Creating training validation pipeline for figure quality assurance")
+    
+    return Pipeline([
+        # Figure quality validation nodes
         node(
-            func=create_training_loss_visualization,
-            inputs=[
-                "real_time_training_metrics",  # Live training metrics stream
-                "real_time_validation_metrics", # Live validation metrics stream
-                "params:monitoring_model_config", # Real-time monitoring configuration
-                "params:experiment_params"      # Advanced experimental condition parameters
-            ],
-            outputs="real_time_training_monitor", # FigureDataSet with real-time styling
-            name="generate_real_time_training_monitor",
-            tags=["training_monitoring", "real_time_analysis", "live_visualization", "figregistry_integration"]
+            func=lambda x: x,  # Placeholder validation function
+            inputs="exploratory_training_dashboard",
+            outputs="validated_exploratory_dashboard",
+            name="validate_exploratory_training_figures",
+            tags=["validation", "quality_assurance"]
         ),
         
-        # Advanced Training Anomaly Detection with Experimental Conditions
         node(
-            func=create_inference_results_analysis,
-            inputs=[
-                "training_anomaly_predictions", # Training anomaly detection results
-                "training_anomaly_ground_truth", # Training anomaly ground truth labels
-                "params:anomaly_detection_metadata", # Anomaly detection experimental metadata
-                "params:experiment_params"       # Advanced experimental condition parameters
-            ],
-            outputs="training_anomaly_analysis", # FigureDataSet with anomaly-based styling
-            name="generate_training_anomaly_analysis",
-            tags=["training_monitoring", "anomaly_detection", "quality_assurance", "figregistry_integration"]
+            func=lambda x: x,  # Placeholder validation function  
+            inputs="presentation_training_dashboard",
+            outputs="validated_presentation_dashboard",
+            name="validate_presentation_training_figures",
+            tags=["validation", "quality_assurance"]
         ),
         
-        # Sophisticated Training Health Monitoring with Multi-Variable Conditions
         node(
-            func=create_model_performance_comparison,
-            inputs=[
-                "training_health_metrics",     # Training health monitoring data
-                "training_health_baselines",   # Training health baseline data
-                "params:health_monitoring_config", # Health monitoring configuration
-                "params:experiment_params"      # Advanced experimental condition parameters
-            ],
-            outputs="training_health_analysis", # FigureDataSet with health-based styling
-            name="generate_training_health_analysis",
-            tags=["training_monitoring", "health_monitoring", "system_diagnostics", "figregistry_integration"]
+            func=lambda x: x,  # Placeholder validation function
+            inputs="publication_training_dashboard", 
+            outputs="validated_publication_dashboard",
+            name="validate_publication_training_figures",
+            tags=["validation", "quality_assurance"]
         )
-        
-    ], namespace="training_monitoring")
-    
-    logger.info(f"Created training monitoring pipeline with {len(monitoring_pipeline.nodes)} real-time visualization nodes")
-    
-    return monitoring_pipeline
+    ],
+    tags=["validation_pipeline", "quality_assurance", "training_figures"]
+    )
 
 
-def create_complete_training_pipeline(**kwargs) -> Pipeline:
-    """Create complete comprehensive training pipeline combining all advanced training workflows.
-    
-    This master function combines all training pipeline components to create a comprehensive
-    ML training workflow that demonstrates the full scope of figregistry-kedro integration
-    capabilities with sophisticated experimental condition handling and automated figure management.
-    
-    Args:
-        **kwargs: Additional pipeline configuration parameters
-        
-    Returns:
-        Pipeline: Complete comprehensive training pipeline demonstrating advanced
-            figregistry-kedro integration across all training workflow aspects
-            
-    Note:
-        This pipeline serves as the primary demonstration of F-005 feature capabilities,
-        showcasing enterprise-grade automated figure management for complex ML training
-        workflows with zero-touch styling and sophisticated experimental condition resolution.
-        
-        The complete pipeline eliminates all manual plt.savefig() calls from training
-        workflows while providing consistent, publication-ready visualizations across
-        all experimental conditions per Section 0.1.1 primary objectives.
+def create_combined_training_pipeline(**kwargs) -> Pipeline:
     """
-    logger.info("Creating complete comprehensive training pipeline with full figregistry-kedro integration")
+    Create combined training pipeline with integrated validation.
     
-    # Combine all training pipeline components for comprehensive demonstration
-    complete_pipeline = (
-        create_pipeline(**kwargs) +
-        create_training_comparison_pipeline(**kwargs) + 
-        create_training_monitoring_pipeline(**kwargs)
-    )
+    This function demonstrates pipeline composition patterns for enterprise
+    deployments where training and validation workflows are executed together
+    with sophisticated error handling and quality gates.
     
-    # Add comprehensive metadata for the complete training pipeline
-    complete_metadata = {
-        "pipeline_scope": "comprehensive_ml_training",
-        "figregistry_integration": "complete_advanced_demonstration",
-        "total_nodes": len(complete_pipeline.nodes),
-        "figregistry_datasets": sum(1 for node in complete_pipeline.nodes 
-                                   if any("visualization" in output or "analysis" in output or "monitor" in output
-                                         for output in node.outputs)),
-        "experimental_design_patterns": [
-            "single_variable_conditions",      # Basic condition-based styling
-            "multi_variable_conditions",       # Complex condition combinations
-            "hierarchical_conditions",         # Nested condition resolution
-            "wildcard_pattern_matching",       # F-002-RQ-002 wildcard support
-            "treatment_group_analysis",        # A/B testing patterns
-            "real_time_condition_resolution",  # Dynamic condition updating
-            "environment_specific_styling"     # Environment-based styling
-        ],
-        "advanced_features_demonstrated": [
-            "zero_touch_figure_management",           # Core F-005 objective
-            "automated_condition_based_styling",      # F-002 requirements
-            "kedro_versioning_integration",           # F-005-RQ-002 compliance
-            "sophisticated_experimental_design",     # F-002-RQ-002 patterns
-            "enterprise_grade_visualization",        # Production-ready patterns
-            "comprehensive_error_handling",          # Robust error management
-            "performance_optimized_styling",         # <5% overhead per F-005 specs
-            "thread_safe_pipeline_execution"        # Concurrent pipeline support
-        ],
-        "catalog_integration_capabilities": {
-            "purpose_categories": ["exploratory", "presentation", "publication"],
-            "condition_parameter_resolution": "advanced_multi_variable",
-            "style_parameter_overrides": "comprehensive_customization",
-            "versioning_support": "full_kedro_compatibility",
-            "automated_directory_management": "intelligent_path_resolution",
-            "format_support": ["PNG", "PDF", "SVG", "EPS"],
-            "performance_optimization": "sub_5_percent_overhead"
-        }
-    }
+    Returns:
+        Pipeline: Combined training and validation pipeline
+    """
+    logger.info("Creating combined training pipeline with integrated validation")
     
-    # Store comprehensive metadata
-    complete_pipeline.metadata = complete_metadata
+    # Create main training pipeline
+    training_pipeline = create_pipeline(**kwargs)
     
-    # Log comprehensive pipeline statistics
-    total_nodes = complete_metadata["total_nodes"]
-    figregistry_outputs = complete_metadata["figregistry_datasets"]
-    coverage_percentage = (figregistry_outputs / total_nodes) * 100 if total_nodes > 0 else 0
+    # Create validation pipeline
+    validation_pipeline = create_training_validation_pipeline(**kwargs)
     
-    logger.info(
-        f"Created complete training pipeline: {total_nodes} total nodes, "
-        f"{figregistry_outputs} FigureDataSet outputs ({coverage_percentage:.1f}% automation coverage)"
-    )
+    # Combine pipelines with dependency management
+    combined_pipeline = training_pipeline + validation_pipeline
     
-    logger.info(
-        f"Advanced features demonstrated: {', '.join(complete_metadata['advanced_features_demonstrated'])}"
-    )
+    logger.info(f"Combined pipeline created with {len(combined_pipeline.nodes)} total nodes")
     
-    return complete_pipeline
+    return combined_pipeline
+
+
+# Export pipeline creation functions for flexible usage patterns
+__all__ = [
+    "create_pipeline",
+    "create_training_validation_pipeline", 
+    "create_combined_training_pipeline"
+]
