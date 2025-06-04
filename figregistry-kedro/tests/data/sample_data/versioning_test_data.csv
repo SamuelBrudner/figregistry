@@ -1,41 +1,51 @@
-run_id,kedro_version,figregistry_timestamp,experiment_condition,data_value,execution_time,pipeline_name,concurrent_run_group,version_conflict_scenario,historical_reference,measurement_type,researcher_id,dataset_size,processing_duration_ms
-1,2024-01-15T10.30.45.123Z,20240115_103045,control,23.45,2024-01-15T10:30:45.123Z,basic_analysis,A,none,initial,temperature,R001,100,45
-2,2024-01-15T10.30.46.234Z,20240115_103046,control,23.52,2024-01-15T10:30:46.234Z,basic_analysis,A,none,run_1,temperature,R001,100,47
-3,2024-01-15T10.30.47.345Z,20240115_103047,treatment_a,28.91,2024-01-15T10:30:47.345Z,basic_analysis,A,none,run_2,temperature,R001,100,43
-4,2024-01-15T10.30.48.456Z,20240115_103048,treatment_b,31.67,2024-01-15T10:30:48.456Z,basic_analysis,A,none,run_3,temperature,R001,100,51
-5,2024-01-15T10.30.49.567Z,20240115_103049,exploratory,19.23,2024-01-15T10:30:49.567Z,basic_analysis,A,none,run_4,temperature,R001,100,48
-6,2024-01-15T11.15.23.678Z,20240115_111523,control,22.98,2024-01-15T11:15:23.678Z,advanced_pipeline,B,rapid_succession,run_5,pressure,R002,500,156
-7,2024-01-15T11.15.23.789Z,20240115_111523,control,23.01,2024-01-15T11:15:23.789Z,advanced_pipeline,B,rapid_succession,run_5,pressure,R002,500,158
-8,2024-01-15T11.15.23.890Z,20240115_111523,treatment_a,28.54,2024-01-15T11:15:23.890Z,advanced_pipeline,B,rapid_succession,run_5,pressure,R002,500,162
-9,2024-01-15T14.22.15.123Z,20240115_142215,control,23.33,2024-01-15T14:22:15.123Z,concurrent_test,C,concurrent_group_1,timestamp_collision,temperature,R003,750,89
-10,2024-01-15T14.22.15.124Z,20240115_142215,control,23.35,2024-01-15T14:22:15.124Z,concurrent_test,C,concurrent_group_1,timestamp_collision,temperature,R004,750,91
-11,2024-01-15T14.22.15.125Z,20240115_142215,treatment_a,28.77,2024-01-15T14:22:15.125Z,concurrent_test,C,concurrent_group_1,timestamp_collision,temperature,R005,750,88
-12,2024-01-15T14.22.15.126Z,20240115_142215,treatment_b,31.89,2024-01-15T14:22:15.126Z,concurrent_test,C,concurrent_group_1,timestamp_collision,temperature,R006,750,93
-13,2024-01-16T09.45.12.234Z,20240116_094512,control,23.67,2024-01-16T09:45:12.234Z,daily_rollover,D,none,previous_day_run_12,flow_rate,R001,200,67
-14,2024-01-16T09.45.13.345Z,20240116_094513,treatment_a,29.12,2024-01-16T09:45:13.345Z,daily_rollover,D,none,previous_day_run_12,flow_rate,R001,200,71
-15,2024-01-16T09.45.14.456Z,20240116_094514,treatment_b,32.01,2024-01-16T09:45:14.456Z,daily_rollover,D,none,previous_day_run_12,flow_rate,R001,200,69
-16,2024-01-16T15.30.22.567Z,20240116_153022,control,22.85,2024-01-16T15:30:22.567Z,version_stress_test,E,stress_group_1,version_flood,temperature,R007,1000,234
-17,2024-01-16T15.30.22.568Z,20240116_153022,control,22.87,2024-01-16T15:30:22.568Z,version_stress_test,E,stress_group_1,version_flood,temperature,R008,1000,236
-18,2024-01-16T15.30.22.569Z,20240116_153022,control,22.89,2024-01-16T15:30:22.569Z,version_stress_test,E,stress_group_1,version_flood,temperature,R009,1000,238
-19,2024-01-16T15.30.22.570Z,20240116_153022,control,22.91,2024-01-16T15:30:22.570Z,version_stress_test,E,stress_group_1,version_flood,temperature,R010,1000,240
-20,2024-01-16T15.30.22.571Z,20240116_153022,control,22.93,2024-01-16T15:30:22.571Z,version_stress_test,E,stress_group_1,version_flood,temperature,R011,1000,242
-21,2024-01-17T08.15.45.678Z,20240117_081545,treatment_a,28.45,2024-01-17T08:15:45.678Z,historical_comparison,F,none,baseline_run_1,conductivity,R002,300,78
-22,2024-01-17T08.15.46.789Z,20240117_081546,treatment_a,28.52,2024-01-17T08:15:46.789Z,historical_comparison,F,none,baseline_run_1,conductivity,R002,300,82
-23,2024-01-17T08.15.47.890Z,20240117_081547,treatment_b,31.23,2024-01-17T08:15:47.890Z,historical_comparison,F,none,baseline_run_1,conductivity,R002,300,79
-24,2024-01-17T12.00.00.000Z,20240117_120000,exploratory,19.87,2024-01-17T12:00:00.000Z,edge_case_midnight,G,edge_case_group,exact_timestamp,ph_level,R012,50,34
-25,2024-01-17T12.00.00.001Z,20240117_120000,exploratory,19.89,2024-01-17T12:00:00.001Z,edge_case_midnight,G,edge_case_group,exact_timestamp,ph_level,R013,50,36
-26,2024-01-17T16.45.33.123Z,20240117_164533,control,23.11,2024-01-17T16:45:33.123Z,rollback_scenario,H,none,rollback_test,viscosity,R001,400,112
-27,2024-01-17T16.45.34.234Z,20240117_164534,control,23.09,2024-01-17T16:45:34.234Z,rollback_scenario,H,none,rollback_test,viscosity,R001,400,115
-28,2024-01-17T16.45.35.345Z,20240117_164535,treatment_a,28.67,2024-01-17T16:45:35.345Z,rollback_scenario,H,none,rollback_test,viscosity,R001,400,118
-29,2024-01-18T07.30.15.456Z,20240118_073015,control,23.78,2024-01-18T07:30:15.456Z,cross_day_versioning,I,cross_day_group,day_boundary,density,R014,600,145
-30,2024-01-18T07.30.16.567Z,20240118_073016,treatment_a,29.34,2024-01-18T07:30:16.567Z,cross_day_versioning,I,cross_day_group,day_boundary,density,R014,600,148
-31,2024-01-18T10.15.22.678Z,20240118_101522,treatment_b,32.45,2024-01-18T10:15:22.678Z,performance_baseline,J,performance_group,performance_test,turbidity,R015,2000,456
-32,2024-01-18T10.15.23.789Z,20240118_101523,treatment_b,32.52,2024-01-18T10:15:23.789Z,performance_baseline,J,performance_group,performance_test,turbidity,R015,2000,462
-33,2024-01-18T10.15.24.890Z,20240118_101524,exploratory,20.15,2024-01-18T10:15:24.890Z,performance_baseline,J,performance_group,performance_test,turbidity,R015,2000,458
-34,2024-01-18T14.45.11.123Z,20240118_144511,control,22.95,2024-01-18T14:45:11.123Z,version_recovery,K,recovery_group,version_recovery,alkalinity,R016,150,56
-35,2024-01-18T14.45.12.234Z,20240118_144512,control,22.97,2024-01-18T14:45:12.234Z,version_recovery,K,recovery_group,version_recovery,alkalinity,R016,150,58
-36,2024-01-18T14.45.13.345Z,20240118_144513,treatment_a,28.81,2024-01-18T14:45:13.345Z,version_recovery,K,recovery_group,version_recovery,alkalinity,R016,150,54
-37,2024-01-19T11.20.34.456Z,20240119_112034,treatment_b,31.78,2024-01-19T11:20:34.456Z,final_validation,L,validation_group,final_test,chlorophyll,R017,800,189
-38,2024-01-19T11.20.35.567Z,20240119_112035,treatment_b,31.85,2024-01-19T11:20:35.567Z,final_validation,L,validation_group,final_test,chlorophyll,R017,800,192
-39,2024-01-19T11.20.36.678Z,20240119_112036,exploratory,19.76,2024-01-19T11:20:36.678Z,final_validation,L,validation_group,final_test,chlorophyll,R017,800,187
-40,2024-01-19T15.55.47.789Z,20240119_155547,control,23.44,2024-01-19T15:55:47.789Z,comprehensive_test,M,comprehensive_group,complete_workflow,dissolved_oxygen,R018,1500,367
+pipeline_run_id,figregistry_version,kedro_version,condition,experiment_id,measurement_value,pipeline_timestamp,execution_timestamp,researcher_id,session_id,run_sequence,versioning_scenario,previous_run_ref,comparison_baseline,conflict_marker,notes
+RUN_001_v1,20231201_093015,v001,control,EXP_VER_001,24.73,2023-12-01T09:30:15.123Z,2023-12-01T09:30:15.123Z,researcher_001,SESSION_A,1,initial_run,NULL,24.73,none,Initial baseline measurement for versioning test
+RUN_001_v2,20231201_093516,v002,control,EXP_VER_001,24.89,2023-12-01T09:35:16.456Z,2023-12-01T09:35:16.456Z,researcher_001,SESSION_A,2,rapid_succession,RUN_001_v1,24.73,none,Rapid successive run - 5 minute gap
+RUN_001_v3,20231201_093618,v003,control,EXP_VER_001,24.67,2023-12-01T09:36:18.789Z,2023-12-01T09:36:18.789Z,researcher_001,SESSION_A,3,rapid_succession,RUN_001_v2,24.89,none,Ultra-rapid succession - 1 minute gap testing versioning collision
+RUN_002_v1,20231201_103045,v004,treatment_a,EXP_VER_002,31.45,2023-12-01T10:30:45.234Z,2023-12-01T10:30:45.234Z,researcher_002,SESSION_B,1,concurrent_session,NULL,31.45,none,Concurrent session start during SESSION_A
+RUN_001_v4,20231201_103127,v005,control,EXP_VER_001,24.91,2023-12-01T10:31:27.567Z,2023-12-01T10:31:27.567Z,researcher_001,SESSION_A,4,version_continuation,RUN_001_v3,24.67,potential_conflict,SESSION_A continues while SESSION_B active
+RUN_002_v2,20231201_103203,v006,treatment_a,EXP_VER_002,31.78,2023-12-01T10:32:03.891Z,2023-12-01T10:32:03.891Z,researcher_002,SESSION_B,2,concurrent_execution,RUN_002_v1,31.45,potential_conflict,Concurrent execution overlapping timestamps
+RUN_003_v1,20231201_110000,v007,treatment_b,EXP_VER_003,28.67,2023-12-01T11:00:00.000Z,2023-12-01T11:00:00.000Z,researcher_003,SESSION_C,1,exact_timestamp,NULL,28.67,timestamp_precision,Exact timestamp testing edge case
+RUN_003_v2,20231201_110000,v008,treatment_b,EXP_VER_003,28.89,2023-12-01T11:00:00.001Z,2023-12-01T11:00:00.001Z,researcher_003,SESSION_C,2,millisecond_precision,RUN_003_v1,28.67,timestamp_precision,1ms difference testing versioning precision
+RUN_004_v1,20231201_113522,v009,exploratory,EXP_VER_004,26.81,2023-12-01T11:35:22.678Z,2023-12-01T11:35:22.678Z,researcher_004,SESSION_D,1,historical_reference,RUN_001_v1,24.73,none,Historical comparison to initial baseline
+RUN_004_v2,20231201_114015,v010,exploratory,EXP_VER_004,35.67,2023-12-01T11:40:15.345Z,2023-12-01T11:40:15.345Z,researcher_004,SESSION_D,2,version_comparison,RUN_004_v1,26.81,none,Version progression tracking
+RUN_005_v1,20231201_120001,v011,presentation,EXP_VER_005,29.45,2023-12-01T12:00:01.234Z,2023-12-01T12:00:01.234Z,researcher_005,SESSION_E,1,kedro_versioning_enabled,NULL,29.45,none,First run with Kedro versioning enabled
+RUN_005_v2,20231201_120145,v012,presentation,EXP_VER_005,29.67,2023-12-01T12:01:45.567Z,2023-12-01T12:01:45.567Z,researcher_005,SESSION_E,2,kedro_versioning_enabled,RUN_005_v1,29.45,none,Second versioned run in same session
+RUN_006_v1,20231201_130030,v013,publication,EXP_VER_006,30.89,2023-12-01T13:00:30.789Z,2023-12-01T13:00:30.789Z,researcher_006,SESSION_F,1,version_rollback_test,RUN_005_v2,29.67,none,Testing version rollback scenario
+RUN_007_v1,20231201_133045,v014,control,EXP_VER_007,23.45,2023-12-01T13:30:45.123Z,2023-12-01T13:30:45.123Z,researcher_007,SESSION_G,1,parallel_pipeline_A,NULL,23.45,parallel_execution,Parallel pipeline execution start A
+RUN_008_v1,20231201_133047,v015,control,EXP_VER_008,23.78,2023-12-01T13:30:47.456Z,2023-12-01T13:30:47.456Z,researcher_008,SESSION_H,1,parallel_pipeline_B,NULL,23.78,parallel_execution,Parallel pipeline execution start B - 2 second overlap
+RUN_007_v2,20231201_133512,v016,control,EXP_VER_007,24.12,2023-12-01T13:35:12.789Z,2023-12-01T13:35:12.789Z,researcher_007,SESSION_G,2,parallel_pipeline_A,RUN_007_v1,23.45,parallel_execution,Pipeline A continuation
+RUN_008_v2,20231201_133515,v017,control,EXP_VER_008,24.34,2023-12-01T13:35:15.012Z,2023-12-01T13:35:15.012Z,researcher_008,SESSION_H,2,parallel_pipeline_B,RUN_008_v1,23.78,parallel_execution,Pipeline B continuation - 3 second overlap
+RUN_009_v1,20231201_140000,v018,treatment_a,EXP_VER_009,30.78,2023-12-01T14:00:00.000Z,2023-12-01T14:00:00.000Z,researcher_009,SESSION_I,1,version_conflict_simulation,RUN_006_v1,30.89,version_conflict,Simulated version conflict scenario
+RUN_009_v2,20231201_140000,v019,treatment_a,EXP_VER_009,30.95,2023-12-01T14:00:00.000Z,2023-12-01T14:00:00.000Z,researcher_009,SESSION_I,2,version_conflict_simulation,RUN_009_v1,30.78,version_conflict,Duplicate timestamp conflict resolution test
+RUN_010_v1,20231201_143022,v020,treatment_b,EXP_VER_010,27.34,2023-12-01T14:30:22.345Z,2023-12-01T14:30:22.345Z,researcher_010,SESSION_J,1,cross_session_reference,RUN_007_v1,23.45,none,Cross-session reference to different pipeline
+RUN_011_v1,20231201_150015,v021,exploratory,EXP_VER_011,32.11,2023-12-01T15:00:15.678Z,2023-12-01T15:00:15.678Z,researcher_001,SESSION_K,1,researcher_session_reuse,RUN_001_v1,24.73,none,Same researcher new session - version continuity test
+RUN_012_v1,20231201_153030,v022,presentation,EXP_VER_012,28.98,2023-12-01T15:30:30.912Z,2023-12-01T15:30:30.912Z,researcher_002,SESSION_L,1,version_chain_test,RUN_002_v2,31.78,none,Version chain validation across sessions
+RUN_013_v1,20231201_160045,v023,publication,EXP_VER_013,31.67,2023-12-01T16:00:45.234Z,2023-12-01T16:00:45.234Z,researcher_003,SESSION_M,1,multi_condition_versioning,RUN_003_v2,28.89,none,Multi-condition version tracking
+RUN_014_v1,20231201_163022,v024,control,EXP_VER_014,24.89,2023-12-01T16:30:22.567Z,2023-12-01T16:30:22.567Z,researcher_004,SESSION_N,1,version_comparison_multi,RUN_001_v1,24.73,none,Multi-version comparison baseline
+RUN_014_v2,20231201_164015,v025,control,EXP_VER_014,25.12,2023-12-01T16:40:15.890Z,2023-12-01T16:40:15.890Z,researcher_004,SESSION_N,2,version_comparison_multi,RUN_014_v1,24.89,none,Multi-version comparison progression
+RUN_015_v1,20231201_170030,v026,treatment_a,EXP_VER_015,31.23,2023-12-01T17:00:30.123Z,2023-12-01T17:00:30.123Z,researcher_005,SESSION_O,1,end_day_versioning,RUN_011_v1,32.11,none,End of day version checkpoint
+RUN_016_v1,20231202_080015,v027,control,EXP_VER_016,23.67,2023-12-02T08:00:15.456Z,2023-12-02T08:00:15.456Z,researcher_006,SESSION_P,1,next_day_continuation,RUN_015_v1,31.23,date_boundary,Next day continuation - date boundary test
+RUN_017_v1,20231202_083045,v028,treatment_b,EXP_VER_017,28.45,2023-12-02T08:30:45.789Z,2023-12-02T08:30:45.789Z,researcher_007,SESSION_Q,1,batch_processing_start,NULL,28.45,none,Batch processing version start
+RUN_017_v2,20231202_083546,v029,treatment_b,EXP_VER_017,28.67,2023-12-02T08:35:46.012Z,2023-12-02T08:35:46.012Z,researcher_007,SESSION_Q,2,batch_processing_continuation,RUN_017_v1,28.45,none,Batch processing rapid iteration
+RUN_017_v3,20231202_084012,v030,treatment_b,EXP_VER_017,28.91,2023-12-02T08:40:12.345Z,2023-12-02T08:40:12.345Z,researcher_007,SESSION_Q,3,batch_processing_continuation,RUN_017_v2,28.67,none,Batch processing third iteration
+RUN_018_v1,20231202_090022,v031,exploratory,EXP_VER_018,26.78,2023-12-02T09:00:22.678Z,2023-12-02T09:00:22.678Z,researcher_008,SESSION_R,1,version_metadata_test,RUN_016_v1,23.67,none,Version metadata validation
+RUN_019_v1,20231202_093015,v032,presentation,EXP_VER_019,29.34,2023-12-02T09:30:15.901Z,2023-12-02T09:30:15.901Z,researcher_009,SESSION_S,1,24_hour_cycle,RUN_001_v1,24.73,time_cycle,24-hour cycle version comparison
+RUN_020_v1,20231202_100030,v033,publication,EXP_VER_020,32.45,2023-12-02T10:00:30.234Z,2023-12-02T10:00:30.234Z,researcher_010,SESSION_T,1,final_version_validation,RUN_019_v1,29.34,none,Final comprehensive version validation
+RUN_021_v1,20231202_103045,v034,control,EXP_VER_021,,2023-12-02T10:30:45.567Z,2023-12-02T10:30:45.567Z,researcher_001,SESSION_U,1,missing_data_versioning,RUN_020_v1,32.45,data_missing,Missing measurement value version handling
+RUN_022_v1,20231202_110015,v035,treatment_a,EXP_VER_022,156.78,2023-12-02T11:00:15.890Z,2023-12-02T11:00:15.890Z,researcher_002,SESSION_V,1,outlier_versioning,RUN_021_v1,,outlier_detection,Extreme outlier version tracking
+RUN_023_v1,20231202_113030,v036,treatment_b,EXP_VER_023,27.89,2023-12-02T11:30:30.123Z,2023-12-02T11:30:30.123Z,researcher_003,SESSION_W,1,version_recovery_test,RUN_022_v1,156.78,none,Recovery from outlier version
+RUN_024_v1,20231202_120045,v037,exploratory,EXP_VER_024,33.67,2023-12-02T12:00:45.456Z,2023-12-02T12:00:45.456Z,researcher_004,SESSION_X,1,concurrent_conflict_A,NULL,33.67,concurrent_conflict,Concurrent conflict scenario A start
+RUN_025_v1,20231202_120047,v038,exploratory,EXP_VER_025,33.89,2023-12-02T12:00:47.789Z,2023-12-02T12:00:47.789Z,researcher_005,SESSION_Y,1,concurrent_conflict_B,NULL,33.89,concurrent_conflict,Concurrent conflict scenario B start - 2 second gap
+RUN_024_v2,20231202_120512,v039,exploratory,EXP_VER_024,34.12,2023-12-02T12:05:12.012Z,2023-12-02T12:05:12.012Z,researcher_004,SESSION_X,2,concurrent_conflict_A,RUN_024_v1,33.67,concurrent_conflict,Concurrent conflict A progression
+RUN_025_v2,20231202_120515,v040,exploratory,EXP_VER_025,34.34,2023-12-02T12:05:15.345Z,2023-12-02T12:05:15.345Z,researcher_005,SESSION_Y,2,concurrent_conflict_B,RUN_025_v1,33.89,concurrent_conflict,Concurrent conflict B progression - 3 second gap
+RUN_026_v1,20231202_123022,v041,presentation,EXP_VER_026,30.56,2023-12-02T12:30:22.678Z,2023-12-02T12:30:22.678Z,researcher_006,SESSION_Z,1,version_consolidation,RUN_024_v2,34.12,none,Version consolidation post-conflict
+RUN_027_v1,20231202_130015,v042,publication,EXP_VER_027,31.78,2023-12-02T13:00:15.901Z,2023-12-02T13:00:15.901Z,researcher_007,SESSION_AA,1,stress_test_rapid_1,NULL,31.78,stress_test,Stress test rapid versioning start
+RUN_027_v2,20231202_130016,v043,publication,EXP_VER_027,31.89,2023-12-02T13:00:16.234Z,2023-12-02T13:00:16.234Z,researcher_007,SESSION_AA,2,stress_test_rapid_2,RUN_027_v1,31.78,stress_test,1 second rapid iteration
+RUN_027_v3,20231202_130017,v044,publication,EXP_VER_027,32.01,2023-12-02T13:00:17.567Z,2023-12-02T13:00:17.567Z,researcher_007,SESSION_AA,3,stress_test_rapid_3,RUN_027_v2,31.89,stress_test,1 second rapid iteration
+RUN_027_v4,20231202_130018,v045,publication,EXP_VER_027,32.12,2023-12-02T13:00:18.890Z,2023-12-02T13:00:18.890Z,researcher_007,SESSION_AA,4,stress_test_rapid_4,RUN_027_v3,32.01,stress_test,1 second rapid iteration
+RUN_027_v5,20231202_130019,v046,publication,EXP_VER_027,32.23,2023-12-02T13:00:19.123Z,2023-12-02T13:00:19.123Z,researcher_007,SESSION_AA,5,stress_test_rapid_5,RUN_027_v4,32.12,stress_test,1 second rapid iteration - versioning system stress
+RUN_028_v1,20231202_133030,v047,control,EXP_VER_028,24.56,2023-12-02T13:30:30.456Z,2023-12-02T13:30:30.456Z,researcher_008,SESSION_BB,1,post_stress_recovery,RUN_027_v5,32.23,none,Post stress test recovery validation
+RUN_029_v1,20231202_140045,v048,treatment_a,EXP_VER_029,30.45,2023-12-02T14:00:45.789Z,2023-12-02T14:00:45.789Z,researcher_009,SESSION_CC,1,version_lineage_test,RUN_001_v1,24.73,none,Version lineage tracking across full test suite
+RUN_030_v1,20231202_143015,v049,treatment_b,EXP_VER_030,28.67,2023-12-02T14:30:15.012Z,2023-12-02T14:30:15.012Z,researcher_010,SESSION_DD,1,final_comprehensive,RUN_029_v1,30.45,none,Final comprehensive versioning validation
+RUN_030_v2,20231202_150030,v050,treatment_b,EXP_VER_030,28.89,2023-12-02T15:00:30.345Z,2023-12-02T15:00:30.345Z,researcher_010,SESSION_DD,2,test_suite_conclusion,RUN_030_v1,28.67,none,Test suite conclusion - versioning system validation complete
