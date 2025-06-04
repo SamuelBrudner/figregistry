@@ -1,1132 +1,1039 @@
-"""Configuration testing fixtures for FigRegistry-Kedro integration.
+"""
+Configuration Testing Fixtures for FigRegistry-Kedro Integration
 
-This module provides comprehensive YAML configuration test data for validating
-the FigRegistryConfigBridge functionality, including environment-specific overrides,
-configuration merging scenarios, Pydantic validation testing, and error handling
-for various configuration edge cases.
+This module provides comprehensive YAML configuration test data for testing the 
+FigRegistryConfigBridge component. Fixtures support environment-specific configuration 
+override testing, configuration merging validation, Pydantic validation testing, 
+and error handling scenarios as required by F-007 and F-007.2 functional requirements.
 
-The fixtures support testing of:
-- Configuration bridge between Kedro ConfigLoader and FigRegistry YAML system
-- Environment-specific configuration precedence rules per F-007.2
-- Pydantic validation for type safety across both systems per Section 5.2.5
-- Configuration merging with proper precedence rules per F-007
-- Performance validation for <10ms merge time requirements
-- Error handling for malformed YAML and schema violations
+The fixtures enable comprehensive testing of:
+- Base FigRegistry configuration templates for baseline testing (Section 5.2.5)
+- Environment-specific configuration overrides (F-007.2)
+- Configuration merging with proper precedence rules (F-007)
+- Pydantic validation for type safety across both systems (Section 5.2.5)
+- Error handling for malformed configurations and schema violations
+- Performance requirements validation (<10ms merge time targets)
+
+Key Testing Scenarios:
+- Valid configuration merging between Kedro and FigRegistry systems
+- Environment-specific override precedence (local, staging, production)
+- Schema validation failures and error aggregation
+- Configuration caching and performance benchmarking
+- Thread-safety testing for concurrent access patterns
 """
 
-import pytest
-from typing import Any, Dict, List, Optional, Tuple
+import copy
 from pathlib import Path
-import tempfile
+from typing import Any, Dict, List, Optional, Tuple
+from unittest.mock import MagicMock
+
+import pytest
 import yaml
-from datetime import datetime
-from unittest.mock import Mock
 
-
-# =============================================================================
-# Base FigRegistry Configuration Fixtures
-# =============================================================================
 
 @pytest.fixture
 def base_figregistry_config() -> Dict[str, Any]:
-    """Standard FigRegistry YAML configuration for baseline testing per Section 5.2.5.
+    """
+    Provide standard FigRegistry YAML configuration for baseline testing per Section 5.2.5.
     
-    Provides a complete, valid FigRegistry configuration with all major sections
-    populated for use as the foundation for testing configuration merging,
-    validation, and bridge functionality.
+    This fixture contains a comprehensive base configuration that represents a typical
+    FigRegistry setup with all required and optional sections properly configured.
+    Used as the foundation for testing configuration merging, validation, and 
+    environment-specific overrides.
     
     Returns:
-        Complete FigRegistry configuration dictionary with styles, palettes,
-        outputs, and defaults sections properly structured.
+        Dict containing complete FigRegistry configuration with all sections
     """
     return {
-        "figregistry_version": "0.3.0",
+        "figregistry_version": ">=0.3.0",
+        "metadata": {
+            "config_version": "1.0.0",
+            "created_by": "figregistry-kedro test suite",
+            "description": "Base FigRegistry configuration for testing",
+            "last_updated": "2024-01-15T10:30:00Z",
+            "project_name": "figregistry-kedro-test"
+        },
         "styles": {
-            "control": {
-                "color": "#1f77b4",
+            "exploratory": {
+                "color": "#A8E6CF",
                 "marker": "o",
                 "linestyle": "-",
-                "linewidth": 2.0,
-                "markersize": 6,
-                "alpha": 0.8,
-                "label": "Control"
+                "linewidth": 1.5,
+                "alpha": 0.7,
+                "label": "Exploratory Analysis",
+                "markersize": 6
             },
-            "treatment_a": {
-                "color": "#ff7f0e", 
+            "presentation": {
+                "color": "#FFB6C1", 
                 "marker": "s",
-                "linestyle": "--",
-                "linewidth": 2.5,
-                "markersize": 7,
-                "alpha": 0.9,
-                "label": "Treatment A"
+                "linestyle": "-",
+                "linewidth": 2.0,
+                "alpha": 0.8,
+                "label": "Presentation Ready",
+                "markersize": 8
             },
-            "treatment_b": {
-                "color": "#2ca02c",
+            "publication": {
+                "color": "#1A1A1A",
                 "marker": "^",
-                "linestyle": "-.",
-                "linewidth": 2.0,
-                "markersize": 8,
-                "alpha": 0.85,
-                "label": "Treatment B"
-            },
-            "exploratory_*": {
-                "color": "#d62728",
-                "marker": "x",
-                "linestyle": ":",
-                "linewidth": 1.5,
-                "markersize": 5,
-                "alpha": 0.7,
-                "label": "Exploratory"
-            }
-        },
-        "palettes": {
-            "default": ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd"],
-            "colorblind_safe": ["#0173b2", "#de8f05", "#029e73", "#cc78bc", "#ca9161"],
-            "publication": ["#000000", "#404040", "#808080", "#b0b0b0", "#d0d0d0"],
-            "high_contrast": ["#000000", "#ffffff", "#ff0000", "#00ff00", "#0000ff"]
-        },
-        "outputs": {
-            "base_path": "figures",
-            "path_aliases": {
-                "expl": "exploratory",
-                "pres": "presentation", 
-                "pub": "publication"
-            },
-            "timestamp_format": "{name}_{ts}",
-            "default_format": "png",
-            "dpi": 300,
-            "bbox_inches": "tight",
-            "pad_inches": 0.1
-        },
-        "defaults": {
-            "figure_size": [10, 6],
-            "font_family": "sans-serif",
-            "font_size": 12,
-            "line_width": 1.5,
-            "marker_size": 6,
-            "color_cycle": "default",
-            "grid": True,
-            "spine_visibility": {
-                "top": False,
-                "right": False,
-                "bottom": True,
-                "left": True
-            }
-        },
-        "metadata": {
-            "project_name": "figregistry-kedro-test",
-            "description": "Test configuration for FigRegistry-Kedro integration",
-            "version": "1.0.0",
-            "created": "2024-01-01T00:00:00Z"
-        }
-    }
-
-
-@pytest.fixture
-def minimal_figregistry_config() -> Dict[str, Any]:
-    """Minimal valid FigRegistry configuration for basic testing.
-    
-    Provides the bare minimum required configuration fields to test
-    configuration loading and validation with default value handling.
-    
-    Returns:
-        Minimal FigRegistry configuration with only required fields.
-    """
-    return {
-        "figregistry_version": "0.3.0",
-        "styles": {
-            "default": {
-                "color": "#1f77b4",
-                "marker": "o"
-            }
-        }
-    }
-
-
-@pytest.fixture 
-def comprehensive_figregistry_config() -> Dict[str, Any]:
-    """Comprehensive FigRegistry configuration with advanced features.
-    
-    Includes complex styling patterns, multiple palettes, advanced output
-    configurations, and extensive metadata for testing full feature support.
-    
-    Returns:
-        Comprehensive configuration dictionary with all optional fields.
-    """
-    return {
-        "figregistry_version": "0.3.0",
-        "styles": {
-            "baseline": {
-                "color": "#1f77b4",
-                "marker": "o",
                 "linestyle": "-",
-                "linewidth": 2.0,
-                "markersize": 6,
-                "alpha": 0.8,
-                "label": "Baseline",
-                "zorder": 1
+                "linewidth": 2.5,
+                "alpha": 1.0,
+                "label": "Publication Quality",
+                "markersize": 10
             },
-            "intervention_high": {
-                "color": "#ff7f0e",
-                "marker": "s", 
+            "baseline": {
+                "color": "#2E86AB",
+                "marker": "o",
                 "linestyle": "--",
-                "linewidth": 3.0,
-                "markersize": 8,
-                "alpha": 0.9,
-                "label": "High Dose",
-                "zorder": 2
-            },
-            "intervention_low": {
-                "color": "#ffbb78",
-                "marker": "s",
-                "linestyle": "--", 
                 "linewidth": 2.0,
-                "markersize": 6,
-                "alpha": 0.7,
-                "label": "Low Dose",
-                "zorder": 2
+                "alpha": 0.9,
+                "label": "Baseline Condition"
             },
-            "exploratory_*": {
-                "color": "#d62728",
-                "marker": "x",
-                "linestyle": ":",
-                "linewidth": 1.0,
-                "markersize": 4,
-                "alpha": 0.5,
-                "label": "Exploratory",
-                "zorder": 0
-            },
-            "validation_*": {
-                "color": "#9467bd",
-                "marker": "v",
-                "linestyle": "-.",
-                "linewidth": 1.5,
-                "markersize": 5,
-                "alpha": 0.6,
-                "label": "Validation",
-                "zorder": 1
-            }
-        },
-        "palettes": {
-            "default": ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"],
-            "qualitative": ["#e377c2", "#7f7f7f", "#bcbd22", "#17becf", "#aec7e8", "#ffbb78"],
-            "sequential_blue": ["#f7fbff", "#deebf7", "#c6dbef", "#9ecae1", "#6baed6", "#3182bd"],
-            "diverging": ["#d73027", "#f46d43", "#fdae61", "#fee08b", "#d9ef8b", "#a6d96a"],
-            "colorblind_safe": ["#0173b2", "#de8f05", "#029e73", "#d55e00", "#cc78bc", "#ca9161"],
-            "publication_bw": ["#000000", "#404040", "#666666", "#999999", "#cccccc", "#ffffff"],
-            "high_contrast": ["#000000", "#ffffff", "#ff0000", "#00ff00", "#0000ff", "#ffff00"]
-        },
-        "outputs": {
-            "base_path": "outputs/figures",
-            "path_aliases": {
-                "expl": "01_exploratory",
-                "eda": "01_exploratory", 
-                "pres": "02_presentation",
-                "present": "02_presentation",
-                "pub": "03_publication",
-                "publish": "03_publication",
-                "temp": "temp",
-                "debug": "debug"
-            },
-            "timestamp_format": "{name}_{ts:%Y%m%d_%H%M%S}",
-            "slug_format": "{purpose}_{name}_{condition}",
-            "default_format": "png",
-            "formats": ["png", "pdf", "svg"],
-            "dpi": 300,
-            "bbox_inches": "tight",
-            "pad_inches": 0.1,
-            "facecolor": "white",
-            "edgecolor": "none",
-            "transparent": False,
-            "metadata": True
-        },
-        "defaults": {
-            "figure_size": [12, 8],
-            "font_family": "DejaVu Sans", 
-            "font_size": 14,
-            "title_size": 16,
-            "label_size": 12,
-            "tick_size": 10,
-            "legend_size": 11,
-            "line_width": 2.0,
-            "marker_size": 8,
-            "color_cycle": "default",
-            "grid": True,
-            "grid_alpha": 0.3,
-            "spine_visibility": {
-                "top": False,
-                "right": False,
-                "bottom": True,
-                "left": True
-            },
-            "spine_linewidth": 1.0,
-            "tick_direction": "out",
-            "legend_frameon": True,
-            "legend_fancybox": True,
-            "legend_shadow": False
-        },
-        "metadata": {
-            "project_name": "advanced-kedro-figregistry-project",
-            "description": "Comprehensive test configuration for advanced FigRegistry-Kedro integration",
-            "version": "2.1.0",
-            "author": "Test Suite",
-            "created": "2024-01-01T00:00:00Z",
-            "updated": "2024-01-15T12:30:00Z",
-            "tags": ["kedro", "figregistry", "testing", "integration"],
-            "environment": "test"
-        }
-    }
-
-
-# =============================================================================
-# Kedro Configuration Override Fixtures  
-# =============================================================================
-
-@pytest.fixture
-def local_override_config() -> Dict[str, Any]:
-    """Environment-specific configuration testing per F-007.2.
-    
-    Provides Kedro local environment overrides that should take precedence
-    over base FigRegistry configuration during merging operations.
-    
-    Returns:
-        Kedro local environment configuration overrides.
-    """
-    return {
-        "styles": {
-            "control": {
-                "color": "#0066cc",  # Override base color
-                "linewidth": 3.0,   # Override base linewidth
-                "label": "Local Control"  # Override base label
-            },
-            "local_condition": {
-                "color": "#ff6600",
+            "treatment": {
+                "color": "#F24236",
                 "marker": "D",
                 "linestyle": "-",
                 "linewidth": 2.0,
-                "alpha": 0.8,
-                "label": "Local Only"
+                "alpha": 0.9,
+                "label": "Treatment Condition"
             }
         },
-        "outputs": {
-            "base_path": "local_figures",  # Override base path
-            "dpi": 150,  # Override DPI for faster local testing
-            "default_format": "svg"  # Override format for dev
+        "palettes": {
+            "default": ["#2E86AB", "#A23B72", "#F18F01", "#C73E1D"],
+            "colorblind_safe": ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728"],
+            "publication": {
+                "primary": "#000000",
+                "secondary": "#666666", 
+                "accent": "#2E86AB",
+                "highlight": "#F24236"
+            }
         },
         "defaults": {
-            "figure_size": [8, 5],  # Smaller for local development
-            "font_size": 10,  # Smaller font for local
-            "grid": False  # Disable grid locally
-        },
-        "kedro": {
-            "enable_versioning": False,
-            "parallel_execution": False,
-            "debug_mode": True,
-            "cache_styling": True
-        }
-    }
-
-
-@pytest.fixture
-def staging_override_config() -> Dict[str, Any]:
-    """Staging environment configuration for multi-environment testing.
-    
-    Returns:
-        Staging environment specific overrides.
-    """
-    return {
-        "styles": {
-            "control": {
-                "alpha": 0.9  # Higher alpha for staging visibility
+            "figure": {
+                "figsize": [10, 8],
+                "dpi": 150,
+                "facecolor": "white",
+                "edgecolor": "none"
             },
-            "staging_validation": {
-                "color": "#9900cc",
-                "marker": "v", 
-                "linestyle": "-.",
-                "label": "Staging Validation"
+            "line": {
+                "color": "#2E86AB",
+                "linewidth": 2.0,
+                "alpha": 0.8
+            },
+            "scatter": {
+                "s": 50,
+                "alpha": 0.7,
+                "edgecolors": "black",
+                "linewidth": 0.5
+            },
+            "fallback_style": {
+                "color": "#95A5A6",
+                "marker": "o",
+                "linestyle": "-",
+                "linewidth": 1.5,
+                "alpha": 0.7,
+                "label": "Unknown Condition"
             }
         },
         "outputs": {
-            "base_path": "staging/figures",
-            "dpi": 200,
-            "metadata": True,
-            "timestamp_format": "staging_{name}_{ts:%Y%m%d_%H%M}"
+            "base_path": "data/08_reporting",
+            "naming": {
+                "template": "{name}_{condition}_{ts}",
+                "timestamp_format": "%Y%m%d_%H%M%S"
+            },
+            "formats": {
+                "defaults": {
+                    "exploratory": ["png"],
+                    "presentation": ["png", "pdf"],
+                    "publication": ["pdf", "svg"]
+                },
+                "resolution": {
+                    "png": {"dpi": 300},
+                    "pdf": {"dpi": 300},
+                    "svg": {"dpi": 300}
+                }
+            },
+            "paths": {
+                "exploratory": "exploratory",
+                "presentation": "presentation",
+                "publication": "publication"
+            }
         },
-        "defaults": {
-            "figure_size": [10, 6],
-            "font_size": 12,
-            "grid": True
+        "style_inheritance": {
+            "enabled": True,
+            "hierarchy": ["specific", "category", "defaults"],
+            "merge_strategy": "deep"
         },
-        "kedro": {
-            "enable_versioning": True,
-            "parallel_execution": True,
-            "debug_mode": False,
-            "performance_monitoring": True
+        "conditional_rules": {
+            "wildcard_patterns": ["*_control", "*_treatment"],
+            "partial_matching": True,
+            "case_sensitive": False
+        },
+        "performance": {
+            "cache_enabled": True,
+            "max_cache_size": 1000,
+            "target_merge_time_ms": 10.0
+        },
+        "validation": {
+            "strict_mode": True,
+            "required_fields": ["styles", "defaults", "outputs"],
+            "schema_version": "1.0"
         }
     }
 
 
-@pytest.fixture
-def production_override_config() -> Dict[str, Any]:
-    """Production environment configuration for deployment testing.
+@pytest.fixture  
+def local_override_config() -> Dict[str, Any]:
+    """
+    Provide environment-specific configuration testing for local development per F-007.2.
+    
+    This fixture represents Kedro local environment configuration overrides that should
+    take precedence over base FigRegistry configurations during merging. Tests the
+    precedence rules where Kedro-specific parameters override FigRegistry defaults.
     
     Returns:
-        Production environment specific overrides with optimized settings.
+        Dict containing local environment configuration overrides
     """
     return {
-        "styles": {
-            "control": {
-                "linewidth": 2.5,  # Thicker lines for production
-                "alpha": 1.0  # Full opacity for production
+        "figregistry": {
+            "outputs": {
+                "base_path": "data/01_raw/debug_figures",
+                "naming": {
+                    "template": "local_{name}_{ts}"
+                },
+                "formats": {
+                    "defaults": {
+                        "exploratory": ["png"]  # Only PNG for local development
+                    }
+                }
+            },
+            "defaults": {
+                "figure": {
+                    "figsize": [8, 6],  # Smaller figures for local development
+                    "dpi": 100  # Lower DPI for faster rendering
+                },
+                "line": {
+                    "linewidth": 1.0  # Thinner lines for debugging
+                }
+            },
+            "performance": {
+                "cache_enabled": True,
+                "target_merge_time_ms": 5.0  # Faster target for local
+            },
+            "validation": {
+                "strict_mode": False  # Relaxed validation for development
             }
         },
-        "outputs": {
-            "base_path": "/opt/kedro/production/figures",
-            "dpi": 300,
-            "formats": ["png", "pdf"],
-            "bbox_inches": "tight",
-            "pad_inches": 0.2,
-            "metadata": True,
-            "timestamp_format": "prod_{name}_{ts:%Y%m%d_%H%M%S}"
-        },
-        "defaults": {
-            "figure_size": [12, 8],
-            "font_size": 14,
-            "line_width": 2.0,
-            "grid": True,
-            "grid_alpha": 0.2
-        },
-        "kedro": {
-            "enable_versioning": True,
-            "parallel_execution": True,
-            "debug_mode": False,
-            "performance_monitoring": True,
-            "cache_styling": True,
-            "enable_concurrent_access": True,
-            "validation_enabled": True
+        "parameters": {
+            "experiment_condition": "local_test",
+            "experiment_phase": "development",
+            "analysis_stage": "exploratory",
+            "model_type": "prototype",
+            "plot_settings": {
+                "figure_size": [6, 4],
+                "dpi": 72
+            },
+            "execution_config": {
+                "output_base_path": "outputs/local",
+                "figure_formats": ["png"]
+            }
         }
     }
 
 
-# =============================================================================
-# Configuration Merging Test Scenarios
-# =============================================================================
-
 @pytest.fixture
-def merged_config_scenarios() -> List[Tuple[str, Dict[str, Any], Dict[str, Any], Dict[str, Any]]]:
-    """Various configuration merge combinations for comprehensive testing.
-    
-    Provides test scenarios for validating configuration merging logic,
-    precedence rules, and edge cases in the FigRegistryConfigBridge.
-    
-    Returns:
-        List of tuples containing (scenario_name, base_config, override_config, expected_merged).
+def environment_specific_configs() -> Dict[str, Dict[str, Any]]:
     """
-    scenarios = []
+    Provide environment-specific configurations supporting development, staging, and 
+    production scenarios per F-007.2.
     
-    # Scenario 1: Simple override
-    base_simple = {
-        "styles": {"control": {"color": "#1f77b4", "marker": "o"}},
-        "outputs": {"base_path": "figures", "dpi": 300}
-    }
-    override_simple = {
-        "styles": {"control": {"color": "#ff0000"}},
-        "outputs": {"dpi": 150}
-    }
-    expected_simple = {
-        "styles": {"control": {"color": "#ff0000", "marker": "o"}},
-        "outputs": {"base_path": "figures", "dpi": 150}
-    }
-    scenarios.append(("simple_override", base_simple, override_simple, expected_simple))
+    This fixture provides a complete set of environment configurations that test
+    the configuration bridge's ability to handle different deployment environments
+    with appropriate overrides for each stage of the development lifecycle.
     
-    # Scenario 2: Deep merge with new sections
-    base_deep = {
-        "styles": {
-            "control": {"color": "#1f77b4", "marker": "o"},
-            "treatment": {"color": "#ff7f0e", "marker": "s"}
+    Returns:
+        Dict mapping environment names to their specific configurations
+    """
+    return {
+        "base": {
+            "figregistry": {
+                "metadata": {
+                    "environment": "base",
+                    "config_level": "baseline"
+                },
+                "performance": {
+                    "target_merge_time_ms": 10.0
+                }
+            }
         },
-        "defaults": {"figure_size": [10, 6], "font_size": 12}
-    }
-    override_deep = {
-        "styles": {
-            "control": {"linewidth": 2.0},
-            "new_condition": {"color": "#00ff00", "marker": "^"}
+        "local": {
+            "figregistry": {
+                "metadata": {
+                    "environment": "local",
+                    "config_level": "development"
+                },
+                "outputs": {
+                    "base_path": "data/01_raw/local_figures",
+                    "formats": {
+                        "defaults": {
+                            "exploratory": ["png"]
+                        }
+                    }
+                },
+                "defaults": {
+                    "figure": {"dpi": 100},
+                    "line": {"linewidth": 1.0}
+                },
+                "performance": {
+                    "target_merge_time_ms": 5.0,
+                    "cache_enabled": True
+                },
+                "validation": {
+                    "strict_mode": False
+                }
+            },
+            "parameters": {
+                "experiment_condition": "local_dev",
+                "debug_mode": True
+            }
         },
-        "defaults": {"font_size": 14},
-        "kedro": {"debug_mode": True}
-    }
-    expected_deep = {
-        "styles": {
-            "control": {"color": "#1f77b4", "marker": "o", "linewidth": 2.0},
-            "treatment": {"color": "#ff7f0e", "marker": "s"},
-            "new_condition": {"color": "#00ff00", "marker": "^"}
+        "staging": {
+            "figregistry": {
+                "metadata": {
+                    "environment": "staging", 
+                    "config_level": "testing"
+                },
+                "outputs": {
+                    "base_path": "data/08_reporting/staging",
+                    "formats": {
+                        "defaults": {
+                            "exploratory": ["png"],
+                            "presentation": ["png", "pdf"]
+                        }
+                    }
+                },
+                "defaults": {
+                    "figure": {"dpi": 200},
+                    "line": {"linewidth": 1.5}
+                },
+                "performance": {
+                    "target_merge_time_ms": 15.0,
+                    "cache_enabled": True
+                },
+                "validation": {
+                    "strict_mode": True
+                }
+            },
+            "parameters": {
+                "experiment_condition": "staging_test",
+                "validation_enabled": True
+            }
         },
-        "defaults": {"figure_size": [10, 6], "font_size": 14},
-        "kedro": {"debug_mode": True}
+        "production": {
+            "figregistry": {
+                "metadata": {
+                    "environment": "production",
+                    "config_level": "release"
+                },
+                "outputs": {
+                    "base_path": "data/08_reporting/production",
+                    "formats": {
+                        "defaults": {
+                            "exploratory": ["png"],
+                            "presentation": ["png", "pdf"],
+                            "publication": ["pdf", "svg", "eps"]
+                        },
+                        "resolution": {
+                            "png": {"dpi": 300},
+                            "pdf": {"dpi": 300},
+                            "svg": {"dpi": 300},
+                            "eps": {"dpi": 300}
+                        }
+                    }
+                },
+                "defaults": {
+                    "figure": {"dpi": 300},
+                    "line": {"linewidth": 2.0}
+                },
+                "performance": {
+                    "target_merge_time_ms": 25.0,  # Allow more time for production quality
+                    "cache_enabled": True,
+                    "max_cache_size": 5000
+                },
+                "validation": {
+                    "strict_mode": True
+                }
+            },
+            "parameters": {
+                "experiment_condition": "production_run",
+                "quality_assurance": True,
+                "audit_trail": True
+            }
+        }
     }
-    scenarios.append(("deep_merge", base_deep, override_deep, expected_deep))
-    
-    # Scenario 3: List replacement (not merging)
-    base_list = {
-        "palettes": {"default": ["#1f77b4", "#ff7f0e", "#2ca02c"]},
-        "outputs": {"formats": ["png", "pdf"]}
-    }
-    override_list = {
-        "palettes": {"default": ["#000000", "#ffffff"]},
-        "outputs": {"formats": ["svg"]}
-    }
-    expected_list = {
-        "palettes": {"default": ["#000000", "#ffffff"]},
-        "outputs": {"formats": ["svg"]}
-    }
-    scenarios.append(("list_replacement", base_list, override_list, expected_list))
-    
-    # Scenario 4: Environment-specific precedence
-    base_env = {
-        "styles": {"control": {"color": "#1f77b4", "alpha": 0.8}},
-        "outputs": {"base_path": "figures"},
-        "environment": "base"
-    }
-    override_env = {
-        "styles": {"control": {"alpha": 1.0}},
-        "outputs": {"base_path": "local_figures"},
-        "environment": "local",
-        "kedro": {"enable_versioning": False}
-    }
-    expected_env = {
-        "styles": {"control": {"color": "#1f77b4", "alpha": 1.0}},
-        "outputs": {"base_path": "local_figures"},
-        "environment": "local",
-        "kedro": {"enable_versioning": False}
-    }
-    scenarios.append(("environment_precedence", base_env, override_env, expected_env))
-    
-    return scenarios
 
 
 @pytest.fixture
-def config_merge_test_cases() -> List[Dict[str, Any]]:
-    """Precedence rule validation scenarios per Section 5.2.5.
+def merged_config_scenarios() -> List[Dict[str, Any]]:
+    """
+    Provide various configuration merge combinations for comprehensive testing.
     
-    Provides test cases for validating that configuration merging follows
-    the correct precedence rules and handles edge cases appropriately.
+    This fixture provides test scenarios that validate configuration merging logic
+    with different combinations of base configs, environment overrides, and
+    direct parameter overrides to ensure precedence rules work correctly.
     
     Returns:
-        List of test case dictionaries with configuration scenarios.
+        List of test scenarios, each containing input configs and expected results
     """
     return [
         {
-            "name": "kedro_overrides_figregistry",
-            "description": "Kedro configurations should override FigRegistry base settings",
-            "figregistry_config": {
-                "styles": {"control": {"color": "#1f77b4", "linewidth": 1.0}},
-                "outputs": {"dpi": 300}
+            "name": "base_only_merge",
+            "description": "Merge with only base FigRegistry configuration",
+            "inputs": {
+                "figregistry_config": {
+                    "styles": {"test": {"color": "#FF0000"}},
+                    "defaults": {"figure": {"figsize": [10, 8]}}
+                },
+                "kedro_config": {},
+                "overrides": {}
             },
-            "kedro_config": {
-                "styles": {"control": {"color": "#ff0000"}},
-                "outputs": {"dpi": 150}
-            },
-            "expected_precedence": {
-                "styles.control.color": "#ff0000",  # Kedro wins
-                "styles.control.linewidth": 1.0,    # FigRegistry preserved
-                "outputs.dpi": 150                  # Kedro wins
+            "expected": {
+                "styles": {"test": {"color": "#FF0000"}},
+                "defaults": {"figure": {"figsize": [10, 8]}},
+                "outputs": {"base_path": "data/08_reporting"}  # Default from required sections
             }
         },
         {
-            "name": "environment_specific_override",
-            "description": "Environment-specific configs override base configs",
-            "base_config": {
-                "styles": {"control": {"color": "#1f77b4"}},
-                "outputs": {"base_path": "figures"},
-                "environment": "base"
+            "name": "kedro_override_merge", 
+            "description": "Kedro parameters override FigRegistry defaults",
+            "inputs": {
+                "figregistry_config": {
+                    "styles": {"test": {"color": "#FF0000"}},
+                    "defaults": {"figure": {"figsize": [10, 8], "dpi": 150}}
+                },
+                "kedro_config": {
+                    "figregistry": {
+                        "defaults": {"figure": {"dpi": 300}}  # Override DPI
+                    },
+                    "parameters": {
+                        "experiment_condition": "test_condition"
+                    }
+                },
+                "overrides": {}
             },
-            "env_config": {
-                "styles": {"control": {"color": "#00ff00"}},
-                "outputs": {"base_path": "local_figures"},
-                "environment": "local"
-            },
-            "expected_precedence": {
-                "styles.control.color": "#00ff00",
-                "outputs.base_path": "local_figures",
-                "environment": "local"
+            "expected": {
+                "styles": {"test": {"color": "#FF0000"}},
+                "defaults": {"figure": {"figsize": [10, 8], "dpi": 300}},  # Kedro override
+                "condition_parameters": {"experiment_condition": "test_condition"}
             }
         },
         {
-            "name": "nested_dict_deep_merge",
-            "description": "Nested dictionaries should merge deeply, not replace",
-            "base_config": {
-                "defaults": {
-                    "spine_visibility": {"top": False, "right": False, "bottom": True, "left": True},
-                    "figure_size": [10, 6]
+            "name": "direct_override_merge",
+            "description": "Direct overrides take highest precedence",
+            "inputs": {
+                "figregistry_config": {
+                    "styles": {"test": {"color": "#FF0000"}},
+                    "defaults": {"figure": {"figsize": [10, 8]}}
+                },
+                "kedro_config": {
+                    "figregistry": {
+                        "defaults": {"figure": {"figsize": [12, 10]}}
+                    }
+                },
+                "overrides": {
+                    "defaults": {"figure": {"figsize": [8, 6]}}  # Highest precedence
                 }
             },
-            "override_config": {
-                "defaults": {
-                    "spine_visibility": {"top": True},  # Only override top
-                    "font_size": 12  # Add new field
-                }
-            },
-            "expected_result": {
-                "defaults": {
-                    "spine_visibility": {"top": True, "right": False, "bottom": True, "left": True},
-                    "figure_size": [10, 6],
-                    "font_size": 12
-                }
+            "expected": {
+                "styles": {"test": {"color": "#FF0000"}},
+                "defaults": {"figure": {"figsize": [8, 6]}}  # Direct override wins
             }
         },
         {
-            "name": "list_complete_replacement",
-            "description": "Lists should be replaced completely, not merged",
-            "base_config": {
-                "palettes": {"default": ["#1f77b4", "#ff7f0e", "#2ca02c"]},
-                "outputs": {"formats": ["png", "pdf", "svg"]}
+            "name": "complex_deep_merge",
+            "description": "Complex deep merge with multiple override levels",
+            "inputs": {
+                "figregistry_config": {
+                    "styles": {
+                        "baseline": {"color": "#FF0000", "linewidth": 1.0},
+                        "treatment": {"color": "#00FF00", "linewidth": 2.0}
+                    },
+                    "defaults": {
+                        "figure": {"figsize": [10, 8], "dpi": 150},
+                        "line": {"alpha": 0.8}
+                    },
+                    "outputs": {
+                        "base_path": "original/path",
+                        "naming": {"template": "orig_{name}"}
+                    }
+                },
+                "kedro_config": {
+                    "figregistry": {
+                        "styles": {
+                            "baseline": {"linewidth": 1.5},  # Override linewidth only
+                            "new_style": {"color": "#0000FF"}  # Add new style
+                        },
+                        "outputs": {
+                            "base_path": "kedro/path"  # Override path
+                        }
+                    }
+                },
+                "overrides": {
+                    "defaults": {
+                        "line": {"alpha": 1.0}  # Override alpha
+                    }
+                }
             },
-            "override_config": {
-                "palettes": {"default": ["#000000", "#ffffff"]},
-                "outputs": {"formats": ["png"]}
-            },
-            "expected_result": {
-                "palettes": {"default": ["#000000", "#ffffff"]},
-                "outputs": {"formats": ["png"]}
+            "expected": {
+                "styles": {
+                    "baseline": {"color": "#FF0000", "linewidth": 1.5},  # Merged
+                    "treatment": {"color": "#00FF00", "linewidth": 2.0},  # Unchanged
+                    "new_style": {"color": "#0000FF"}  # Added from Kedro
+                },
+                "defaults": {
+                    "figure": {"figsize": [10, 8], "dpi": 150},  # Unchanged
+                    "line": {"alpha": 1.0}  # Override wins
+                },
+                "outputs": {
+                    "base_path": "kedro/path",  # Kedro override
+                    "naming": {"template": "orig_{name}"}  # Unchanged
+                }
             }
         }
     ]
 
 
-# =============================================================================
-# Invalid Configuration Fixtures
-# =============================================================================
+@pytest.fixture
+def config_merge_test_cases() -> List[Dict[str, Any]]:
+    """
+    Provide precedence rule validation scenarios per Section 5.2.5.
+    
+    This fixture tests the specific precedence rules defined in the configuration
+    bridge: Override parameters > Kedro config > FigRegistry config > Defaults.
+    Each test case validates that the precedence hierarchy is correctly implemented.
+    
+    Returns:
+        List of test cases validating configuration precedence rules
+    """
+    return [
+        {
+            "test_id": "precedence_override_wins",
+            "description": "Direct override parameters take highest precedence",
+            "precedence_level": "override",
+            "base_config": {"defaults": {"figure": {"dpi": 100}}},
+            "kedro_config": {"figregistry": {"defaults": {"figure": {"dpi": 200}}}},
+            "override_params": {"defaults": {"figure": {"dpi": 300}}},
+            "expected_value": 300,
+            "field_path": ["defaults", "figure", "dpi"]
+        },
+        {
+            "test_id": "precedence_kedro_over_base",
+            "description": "Kedro config overrides base FigRegistry config",
+            "precedence_level": "kedro",
+            "base_config": {"outputs": {"base_path": "base/path"}},
+            "kedro_config": {"figregistry": {"outputs": {"base_path": "kedro/path"}}},
+            "override_params": {},
+            "expected_value": "kedro/path",
+            "field_path": ["outputs", "base_path"]
+        },
+        {
+            "test_id": "precedence_base_when_no_override",
+            "description": "Base config used when no overrides present",
+            "precedence_level": "base",
+            "base_config": {"styles": {"test": {"color": "#FF0000"}}},
+            "kedro_config": {},
+            "override_params": {},
+            "expected_value": "#FF0000", 
+            "field_path": ["styles", "test", "color"]
+        },
+        {
+            "test_id": "precedence_defaults_when_missing",
+            "description": "Required defaults applied when sections missing",
+            "precedence_level": "defaults",
+            "base_config": {"styles": {}},  # Missing required sections
+            "kedro_config": {},
+            "override_params": {},
+            "expected_value": "data/08_reporting",  # Default base_path
+            "field_path": ["outputs", "base_path"]
+        },
+        {
+            "test_id": "precedence_partial_override",
+            "description": "Partial overrides preserve other fields",
+            "precedence_level": "partial",
+            "base_config": {
+                "defaults": {
+                    "figure": {"figsize": [10, 8], "dpi": 150, "facecolor": "white"}
+                }
+            },
+            "kedro_config": {
+                "figregistry": {
+                    "defaults": {"figure": {"dpi": 300}}  # Only override DPI
+                }
+            },
+            "override_params": {},
+            "expected_values": {
+                "figsize": [10, 8],  # Preserved from base
+                "dpi": 300,  # Overridden by Kedro
+                "facecolor": "white"  # Preserved from base
+            },
+            "field_path": ["defaults", "figure"]
+        },
+        {
+            "test_id": "precedence_parameter_injection",
+            "description": "Kedro parameters correctly injected into condition context",
+            "precedence_level": "parameter_injection",
+            "base_config": {"styles": {"test": {"color": "#FF0000"}}},
+            "kedro_config": {
+                "parameters": {
+                    "experiment_condition": "baseline",
+                    "experiment_phase": "training",
+                    "model_type": "neural_network"
+                }
+            },
+            "override_params": {},
+            "expected_values": {
+                "experiment_condition": "baseline",
+                "experiment_phase": "training", 
+                "model_type": "neural_network"
+            },
+            "field_path": ["condition_parameters"]
+        }
+    ]
+
 
 @pytest.fixture
 def invalid_config_fixtures() -> Dict[str, Dict[str, Any]]:
-    """Error handling validation including malformed YAML and schema violations.
+    """
+    Provide error handling validation including malformed YAML and schema violations.
     
-    Provides various invalid configuration scenarios to test error handling
-    and validation in the configuration bridge and Pydantic models.
+    This fixture provides various invalid configuration scenarios to test the
+    configuration bridge's error handling, validation, and error aggregation
+    capabilities. Tests both YAML parsing errors and Pydantic schema violations.
     
     Returns:
-        Dictionary of invalid configuration scenarios mapped by error type.
+        Dict mapping error types to invalid configuration examples
     """
     return {
-        "missing_version": {
-            "config": {
-                "styles": {"control": {"color": "#1f77b4"}}
-                # Missing figregistry_version
-            },
-            "expected_error": "figregistry_version",
-            "error_type": "ValidationError"
-        },
-        "invalid_color_format": {
-            "config": {
-                "figregistry_version": "0.3.0",
-                "styles": {
-                    "control": {
-                        "color": "not_a_color",  # Invalid color format
-                        "marker": "o"
-                    }
+        "malformed_yaml": {
+            "description": "YAML syntax errors that should be caught during parsing",
+            "configs": [
+                {
+                    "name": "invalid_indentation",
+                    "yaml_content": """
+styles:
+baseline:  # Missing proper indentation
+  color: "#FF0000"
+    """,
+                    "expected_error": "yaml.scanner.ScannerError"
+                },
+                {
+                    "name": "invalid_syntax",
+                    "yaml_content": """
+styles:
+  baseline: {
+    color: "#FF0000"
+    # Missing closing brace
+    """,
+                    "expected_error": "yaml.scanner.ScannerError"
+                },
+                {
+                    "name": "duplicate_keys",
+                    "yaml_content": """
+styles:
+  baseline:
+    color: "#FF0000"
+  baseline:  # Duplicate key
+    color: "#00FF00"
+    """,
+                    "expected_error": "yaml.constructor.ConstructorError"
                 }
-            },
-            "expected_error": "color",
-            "error_type": "ValidationError"
+            ]
         },
-        "invalid_marker": {
-            "config": {
-                "figregistry_version": "0.3.0", 
-                "styles": {
-                    "control": {
-                        "color": "#1f77b4",
-                        "marker": "invalid_marker"  # Invalid matplotlib marker
-                    }
+        "schema_violations": {
+            "description": "Configurations that violate Pydantic schema validation",
+            "configs": [
+                {
+                    "name": "invalid_version_constraint",
+                    "config": {
+                        "figregistry_version": "invalid_version_format",
+                        "styles": {"test": {"color": "#FF0000"}}
+                    },
+                    "expected_error": "ConfigValidationError",
+                    "expected_field": "figregistry_version"
+                },
+                {
+                    "name": "missing_required_color",
+                    "config": {
+                        "styles": {
+                            "test": {"linewidth": 2.0}  # Missing required color
+                        }
+                    },
+                    "expected_error": "ConfigValidationError",
+                    "expected_field": "styles.test.color"
+                },
+                {
+                    "name": "invalid_marker_type",
+                    "config": {
+                        "styles": {
+                            "test": {
+                                "color": "#FF0000",
+                                "marker": 123  # Invalid marker type (should be string)
+                            }
+                        }
+                    },
+                    "expected_error": "ConfigValidationError",
+                    "expected_field": "styles.test.marker"
+                },
+                {
+                    "name": "missing_output_base_path",
+                    "config": {
+                        "outputs": {
+                            "naming": {"template": "{name}_{ts}"}
+                            # Missing required base_path
+                        }
+                    },
+                    "expected_error": "ConfigValidationError",
+                    "expected_field": "outputs.base_path"
                 }
-            },
-            "expected_error": "marker",
-            "error_type": "ValidationError"
+            ]
         },
-        "invalid_numeric_type": {
-            "config": {
-                "figregistry_version": "0.3.0",
-                "styles": {
-                    "control": {
-                        "color": "#1f77b4",
-                        "linewidth": "not_a_number"  # Should be numeric
-                    }
+        "merge_conflicts": {
+            "description": "Configuration merge scenarios that should fail validation",
+            "configs": [
+                {
+                    "name": "conflicting_types",
+                    "base_config": {
+                        "defaults": {"figure": {"figsize": [10, 8]}}
+                    },
+                    "override_config": {
+                        "defaults": {"figure": {"figsize": "invalid_string"}}  # Type conflict
+                    },
+                    "expected_error": "ConfigValidationError",
+                    "expected_field": "defaults.figure.figsize"
+                },
+                {
+                    "name": "invalid_nested_structure",
+                    "base_config": {
+                        "styles": {"test": {"color": "#FF0000"}}
+                    },
+                    "override_config": {
+                        "styles": "invalid_string_instead_of_dict"  # Structure conflict
+                    },
+                    "expected_error": "ConfigMergeError"
                 }
-            },
-            "expected_error": "linewidth",
-            "error_type": "ValidationError"
+            ]
         },
-        "invalid_path_type": {
-            "config": {
-                "figregistry_version": "0.3.0",
-                "outputs": {
-                    "base_path": 12345  # Should be string or Path
+        "performance_violations": {
+            "description": "Configurations that might cause performance issues",
+            "configs": [
+                {
+                    "name": "excessive_cache_size",
+                    "config": {
+                        "performance": {
+                            "max_cache_size": -1  # Invalid negative cache size
+                        }
+                    },
+                    "expected_error": "ConfigValidationError",
+                    "expected_field": "performance.max_cache_size"
+                },
+                {
+                    "name": "invalid_target_time",
+                    "config": {
+                        "performance": {
+                            "target_merge_time_ms": "not_a_number"  # Invalid type
+                        }
+                    },
+                    "expected_error": "ConfigValidationError",
+                    "expected_field": "performance.target_merge_time_ms"
                 }
-            },
-            "expected_error": "base_path",
-            "error_type": "ValidationError"
+            ]
+        }
+    }
+
+
+@pytest.fixture
+def pydantic_validation_fixtures() -> Dict[str, Any]:
+    """
+    Provide type safety testing across configuration bridge operations.
+    
+    This fixture provides specific test cases for Pydantic validation features
+    including type coercion, field validation, and custom validators defined
+    in the FigRegistryConfigSchema class.
+    
+    Returns:
+        Dict containing validation test scenarios and expected behaviors
+    """
+    return {
+        "valid_type_coercion": {
+            "description": "Valid type coercion scenarios that should pass",
+            "test_cases": [
+                {
+                    "name": "string_to_number_coercion",
+                    "input": {"defaults": {"line": {"linewidth": "2.0"}}},
+                    "expected": {"defaults": {"line": {"linewidth": 2.0}}},
+                    "field": "defaults.line.linewidth"
+                },
+                {
+                    "name": "list_to_tuple_coercion",
+                    "input": {"defaults": {"figure": {"figsize": (10, 8)}}},
+                    "expected": {"defaults": {"figure": {"figsize": [10, 8]}}},
+                    "field": "defaults.figure.figsize"
+                }
+            ]
         },
-        "invalid_boolean_type": {
+        "custom_validator_tests": {
+            "description": "Test custom validators in FigRegistryConfigSchema",
+            "test_cases": [
+                {
+                    "name": "styles_color_validation",
+                    "input": {
+                        "styles": {
+                            "valid_style": {"color": "#FF0000", "linewidth": 2.0},
+                            "missing_color": {"linewidth": 2.0}  # Should trigger warning
+                        }
+                    },
+                    "expected_warnings": ["Style 'missing_color' missing required 'color' field"],
+                    "should_pass": True
+                },
+                {
+                    "name": "outputs_base_path_validation",
+                    "input": {
+                        "outputs": {
+                            "naming": {"template": "{name}_{ts}"}
+                            # Missing base_path - should fail validation
+                        }
+                    },
+                    "expected_error": "Output configuration must include 'base_path' field",
+                    "should_pass": False
+                },
+                {
+                    "name": "version_constraint_validation",
+                    "input": {"figregistry_version": "invalid_no_operator"},
+                    "expected_error": "Invalid version constraint format: invalid_no_operator",
+                    "should_pass": False
+                }
+            ]
+        },
+        "extra_fields_handling": {
+            "description": "Test handling of extra fields (allow vs forbid)",
+            "test_cases": [
+                {
+                    "name": "extra_fields_allowed",
+                    "input": {
+                        "styles": {"test": {"color": "#FF0000"}},
+                        "custom_extension": {"user_data": "allowed"}  # Extra field
+                    },
+                    "expected_behavior": "allowed",
+                    "should_pass": True
+                },
+                {
+                    "name": "extra_style_properties",
+                    "input": {
+                        "styles": {
+                            "test": {
+                                "color": "#FF0000",
+                                "custom_property": "value"  # Extra property in style
+                            }
+                        }
+                    },
+                    "expected_behavior": "allowed",
+                    "should_pass": True
+                }
+            ]
+        },
+        "type_safety_validation": {
+            "description": "Strict type validation for critical fields",
+            "test_cases": [
+                {
+                    "name": "figsize_type_validation",
+                    "invalid_inputs": [
+                        {"defaults": {"figure": {"figsize": "10x8"}}},  # String instead of list
+                        {"defaults": {"figure": {"figsize": [10]}}},    # Wrong length
+                        {"defaults": {"figure": {"figsize": ["10", "8"]}}},  # String elements
+                    ],
+                    "field": "defaults.figure.figsize",
+                    "expected_error_type": "ValidationError"
+                },
+                {
+                    "name": "color_validation",
+                    "valid_inputs": [
+                        {"styles": {"test": {"color": "#FF0000"}}},     # Hex color
+                        {"styles": {"test": {"color": "red"}}},         # Named color
+                        {"styles": {"test": {"color": "rgb(255,0,0)"}}}, # RGB color
+                    ],
+                    "invalid_inputs": [
+                        {"styles": {"test": {"color": 123}}},           # Number
+                        {"styles": {"test": {"color": "#GGGGGG"}}},     # Invalid hex
+                    ]
+                },
+                {
+                    "name": "boolean_validation",
+                    "valid_inputs": [
+                        {"performance": {"cache_enabled": True}},
+                        {"performance": {"cache_enabled": False}},
+                        {"performance": {"cache_enabled": "true"}},     # String coercion
+                    ],
+                    "invalid_inputs": [
+                        {"performance": {"cache_enabled": "maybe"}},    # Invalid string
+                        {"performance": {"cache_enabled": 123}},        # Number
+                    ]
+                }
+            ]
+        },
+        "nested_validation": {
+            "description": "Validation of deeply nested configuration structures",
+            "test_cases": [
+                {
+                    "name": "deep_nested_structure",
+                    "input": {
+                        "outputs": {
+                            "formats": {
+                                "resolution": {
+                                    "png": {"dpi": 300},
+                                    "pdf": {"dpi": 300}
+                                }
+                            }
+                        }
+                    },
+                    "expected_validation": "passes_deep_validation",
+                    "validation_depth": 4
+                },
+                {
+                    "name": "invalid_deep_nesting",
+                    "input": {
+                        "outputs": {
+                            "formats": {
+                                "resolution": "invalid_string_should_be_dict"
+                            }
+                        }
+                    },
+                    "expected_error": "ValidationError",
+                    "field": "outputs.formats.resolution"
+                }
+            ]
+        }
+    }
+
+
+@pytest.fixture
+def mock_kedro_config_loader():
+    """
+    Provide mock Kedro ConfigLoader for testing configuration bridge operations.
+    
+    This fixture creates a mock ConfigLoader that simulates Kedro's configuration
+    loading behavior with predefined configurations for different environments.
+    Used for testing the configuration bridge without requiring a full Kedro setup.
+    
+    Returns:
+        Mock ConfigLoader with predefined get() method behavior
+    """
+    mock_loader = MagicMock()
+    
+    # Define mock responses for different config sections and environments
+    mock_responses = {
+        ("parameters", "base"): {
+            "experiment_condition": "baseline",
+            "model_type": "linear_regression"
+        },
+        ("parameters", "local"): {
+            "experiment_condition": "local_test",
+            "debug_mode": True,
+            "plot_settings": {"figure_size": [6, 4], "dpi": 72}
+        },
+        ("figregistry", "base"): {
+            "styles": {"mock": {"color": "#FF0000"}},
+            "defaults": {"figure": {"dpi": 150}}
+        },
+        ("figregistry", "local"): {
+            "outputs": {"base_path": "local/path"},
+            "performance": {"target_merge_time_ms": 5.0}
+        },
+        ("catalog", "base"): {
+            "figure_output": {
+                "type": "figregistry_kedro.datasets.FigureDataSet",
+                "purpose": "exploratory"
+            }
+        },
+        ("logging", "base"): {
+            "version": 1,
+            "handlers": {"console": {"class": "logging.StreamHandler"}}
+        }
+    }
+    
+    def mock_get(section: str, environment: str = "base"):
+        """Mock ConfigLoader.get() method."""
+        key = (section, environment)
+        if key in mock_responses:
+            return copy.deepcopy(mock_responses[key])
+        return {}
+    
+    mock_loader.get.side_effect = mock_get
+    return mock_loader
+
+
+@pytest.fixture
+def performance_test_configs() -> Dict[str, Any]:
+    """
+    Provide configuration scenarios for performance benchmarking.
+    
+    This fixture provides configurations of varying complexity to test
+    the <10ms merge time requirement and validate performance characteristics
+    under different load scenarios.
+    
+    Returns:
+        Dict containing performance test configurations
+    """
+    return {
+        "minimal_config": {
+            "description": "Minimal configuration for baseline performance",
             "config": {
-                "figregistry_version": "0.3.0",
+                "styles": {"test": {"color": "#FF0000"}},
+                "defaults": {"figure": {"figsize": [10, 8]}},
+                "outputs": {"base_path": "data"}
+            },
+            "expected_merge_time_ms": 2.0
+        },
+        "moderate_config": {
+            "description": "Moderate complexity configuration",
+            "config": {
+                "styles": {f"style_{i}": {"color": f"#{i:06x}"} for i in range(10)},
                 "defaults": {
-                    "grid": "maybe"  # Should be boolean
-                }
-            },
-            "expected_error": "grid",
-            "error_type": "ValidationError"
-        },
-        "negative_numeric_values": {
-            "config": {
-                "figregistry_version": "0.3.0",
-                "styles": {
-                    "control": {
-                        "color": "#1f77b4",
-                        "linewidth": -1.5,  # Negative linewidth
-                        "markersize": -5,   # Negative markersize
-                        "alpha": -0.5       # Alpha out of range
-                    }
-                }
-            },
-            "expected_error": "negative values",
-            "error_type": "ValidationError"
-        },
-        "alpha_out_of_range": {
-            "config": {
-                "figregistry_version": "0.3.0",
-                "styles": {
-                    "control": {
-                        "color": "#1f77b4",
-                        "alpha": 1.5  # Alpha > 1.0
-                    }
-                }
-            },
-            "expected_error": "alpha",
-            "error_type": "ValidationError"
-        },
-        "empty_styles_dict": {
-            "config": {
-                "figregistry_version": "0.3.0",
-                "styles": {}  # Empty styles not allowed
-            },
-            "expected_error": "styles",
-            "error_type": "ValidationError"
-        },
-        "non_dict_styles": {
-            "config": {
-                "figregistry_version": "0.3.0",
-                "styles": "not_a_dict"  # Should be dictionary
-            },
-            "expected_error": "styles",
-            "error_type": "ValidationError"
-        }
-    }
-
-
-@pytest.fixture
-def malformed_yaml_fixtures() -> Dict[str, str]:
-    """Malformed YAML test cases for parsing error validation.
-    
-    Returns:
-        Dictionary of malformed YAML strings mapped by error type.
-    """
-    return {
-        "invalid_syntax": """
-figregistry_version: "0.3.0"
-styles:
-  control:
-    color: "#1f77b4"
-    marker: "o"
-  # Missing closing quote and invalid indentation
-  treatment:
-    color: "#ff7f0e
-      marker: "s"
-""",
-        "duplicate_keys": """
-figregistry_version: "0.3.0"
-styles:
-  control:
-    color: "#1f77b4"
-    marker: "o"
-    color: "#ff0000"  # Duplicate key
-""",
-        "invalid_indentation": """
-figregistry_version: "0.3.0"
-styles:
-control:  # Wrong indentation
-  color: "#1f77b4"
-""",
-        "unmatched_brackets": """
-figregistry_version: "0.3.0"
-styles:
-  control:
-    color: "#1f77b4"
-    properties: [
-      "linewidth": 2.0
-      "marker": "o"  # Missing comma and bracket
-""",
-        "invalid_unicode": """
-figregistry_version: "0.3.0"
-styles:
-  control:
-    label: "\uDC80"  # Invalid Unicode surrogate
-""",
-        "tab_indentation": """
-figregistry_version: "0.3.0"
-styles:
-\tcontrol:  # Tab instead of spaces
-\t\tcolor: "#1f77b4"
-"""
-    }
-
-
-# =============================================================================
-# Pydantic Validation Fixtures  
-# =============================================================================
-
-@pytest.fixture
-def pydantic_validation_fixtures() -> Dict[str, Dict[str, Any]]:
-    """Type safety testing across configuration bridge operations.
-    
-    Provides test cases specifically for validating Pydantic model validation
-    across the FigRegistryKedroConfig model to ensure type safety.
-    
-    Returns:
-        Dictionary of validation test scenarios.
-    """
-    return {
-        "valid_full_config": {
-            "config": {
-                "styles": {
-                    "control": {
-                        "color": "#1f77b4",
-                        "marker": "o",
-                        "linewidth": 2.0,
-                        "alpha": 0.8
-                    }
-                },
-                "palettes": {
-                    "default": ["#1f77b4", "#ff7f0e", "#2ca02c"]
+                    "figure": {"figsize": [10, 8], "dpi": 150},
+                    "line": {"linewidth": 2.0, "alpha": 0.8}
                 },
                 "outputs": {
-                    "base_path": "figures",
-                    "dpi": 300
-                },
-                "defaults": {
-                    "figure_size": [10, 6],
-                    "font_size": 12,
-                    "grid": True
-                },
-                "kedro": {
-                    "enable_versioning": True,
-                    "debug_mode": False
-                },
-                "environment": "test",
-                "enable_concurrent_access": True,
-                "validation_enabled": True
-            },
-            "should_validate": True
-        },
-        "minimal_valid_config": {
-            "config": {
-                "styles": {
-                    "default": {"color": "#1f77b4"}
+                    "base_path": "data",
+                    "formats": {"defaults": {"exploratory": ["png", "pdf"]}}
                 }
-            },
-            "should_validate": True
-        },
-        "invalid_styles_type": {
-            "config": {
-                "styles": "not_a_dict"
-            },
-            "should_validate": False,
-            "expected_error": "styles must be a dictionary"
-        },
-        "invalid_outputs_type": {
-            "config": {
-                "styles": {"default": {"color": "#1f77b4"}},
-                "outputs": "not_a_dict"
-            },
-            "should_validate": False,
-            "expected_error": "outputs must be a dictionary"
-        },
-        "invalid_boolean_field": {
-            "config": {
-                "styles": {"default": {"color": "#1f77b4"}},
-                "enable_concurrent_access": "not_a_boolean"
-            },
-            "should_validate": False,
-            "expected_error": "enable_concurrent_access"
-        },
-        "invalid_string_field": {
-            "config": {
-                "styles": {"default": {"color": "#1f77b4"}},
-                "environment": 123
-            },
-            "should_validate": False,
-            "expected_error": "environment"
-        },
-        "extra_fields_allowed": {
-            "config": {
-                "styles": {"default": {"color": "#1f77b4"}},
-                "custom_field": "should_be_allowed",
-                "another_extra": {"nested": "value"}
-            },
-            "should_validate": True,
-            "description": "Extra fields should be allowed per Pydantic config"
-        }
-    }
-
-
-# =============================================================================
-# Environment-Specific Configuration Fixtures
-# =============================================================================
-
-@pytest.fixture
-def environment_specific_configs() -> Dict[str, Dict[str, Any]]:
-    """Development, staging, and production scenarios per F-007.2.
-    
-    Provides complete environment-specific configuration sets for testing
-    the full lifecycle of configuration management across deployment stages.
-    
-    Returns:
-        Dictionary of environment configurations mapped by environment name.
-    """
-    return {
-        "development": {
-            "environment": "development",
-            "styles": {
-                "control": {
-                    "color": "#1f77b4",
-                    "marker": "o",
-                    "linewidth": 1.5,
-                    "alpha": 0.7,
-                    "label": "Control (Dev)"
-                },
-                "treatment": {
-                    "color": "#ff7f0e", 
-                    "marker": "s",
-                    "linewidth": 1.5,
-                    "alpha": 0.7,
-                    "label": "Treatment (Dev)"
-                },
-                "debug_*": {
-                    "color": "#d62728",
-                    "marker": "x",
-                    "linestyle": ":",
-                    "linewidth": 1.0,
-                    "alpha": 0.5,
-                    "label": "Debug"
-                }
-            },
-            "outputs": {
-                "base_path": "dev_figures",
-                "dpi": 100,  # Lower DPI for faster iteration
-                "default_format": "png",
-                "timestamp_format": "dev_{name}_{ts:%H%M%S}"
-            },
-            "defaults": {
-                "figure_size": [8, 5],  # Smaller for faster rendering
-                "font_size": 10,
-                "grid": False,  # Cleaner for development
-                "line_width": 1.0
-            },
-            "kedro": {
-                "enable_versioning": False,
-                "parallel_execution": False,
-                "debug_mode": True,
-                "cache_styling": False,  # Disable caching for fresh styles
-                "performance_monitoring": False
-            }
-        },
-        "staging": {
-            "environment": "staging",
-            "styles": {
-                "control": {
-                    "color": "#1f77b4",
-                    "marker": "o", 
-                    "linewidth": 2.0,
-                    "alpha": 0.8,
-                    "label": "Control"
-                },
-                "treatment": {
-                    "color": "#ff7f0e",
-                    "marker": "s",
-                    "linewidth": 2.0,
-                    "alpha": 0.8,
-                    "label": "Treatment"
-                },
-                "validation_*": {
-                    "color": "#9467bd",
-                    "marker": "v",
-                    "linestyle": "-.",
-                    "linewidth": 1.5,
-                    "alpha": 0.6,
-                    "label": "Validation"
-                }
-            },
-            "outputs": {
-                "base_path": "staging/figures",
-                "dpi": 200,  # Medium quality for staging
-                "default_format": "png",
-                "formats": ["png", "svg"],
-                "timestamp_format": "staging_{name}_{ts:%Y%m%d_%H%M}",
-                "metadata": True
-            },
-            "defaults": {
-                "figure_size": [10, 6],
-                "font_size": 12,
-                "grid": True,
-                "grid_alpha": 0.3,
-                "line_width": 1.5
-            },
-            "kedro": {
-                "enable_versioning": True,
-                "parallel_execution": True,
-                "debug_mode": False,
-                "cache_styling": True,
-                "performance_monitoring": True,
-                "validation_enabled": True
-            }
-        },
-        "production": {
-            "environment": "production",
-            "styles": {
-                "control": {
-                    "color": "#1f77b4",
-                    "marker": "o",
-                    "linewidth": 2.5,  # Thicker for production quality
-                    "alpha": 1.0,      # Full opacity for final output
-                    "label": "Control"
-                },
-                "treatment": {
-                    "color": "#ff7f0e",
-                    "marker": "s", 
-                    "linewidth": 2.5,
-                    "alpha": 1.0,
-                    "label": "Treatment"
-                },
-                "final_*": {
-                    "color": "#2ca02c",
-                    "marker": "^",
-                    "linestyle": "-",
-                    "linewidth": 2.0,
-                    "alpha": 0.9,
-                    "label": "Final"
-                }
-            },
-            "outputs": {
-                "base_path": "/opt/kedro/production/figures",
-                "dpi": 300,  # High quality for production
-                "default_format": "pdf",  # Vector format for production
-                "formats": ["pdf", "png", "svg"],
-                "bbox_inches": "tight",
-                "pad_inches": 0.2,
-                "timestamp_format": "prod_{name}_{ts:%Y%m%d_%H%M%S}",
-                "metadata": True,
-                "facecolor": "white",
-                "transparent": False
-            },
-            "defaults": {
-                "figure_size": [12, 8],  # Larger for publication quality
-                "font_size": 14,
-                "title_size": 16,
-                "label_size": 12,
-                "grid": True,
-                "grid_alpha": 0.2,
-                "line_width": 2.0,
-                "spine_visibility": {
-                    "top": False,
-                    "right": False,
-                    "bottom": True,
-                    "left": True
-                }
-            },
-            "kedro": {
-                "enable_versioning": True,
-                "parallel_execution": True,
-                "debug_mode": False,
-                "cache_styling": True,
-                "performance_monitoring": True,
-                "validation_enabled": True,
-                "enable_concurrent_access": True
-            }
-        }
-    }
-
-
-# =============================================================================
-# Performance Testing Fixtures
-# =============================================================================
-
-@pytest.fixture
-def performance_config_scenarios() -> Dict[str, Dict[str, Any]]:
-    """Configuration scenarios for testing <10ms merge time requirements.
-    
-    Provides configurations of various complexities to validate that
-    configuration merging meets the performance target of <10ms.
-    
-    Returns:
-        Dictionary of performance test scenarios.
-    """
-    return {
-        "small_config": {
-            "description": "Small configuration with minimal sections",
-            "base_config": {
-                "styles": {"control": {"color": "#1f77b4"}},
-                "outputs": {"base_path": "figures"}
-            },
-            "override_config": {
-                "styles": {"control": {"marker": "o"}},
-                "outputs": {"dpi": 300}
-            },
-            "expected_merge_time_ms": 1.0
-        },
-        "medium_config": {
-            "description": "Medium configuration with moderate complexity",
-            "base_config": {
-                "styles": {f"condition_{i}": {"color": f"#{'%06x' % (i * 1111 % 16777215)}", "marker": "o"} 
-                          for i in range(20)},
-                "palettes": {"default": [f"#{'%06x' % (i * 2222 % 16777215)}" for i in range(10)]},
-                "outputs": {"base_path": "figures", "dpi": 300, "formats": ["png", "pdf"]},
-                "defaults": {"figure_size": [10, 6], "font_size": 12}
-            },
-            "override_config": {
-                "styles": {f"condition_{i}": {"linewidth": 2.0} for i in range(10)},
-                "outputs": {"dpi": 150},
-                "kedro": {"debug_mode": True}
             },
             "expected_merge_time_ms": 5.0
         },
-        "large_config": {
-            "description": "Large configuration with high complexity",
-            "base_config": {
-                "styles": {f"condition_{i}": {
-                    "color": f"#{'%06x' % (i * 3333 % 16777215)}",
-                    "marker": ["o", "s", "^", "v", "D"][i % 5],
-                    "linewidth": 1.0 + (i % 3),
-                    "alpha": 0.5 + (i % 5) * 0.1
+        "complex_config": {
+            "description": "Complex configuration with many nested sections",
+            "config": {
+                "styles": {f"style_{i}": {
+                    "color": f"#{i:06x}",
+                    "marker": "o",
+                    "linewidth": i % 3 + 1,
+                    "alpha": 0.1 + (i % 10) * 0.1
                 } for i in range(100)},
-                "palettes": {f"palette_{i}": [f"#{'%06x' % (j * 4444 % 16777215)}" for j in range(i, i+5)] 
-                           for i in range(20)},
-                "outputs": {
-                    "base_path": "figures",
-                    "path_aliases": {f"alias_{i}": f"path_{i}" for i in range(50)},
-                    "dpi": 300,
-                    "formats": ["png", "pdf", "svg", "eps"]
-                },
+                "palettes": {f"palette_{i}": [f"#{j:06x}" for j in range(i, i+5)] for i in range(0, 50, 5)},
                 "defaults": {
-                    "figure_size": [12, 8],
-                    "font_size": 14,
-                    "spine_visibility": {"top": False, "right": False, "bottom": True, "left": True}
-                }
-            },
-            "override_config": {
-                "styles": {f"condition_{i}": {"alpha": 0.9} for i in range(0, 100, 2)},
-                "outputs": {"dpi": 200, "base_path": "override_figures"},
-                "kedro": {
-                    "enable_versioning": True,
-                    "parallel_execution": True,
-                    "performance_monitoring": True
+                    "figure": {"figsize": [10, 8], "dpi": 150, "facecolor": "white"},
+                    "line": {"linewidth": 2.0, "alpha": 0.8, "color": "#000000"},
+                    "scatter": {"s": 50, "alpha": 0.7, "edgecolors": "black"}
+                },
+                "outputs": {
+                    "base_path": "data/complex",
+                    "formats": {
+                        "defaults": {
+                            "exploratory": ["png"],
+                            "presentation": ["png", "pdf"],
+                            "publication": ["pdf", "svg", "eps"]
+                        },
+                        "resolution": {fmt: {"dpi": 300} for fmt in ["png", "pdf", "svg", "eps"]}
+                    },
+                    "paths": {purpose: f"output/{purpose}" for purpose in ["exploratory", "presentation", "publication"]}
                 }
             },
             "expected_merge_time_ms": 8.0
@@ -1134,166 +1041,131 @@ def performance_config_scenarios() -> Dict[str, Dict[str, Any]]:
     }
 
 
-# =============================================================================
-# Mock and Utility Fixtures
-# =============================================================================
-
 @pytest.fixture
-def mock_kedro_config_loader():
-    """Mock Kedro ConfigLoader for testing configuration bridge.
+def thread_safety_test_scenarios() -> List[Dict[str, Any]]:
+    """
+    Provide test scenarios for validating thread-safe configuration operations.
+    
+    This fixture provides scenarios for testing concurrent access to the
+    configuration bridge, validating cache safety, and ensuring proper
+    handling of simultaneous configuration operations.
     
     Returns:
-        Mock ConfigLoader instance with configurable behavior.
+        List of thread safety test scenarios
     """
-    mock_loader = Mock()
-    
-    def mock_get(pattern):
-        """Mock get method that returns configuration based on pattern."""
-        if "figregistry" in pattern:
-            return {
-                "styles": {"mock_condition": {"color": "#123456"}},
-                "outputs": {"base_path": "mock_figures"}
-            }
-        return {}
-    
-    mock_loader.get = Mock(side_effect=mock_get)
-    return mock_loader
+    return [
+        {
+            "name": "concurrent_config_loading",
+            "description": "Multiple threads loading configurations simultaneously",
+            "thread_count": 5,
+            "operations_per_thread": 10,
+            "config_variations": [
+                {"environment": "local", "overrides": {"performance": {"cache_enabled": True}}},
+                {"environment": "staging", "overrides": {"validation": {"strict_mode": True}}},
+                {"environment": "production", "overrides": {"outputs": {"base_path": "prod"}}}
+            ],
+            "expected_behavior": "all_operations_succeed"
+        },
+        {
+            "name": "cache_contention_test",
+            "description": "Test cache behavior under concurrent access",
+            "thread_count": 10,
+            "operations_per_thread": 20,
+            "cache_operations": ["get", "set", "clear"],
+            "expected_behavior": "cache_consistency_maintained"
+        },
+        {
+            "name": "mixed_read_write_operations",
+            "description": "Mix of read and write operations to configuration",
+            "thread_count": 8,
+            "read_operations": 15,
+            "write_operations": 5,
+            "expected_behavior": "data_integrity_preserved"
+        }
+    ]
 
 
-@pytest.fixture
-def temp_config_files(tmp_path):
-    """Temporary configuration files for filesystem testing.
+# Helper functions for test data generation and validation
+
+def generate_large_config(num_styles: int = 1000) -> Dict[str, Any]:
+    """
+    Generate large configuration for stress testing.
     
     Args:
-        tmp_path: pytest temporary directory fixture
+        num_styles: Number of styles to generate
         
     Returns:
-        Dictionary of temporary file paths and their contents.
-    """
-    config_files = {}
-    
-    # Base FigRegistry config
-    figregistry_config = {
-        "figregistry_version": "0.3.0",
-        "styles": {"control": {"color": "#1f77b4", "marker": "o"}},
-        "outputs": {"base_path": "figures", "dpi": 300}
-    }
-    figregistry_path = tmp_path / "figregistry.yaml"
-    with open(figregistry_path, 'w') as f:
-        yaml.dump(figregistry_config, f)
-    config_files["figregistry"] = figregistry_path
-    
-    # Kedro config directory structure
-    kedro_conf = tmp_path / "conf"
-    kedro_conf.mkdir()
-    
-    base_conf = kedro_conf / "base"
-    base_conf.mkdir()
-    
-    local_conf = kedro_conf / "local" 
-    local_conf.mkdir()
-    
-    # Base figregistry config in Kedro
-    kedro_base_config = {
-        "styles": {"kedro_condition": {"color": "#ff0000", "marker": "s"}},
-        "outputs": {"base_path": "kedro_figures"}
-    }
-    kedro_base_path = base_conf / "figregistry.yml"
-    with open(kedro_base_path, 'w') as f:
-        yaml.dump(kedro_base_config, f)
-    config_files["kedro_base"] = kedro_base_path
-    
-    # Local override config
-    local_override_config = {
-        "styles": {"kedro_condition": {"linewidth": 2.0}},
-        "outputs": {"dpi": 150}
-    }
-    local_override_path = local_conf / "figregistry.yml"
-    with open(local_override_path, 'w') as f:
-        yaml.dump(local_override_config, f)
-    config_files["kedro_local"] = local_override_path
-    
-    config_files["conf_dir"] = kedro_conf
-    return config_files
-
-
-@pytest.fixture
-def sample_figure():
-    """Sample matplotlib figure for testing dataset operations.
-    
-    Returns:
-        Matplotlib figure instance for testing.
-    """
-    try:
-        import matplotlib.pyplot as plt
-        import numpy as np
-        
-        fig, ax = plt.subplots(figsize=(8, 6))
-        x = np.linspace(0, 10, 100)
-        ax.plot(x, np.sin(x), label="Test Data")
-        ax.set_xlabel("X values")
-        ax.set_ylabel("Y values") 
-        ax.set_title("Test Figure")
-        ax.legend()
-        
-        return fig
-    except ImportError:
-        # Return mock figure if matplotlib not available
-        return Mock()
-
-
-# =============================================================================
-# Comprehensive Test Scenario Fixtures
-# =============================================================================
-
-@pytest.fixture
-def comprehensive_test_scenarios():
-    """Complete test scenarios combining multiple fixture types.
-    
-    Provides end-to-end test scenarios that combine configuration fixtures
-    with expected behaviors for comprehensive integration testing.
-    
-    Returns:
-        Dictionary of comprehensive test scenarios.
+        Large configuration dictionary for performance testing
     """
     return {
-        "full_integration_scenario": {
-            "description": "Complete integration test with all components",
-            "base_figregistry_config": {
-                "figregistry_version": "0.3.0",
-                "styles": {
-                    "baseline": {"color": "#1f77b4", "marker": "o", "linewidth": 2.0},
-                    "treatment": {"color": "#ff7f0e", "marker": "s", "linewidth": 2.0}
-                },
-                "palettes": {"default": ["#1f77b4", "#ff7f0e", "#2ca02c"]},
-                "outputs": {"base_path": "figures", "dpi": 300, "default_format": "png"},
-                "defaults": {"figure_size": [10, 6], "font_size": 12, "grid": True}
-            },
-            "kedro_overrides": {
-                "styles": {
-                    "baseline": {"alpha": 0.8},  # Partial override
-                    "kedro_specific": {"color": "#2ca02c", "marker": "^"}  # New condition
-                },
-                "outputs": {"base_path": "kedro_outputs", "dpi": 200},  # Path and DPI override
-                "kedro": {"enable_versioning": True, "debug_mode": False}  # Kedro-specific config
-            },
-            "expected_merged_config": {
-                "styles": {
-                    "baseline": {"color": "#1f77b4", "marker": "o", "linewidth": 2.0, "alpha": 0.8},
-                    "treatment": {"color": "#ff7f0e", "marker": "s", "linewidth": 2.0},
-                    "kedro_specific": {"color": "#2ca02c", "marker": "^"}
-                },
-                "palettes": {"default": ["#1f77b4", "#ff7f0e", "#2ca02c"]},
-                "outputs": {"base_path": "kedro_outputs", "dpi": 200, "default_format": "png"},
-                "defaults": {"figure_size": [10, 6], "font_size": 12, "grid": True},
-                "kedro": {"enable_versioning": True, "debug_mode": False}
-            },
-            "validation_checks": [
-                "styles.baseline.color == '#1f77b4'",  # Base preserved
-                "styles.baseline.alpha == 0.8",       # Override applied
-                "outputs.base_path == 'kedro_outputs'", # Override applied
-                "outputs.dpi == 200",                  # Override applied
-                "kedro.enable_versioning == True"      # Kedro-specific added
-            ]
+        "styles": {
+            f"style_{i}": {
+                "color": f"#{i % 256:02x}{(i*2) % 256:02x}{(i*3) % 256:02x}",
+                "marker": ["o", "s", "^", "D", "v"][i % 5],
+                "linewidth": 1.0 + (i % 10) * 0.2,
+                "alpha": 0.1 + (i % 9) * 0.1,
+                "label": f"Condition {i}"
+            }
+            for i in range(num_styles)
+        },
+        "defaults": {
+            "figure": {"figsize": [10, 8], "dpi": 150},
+            "line": {"linewidth": 2.0, "alpha": 0.8}
+        },
+        "outputs": {
+            "base_path": "data/stress_test",
+            "naming": {"template": "{name}_{condition}_{ts}"}
         }
     }
+
+
+def validate_config_structure(config: Dict[str, Any], required_sections: List[str]) -> bool:
+    """
+    Validate that configuration contains all required sections.
+    
+    Args:
+        config: Configuration dictionary to validate
+        required_sections: List of required section names
+        
+    Returns:
+        True if all required sections are present
+    """
+    return all(section in config for section in required_sections)
+
+
+def extract_nested_value(config: Dict[str, Any], field_path: List[str]) -> Any:
+    """
+    Extract nested value from configuration using field path.
+    
+    Args:
+        config: Configuration dictionary
+        field_path: List of nested keys to traverse
+        
+    Returns:
+        Value at the specified nested path, or None if not found
+    """
+    current = config
+    for key in field_path:
+        if isinstance(current, dict) and key in current:
+            current = current[key]
+        else:
+            return None
+    return current
+
+
+# Export all fixtures for use in tests
+__all__ = [
+    "base_figregistry_config",
+    "local_override_config", 
+    "environment_specific_configs",
+    "merged_config_scenarios",
+    "config_merge_test_cases",
+    "invalid_config_fixtures",
+    "pydantic_validation_fixtures",
+    "mock_kedro_config_loader",
+    "performance_test_configs",
+    "thread_safety_test_scenarios",
+    "generate_large_config",
+    "validate_config_structure",
+    "extract_nested_value"
+]
