@@ -1,161 +1,101 @@
-# Concurrent Execution Test Data for FigRegistry-Kedro Plugin
-# 
-# This dataset provides comprehensive test data for validating concurrent pipeline execution
-# scenarios, thread-safety operations, and parallel Kedro runner compatibility per Section 5.2.8
-# and Section 6.6.4.3 of the technical specification.
-#
-# Key Testing Scenarios Covered:
-# - Unique execution identifiers for concurrent operation tracking
-# - Thread-safety validation with process/thread identifiers  
-# - Parallel processing scenarios without conflicts
-# - Concurrent FigureDataSet operations and style resolution
-# - Synchronization test data for atomic operations
-# - Stress testing with rapid parallel access patterns
-#
-# Performance Targets Validated:
-# - Plugin Pipeline Execution Overhead: < 200ms per FigureDataSet save (Section 6.6.4.3)
-# - Parallel Runner Concurrency Guidelines: Up to 4 concurrent operations per CPU core (Section 5.2.8)
-# - Thread-safe styling resolution and atomic file operations (Section 5.2.8)
-# - Concurrent execution degradation: < 10% performance impact (Section 6.6.4.3)
-#
-# Usage in Tests:
-# - Load via pandas for concurrent execution scenario testing
-# - Group by thread_id/process_id for parallel operation validation
-# - Use execution_id for tracking operation completion and conflicts
-# - Filter by scenario_type for specific concurrency testing patterns
-# - Validate operation_duration against performance targets
-#
-# Generated: 2024-12-19
-# Compatible with: figregistry-kedro plugin concurrent execution testing framework
-execution_id,thread_id,process_id,scenario_type,operation_type,condition_param,figure_complexity,target_output_path,expected_duration_ms,concurrency_level,sync_point,conflict_potential,memory_pressure_mb,timestamp_offset_ms,pipeline_stage,dataset_name,expected_outcome,stress_factor
-# Basic Sequential Execution (Baseline)
-exec_001,thread_0,proc_0,sequential,figure_save,experiment_baseline,low,data/08_reporting/thread_0/baseline_001.png,150,1,sync_start,none,2.5,0,data_visualization,figure_baseline_001,success,1.0
-exec_002,thread_0,proc_0,sequential,figure_save,experiment_baseline,low,data/08_reporting/thread_0/baseline_002.png,145,1,sync_none,none,2.8,200,data_visualization,figure_baseline_002,success,1.0
-exec_003,thread_0,proc_0,sequential,figure_save,experiment_control,medium,data/08_reporting/thread_0/control_001.png,180,1,sync_none,none,4.2,400,data_visualization,figure_control_001,success,1.0
-exec_004,thread_0,proc_0,sequential,style_resolution,experiment_baseline,low,,25,1,sync_none,none,1.5,600,style_processing,style_baseline_001,success,1.0
-exec_005,thread_0,proc_0,sequential,config_merge,multi_env,medium,,45,1,sync_end,none,3.1,800,configuration,config_merge_001,success,1.0
-
-# Parallel Execution - 2 Threads (Low Concurrency)
-exec_006,thread_1,proc_0,parallel_low,figure_save,experiment_parallel_a,medium,data/08_reporting/thread_1/parallel_a_001.png,175,2,sync_start,low,3.5,0,data_visualization,figure_parallel_a_001,success,1.2
-exec_007,thread_2,proc_0,parallel_low,figure_save,experiment_parallel_b,medium,data/08_reporting/thread_2/parallel_b_001.png,185,2,sync_start,low,3.8,10,data_visualization,figure_parallel_b_001,success,1.2
-exec_008,thread_1,proc_0,parallel_low,style_resolution,experiment_parallel_a,medium,,30,2,sync_none,none,2.1,200,style_processing,style_parallel_a_001,success,1.2
-exec_009,thread_2,proc_0,parallel_low,style_resolution,experiment_parallel_b,medium,,32,2,sync_none,none,2.3,210,style_processing,style_parallel_b_001,success,1.2
-exec_010,thread_1,proc_0,parallel_low,figure_save,experiment_parallel_a,high,data/08_reporting/thread_1/parallel_a_002.png,195,2,sync_barrier,medium,5.2,400,data_visualization,figure_parallel_a_002,success,1.2
-exec_011,thread_2,proc_0,parallel_low,figure_save,experiment_parallel_b,high,data/08_reporting/thread_2/parallel_b_002.png,190,2,sync_barrier,medium,5.1,420,data_visualization,figure_parallel_b_002,success,1.2
-exec_012,thread_1,proc_0,parallel_low,config_access,shared_config,low,,20,2,sync_none,high,1.8,600,configuration,config_access_001,success,1.2
-exec_013,thread_2,proc_0,parallel_low,config_access,shared_config,low,,22,2,sync_none,high,1.9,620,configuration,config_access_002,success,1.2
-
-# Parallel Execution - 4 Threads (Medium Concurrency)
-exec_014,thread_1,proc_0,parallel_medium,figure_save,experiment_quad_a,high,data/08_reporting/thread_1/quad_a_001.png,195,4,sync_start,medium,4.8,0,data_visualization,figure_quad_a_001,success,1.5
-exec_015,thread_2,proc_0,parallel_medium,figure_save,experiment_quad_b,high,data/08_reporting/thread_2/quad_b_001.png,200,4,sync_start,medium,5.1,5,data_visualization,figure_quad_b_001,success,1.5
-exec_016,thread_3,proc_0,parallel_medium,figure_save,experiment_quad_c,high,data/08_reporting/thread_3/quad_c_001.png,205,4,sync_start,medium,5.3,10,data_visualization,figure_quad_c_001,success,1.5
-exec_017,thread_4,proc_0,parallel_medium,figure_save,experiment_quad_d,high,data/08_reporting/thread_4/quad_d_001.png,210,4,sync_start,medium,5.5,15,data_visualization,figure_quad_d_001,success,1.5
-exec_018,thread_1,proc_0,parallel_medium,style_resolution,experiment_quad_a,high,,35,4,sync_none,low,2.8,100,style_processing,style_quad_a_001,success,1.5
-exec_019,thread_2,proc_0,parallel_medium,style_resolution,experiment_quad_b,high,,38,4,sync_none,low,3.1,105,style_processing,style_quad_b_001,success,1.5
-exec_020,thread_3,proc_0,parallel_medium,style_resolution,experiment_quad_c,high,,36,4,sync_none,low,2.9,110,style_processing,style_quad_c_001,success,1.5
-exec_021,thread_4,proc_0,parallel_medium,style_resolution,experiment_quad_d,high,,40,4,sync_none,low,3.3,115,style_processing,style_quad_d_001,success,1.5
-
-# Shared Resource Contention Testing
-exec_022,thread_1,proc_0,shared_resource,figure_save,experiment_shared,medium,data/08_reporting/shared/conflict_test.png,220,4,sync_barrier,very_high,6.1,200,data_visualization,figure_shared_001,success,2.0
-exec_023,thread_2,proc_0,shared_resource,figure_save,experiment_shared,medium,data/08_reporting/shared/conflict_test.png,230,4,sync_barrier,very_high,6.3,205,data_visualization,figure_shared_002,conflict_resolved,2.0
-exec_024,thread_3,proc_0,shared_resource,figure_save,experiment_shared,medium,data/08_reporting/shared/conflict_test.png,240,4,sync_barrier,very_high,6.5,210,data_visualization,figure_shared_003,conflict_resolved,2.0
-exec_025,thread_4,proc_0,shared_resource,figure_save,experiment_shared,medium,data/08_reporting/shared/conflict_test.png,235,4,sync_barrier,very_high,6.2,215,data_visualization,figure_shared_004,conflict_resolved,2.0
-exec_026,thread_1,proc_0,shared_resource,cache_invalidation,shared_cache,high,,50,4,sync_critical,very_high,4.2,300,cache_management,cache_invalidate_001,success,2.0
-exec_027,thread_2,proc_0,shared_resource,cache_read,shared_cache,high,,25,4,sync_critical,very_high,2.1,310,cache_management,cache_read_001,success,2.0
-exec_028,thread_3,proc_0,shared_resource,cache_write,shared_cache,high,,45,4,sync_critical,very_high,3.8,320,cache_management,cache_write_001,success,2.0
-exec_029,thread_4,proc_0,shared_resource,cache_read,shared_cache,high,,28,4,sync_critical,very_high,2.3,330,cache_management,cache_read_002,success,2.0
-
-# High Concurrency Stress Testing - 8 Threads
-exec_030,thread_1,proc_0,stress_high,figure_save,stress_test_a,extreme,data/08_reporting/stress/thread_1/stress_a_001.png,250,8,sync_start,high,8.5,0,data_visualization,figure_stress_a_001,success,3.0
-exec_031,thread_2,proc_0,stress_high,figure_save,stress_test_b,extreme,data/08_reporting/stress/thread_2/stress_b_001.png,260,8,sync_start,high,8.8,2,data_visualization,figure_stress_b_001,success,3.0
-exec_032,thread_3,proc_0,stress_high,figure_save,stress_test_c,extreme,data/08_reporting/stress/thread_3/stress_c_001.png,255,8,sync_start,high,8.6,4,data_visualization,figure_stress_c_001,success,3.0
-exec_033,thread_4,proc_0,stress_high,figure_save,stress_test_d,extreme,data/08_reporting/stress/thread_4/stress_d_001.png,265,8,sync_start,high,9.0,6,data_visualization,figure_stress_d_001,success,3.0
-exec_034,thread_5,proc_0,stress_high,figure_save,stress_test_e,extreme,data/08_reporting/stress/thread_5/stress_e_001.png,270,8,sync_start,high,9.2,8,data_visualization,figure_stress_e_001,success,3.0
-exec_035,thread_6,proc_0,stress_high,figure_save,stress_test_f,extreme,data/08_reporting/stress/thread_6/stress_f_001.png,275,8,sync_start,high,9.4,10,data_visualization,figure_stress_f_001,success,3.0
-exec_036,thread_7,proc_0,stress_high,figure_save,stress_test_g,extreme,data/08_reporting/stress/thread_7/stress_g_001.png,280,8,sync_start,high,9.6,12,data_visualization,figure_stress_g_001,success,3.0
-exec_037,thread_8,proc_0,stress_high,figure_save,stress_test_h,extreme,data/08_reporting/stress/thread_8/stress_h_001.png,285,8,sync_start,high,9.8,14,data_visualization,figure_stress_h_001,success,3.0
-
-# Rapid Fire Operations - Burst Testing
-exec_038,thread_1,proc_0,burst_rapid,figure_save,burst_test_1,low,data/08_reporting/burst/thread_1/burst_001.png,160,8,sync_none,medium,3.2,0,data_visualization,figure_burst_001,success,2.5
-exec_039,thread_2,proc_0,burst_rapid,figure_save,burst_test_2,low,data/08_reporting/burst/thread_2/burst_002.png,165,8,sync_none,medium,3.4,5,data_visualization,figure_burst_002,success,2.5
-exec_040,thread_3,proc_0,burst_rapid,figure_save,burst_test_3,low,data/08_reporting/burst/thread_3/burst_003.png,170,8,sync_none,medium,3.6,10,data_visualization,figure_burst_003,success,2.5
-exec_041,thread_4,proc_0,burst_rapid,figure_save,burst_test_4,low,data/08_reporting/burst/thread_4/burst_004.png,175,8,sync_none,medium,3.8,15,data_visualization,figure_burst_004,success,2.5
-exec_042,thread_5,proc_0,burst_rapid,figure_save,burst_test_5,low,data/08_reporting/burst/thread_5/burst_005.png,180,8,sync_none,medium,4.0,20,data_visualization,figure_burst_005,success,2.5
-exec_043,thread_6,proc_0,burst_rapid,figure_save,burst_test_6,low,data/08_reporting/burst/thread_6/burst_006.png,185,8,sync_none,medium,4.2,25,data_visualization,figure_burst_006,success,2.5
-exec_044,thread_7,proc_0,burst_rapid,figure_save,burst_test_7,low,data/08_reporting/burst/thread_7/burst_007.png,190,8,sync_none,medium,4.4,30,data_visualization,figure_burst_007,success,2.5
-exec_045,thread_8,proc_0,burst_rapid,figure_save,burst_test_8,low,data/08_reporting/burst/thread_8/burst_008.png,195,8,sync_none,medium,4.6,35,data_visualization,figure_burst_008,success,2.5
-
-# Multi-Process Testing - Process-Level Concurrency
-exec_046,thread_1,proc_1,multi_process,figure_save,process_test_a,medium,data/08_reporting/process_1/proc_a_001.png,200,2,sync_start,low,5.0,0,data_visualization,figure_proc_a_001,success,1.8
-exec_047,thread_1,proc_2,multi_process,figure_save,process_test_b,medium,data/08_reporting/process_2/proc_b_001.png,205,2,sync_start,low,5.2,5,data_visualization,figure_proc_b_001,success,1.8
-exec_048,thread_2,proc_1,multi_process,style_resolution,process_test_a,medium,,40,2,sync_none,none,2.5,100,style_processing,style_proc_a_001,success,1.8
-exec_049,thread_2,proc_2,multi_process,style_resolution,process_test_b,medium,,42,2,sync_none,none,2.7,105,style_processing,style_proc_b_001,success,1.8
-exec_050,thread_3,proc_1,multi_process,config_load,independent_config,low,,35,2,sync_none,none,3.1,200,configuration,config_proc_1_001,success,1.8
-exec_051,thread_3,proc_2,multi_process,config_load,independent_config,low,,38,2,sync_none,none,3.3,205,configuration,config_proc_2_001,success,1.8
-
-# Race Condition Testing - Critical Section Operations
-exec_052,thread_1,proc_0,race_condition,config_update,shared_config_race,medium,,55,4,sync_critical,very_high,4.5,0,configuration,config_race_001,success,2.8
-exec_053,thread_2,proc_0,race_condition,config_read,shared_config_race,medium,,25,4,sync_critical,very_high,2.2,5,configuration,config_race_002,success,2.8
-exec_054,thread_3,proc_0,race_condition,config_update,shared_config_race,medium,,60,4,sync_critical,very_high,4.8,10,configuration,config_race_003,success,2.8
-exec_055,thread_4,proc_0,race_condition,config_read,shared_config_race,medium,,28,4,sync_critical,very_high,2.4,15,configuration,config_race_004,success,2.8
-exec_056,thread_1,proc_0,race_condition,style_cache_update,shared_style_cache,high,,45,4,sync_critical,very_high,3.8,100,cache_management,style_cache_race_001,success,2.8
-exec_057,thread_2,proc_0,race_condition,style_cache_read,shared_style_cache,high,,20,4,sync_critical,very_high,1.8,105,cache_management,style_cache_race_002,success,2.8
-exec_058,thread_3,proc_0,race_condition,style_cache_invalidate,shared_style_cache,high,,35,4,sync_critical,very_high,3.2,110,cache_management,style_cache_race_003,success,2.8
-exec_059,thread_4,proc_0,race_condition,style_cache_read,shared_style_cache,high,,22,4,sync_critical,very_high,2.0,115,cache_management,style_cache_race_004,success,2.8
-
-# Deadlock Prevention Testing
-exec_060,thread_1,proc_0,deadlock_prevention,resource_lock_a_then_b,dual_resource_test,medium,,180,2,sync_order_1,very_high,6.5,0,resource_management,deadlock_prev_001,success,3.5
-exec_061,thread_2,proc_0,deadlock_prevention,resource_lock_b_then_a,dual_resource_test,medium,,185,2,sync_order_2,very_high,6.7,10,resource_management,deadlock_prev_002,success,3.5
-exec_062,thread_1,proc_0,deadlock_prevention,release_resource_a,dual_resource_test,medium,,25,2,sync_release_1,high,2.1,200,resource_management,deadlock_prev_003,success,3.5
-exec_063,thread_2,proc_0,deadlock_prevention,release_resource_b,dual_resource_test,medium,,27,2,sync_release_2,high,2.3,210,resource_management,deadlock_prev_004,success,3.5
-
-# Memory Pressure Under Concurrency
-exec_064,thread_1,proc_0,memory_pressure,figure_save_large,memory_stress_a,extreme,data/08_reporting/memory/thread_1/large_001.png,300,4,sync_start,high,15.2,0,data_visualization,figure_memory_a_001,success,4.0
-exec_065,thread_2,proc_0,memory_pressure,figure_save_large,memory_stress_b,extreme,data/08_reporting/memory/thread_2/large_002.png,310,4,sync_start,high,15.8,5,data_visualization,figure_memory_b_001,success,4.0
-exec_066,thread_3,proc_0,memory_pressure,figure_save_large,memory_stress_c,extreme,data/08_reporting/memory/thread_3/large_003.png,320,4,sync_start,high,16.1,10,data_visualization,figure_memory_c_001,success,4.0
-exec_067,thread_4,proc_0,memory_pressure,figure_save_large,memory_stress_d,extreme,data/08_reporting/memory/thread_4/large_004.png,315,4,sync_start,high,15.9,15,data_visualization,figure_memory_d_001,success,4.0
-exec_068,thread_1,proc_0,memory_pressure,gc_collection,memory_cleanup,low,,75,4,sync_barrier,medium,8.2,500,memory_management,gc_collect_001,success,4.0
-exec_069,thread_2,proc_0,memory_pressure,memory_check,memory_validation,low,,15,4,sync_none,low,1.5,600,memory_management,memory_check_001,success,4.0
-
-# Performance Degradation Validation
-exec_070,thread_1,proc_0,performance_validation,figure_save,perf_baseline_single,medium,data/08_reporting/perf/single/baseline_001.png,175,1,sync_none,none,4.2,0,data_visualization,figure_perf_single_001,success,1.0
-exec_071,thread_1,proc_0,performance_validation,figure_save,perf_test_dual_a,medium,data/08_reporting/perf/dual/test_a_001.png,190,2,sync_start,low,4.5,100,data_visualization,figure_perf_dual_a_001,success,1.1
-exec_072,thread_2,proc_0,performance_validation,figure_save,perf_test_dual_b,medium,data/08_reporting/perf/dual/test_b_001.png,195,2,sync_start,low,4.7,105,data_visualization,figure_perf_dual_b_001,success,1.1
-exec_073,thread_1,proc_0,performance_validation,figure_save,perf_test_quad_a,medium,data/08_reporting/perf/quad/test_a_001.png,205,4,sync_start,medium,5.1,200,data_visualization,figure_perf_quad_a_001,success,1.2
-exec_074,thread_2,proc_0,performance_validation,figure_save,perf_test_quad_b,medium,data/08_reporting/perf/quad/test_b_001.png,210,4,sync_start,medium,5.3,205,data_visualization,figure_perf_quad_b_001,success,1.2
-exec_075,thread_3,proc_0,performance_validation,figure_save,perf_test_quad_c,medium,data/08_reporting/perf/quad/test_c_001.png,215,4,sync_start,medium,5.5,210,data_visualization,figure_perf_quad_c_001,success,1.2
-exec_076,thread_4,proc_0,performance_validation,figure_save,perf_test_quad_d,medium,data/08_reporting/perf/quad/test_d_001.png,220,4,sync_start,medium,5.7,215,data_visualization,figure_perf_quad_d_001,success,1.2
-
-# Thread Safety Edge Cases
-exec_077,thread_1,proc_0,edge_cases,simultaneous_start,edge_test_sync,high,data/08_reporting/edge/thread_1/sync_001.png,225,8,sync_precise,very_high,7.1,0,data_visualization,figure_edge_sync_001,success,3.2
-exec_078,thread_2,proc_0,edge_cases,simultaneous_start,edge_test_sync,high,data/08_reporting/edge/thread_2/sync_002.png,230,8,sync_precise,very_high,7.3,0,data_visualization,figure_edge_sync_002,success,3.2
-exec_079,thread_3,proc_0,edge_cases,simultaneous_start,edge_test_sync,high,data/08_reporting/edge/thread_3/sync_003.png,235,8,sync_precise,very_high,7.5,0,data_visualization,figure_edge_sync_003,success,3.2
-exec_080,thread_4,proc_0,edge_cases,context_switch,edge_test_context,medium,,45,8,sync_none,high,3.8,100,context_management,context_switch_001,success,3.2
-exec_081,thread_5,proc_0,edge_cases,interrupt_handling,edge_test_interrupt,low,,35,8,sync_none,medium,2.9,150,interrupt_management,interrupt_handle_001,success,3.2
-
-# Recovery and Resilience Testing
-exec_082,thread_1,proc_0,resilience,failure_recovery,recovery_test_a,medium,data/08_reporting/recovery/thread_1/recovery_001.png,280,4,sync_recovery,high,6.2,0,data_visualization,figure_recovery_001,recovered,2.5
-exec_083,thread_2,proc_0,resilience,timeout_handling,recovery_test_timeout,high,,120,4,sync_timeout,very_high,4.8,50,timeout_management,timeout_handle_001,timeout_recovered,2.5
-exec_084,thread_3,proc_0,resilience,resource_exhaustion,recovery_test_resource,extreme,,200,4,sync_resource,very_high,12.5,100,resource_management,resource_recovery_001,resource_recovered,2.5
-exec_085,thread_4,proc_0,resilience,graceful_degradation,recovery_test_degrade,high,data/08_reporting/recovery/thread_4/degraded_001.png,350,4,sync_degrade,high,8.1,150,data_visualization,figure_degraded_001,degraded_success,2.5
-
-# Long-Duration Stability Testing
-exec_086,thread_1,proc_0,stability_long,sustained_operation_1,stability_test_a,medium,data/08_reporting/stability/thread_1/sustained_001.png,180,2,sync_sustained,low,4.5,0,data_visualization,figure_sustained_001,success,1.5
-exec_087,thread_2,proc_0,stability_long,sustained_operation_2,stability_test_b,medium,data/08_reporting/stability/thread_2/sustained_002.png,185,2,sync_sustained,low,4.7,1000,data_visualization,figure_sustained_002,success,1.5
-exec_088,thread_1,proc_0,stability_long,sustained_operation_3,stability_test_a,medium,data/08_reporting/stability/thread_1/sustained_003.png,190,2,sync_sustained,low,4.9,2000,data_visualization,figure_sustained_003,success,1.5
-exec_089,thread_2,proc_0,stability_long,sustained_operation_4,stability_test_b,medium,data/08_reporting/stability/thread_2/sustained_004.png,195,2,sync_sustained,low,5.1,3000,data_visualization,figure_sustained_004,success,1.5
-exec_090,thread_1,proc_0,stability_long,sustained_operation_5,stability_test_a,medium,data/08_reporting/stability/thread_1/sustained_005.png,200,2,sync_sustained,low,5.3,4000,data_visualization,figure_sustained_005,success,1.5
-
-# Cross-Platform Concurrency Validation
-exec_091,thread_1,proc_0,cross_platform,platform_test_linux,cross_platform_a,medium,data/08_reporting/cross_platform/linux/thread_1/cross_001.png,185,4,sync_platform,medium,4.8,0,data_visualization,figure_cross_linux_001,success,1.8
-exec_092,thread_2,proc_0,cross_platform,platform_test_windows,cross_platform_b,medium,data/08_reporting/cross_platform/windows/thread_2/cross_002.png,190,4,sync_platform,medium,5.0,10,data_visualization,figure_cross_windows_002,success,1.8
-exec_093,thread_3,proc_0,cross_platform,platform_test_macos,cross_platform_c,medium,data/08_reporting/cross_platform/macos/thread_3/cross_003.png,195,4,sync_platform,medium,5.2,20,data_visualization,figure_cross_macos_003,success,1.8
-exec_094,thread_4,proc_0,cross_platform,file_system_sync,cross_platform_fs,low,,55,4,sync_filesystem,high,3.2,30,filesystem_management,filesystem_sync_001,success,1.8
-
-# Final Cleanup and Validation
-exec_095,thread_1,proc_0,cleanup_validation,cleanup_temp_files,cleanup_test,low,,40,1,sync_cleanup,none,2.1,0,cleanup_management,cleanup_temp_001,success,1.0
-exec_096,thread_1,proc_0,cleanup_validation,validate_consistency,validation_test,low,,30,1,sync_validation,none,1.8,100,validation_management,validate_consistency_001,success,1.0
-exec_097,thread_1,proc_0,cleanup_validation,memory_leak_check,memory_leak_test,low,,25,1,sync_memory,none,1.5,200,memory_management,memory_leak_check_001,success,1.0
-exec_098,thread_1,proc_0,cleanup_validation,performance_summary,performance_summary_test,low,,20,1,sync_summary,none,1.2,300,performance_management,performance_summary_001,success,1.0
-exec_099,thread_1,proc_0,cleanup_validation,test_completion,completion_test,low,,15,1,sync_completion,none,1.0,400,test_management,test_completion_001,success,1.0
-exec_100,thread_1,proc_0,cleanup_validation,final_validation,final_test,low,,10,1,sync_final,none,0.8,500,validation_management,final_validation_001,success,1.0
+execution_id,thread_id,process_id,pipeline_name,condition_param,execution_timestamp,execution_order,purpose_category,synchronization_token,stress_level,memory_target_mb,concurrent_index,team_identifier,experiment_type,figure_complexity,expected_duration_ms,thread_safety_marker,atomic_operation_id,conflict_resolution_strategy,parallel_access_pattern,resource_contention_level,cache_pressure_factor,coordination_sequence,validation_checkpoint,cleanup_required
+exec_001,thread_001,proc_001,basic_concurrent_a,baseline_condition,2024-12-04T10:00:00.000Z,1,exploratory,sync_token_001,low,2.0,0,team_alpha,ml_training,simple,150,ts_marker_001,atomic_001,first_wins,sequential,low,0.1,coord_001,checkpoint_001,false
+exec_002,thread_002,proc_001,basic_concurrent_b,treatment_condition,2024-12-04T10:00:00.100Z,2,presentation,sync_token_002,low,2.1,1,team_alpha,ml_training,simple,155,ts_marker_002,atomic_002,first_wins,sequential,low,0.1,coord_002,checkpoint_002,false
+exec_003,thread_001,proc_002,medium_concurrent_a,baseline_condition,2024-12-04T10:00:00.200Z,3,exploratory,sync_token_003,medium,3.5,2,team_beta,data_analysis,medium,200,ts_marker_003,atomic_003,last_wins,parallel,medium,0.3,coord_003,checkpoint_003,false
+exec_004,thread_002,proc_002,medium_concurrent_b,treatment_condition,2024-12-04T10:00:00.250Z,4,presentation,sync_token_004,medium,3.6,3,team_beta,data_analysis,medium,205,ts_marker_004,atomic_004,last_wins,parallel,medium,0.3,coord_004,checkpoint_004,false
+exec_005,thread_003,proc_002,medium_concurrent_c,control_condition,2024-12-04T10:00:00.300Z,5,publication,sync_token_005,medium,3.8,4,team_beta,data_analysis,medium,210,ts_marker_005,atomic_005,merge_strategy,parallel,medium,0.3,coord_005,checkpoint_005,false
+exec_006,thread_004,proc_002,medium_concurrent_d,experimental_condition,2024-12-04T10:00:00.350Z,6,report,sync_token_006,medium,3.9,5,team_beta,data_analysis,medium,215,ts_marker_006,atomic_006,merge_strategy,parallel,medium,0.3,coord_006,checkpoint_006,false
+exec_007,thread_001,proc_003,high_concurrent_pipeline_00,stress_condition_0_0,2024-12-04T10:00:00.400Z,7,exploratory,sync_token_007,high,5.2,6,team_gamma,deep_learning,complex,280,ts_marker_007,atomic_007,versioned_conflict,rapid_parallel,high,0.6,coord_007,checkpoint_007,true
+exec_008,thread_002,proc_003,high_concurrent_pipeline_01,stress_condition_1_1,2024-12-04T10:00:00.420Z,8,presentation,sync_token_008,high,5.3,7,team_gamma,deep_learning,complex,285,ts_marker_008,atomic_008,versioned_conflict,rapid_parallel,high,0.6,coord_008,checkpoint_008,true
+exec_009,thread_003,proc_003,high_concurrent_pipeline_02,stress_condition_2_2,2024-12-04T10:00:00.440Z,9,publication,sync_token_009,high,5.5,8,team_gamma,deep_learning,complex,290,ts_marker_009,atomic_009,atomic_increment,rapid_parallel,high,0.6,coord_009,checkpoint_009,true
+exec_010,thread_004,proc_003,high_concurrent_pipeline_03,stress_condition_3_3,2024-12-04T10:00:00.460Z,10,report,sync_token_010,high,5.7,9,team_gamma,deep_learning,complex,295,ts_marker_010,atomic_010,atomic_increment,rapid_parallel,high,0.6,coord_010,checkpoint_010,true
+exec_011,thread_005,proc_003,high_concurrent_pipeline_04,stress_condition_4_4,2024-12-04T10:00:00.480Z,11,thesis,sync_token_011,high,5.9,10,team_gamma,deep_learning,complex,300,ts_marker_011,atomic_011,lock_based,rapid_parallel,high,0.6,coord_011,checkpoint_011,true
+exec_012,thread_006,proc_003,high_concurrent_pipeline_05,stress_condition_0_1,2024-12-04T10:00:00.500Z,12,exploratory,sync_token_012,high,6.0,11,team_gamma,deep_learning,complex,305,ts_marker_012,atomic_012,lock_based,rapid_parallel,high,0.6,coord_012,checkpoint_012,true
+exec_013,thread_007,proc_003,high_concurrent_pipeline_06,stress_condition_1_2,2024-12-04T10:00:00.520Z,13,presentation,sync_token_013,high,6.1,12,team_gamma,deep_learning,complex,310,ts_marker_013,atomic_013,compare_and_swap,rapid_parallel,high,0.6,coord_013,checkpoint_013,true
+exec_014,thread_008,proc_003,high_concurrent_pipeline_07,stress_condition_2_3,2024-12-04T10:00:00.540Z,14,publication,sync_token_014,high,6.2,13,team_gamma,deep_learning,complex,315,ts_marker_014,atomic_014,compare_and_swap,rapid_parallel,high,0.6,coord_014,checkpoint_014,true
+exec_015,thread_001,proc_004,stress_pipeline_00,stress_condition_0_0,2024-12-04T10:00:00.560Z,15,exploratory,sync_token_015,maximum,8.5,14,team_delta,ensemble_learning,stress_maximum,450,ts_marker_015,atomic_015,distributed_lock,burst_parallel,maximum,0.9,coord_015,checkpoint_015,true
+exec_016,thread_002,proc_004,stress_pipeline_01,stress_condition_1_1,2024-12-04T10:00:00.565Z,16,presentation,sync_token_016,maximum,8.6,15,team_delta,ensemble_learning,stress_maximum,455,ts_marker_016,atomic_016,distributed_lock,burst_parallel,maximum,0.9,coord_016,checkpoint_016,true
+exec_017,thread_003,proc_004,stress_pipeline_02,stress_condition_2_2,2024-12-04T10:00:00.570Z,17,publication,sync_token_017,maximum,8.7,16,team_delta,ensemble_learning,stress_maximum,460,ts_marker_017,atomic_017,optimistic_lock,burst_parallel,maximum,0.9,coord_017,checkpoint_017,true
+exec_018,thread_004,proc_004,stress_pipeline_03,stress_condition_3_3,2024-12-04T10:00:00.575Z,18,report,sync_token_018,maximum,8.8,17,team_delta,ensemble_learning,stress_maximum,465,ts_marker_018,atomic_018,optimistic_lock,burst_parallel,maximum,0.9,coord_018,checkpoint_018,true
+exec_019,thread_005,proc_004,stress_pipeline_04,stress_condition_4_4,2024-12-04T10:00:00.580Z,19,thesis,sync_token_019,maximum,8.9,18,team_delta,ensemble_learning,stress_maximum,470,ts_marker_019,atomic_019,pessimistic_lock,burst_parallel,maximum,0.9,coord_019,checkpoint_019,true
+exec_020,thread_006,proc_004,stress_pipeline_05,stress_condition_0_1,2024-12-04T10:00:00.585Z,20,exploratory,sync_token_020,maximum,9.0,19,team_delta,ensemble_learning,stress_maximum,475,ts_marker_020,atomic_020,pessimistic_lock,burst_parallel,maximum,0.9,coord_020,checkpoint_020,true
+exec_021,thread_007,proc_004,stress_pipeline_06,stress_condition_1_2,2024-12-04T10:00:00.590Z,21,presentation,sync_token_021,maximum,9.1,20,team_delta,ensemble_learning,stress_maximum,480,ts_marker_021,atomic_021,snapshot_isolation,burst_parallel,maximum,0.9,coord_021,checkpoint_021,true
+exec_022,thread_008,proc_004,stress_pipeline_07,stress_condition_2_3,2024-12-04T10:00:00.595Z,22,publication,sync_token_022,maximum,9.2,21,team_delta,ensemble_learning,stress_maximum,485,ts_marker_022,atomic_022,snapshot_isolation,burst_parallel,maximum,0.9,coord_022,checkpoint_022,true
+exec_023,thread_009,proc_004,stress_pipeline_08,stress_condition_3_4,2024-12-04T10:00:00.600Z,23,report,sync_token_023,maximum,9.3,22,team_delta,ensemble_learning,stress_maximum,490,ts_marker_023,atomic_023,serializable,burst_parallel,maximum,0.9,coord_023,checkpoint_023,true
+exec_024,thread_010,proc_004,stress_pipeline_09,stress_condition_4_0,2024-12-04T10:00:00.605Z,24,thesis,sync_token_024,maximum,9.4,23,team_delta,ensemble_learning,stress_maximum,495,ts_marker_024,atomic_024,serializable,burst_parallel,maximum,0.9,coord_024,checkpoint_024,true
+exec_025,thread_011,proc_004,stress_pipeline_10,stress_condition_0_2,2024-12-04T10:00:00.610Z,25,exploratory,sync_token_025,maximum,9.5,24,team_delta,ensemble_learning,stress_maximum,500,ts_marker_025,atomic_025,read_committed,burst_parallel,maximum,0.9,coord_025,checkpoint_025,true
+exec_026,thread_012,proc_004,stress_pipeline_11,stress_condition_1_3,2024-12-04T10:00:00.615Z,26,presentation,sync_token_026,maximum,9.6,25,team_delta,ensemble_learning,stress_maximum,505,ts_marker_026,atomic_026,read_committed,burst_parallel,maximum,0.9,coord_026,checkpoint_026,true
+exec_027,thread_013,proc_004,stress_pipeline_12,stress_condition_2_4,2024-12-04T10:00:00.620Z,27,publication,sync_token_027,maximum,9.7,26,team_delta,ensemble_learning,stress_maximum,510,ts_marker_027,atomic_027,read_uncommitted,burst_parallel,maximum,0.9,coord_027,checkpoint_027,true
+exec_028,thread_014,proc_004,stress_pipeline_13,stress_condition_3_0,2024-12-04T10:00:00.625Z,28,report,sync_token_028,maximum,9.8,27,team_delta,ensemble_learning,stress_maximum,515,ts_marker_028,atomic_028,read_uncommitted,burst_parallel,maximum,0.9,coord_028,checkpoint_028,true
+exec_029,thread_015,proc_004,stress_pipeline_14,stress_condition_4_1,2024-12-04T10:00:00.630Z,29,thesis,sync_token_029,maximum,9.9,28,team_delta,ensemble_learning,stress_maximum,520,ts_marker_029,atomic_029,repeatable_read,burst_parallel,maximum,0.9,coord_029,checkpoint_029,true
+exec_030,thread_016,proc_004,stress_pipeline_15,stress_condition_0_3,2024-12-04T10:00:00.635Z,30,exploratory,sync_token_030,maximum,10.0,29,team_delta,ensemble_learning,stress_maximum,525,ts_marker_030,atomic_030,repeatable_read,burst_parallel,maximum,0.9,coord_030,checkpoint_030,true
+exec_031,thread_001,proc_005,rapid_access_pipeline_01,rapid_condition_001,2024-12-04T10:00:00.640Z,31,exploratory,sync_token_031,high,4.2,30,team_epsilon,reinforcement_learning,medium,180,ts_marker_031,atomic_031,event_sourcing,rapid_burst,high,0.7,coord_031,checkpoint_031,true
+exec_032,thread_002,proc_005,rapid_access_pipeline_02,rapid_condition_002,2024-12-04T10:00:00.642Z,32,presentation,sync_token_032,high,4.3,31,team_epsilon,reinforcement_learning,medium,182,ts_marker_032,atomic_032,event_sourcing,rapid_burst,high,0.7,coord_032,checkpoint_032,true
+exec_033,thread_003,proc_005,rapid_access_pipeline_03,rapid_condition_003,2024-12-04T10:00:00.644Z,33,publication,sync_token_033,high,4.4,32,team_epsilon,reinforcement_learning,medium,184,ts_marker_033,atomic_033,cqrs_pattern,rapid_burst,high,0.7,coord_033,checkpoint_033,true
+exec_034,thread_004,proc_005,rapid_access_pipeline_04,rapid_condition_004,2024-12-04T10:00:00.646Z,34,report,sync_token_034,high,4.5,33,team_epsilon,reinforcement_learning,medium,186,ts_marker_034,atomic_034,cqrs_pattern,rapid_burst,high,0.7,coord_034,checkpoint_034,true
+exec_035,thread_005,proc_005,rapid_access_pipeline_05,rapid_condition_005,2024-12-04T10:00:00.648Z,35,thesis,sync_token_035,high,4.6,34,team_epsilon,reinforcement_learning,medium,188,ts_marker_035,atomic_035,saga_pattern,rapid_burst,high,0.7,coord_035,checkpoint_035,true
+exec_036,thread_006,proc_005,rapid_access_pipeline_06,rapid_condition_006,2024-12-04T10:00:00.650Z,36,exploratory,sync_token_036,high,4.7,35,team_epsilon,reinforcement_learning,medium,190,ts_marker_036,atomic_036,saga_pattern,rapid_burst,high,0.7,coord_036,checkpoint_036,true
+exec_037,thread_007,proc_005,rapid_access_pipeline_07,rapid_condition_007,2024-12-04T10:00:00.652Z,37,presentation,sync_token_037,high,4.8,36,team_epsilon,reinforcement_learning,medium,192,ts_marker_037,atomic_037,compensating_action,rapid_burst,high,0.7,coord_037,checkpoint_037,true
+exec_038,thread_008,proc_005,rapid_access_pipeline_08,rapid_condition_008,2024-12-04T10:00:00.654Z,38,publication,sync_token_038,high,4.9,37,team_epsilon,reinforcement_learning,medium,194,ts_marker_038,atomic_038,compensating_action,rapid_burst,high,0.7,coord_038,checkpoint_038,true
+exec_039,thread_009,proc_005,rapid_access_pipeline_09,rapid_condition_009,2024-12-04T10:00:00.656Z,39,report,sync_token_039,high,5.0,38,team_epsilon,reinforcement_learning,medium,196,ts_marker_039,atomic_039,two_phase_commit,rapid_burst,high,0.7,coord_039,checkpoint_039,true
+exec_040,thread_010,proc_005,rapid_access_pipeline_10,rapid_condition_010,2024-12-04T10:00:00.658Z,40,thesis,sync_token_040,high,5.1,39,team_epsilon,reinforcement_learning,medium,198,ts_marker_040,atomic_040,two_phase_commit,rapid_burst,high,0.7,coord_040,checkpoint_040,true
+exec_041,thread_001,proc_006,memory_pressure_pipeline_01,memory_stress_001,2024-12-04T10:00:01.000Z,41,exploratory,sync_token_041,maximum,12.5,40,team_zeta,federated_learning,stress_maximum,600,ts_marker_041,atomic_041,memory_fence,memory_intensive,maximum,0.95,coord_041,checkpoint_041,true
+exec_042,thread_002,proc_006,memory_pressure_pipeline_02,memory_stress_002,2024-12-04T10:00:01.010Z,42,presentation,sync_token_042,maximum,12.6,41,team_zeta,federated_learning,stress_maximum,605,ts_marker_042,atomic_042,memory_fence,memory_intensive,maximum,0.95,coord_042,checkpoint_042,true
+exec_043,thread_003,proc_006,memory_pressure_pipeline_03,memory_stress_003,2024-12-04T10:00:01.020Z,43,publication,sync_token_043,maximum,12.7,42,team_zeta,federated_learning,stress_maximum,610,ts_marker_043,atomic_043,memory_barrier,memory_intensive,maximum,0.95,coord_043,checkpoint_043,true
+exec_044,thread_004,proc_006,memory_pressure_pipeline_04,memory_stress_004,2024-12-04T10:00:01.030Z,44,report,sync_token_044,maximum,12.8,43,team_zeta,federated_learning,stress_maximum,615,ts_marker_044,atomic_044,memory_barrier,memory_intensive,maximum,0.95,coord_044,checkpoint_044,true
+exec_045,thread_005,proc_006,memory_pressure_pipeline_05,memory_stress_005,2024-12-04T10:00:01.040Z,45,thesis,sync_token_045,maximum,12.9,44,team_zeta,federated_learning,stress_maximum,620,ts_marker_045,atomic_045,cache_coherence,memory_intensive,maximum,0.95,coord_045,checkpoint_045,true
+exec_046,thread_006,proc_006,memory_pressure_pipeline_06,memory_stress_006,2024-12-04T10:00:01.050Z,46,exploratory,sync_token_046,maximum,13.0,45,team_zeta,federated_learning,stress_maximum,625,ts_marker_046,atomic_046,cache_coherence,memory_intensive,maximum,0.95,coord_046,checkpoint_046,true
+exec_047,thread_007,proc_006,memory_pressure_pipeline_07,memory_stress_007,2024-12-04T10:00:01.060Z,47,presentation,sync_token_047,maximum,13.1,46,team_zeta,federated_learning,stress_maximum,630,ts_marker_047,atomic_047,write_through,memory_intensive,maximum,0.95,coord_047,checkpoint_047,true
+exec_048,thread_008,proc_006,memory_pressure_pipeline_08,memory_stress_008,2024-12-04T10:00:01.070Z,48,publication,sync_token_048,maximum,13.2,47,team_zeta,federated_learning,stress_maximum,635,ts_marker_048,atomic_048,write_through,memory_intensive,maximum,0.95,coord_048,checkpoint_048,true
+exec_049,thread_009,proc_006,memory_pressure_pipeline_09,memory_stress_009,2024-12-04T10:00:01.080Z,49,report,sync_token_049,maximum,13.3,48,team_zeta,federated_learning,stress_maximum,640,ts_marker_049,atomic_049,write_back,memory_intensive,maximum,0.95,coord_049,checkpoint_049,true
+exec_050,thread_010,proc_006,memory_pressure_pipeline_10,memory_stress_010,2024-12-04T10:00:01.090Z,50,thesis,sync_token_050,maximum,13.4,49,team_zeta,federated_learning,stress_maximum,645,ts_marker_050,atomic_050,write_back,memory_intensive,maximum,0.95,coord_050,checkpoint_050,true
+exec_051,thread_001,proc_007,deadlock_prevention_pipeline_01,deadlock_test_001,2024-12-04T10:00:01.100Z,51,exploratory,sync_token_051,high,6.5,50,team_eta,adversarial_learning,complex,350,ts_marker_051,atomic_051,ordered_locking,deadlock_prone,high,0.8,coord_051,checkpoint_051,true
+exec_052,thread_002,proc_007,deadlock_prevention_pipeline_02,deadlock_test_002,2024-12-04T10:00:01.110Z,52,presentation,sync_token_052,high,6.6,51,team_eta,adversarial_learning,complex,355,ts_marker_052,atomic_052,ordered_locking,deadlock_prone,high,0.8,coord_052,checkpoint_052,true
+exec_053,thread_003,proc_007,deadlock_prevention_pipeline_03,deadlock_test_003,2024-12-04T10:00:01.120Z,53,publication,sync_token_053,high,6.7,52,team_eta,adversarial_learning,complex,360,ts_marker_053,atomic_053,timeout_strategy,deadlock_prone,high,0.8,coord_053,checkpoint_053,true
+exec_054,thread_004,proc_007,deadlock_prevention_pipeline_04,deadlock_test_004,2024-12-04T10:00:01.130Z,54,report,sync_token_054,high,6.8,53,team_eta,adversarial_learning,complex,365,ts_marker_054,atomic_054,timeout_strategy,deadlock_prone,high,0.8,coord_054,checkpoint_054,true
+exec_055,thread_005,proc_007,deadlock_prevention_pipeline_05,deadlock_test_005,2024-12-04T10:00:01.140Z,55,thesis,sync_token_055,high,6.9,54,team_eta,adversarial_learning,complex,370,ts_marker_055,atomic_055,backoff_strategy,deadlock_prone,high,0.8,coord_055,checkpoint_055,true
+exec_056,thread_006,proc_007,deadlock_prevention_pipeline_06,deadlock_test_006,2024-12-04T10:00:01.150Z,56,exploratory,sync_token_056,high,7.0,55,team_eta,adversarial_learning,complex,375,ts_marker_056,atomic_056,backoff_strategy,deadlock_prone,high,0.8,coord_056,checkpoint_056,true
+exec_057,thread_007,proc_007,deadlock_prevention_pipeline_07,deadlock_test_007,2024-12-04T10:00:01.160Z,57,presentation,sync_token_057,high,7.1,56,team_eta,adversarial_learning,complex,380,ts_marker_057,atomic_057,priority_inheritance,deadlock_prone,high,0.8,coord_057,checkpoint_057,true
+exec_058,thread_008,proc_007,deadlock_prevention_pipeline_08,deadlock_test_008,2024-12-04T10:00:01.170Z,58,publication,sync_token_058,high,7.2,57,team_eta,adversarial_learning,complex,385,ts_marker_058,atomic_058,priority_inheritance,deadlock_prone,high,0.8,coord_058,checkpoint_058,true
+exec_059,thread_009,proc_007,deadlock_prevention_pipeline_09,deadlock_test_009,2024-12-04T10:00:01.180Z,59,report,sync_token_059,high,7.3,58,team_eta,adversarial_learning,complex,390,ts_marker_059,atomic_059,wound_wait,deadlock_prone,high,0.8,coord_059,checkpoint_059,true
+exec_060,thread_010,proc_007,deadlock_prevention_pipeline_10,deadlock_test_010,2024-12-04T10:00:01.190Z,60,thesis,sync_token_060,high,7.4,59,team_eta,adversarial_learning,complex,395,ts_marker_060,atomic_060,wound_wait,deadlock_prone,high,0.8,coord_060,checkpoint_060,true
+exec_061,thread_001,proc_008,race_condition_pipeline_01,race_test_001,2024-12-04T10:00:01.200Z,61,exploratory,sync_token_061,medium,3.2,60,team_theta,neural_architecture_search,medium,250,ts_marker_061,atomic_061,check_then_act,race_condition_test,medium,0.5,coord_061,checkpoint_061,false
+exec_062,thread_002,proc_008,race_condition_pipeline_02,race_test_002,2024-12-04T10:00:01.202Z,62,presentation,sync_token_062,medium,3.3,61,team_theta,neural_architecture_search,medium,252,ts_marker_062,atomic_062,check_then_act,race_condition_test,medium,0.5,coord_062,checkpoint_062,false
+exec_063,thread_003,proc_008,race_condition_pipeline_03,race_test_003,2024-12-04T10:00:01.204Z,63,publication,sync_token_063,medium,3.4,62,team_theta,neural_architecture_search,medium,254,ts_marker_063,atomic_063,compare_and_set,race_condition_test,medium,0.5,coord_063,checkpoint_063,false
+exec_064,thread_004,proc_008,race_condition_pipeline_04,race_test_004,2024-12-04T10:00:01.206Z,64,report,sync_token_064,medium,3.5,63,team_theta,neural_architecture_search,medium,256,ts_marker_064,atomic_064,compare_and_set,race_condition_test,medium,0.5,coord_064,checkpoint_064,false
+exec_065,thread_005,proc_008,race_condition_pipeline_05,race_test_005,2024-12-04T10:00:01.208Z,65,thesis,sync_token_065,medium,3.6,64,team_theta,neural_architecture_search,medium,258,ts_marker_065,atomic_065,test_and_set,race_condition_test,medium,0.5,coord_065,checkpoint_065,false
+exec_066,thread_006,proc_008,race_condition_pipeline_06,race_test_006,2024-12-04T10:00:01.210Z,66,exploratory,sync_token_066,medium,3.7,65,team_theta,neural_architecture_search,medium,260,ts_marker_066,atomic_066,test_and_set,race_condition_test,medium,0.5,coord_066,checkpoint_066,false
+exec_067,thread_007,proc_008,race_condition_pipeline_07,race_test_007,2024-12-04T10:00:01.212Z,67,presentation,sync_token_067,medium,3.8,66,team_theta,neural_architecture_search,medium,262,ts_marker_067,atomic_067,atomic_exchange,race_condition_test,medium,0.5,coord_067,checkpoint_067,false
+exec_068,thread_008,proc_008,race_condition_pipeline_08,race_test_008,2024-12-04T10:00:01.214Z,68,publication,sync_token_068,medium,3.9,67,team_theta,neural_architecture_search,medium,264,ts_marker_068,atomic_068,atomic_exchange,race_condition_test,medium,0.5,coord_068,checkpoint_068,false
+exec_069,thread_009,proc_008,race_condition_pipeline_09,race_test_009,2024-12-04T10:00:01.216Z,69,report,sync_token_069,medium,4.0,68,team_theta,neural_architecture_search,medium,266,ts_marker_069,atomic_069,fetch_and_add,race_condition_test,medium,0.5,coord_069,checkpoint_069,false
+exec_070,thread_010,proc_008,race_condition_pipeline_10,race_test_010,2024-12-04T10:00:01.218Z,70,thesis,sync_token_070,medium,4.1,69,team_theta,neural_architecture_search,medium,268,ts_marker_070,atomic_070,fetch_and_add,race_condition_test,medium,0.5,coord_070,checkpoint_070,false
+exec_071,thread_001,proc_009,cache_thrashing_pipeline_01,cache_stress_001,2024-12-04T10:00:01.220Z,71,exploratory,sync_token_071,maximum,15.0,70,team_iota,quantum_ml,stress_maximum,700,ts_marker_071,atomic_071,cache_invalidation,cache_thrashing,maximum,0.99,coord_071,checkpoint_071,true
+exec_072,thread_002,proc_009,cache_thrashing_pipeline_02,cache_stress_002,2024-12-04T10:00:01.222Z,72,presentation,sync_token_072,maximum,15.1,71,team_iota,quantum_ml,stress_maximum,702,ts_marker_072,atomic_072,cache_invalidation,cache_thrashing,maximum,0.99,coord_072,checkpoint_072,true
+exec_073,thread_003,proc_009,cache_thrashing_pipeline_03,cache_stress_003,2024-12-04T10:00:01.224Z,73,publication,sync_token_073,maximum,15.2,72,team_iota,quantum_ml,stress_maximum,704,ts_marker_073,atomic_073,cache_eviction,cache_thrashing,maximum,0.99,coord_073,checkpoint_073,true
+exec_074,thread_004,proc_009,cache_thrashing_pipeline_04,cache_stress_004,2024-12-04T10:00:01.226Z,74,report,sync_token_074,maximum,15.3,73,team_iota,quantum_ml,stress_maximum,706,ts_marker_074,atomic_074,cache_eviction,cache_thrashing,maximum,0.99,coord_074,checkpoint_074,true
+exec_075,thread_005,proc_009,cache_thrashing_pipeline_05,cache_stress_005,2024-12-04T10:00:01.228Z,75,thesis,sync_token_075,maximum,15.4,74,team_iota,quantum_ml,stress_maximum,708,ts_marker_075,atomic_075,cache_coherence_protocol,cache_thrashing,maximum,0.99,coord_075,checkpoint_075,true
+exec_076,thread_006,proc_009,cache_thrashing_pipeline_06,cache_stress_006,2024-12-04T10:00:01.230Z,76,exploratory,sync_token_076,maximum,15.5,75,team_iota,quantum_ml,stress_maximum,710,ts_marker_076,atomic_076,cache_coherence_protocol,cache_thrashing,maximum,0.99,coord_076,checkpoint_076,true
+exec_077,thread_007,proc_009,cache_thrashing_pipeline_07,cache_stress_007,2024-12-04T10:00:01.232Z,77,presentation,sync_token_077,maximum,15.6,76,team_iota,quantum_ml,stress_maximum,712,ts_marker_077,atomic_077,write_allocate,cache_thrashing,maximum,0.99,coord_077,checkpoint_077,true
+exec_078,thread_008,proc_009,cache_thrashing_pipeline_08,cache_stress_008,2024-12-04T10:00:01.234Z,78,publication,sync_token_078,maximum,15.7,77,team_iota,quantum_ml,stress_maximum,714,ts_marker_078,atomic_078,write_allocate,cache_thrashing,maximum,0.99,coord_078,checkpoint_078,true
+exec_079,thread_009,proc_009,cache_thrashing_pipeline_09,cache_stress_009,2024-12-04T10:00:01.236Z,79,report,sync_token_079,maximum,15.8,78,team_iota,quantum_ml,stress_maximum,716,ts_marker_079,atomic_079,write_no_allocate,cache_thrashing,maximum,0.99,coord_079,checkpoint_079,true
+exec_080,thread_010,proc_009,cache_thrashing_pipeline_10,cache_stress_010,2024-12-04T10:00:01.238Z,80,thesis,sync_token_080,maximum,15.9,79,team_iota,quantum_ml,stress_maximum,718,ts_marker_080,atomic_080,write_no_allocate,cache_thrashing,maximum,0.99,coord_080,checkpoint_080,true
+exec_081,thread_001,proc_010,synchronization_barrier_pipeline_01,barrier_test_001,2024-12-04T10:00:01.240Z,81,exploratory,sync_token_081,high,5.5,80,team_kappa,distributed_learning,complex,320,ts_marker_081,atomic_081,barrier_synchronization,barrier_coordination,high,0.75,coord_081,checkpoint_081,true
+exec_082,thread_002,proc_010,synchronization_barrier_pipeline_02,barrier_test_002,2024-12-04T10:00:01.245Z,82,presentation,sync_token_082,high,5.6,81,team_kappa,distributed_learning,complex,322,ts_marker_082,atomic_082,barrier_synchronization,barrier_coordination,high,0.75,coord_082,checkpoint_082,true
+exec_083,thread_003,proc_010,synchronization_barrier_pipeline_03,barrier_test_003,2024-12-04T10:00:01.250Z,83,publication,sync_token_083,high,5.7,82,team_kappa,distributed_learning,complex,324,ts_marker_083,atomic_083,countdown_latch,barrier_coordination,high,0.75,coord_083,checkpoint_083,true
+exec_084,thread_004,proc_010,synchronization_barrier_pipeline_04,barrier_test_004,2024-12-04T10:00:01.255Z,84,report,sync_token_084,high,5.8,83,team_kappa,distributed_learning,complex,326,ts_marker_084,atomic_084,countdown_latch,barrier_coordination,high,0.75,coord_084,checkpoint_084,true
+exec_085,thread_005,proc_010,synchronization_barrier_pipeline_05,barrier_test_005,2024-12-04T10:00:01.260Z,85,thesis,sync_token_085,high,5.9,84,team_kappa,distributed_learning,complex,328,ts_marker_085,atomic_085,cyclic_barrier,barrier_coordination,high,0.75,coord_085,checkpoint_085,true
+exec_086,thread_006,proc_010,synchronization_barrier_pipeline_06,barrier_test_006,2024-12-04T10:00:01.265Z,86,exploratory,sync_token_086,high,6.0,85,team_kappa,distributed_learning,complex,330,ts_marker_086,atomic_086,cyclic_barrier,barrier_coordination,high,0.75,coord_086,checkpoint_086,true
+exec_087,thread_007,proc_010,synchronization_barrier_pipeline_07,barrier_test_007,2024-12-04T10:00:01.270Z,87,presentation,sync_token_087,high,6.1,86,team_kappa,distributed_learning,complex,332,ts_marker_087,atomic_087,phaser_synchronization,barrier_coordination,high,0.75,coord_087,checkpoint_087,true
+exec_088,thread_008,proc_010,synchronization_barrier_pipeline_08,barrier_test_008,2024-12-04T10:00:01.275Z,88,publication,sync_token_088,high,6.2,87,team_kappa,distributed_learning,complex,334,ts_marker_088,atomic_088,phaser_synchronization,barrier_coordination,high,0.75,coord_088,checkpoint_088,true
+exec_089,thread_009,proc_010,synchronization_barrier_pipeline_09,barrier_test_009,2024-12-04T10:00:01.280Z,89,report,sync_token_089,high,6.3,88,team_kappa,distributed_learning,complex,336,ts_marker_089,atomic_089,semaphore_coordination,barrier_coordination,high,0.75,coord_089,checkpoint_089,true
+exec_090,thread_010,proc_010,synchronization_barrier_pipeline_10,barrier_test_010,2024-12-04T10:00:01.285Z,90,thesis,sync_token_090,high,6.4,89,team_kappa,distributed_learning,complex,338,ts_marker_090,atomic_090,semaphore_coordination,barrier_coordination,high,0.75,coord_090,checkpoint_090,true
+exec_091,thread_001,proc_011,load_balancing_pipeline_01,load_test_001,2024-12-04T10:00:01.290Z,91,exploratory,sync_token_091,medium,4.5,90,team_lambda,transfer_learning,medium,280,ts_marker_091,atomic_091,round_robin,load_balancing,medium,0.6,coord_091,checkpoint_091,false
+exec_092,thread_002,proc_011,load_balancing_pipeline_02,load_test_002,2024-12-04T10:00:01.295Z,92,presentation,sync_token_092,medium,4.6,91,team_lambda,transfer_learning,medium,282,ts_marker_092,atomic_092,round_robin,load_balancing,medium,0.6,coord_092,checkpoint_092,false
+exec_093,thread_003,proc_011,load_balancing_pipeline_03,load_test_003,2024-12-04T10:00:01.300Z,93,publication,sync_token_093,medium,4.7,92,team_lambda,transfer_learning,medium,284,ts_marker_093,atomic_093,weighted_round_robin,load_balancing,medium,0.6,coord_093,checkpoint_093,false
+exec_094,thread_004,proc_011,load_balancing_pipeline_04,load_test_004,2024-12-04T10:00:01.305Z,94,report,sync_token_094,medium,4.8,93,team_lambda,transfer_learning,medium,286,ts_marker_094,atomic_094,weighted_round_robin,load_balancing,medium,0.6,coord_094,checkpoint_094,false
+exec_095,thread_005,proc_011,load_balancing_pipeline_05,load_test_005,2024-12-04T10:00:01.310Z,95,thesis,sync_token_095,medium,4.9,94,team_lambda,transfer_learning,medium,288,ts_marker_095,atomic_095,least_connections,load_balancing,medium,0.6,coord_095,checkpoint_095,false
+exec_096,thread_006,proc_011,load_balancing_pipeline_06,load_test_006,2024-12-04T10:00:01.315Z,96,exploratory,sync_token_096,medium,5.0,95,team_lambda,transfer_learning,medium,290,ts_marker_096,atomic_096,least_connections,load_balancing,medium,0.6,coord_096,checkpoint_096,false
+exec_097,thread_007,proc_011,load_balancing_pipeline_07,load_test_007,2024-12-04T10:00:01.320Z,97,presentation,sync_token_097,medium,5.1,96,team_lambda,transfer_learning,medium,292,ts_marker_097,atomic_097,least_response_time,load_balancing,medium,0.6,coord_097,checkpoint_097,false
+exec_098,thread_008,proc_011,load_balancing_pipeline_08,load_test_008,2024-12-04T10:00:01.325Z,98,publication,sync_token_098,medium,5.2,97,team_lambda,transfer_learning,medium,294,ts_marker_098,atomic_098,least_response_time,load_balancing,medium,0.6,coord_098,checkpoint_098,false
+exec_099,thread_009,proc_011,load_balancing_pipeline_09,load_test_009,2024-12-04T10:00:01.330Z,99,report,sync_token_099,medium,5.3,98,team_lambda,transfer_learning,medium,296,ts_marker_099,atomic_099,random_selection,load_balancing,medium,0.6,coord_099,checkpoint_099,false
+exec_100,thread_010,proc_011,load_balancing_pipeline_10,load_test_010,2024-12-04T10:00:01.335Z,100,thesis,sync_token_100,medium,5.4,99,team_lambda,transfer_learning,medium,298,ts_marker_100,atomic_100,random_selection,load_balancing,medium,0.6,coord_100,checkpoint_100,false
