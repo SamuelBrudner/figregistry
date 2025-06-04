@@ -1,510 +1,436 @@
 # FigRegistry-Kedro Plugin API Reference
 
-The FigRegistry-Kedro plugin provides seamless integration between FigRegistry's scientific visualization management capabilities and Kedro's machine learning pipeline framework. This API reference covers all plugin components, providing comprehensive documentation for automated figure styling, versioning, and lifecycle management within Kedro workflows.
+Welcome to the comprehensive API reference for the `figregistry-kedro` plugin. This documentation provides complete coverage of all public interfaces, integration patterns, and architectural components that enable automated figure styling and versioning within Kedro machine learning pipelines.
 
-## Plugin Overview
+## Overview
 
-The figregistry-kedro plugin consists of three core integration components that work together to provide zero-touch figure management in Kedro pipelines:
+The `figregistry-kedro` plugin extends FigRegistry's scientific visualization management capabilities into the Kedro framework through three core integration components that maintain the architectural philosophies of both systems while enabling powerful workflow automation.
 
-### Architecture Components
+### Plugin Components
+
+| Component | Purpose | API Documentation |
+|-----------|---------|-------------------|
+| **[FigureDataSet](datasets.md)** | Custom Kedro AbstractDataSet for automated figure styling and versioning | [View API →](datasets.md) |
+| **[FigRegistryHooks](hooks.md)** | Lifecycle hooks for non-invasive configuration initialization | [View API →](hooks.md) |
+| **[FigRegistryConfigBridge](config.md)** | Configuration translation layer between Kedro and FigRegistry | [View API →](config.md) |
+
+### Key Integration Features
+
+- **Zero-Touch Automation**: Eliminates manual `plt.savefig()` calls and styling code from pipeline nodes
+- **Condition-Based Styling**: Automatically applies FigRegistry styling based on experimental conditions
+- **Framework Compatibility**: Preserves both Kedro's catalog system and FigRegistry's zero-dependency philosophy
+- **Performance Optimized**: <5% overhead compared to manual matplotlib operations
+- **Thread-Safe**: Supports parallel execution with Kedro's concurrent runners
+
+## Architecture Overview
+
+The plugin architecture establishes a unidirectional dependency where `figregistry-kedro` depends on both core systems while neither requires awareness of the integration layer.
 
 ```mermaid
-graph TD
+graph TB
     subgraph "Kedro Framework"
-        KC[Kedro Catalog]
-        KCL[Kedro ConfigLoader]
+        KC[Kedro Catalog] 
+        KR[Kedro Runners]
         KH[Kedro Hooks]
-        KP[Kedro Pipeline]
+        KCL[Kedro ConfigLoader]
     end
     
-    subgraph "FigRegistry-Kedro Plugin"
-        FDS[FigureDataSet]
-        FRH[FigRegistryHooks]
-        FCB[FigRegistryConfigBridge]
+    subgraph "figregistry-kedro Plugin"
+        FDS[FigureDataSet<br/>AbstractDataSet Implementation]
+        FRH[FigRegistryHooks<br/>Lifecycle Integration]
+        FCB[FigRegistryConfigBridge<br/>Config Translation]
     end
     
     subgraph "FigRegistry Core"
-        FR[FigRegistry API]
-        SM[Style Manager]
-        OM[Output Manager]
+        FC[FigRegistry Config Engine]
+        FSM[FigRegistry Style Manager] 
+        FOM[FigRegistry Output Manager]
     end
     
-    subgraph "User Code"
-        PN[Pipeline Nodes]
+    subgraph "Scientific Computing Stack"
         MPL[Matplotlib Figures]
+        NP[NumPy Arrays]
+        PD[Pandas DataFrames]
     end
     
-    %% Integration Flow
-    KCL --> FCB
-    FCB --> FR
-    KH --> FRH
+    %% Component relationships
+    FDS --> KC
+    FDS --> FSM
+    FDS --> FOM
+    FRH --> KH
     FRH --> FCB
-    KC --> FDS
-    FDS --> SM
-    FDS --> OM
-    PN --> MPL
-    MPL --> FDS
+    FCB --> KCL
+    FCB --> FC
     
-    %% Styling Relationships
-    KP --> PN
-    SM --> FDS
-    OM --> KC
+    %% Data flow
+    KR --> FDS
+    FDS --> MPL
+    MPL --> FSM
+    FSM --> FOM
     
-    %% Plugin Components in Purple
-    style FDS fill:#9c27b0,color:#fff
-    style FRH fill:#9c27b0,color:#fff
-    style FCB fill:#9c27b0,color:#fff
+    %% Styling
+    classDef plugin fill:#9c27b0,color:#fff
+    classDef kedro fill:#ff9800,color:#fff  
+    classDef figregistry fill:#2196f3,color:#fff
+    classDef scientific fill:#4caf50,color:#fff
     
-    %% Core Components in Blue
-    style FR fill:#2196f3,color:#fff
-    style SM fill:#2196f3,color:#fff
-    style OM fill:#2196f3,color:#fff
+    class FDS,FRH,FCB plugin
+    class KC,KR,KH,KCL kedro
+    class FC,FSM,FOM figregistry
+    class MPL,NP,PD scientific
 ```
 
-### Component Responsibilities
+### Component Data Flow
 
-| Component | Primary Responsibility | Integration Point |
-|-----------|----------------------|------------------|
-| **[FigureDataSet](datasets.md)** | Automated figure styling and versioning in Kedro catalog | `kedro.io.AbstractDataSet` implementation |
-| **[FigRegistryHooks](hooks.md)** | Lifecycle management and configuration initialization | Kedro hook specifications |
-| **[FigRegistryConfigBridge](config.md)** | Configuration merging between Kedro and FigRegistry | Kedro ConfigLoader integration |
+The integration follows Kedro's pipeline execution model with FigRegistry styling applied at dataset save boundaries:
 
-## Quick Start Reference
+```mermaid
+sequenceDiagram
+    participant U as Pipeline Node
+    participant FDS as FigureDataSet
+    participant FCB as ConfigBridge
+    participant FSM as Style Manager
+    participant FOM as Output Manager
+    participant KC as Kedro Catalog
+    
+    Note over U,KC: Plugin Integration Data Flow
+    
+    U->>FDS: save(matplotlib_figure)
+    FDS->>FCB: get_merged_config()
+    FCB-->>FDS: Merged Configuration
+    FDS->>FSM: get_style(condition_param)
+    FSM-->>FDS: Style Dictionary
+    FDS->>FOM: save_figure(styled_figure)
+    FOM-->>FDS: File Path
+    FDS->>KC: register_versioned_output()
+    KC-->>FDS: Versioned Path
+    FDS-->>U: Save Confirmation
+```
+
+## Quick Reference
 
 ### Installation
 
 ```bash
+# Install via pip
 pip install figregistry-kedro
+
+# Install via conda  
+conda install -c conda-forge figregistry-kedro
 ```
 
-### Basic Setup
+### Basic Usage
 
-1. **Add hooks to your Kedro project** (`settings.py`):
+#### 1. Register Hooks
 
 ```python
-from figregistry_kedro import FigRegistryHooks
+# settings.py
+from figregistry_kedro.hooks import FigRegistryHooks
 
 HOOKS = (FigRegistryHooks(),)
 ```
 
-2. **Configure FigureDataSet in catalog** (`catalog.yml`):
-
-```yaml
-experiment_plots:
-  type: figregistry_kedro.FigureDataSet
-  filepath: data/08_reporting/experiment_results.png
-  purpose: presentation
-  condition_param: experiment_condition
-```
-
-3. **Return matplotlib figures from pipeline nodes**:
-
-```python
-import matplotlib.pyplot as plt
-
-def create_visualization(data):
-    fig, ax = plt.subplots()
-    ax.plot(data["x"], data["y"])
-    ax.set_title("Analysis Results")
-    return fig  # FigRegistry styling applied automatically
-```
-
-### Common Usage Patterns
-
-#### Environment-Specific Styling
+#### 2. Configure Dataset
 
 ```yaml
 # conf/base/catalog.yml
-production_plots:
+analysis_plot:
   type: figregistry_kedro.FigureDataSet
-  filepath: data/08_reporting/results.png
+  filepath: data/08_reporting/analysis.png
   purpose: presentation
-
-# conf/local/catalog.yml  
-production_plots:
-  purpose: exploratory  # Override for development
-  style_params:
-    figure.dpi: 150  # Lower DPI for faster development
-```
-
-#### Dynamic Condition Resolution
-
-```yaml
-# catalog.yml with condition parameters
-analysis_plots:
+  condition_param: experiment_type
+  
+training_curves:
   type: figregistry_kedro.FigureDataSet
-  filepath: data/08_reporting/{condition}/analysis.png
-  condition_param: experiment_condition
+  filepath: data/08_reporting/training_${experiment_id}.pdf
+  purpose: publication
+  condition_param: model_architecture
   style_params:
     figure.dpi: 300
-    axes.grid: true
+    savefig.format: pdf
 ```
 
-#### Versioned Figure Outputs
-
-```yaml
-# Kedro versioning integration
-versioned_figures:
-  type: figregistry_kedro.FigureDataSet
-  filepath: data/08_reporting/versioned/analysis.png
-  versioned: true
-  purpose: publication
-```
-
-## Core API Components
-
-### [FigureDataSet](datasets.md)
-
-Custom Kedro `AbstractDataSet` implementation for matplotlib figure objects with automated FigRegistry styling and versioning.
-
-**Key Features:**
-- Automatic condition-based styling application
-- Seamless Kedro catalog integration
-- Thread-safe operation for parallel pipelines
-- <5% performance overhead vs manual saves
-- Support for Kedro versioning system
-
-**Primary Methods:**
-- `_save(data: Figure) -> None`: Save figure with styling
-- `_describe() -> Dict[str, Any]`: Dataset metadata
-- `_exists() -> bool`: Check file existence
-
-[**→ View Detailed API Documentation**](datasets.md)
-
-### [FigRegistryHooks](hooks.md)
-
-Kedro lifecycle hooks for non-invasive FigRegistry initialization and context management throughout pipeline execution.
-
-**Key Features:**
-- Non-invasive integration preserving Kedro execution model
-- Thread-safe configuration management
-- <5ms hook execution overhead
-- Automatic error handling and graceful degradation
-- Support for environment-specific configurations
-
-**Hook Methods:**
-- `after_config_loaded()`: Initialize configuration bridge
-- `before_pipeline_run()`: Setup pipeline context
-- `after_pipeline_run()`: Resource cleanup
-
-[**→ View Detailed API Documentation**](hooks.md)
-
-### [FigRegistryConfigBridge](config.md)
-
-Configuration translation layer between Kedro's ConfigLoader system and FigRegistry's YAML-based configuration management.
-
-**Key Features:**
-- Seamless configuration merging with type safety
-- <10ms configuration merging overhead
-- Environment-aware configuration handling
-- Pydantic validation for merged configurations
-- Thread-safe concurrent access patterns
-
-**Primary Methods:**
-- `get_merged_config() -> FigRegistryKedroConfig`: Unified configuration
-- `clear_cache()`: Force configuration reload
-- `init_config()`: Initialize configuration bridge
-
-[**→ View Detailed API Documentation**](config.md)
-
-## Data Flow Architecture
-
-```mermaid
-sequenceDiagram
-    participant User as Pipeline Node
-    participant FDS as FigureDataSet
-    participant FCB as ConfigBridge
-    participant SM as Style Manager
-    participant OM as Output Manager
-    participant KC as Kedro Catalog
-    participant FRH as FigRegistryHooks
-    
-    Note over FRH: Pipeline Initialization
-    FRH->>FCB: Initialize Configuration Bridge
-    FCB->>FCB: Merge Kedro + FigRegistry Config
-    FCB-->>FRH: Configuration Ready
-    
-    Note over User,KC: Figure Save Operation
-    User->>FDS: Save Figure via Catalog
-    FDS->>FCB: Get Merged Configuration
-    FCB-->>FDS: Configuration Object
-    FDS->>SM: Resolve Style (condition_param)
-    SM-->>FDS: Style Dictionary
-    FDS->>FDS: Apply Styling to Figure
-    FDS->>OM: Save with FigRegistry Output Manager
-    OM->>KC: Persist to Kedro Catalog
-    KC-->>FDS: Versioned File Path
-    FDS-->>User: Save Confirmation
-    
-    Note over FRH: Pipeline Cleanup
-    FRH->>FCB: Cleanup Context
-    FCB->>FCB: Clear Session Cache
-```
-
-## Compatibility Matrix
-
-### Python Versions
-
-| Python Version | Support Status | Testing Status | Notes |
-|---------------|----------------|----------------|-------|
-| **3.10** | ✅ Full Support | ✅ Automated CI | Minimum required version |
-| **3.11** | ✅ Full Support | ✅ Automated CI | Recommended version |
-| **3.12** | ✅ Full Support | ✅ Automated CI | Latest stable support |
-| **3.13** | ✅ Full Support | ✅ Automated CI | Forward compatibility |
-
-### Kedro Framework Versions
-
-| Kedro Version | Support Status | Integration Level | Notes |
-|---------------|----------------|------------------|-------|
-| **0.18.0** | ✅ Full Support | Complete AbstractDataSet API | Minimum required version |
-| **0.18.x** | ✅ Full Support | All hook specifications | Stable LTS support |
-| **0.19.x** | ✅ Full Support | Enhanced versioning features | Current stable |
-| **0.20.x** | 🚧 Planned | Future compatibility | Under development |
-
-### Core Dependencies
-
-| Dependency | Version Requirement | Purpose | Integration Method |
-|------------|-------------------|---------|-------------------|
-| **figregistry** | `>=0.3.0` | Core visualization management | Direct API integration |
-| **matplotlib** | `>=3.9.0` | Figure backend | Inherited from figregistry |
-| **pydantic** | `>=2.9.0` | Configuration validation | Inherited from figregistry |
-| **pyyaml** | `>=6.0.1` | YAML configuration parsing | Inherited from figregistry |
-
-## Performance Specifications
-
-### Operation Targets
-
-| Operation | Target Performance | Typical Range | SLA Requirement |
-|-----------|-------------------|---------------|-----------------|
-| **Style Resolution** | <1ms | 0.1-0.8ms | Per figure styling lookup |
-| **Configuration Merge** | <10ms | 2-8ms | Bridge initialization |
-| **Figure Save** | <100ms | 20-80ms | Including matplotlib operations |
-| **Hook Execution** | <5ms | 1-3ms | Per hook invocation |
-| **Total Overhead** | <5% | 1-3% | vs manual matplotlib operations |
-
-### Memory Usage
-
-| Component | Memory Impact | Scaling Factor | Optimization |
-|-----------|---------------|----------------|--------------|
-| **Configuration Cache** | <2MB | Linear with config size | LRU cache with configurable limits |
-| **Style Cache** | <1MB | Linear with unique conditions | Thread-safe with automatic cleanup |
-| **Figure Processing** | Constant | Independent of pipeline size | Streaming operations |
-| **Thread-Local Storage** | <100KB/thread | Linear with worker count | Automatic garbage collection |
-
-### Concurrency Support
-
-| Scenario | Recommended Workers | Performance Characteristics |
-|----------|-------------------|---------------------------|
-| **CPU-intensive analysis** | Up to CPU cores | Limited by matplotlib thread safety |
-| **I/O-heavy workflows** | 2x CPU cores | Benefits from parallel I/O operations |
-| **Memory-constrained environments** | 1-2 workers | Prevents memory exhaustion |
-| **Large figure pipelines** | 4 workers max | Optimal for figure generation workflows |
-
-## Error Handling
-
-### Exception Hierarchy
+#### 3. Create Pipeline Node
 
 ```python
-# Plugin-specific exceptions
-from figregistry_kedro import (
-    FigureDataSetError,           # Dataset operation failures
-    HookExecutionError,           # Hook lifecycle failures  
-    ConfigurationMergeError       # Configuration bridge failures
-)
+# pipelines/visualization.py
+import matplotlib.pyplot as plt
+from kedro.pipeline import Pipeline, node
 
-# Usage example
-try:
-    dataset = FigureDataSet(filepath="output.png")
-    dataset._save(figure)
-except FigureDataSetError as e:
-    logger.error(f"Figure save failed: {e}")
-    # Handle gracefully or retry
+def create_analysis_plot(processed_data, experiment_type):
+    """Generate analysis visualization with automatic styling."""
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Create your visualization
+    ax.plot(processed_data['x'], processed_data['y'])
+    ax.set_title('Analysis Results')
+    ax.set_xlabel('Time')
+    ax.set_ylabel('Value')
+    
+    # Return figure - FigureDataSet handles styling and saving
+    return fig
+
+def create_pipeline():
+    return Pipeline([
+        node(
+            func=create_analysis_plot,
+            inputs=["processed_data", "params:experiment_type"],
+            outputs="analysis_plot",
+            name="create_analysis_visualization"
+        )
+    ])
 ```
 
-### Common Error Scenarios
-
-| Error Type | Typical Cause | Resolution Strategy |
-|------------|---------------|-------------------|
-| **Missing Dependencies** | kedro or figregistry not installed | Install required packages |
-| **Configuration Validation** | Invalid YAML or schema mismatch | Check configuration syntax |
-| **Permission Errors** | Insufficient file system permissions | Verify output directory access |
-| **Style Resolution** | Unknown condition or missing config | Provide fallback styling |
-
-## Advanced Integration
-
-### Multi-Environment Configuration
+#### 4. Configuration Integration
 
 ```yaml
 # conf/base/figregistry.yml
-styles:
+purposes:
   exploratory:
-    figure.dpi: 100
-    figure.facecolor: white
-  
-# conf/production/figregistry.yml
-styles:
-  exploratory:
-    figure.dpi: 300  # High resolution for production
-    figure.facecolor: white
-    axes.grid: true
+    style_params:
+      figure.figsize: [8, 6]
+      axes.titlesize: 12
+  presentation:
+    style_params:
+      figure.figsize: [10, 7]
+      axes.titlesize: 14
+      font.size: 12
+  publication:
+    style_params:
+      figure.figsize: [12, 8]
+      axes.titlesize: 16
+      font.size: 11
+      savefig.dpi: 300
+
+conditions:
+  "experiment_type:baseline":
+    style_params:
+      lines.color: blue
+      lines.linestyle: "-"
+  "experiment_type:treatment":
+    style_params:
+      lines.color: red
+      lines.linestyle: "--"
 ```
 
-### Custom Hook Configuration
+## Version Compatibility Matrix
 
+The plugin maintains compatibility across multiple Python and framework versions:
+
+| Python | FigRegistry | Kedro | Status | Notes |
+|--------|-------------|-------|--------|-------|
+| **3.10** | ≥0.3.0 | 0.18.0-0.18.14 | ✅ Fully Supported | Recommended for new projects |
+| **3.10** | ≥0.3.0 | 0.19.0-0.19.x | ✅ Fully Supported | Latest features |
+| **3.11** | ≥0.3.0 | 0.18.0-0.18.14 | ✅ Fully Supported | Production ready |
+| **3.11** | ≥0.3.0 | 0.19.0-0.19.x | ✅ Fully Supported | Recommended |
+| **3.12** | ≥0.3.0 | 0.18.0-0.18.14 | ✅ Fully Supported | Latest Python features |
+| **3.12** | ≥0.3.0 | 0.19.0-0.19.x | ✅ Fully Supported | Cutting edge |
+| **3.9** | Any | Any | ❌ Not Supported | EOL in plugin v0.1.0 |
+| **≥3.13** | Any | Any | 🚧 Future Support | Planned for plugin v0.2.0 |
+
+### Dependency Requirements
+
+```toml
+# Plugin requirements
+[project.dependencies]
+figregistry = ">=0.3.0"
+kedro = ">=0.18.0,<0.20.0"
+pydantic = ">=2.9.0"
+matplotlib = ">=3.9.0"
+pyyaml = ">=6.0.1"
+numpy = ">=1.24.0"
+pandas = ">=2.0.0"
+scipy = ">=1.10.0"
+```
+
+## API Component Index
+
+### Core Integration Classes
+
+#### [FigureDataSet](datasets.md)
+Custom Kedro `AbstractDataSet` implementation enabling automated figure styling and versioning.
+
+**Primary Interfaces:**
+- `FigureDataSet.__init__(filepath, purpose, condition_param, **kwargs)` - Dataset initialization
+- `FigureDataSet._save(data: Figure) -> None` - Figure persistence with styling
+- `FigureDataSet._load() -> Figure` - Figure loading for pipeline reuse
+- `FigureDataSet._describe() -> Dict[str, Any]` - Dataset metadata description
+
+**Key Features:**
+- Automated condition-based styling application
+- Kedro catalog and versioning integration
+- Thread-safe parallel execution support
+- Performance optimization (<5% overhead)
+
+#### [FigRegistryHooks](hooks.md)
+Lifecycle hooks providing non-invasive integration between framework execution models.
+
+**Primary Interfaces:**
+- `FigRegistryHooks.__init__(**config_options)` - Hook initialization
+- `FigRegistryHooks.before_pipeline_run(run_params, pipeline, catalog)` - Pre-execution setup
+- `FigRegistryHooks.after_config_loaded(context, config_loader, conf_source)` - Configuration initialization
+
+**Key Features:**
+- Non-invasive lifecycle integration preserving Kedro's execution model
+- Automatic configuration bridge initialization
+- Performance monitoring and metrics collection
+- Graceful error handling with fallback mechanisms
+
+#### [FigRegistryConfigBridge](config.md)
+Configuration translation layer merging Kedro ConfigLoader with FigRegistry YAML configurations.
+
+**Primary Interfaces:**
+- `FigRegistryConfigBridge.__init__(**bridge_options)` - Bridge initialization
+- `FigRegistryConfigBridge.init_config(kedro_config_loader)` - Configuration merging
+- `FigRegistryConfigBridge.get_merged_config()` - Unified configuration access
+
+**Key Features:**
+- Seamless configuration merging with clear precedence rules
+- Environment-specific configuration support (base, local, staging, production)
+- High-performance caching with <10ms merge overhead
+- Comprehensive validation with detailed error reporting
+
+### Utility Functions and Helpers
+
+#### Plugin Discovery and Metadata
 ```python
-# settings.py with custom hook parameters
-from figregistry_kedro import FigRegistryHooks
+# Plugin information for Kedro ecosystem integration
+figregistry_kedro.get_plugin_info() -> Dict[str, Any]
 
-HOOKS = (
-    FigRegistryHooks(
-        auto_initialize=True,
-        enable_performance_monitoring=True,
-        fallback_on_error=False,  # Strict mode
-        max_initialization_time=0.003  # 3ms timeout
-    ),
-)
+# Version compatibility validation
+figregistry_kedro.validate_version_compatibility() -> bool
+
+# Performance metrics and monitoring
+figregistry_kedro.get_plugin_performance_metrics() -> Dict[str, Any]
 ```
 
-### Programmatic Dataset Creation
-
+#### Convenience Constructors
 ```python
-from figregistry_kedro.datasets import create_figure_dataset
-
-# Factory function for dynamic dataset creation
-dataset = create_figure_dataset(
-    filepath="dynamic_output.png",
-    purpose="presentation", 
-    condition_param="model_version",
-    style_params={"figure.dpi": 300}
-)
+# Streamlined component creation
+figregistry_kedro.create_figure_dataset(**kwargs) -> FigureDataSet
+figregistry_kedro.create_hooks(**kwargs) -> FigRegistryHooks  
+figregistry_kedro.create_config_bridge(**kwargs) -> FigRegistryConfigBridge
 ```
 
-## Plugin Development
-
-### Extending FigureDataSet
-
+#### Validation and Configuration Helpers
 ```python
-from figregistry_kedro.datasets import FigureDataSet
+# Dataset configuration validation
+figregistry_kedro.datasets.validate_figure_dataset_config(config: Dict) -> bool
 
-class CustomFigureDataSet(FigureDataSet):
-    """Extended dataset with custom processing."""
-    
-    def _save(self, data):
-        # Custom pre-processing
-        processed_figure = self._preprocess_figure(data)
-        
-        # Call parent save with styling
-        super()._save(processed_figure)
-        
-        # Custom post-processing
-        self._post_save_actions()
+# Available styling purposes enumeration
+figregistry_kedro.datasets.get_available_purposes() -> List[str]
+
+# Hook state management for debugging
+figregistry_kedro.hooks.get_global_hook_state() -> Dict[str, Any]
+figregistry_kedro.hooks.clear_global_hook_state() -> None
 ```
 
-### Custom Hook Implementation
+### Exception Classes
 
-```python
-from figregistry_kedro.hooks import FigRegistryHooks
+The plugin defines specialized exception classes for comprehensive error handling:
 
-class ExtendedFigRegistryHooks(FigRegistryHooks):
-    """Enhanced hooks with custom lifecycle management."""
-    
-    def before_pipeline_run(self, run_params, pipeline, catalog):
-        # Custom initialization
-        super().before_pipeline_run(run_params, pipeline, catalog)
-        
-        # Additional setup
-        self._setup_custom_context(run_params)
-```
+| Exception Class | Module | Purpose |
+|-----------------|--------|---------|
+| `FigureDatasetError` | `datasets` | Dataset operation failures |
+| `HookInitializationError` | `hooks` | Hook registration and setup issues |
+| `HookExecutionError` | `hooks` | Runtime hook execution failures |
+| `ConfigMergeError` | `config` | Configuration merging problems |
+| `ConfigValidationError` | `config` | Configuration validation failures |
 
-## Migration Guide
+## Integration Patterns
 
-### From Manual matplotlib Workflow
-
-**Before:**
-```python
-def create_and_save_plot(data):
-    fig, ax = plt.subplots()
-    ax.plot(data["x"], data["y"])
-    
-    # Manual styling
-    ax.set_facecolor("white") 
-    ax.grid(True, alpha=0.3)
-    
-    # Manual save
-    plt.savefig("output.png", dpi=300, bbox_inches="tight")
-    plt.close()
-```
-
-**After:**
-```python
-def create_plot(data):
-    fig, ax = plt.subplots()
-    ax.plot(data["x"], data["y"])
-    
-    # Styling and saving handled automatically
-    return fig
-```
+### Environment-Specific Configuration
 
 ```yaml
-# catalog.yml
-analysis_plot:
+# conf/base/figregistry.yml (shared defaults)
+purposes:
+  exploratory:
+    style_params:
+      figure.figsize: [8, 6]
+
+# conf/local/figregistry.yml (development overrides)  
+purposes:
+  exploratory:
+    style_params:
+      figure.figsize: [6, 4]  # Smaller for development
+      savefig.dpi: 72         # Lower resolution for speed
+
+# conf/production/figregistry.yml (production settings)
+purposes:
+  publication:
+    style_params:
+      savefig.dpi: 300        # High resolution for publication
+      savefig.format: pdf     # Vector format
+```
+
+### Advanced Dataset Configuration
+
+```yaml
+# Versioned dataset with dynamic parameters
+training_metrics:
   type: figregistry_kedro.FigureDataSet
-  filepath: data/08_reporting/output.png
+  filepath: data/08_reporting/metrics_${model_version}_${timestamp}.png
+  versioned: true
   purpose: presentation
+  condition_param: model_architecture
   style_params:
-    figure.facecolor: white
+    figure.figsize: [12, 8]
     axes.grid: true
-    axes.grid.alpha: 0.3
+  load_args:
+    format: png
   save_args:
-    dpi: 300
+    dpi: 150
     bbox_inches: tight
 ```
 
-### Migration Checklist
-
-- [ ] Install figregistry-kedro plugin
-- [ ] Add FigRegistryHooks to settings.py
-- [ ] Convert manual save functions to return Figure objects
-- [ ] Configure FigureDataSet entries in catalog.yml
-- [ ] Move styling configuration to figregistry.yml
-- [ ] Remove manual plt.savefig() calls from pipeline nodes
-- [ ] Test environment-specific configurations
-- [ ] Validate versioning and experiment tracking
-
-## Community and Support
-
-### Documentation Resources
-
-- **[Installation Guide](../installation.md)**: Detailed setup instructions
-- **[Configuration Guide](../configuration.md)**: Comprehensive configuration options
-- **[Examples Repository](../../examples/)**: Working Kedro projects with plugin integration
-- **[Migration Examples](../../examples/migration/)**: Before/after conversion examples
-
-### API Reference Navigation
-
-| Component | Documentation | Use Cases |
-|-----------|---------------|-----------|
-| **[FigureDataSet](datasets.md)** | Complete AbstractDataSet API | Figure automation in pipelines |
-| **[FigRegistryHooks](hooks.md)** | Lifecycle hook specifications | Configuration and context management |
-| **[FigRegistryConfigBridge](config.md)** | Configuration merging API | Environment-specific setups |
-
-### GitHub Repository
-
-Visit the [figregistry-kedro repository](https://github.com/blitzy-platform/figregistry-kedro) for:
-
-- Source code and development
-- Issue tracking and bug reports
-- Feature requests and discussions
-- Community contributions
-
-### Version Information
+### Performance Monitoring
 
 ```python
-import figregistry_kedro
-print(f"Plugin version: {figregistry_kedro.__version__}")
-print(f"Compatibility: {figregistry_kedro.get_plugin_info()}")
+# Get plugin performance metrics
+metrics = figregistry_kedro.get_plugin_performance_metrics()
+print(f"Plugin load time: {metrics['performance_metrics']['plugin_load_time']}ms")
+
+# Monitor dataset performance
+dataset_metrics = figregistry_kedro.datasets.get_performance_summary()
+print(f"Average save time: {dataset_metrics['average_save_time_ms']}ms")
+
+# Hook execution monitoring
+hook_state = figregistry_kedro.hooks.get_global_hook_state()
+print(f"Hook executions: {hook_state['execution_count']}")
 ```
 
----
+## Migration and Adoption
 
-**Need Help?** Check the [examples directory](../../examples/) for complete working projects, or open an issue on the [GitHub repository](https://github.com/blitzy-platform/figregistry-kedro) for community support.
+### Converting Existing Kedro Projects
+
+For projects currently using manual matplotlib figure saving:
+
+1. **Install Plugin**: `pip install figregistry-kedro`
+2. **Register Hooks**: Add `FigRegistryHooks()` to `settings.py`
+3. **Update Catalog**: Convert matplotlib datasets to `FigureDataSet`
+4. **Add Configuration**: Create `conf/base/figregistry.yml`
+5. **Remove Manual Saving**: Remove `plt.savefig()` calls from nodes
+
+### Best Practices
+
+- **Configuration Layering**: Use environment-specific configs for different deployment stages
+- **Performance Optimization**: Enable caching for repeated styling operations
+- **Error Handling**: Implement fallback mechanisms for configuration validation failures
+- **Monitoring**: Use built-in performance metrics for optimization insights
+- **Testing**: Leverage plugin test utilities for comprehensive validation
+
+## Next Steps
+
+- **[FigureDataSet API →](datasets.md)**: Detailed dataset implementation reference
+- **[FigRegistryHooks API →](hooks.md)**: Complete lifecycle hooks documentation  
+- **[Configuration Bridge API →](config.md)**: Configuration merging and validation guide
+- **[Installation Guide](../installation.md)**: Step-by-step setup instructions
+- **[Configuration Guide](../configuration.md)**: Advanced configuration patterns
+- **[Examples](../examples.md)**: Practical usage examples and tutorials
+
+## Support and Contributing
+
+- **GitHub Repository**: [figregistry-kedro](https://github.com/figregistry/figregistry-kedro)
+- **Issue Tracker**: [Report bugs and request features](https://github.com/figregistry/figregistry-kedro/issues)
+- **Contributing Guide**: [Development setup and contribution guidelines](https://github.com/figregistry/figregistry-kedro/blob/main/CONTRIBUTING.md)
+- **Plugin Registry**: [Listed in Kedro's official plugin registry](https://kedro.readthedocs.io/en/stable/extend_kedro/plugins.html)
