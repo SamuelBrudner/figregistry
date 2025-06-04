@@ -1,181 +1,200 @@
-timestamp,experiment_id,measurement_value,experiment_condition,experiment_phase,model_type,analysis_stage,measurement_uncertainty,quality_indicator,sensor_id,batch_number
-2024-01-01 08:00:00,EXP001,12.45,treatment_group_a,training,linear_regression,exploratory,0.15,good,SENS001,BATCH001
-2024-01-01 08:15:00,EXP001,12.62,treatment_group_a,training,linear_regression,exploratory,0.18,good,SENS001,BATCH001
-2024-01-01 08:30:00,EXP001,12.78,treatment_group_a,training,linear_regression,exploratory,0.12,excellent,SENS001,BATCH001
-2024-01-01 08:45:00,EXP001,12.91,treatment_group_a,training,linear_regression,exploratory,0.16,good,SENS001,BATCH001
-2024-01-01 09:00:00,EXP001,13.12,treatment_group_a,training,linear_regression,exploratory,0.14,good,SENS001,BATCH001
-2024-01-01 09:15:00,EXP001,13.28,treatment_group_a,training,linear_regression,exploratory,0.19,good,SENS001,BATCH001
-2024-01-01 09:30:00,EXP001,13.45,treatment_group_a,training,linear_regression,exploratory,0.11,excellent,SENS001,BATCH001
-2024-01-01 09:45:00,EXP001,13.67,treatment_group_a,training,linear_regression,exploratory,0.17,good,SENS001,BATCH001
-2024-01-01 10:00:00,EXP001,13.89,treatment_group_a,training,linear_regression,exploratory,0.13,good,SENS001,BATCH001
-2024-01-01 10:15:00,EXP001,14.02,treatment_group_a,training,linear_regression,exploratory,0.20,fair,SENS001,BATCH001
-2024-01-01 10:30:00,EXP001,14.18,treatment_group_a,training,linear_regression,exploratory,0.15,good,SENS001,BATCH001
-2024-01-01 10:45:00,EXP001,14.35,treatment_group_a,training,linear_regression,exploratory,0.16,good,SENS001,BATCH001
-2024-01-01 11:00:00,EXP001,14.52,treatment_group_a,training,linear_regression,exploratory,0.12,excellent,SENS001,BATCH001
-2024-01-01 11:15:00,EXP001,14.71,treatment_group_a,training,linear_regression,exploratory,0.18,good,SENS001,BATCH001
-2024-01-01 11:30:00,EXP001,14.88,treatment_group_a,training,linear_regression,exploratory,0.14,good,SENS001,BATCH001
-2024-01-01 11:45:00,EXP001,15.03,treatment_group_a,training,linear_regression,exploratory,0.17,good,SENS001,BATCH001
-2024-01-01 12:00:00,EXP001,15.21,treatment_group_a,training,linear_regression,exploratory,0.13,good,SENS001,BATCH001
-2024-01-01 12:15:00,EXP001,15.38,treatment_group_a,validation,linear_regression,presentation,0.11,excellent,SENS001,BATCH001
-2024-01-01 12:30:00,EXP001,15.54,treatment_group_a,validation,linear_regression,presentation,0.15,good,SENS001,BATCH001
-2024-01-01 12:45:00,EXP001,15.72,treatment_group_a,validation,linear_regression,presentation,0.19,good,SENS001,BATCH001
-2024-01-01 13:00:00,EXP001,15.89,treatment_group_a,validation,linear_regression,presentation,0.16,good,SENS001,BATCH001
-2024-01-01 13:15:00,EXP001,16.05,treatment_group_a,validation,linear_regression,presentation,0.14,good,SENS001,BATCH001
-2024-01-01 13:30:00,EXP001,16.22,treatment_group_a,validation,linear_regression,presentation,0.18,good,SENS001,BATCH001
-2024-01-01 13:45:00,EXP001,16.41,treatment_group_a,validation,linear_regression,presentation,0.12,excellent,SENS001,BATCH001
-2024-01-01 14:00:00,EXP001,16.58,treatment_group_a,validation,linear_regression,presentation,0.17,good,SENS001,BATCH001
-2024-01-01 14:15:00,EXP001,16.74,treatment_group_a,testing,linear_regression,publication,0.13,good,SENS001,BATCH001
-2024-01-01 14:30:00,EXP001,16.91,treatment_group_a,testing,linear_regression,publication,0.15,good,SENS001,BATCH001
-2024-01-01 14:45:00,EXP001,17.08,treatment_group_a,testing,linear_regression,publication,0.11,excellent,SENS001,BATCH001
-2024-01-01 15:00:00,EXP001,17.25,treatment_group_a,testing,linear_regression,publication,0.16,good,SENS001,BATCH001
-2024-01-01 15:15:00,EXP001,17.42,treatment_group_a,final,linear_regression,publication,0.09,excellent,SENS001,BATCH001
-2024-01-01 08:00:00,EXP002,10.23,treatment_group_b,training,random_forest,exploratory,0.22,good,SENS002,BATCH002
-2024-01-01 08:15:00,EXP002,10.41,treatment_group_b,training,random_forest,exploratory,0.19,good,SENS002,BATCH002
-2024-01-01 08:30:00,EXP002,10.58,treatment_group_b,training,random_forest,exploratory,0.25,fair,SENS002,BATCH002
-2024-01-01 08:45:00,EXP002,10.76,treatment_group_b,training,random_forest,exploratory,0.18,good,SENS002,BATCH002
-2024-01-01 09:00:00,EXP002,10.94,treatment_group_b,training,random_forest,exploratory,0.21,good,SENS002,BATCH002
-2024-01-01 09:15:00,EXP002,11.12,treatment_group_b,training,random_forest,exploratory,0.17,good,SENS002,BATCH002
-2024-01-01 09:30:00,EXP002,11.31,treatment_group_b,training,random_forest,exploratory,0.23,good,SENS002,BATCH002
-2024-01-01 09:45:00,EXP002,11.48,treatment_group_b,training,random_forest,exploratory,0.16,good,SENS002,BATCH002
-2024-01-01 10:00:00,EXP002,11.67,treatment_group_b,training,random_forest,exploratory,0.20,good,SENS002,BATCH002
-2024-01-01 10:15:00,EXP002,11.85,treatment_group_b,training,random_forest,exploratory,0.24,fair,SENS002,BATCH002
-2024-01-01 10:30:00,EXP002,12.03,treatment_group_b,training,random_forest,exploratory,0.18,good,SENS002,BATCH002
-2024-01-01 10:45:00,EXP002,12.22,treatment_group_b,training,random_forest,exploratory,0.22,good,SENS002,BATCH002
-2024-01-01 11:00:00,EXP002,12.41,treatment_group_b,training,random_forest,exploratory,0.15,good,SENS002,BATCH002
-2024-01-01 11:15:00,EXP002,12.59,treatment_group_b,training,random_forest,exploratory,0.19,good,SENS002,BATCH002
-2024-01-01 11:30:00,EXP002,12.78,treatment_group_b,training,random_forest,exploratory,0.21,good,SENS002,BATCH002
-2024-01-01 11:45:00,EXP002,12.96,treatment_group_b,training,random_forest,exploratory,0.17,good,SENS002,BATCH002
-2024-01-01 12:00:00,EXP002,13.15,treatment_group_b,training,random_forest,exploratory,0.23,good,SENS002,BATCH002
-2024-01-01 12:15:00,EXP002,13.34,treatment_group_b,validation,random_forest,presentation,0.14,good,SENS002,BATCH002
-2024-01-01 12:30:00,EXP002,13.52,treatment_group_b,validation,random_forest,presentation,0.18,good,SENS002,BATCH002
-2024-01-01 12:45:00,EXP002,13.71,treatment_group_b,validation,random_forest,presentation,0.20,good,SENS002,BATCH002
-2024-01-01 13:00:00,EXP002,13.89,treatment_group_b,validation,random_forest,presentation,0.16,good,SENS002,BATCH002
-2024-01-01 13:15:00,EXP002,14.08,treatment_group_b,validation,random_forest,presentation,0.22,good,SENS002,BATCH002
-2024-01-01 13:30:00,EXP002,14.27,treatment_group_b,validation,random_forest,presentation,0.19,good,SENS002,BATCH002
-2024-01-01 13:45:00,EXP002,14.45,treatment_group_b,validation,random_forest,presentation,0.15,good,SENS002,BATCH002
-2024-01-01 14:00:00,EXP002,14.64,treatment_group_b,validation,random_forest,presentation,0.21,good,SENS002,BATCH002
-2024-01-01 14:15:00,EXP002,14.83,treatment_group_b,testing,random_forest,publication,0.13,good,SENS002,BATCH002
-2024-01-01 14:30:00,EXP002,15.01,treatment_group_b,testing,random_forest,publication,0.17,good,SENS002,BATCH002
-2024-01-01 14:45:00,EXP002,15.20,treatment_group_b,testing,random_forest,publication,0.14,good,SENS002,BATCH002
-2024-01-01 15:00:00,EXP002,15.39,treatment_group_b,testing,random_forest,publication,0.18,good,SENS002,BATCH002
-2024-01-01 15:15:00,EXP002,15.57,treatment_group_b,final,random_forest,publication,0.11,excellent,SENS002,BATCH002
-2024-01-01 08:00:00,EXP003,8.67,control_group,training,ensemble,exploratory,0.28,fair,SENS003,BATCH003
-2024-01-01 08:15:00,EXP003,8.82,control_group,training,ensemble,exploratory,0.24,good,SENS003,BATCH003
-2024-01-01 08:30:00,EXP003,8.96,control_group,training,ensemble,exploratory,0.31,fair,SENS003,BATCH003
-2024-01-01 08:45:00,EXP003,9.11,control_group,training,ensemble,exploratory,0.26,good,SENS003,BATCH003
-2024-01-01 09:00:00,EXP003,9.25,control_group,training,ensemble,exploratory,0.29,fair,SENS003,BATCH003
-2024-01-01 09:15:00,EXP003,9.39,control_group,training,ensemble,exploratory,0.23,good,SENS003,BATCH003
-2024-01-01 09:30:00,EXP003,9.54,control_group,training,ensemble,exploratory,0.27,good,SENS003,BATCH003
-2024-01-01 09:45:00,EXP003,9.68,control_group,training,ensemble,exploratory,0.25,good,SENS003,BATCH003
-2024-01-01 10:00:00,EXP003,9.83,control_group,training,ensemble,exploratory,0.30,fair,SENS003,BATCH003
-2024-01-01 10:15:00,EXP003,9.97,control_group,training,ensemble,exploratory,0.22,good,SENS003,BATCH003
-2024-01-01 10:30:00,EXP003,10.12,control_group,training,ensemble,exploratory,0.28,fair,SENS003,BATCH003
-2024-01-01 10:45:00,EXP003,10.26,control_group,training,ensemble,exploratory,0.24,good,SENS003,BATCH003
-2024-01-01 11:00:00,EXP003,10.41,control_group,training,ensemble,exploratory,0.26,good,SENS003,BATCH003
-2024-01-01 11:15:00,EXP003,10.55,control_group,training,ensemble,exploratory,0.29,fair,SENS003,BATCH003
-2024-01-01 11:30:00,EXP003,10.70,control_group,training,ensemble,exploratory,0.23,good,SENS003,BATCH003
-2024-01-01 11:45:00,EXP003,10.84,control_group,training,ensemble,exploratory,0.27,good,SENS003,BATCH003
-2024-01-01 12:00:00,EXP003,10.99,control_group,training,ensemble,exploratory,0.25,good,SENS003,BATCH003
-2024-01-01 12:15:00,EXP003,11.13,control_group,validation,ensemble,presentation,0.21,good,SENS003,BATCH003
-2024-01-01 12:30:00,EXP003,11.28,control_group,validation,ensemble,presentation,0.24,good,SENS003,BATCH003
-2024-01-01 12:45:00,EXP003,11.42,control_group,validation,ensemble,presentation,0.26,good,SENS003,BATCH003
-2024-01-01 13:00:00,EXP003,11.57,control_group,validation,ensemble,presentation,0.22,good,SENS003,BATCH003
-2024-01-01 13:15:00,EXP003,11.71,control_group,validation,ensemble,presentation,0.28,fair,SENS003,BATCH003
-2024-01-01 13:30:00,EXP003,11.86,control_group,validation,ensemble,presentation,0.20,good,SENS003,BATCH003
-2024-01-01 13:45:00,EXP003,12.00,control_group,validation,ensemble,presentation,0.25,good,SENS003,BATCH003
-2024-01-01 14:00:00,EXP003,12.15,control_group,validation,ensemble,presentation,0.23,good,SENS003,BATCH003
-2024-01-01 14:15:00,EXP003,12.29,control_group,testing,ensemble,publication,0.19,good,SENS003,BATCH003
-2024-01-01 14:30:00,EXP003,12.44,control_group,testing,ensemble,publication,0.22,good,SENS003,BATCH003
-2024-01-01 14:45:00,EXP003,12.58,control_group,testing,ensemble,publication,0.18,good,SENS003,BATCH003
-2024-01-01 15:00:00,EXP003,12.73,control_group,testing,ensemble,publication,0.21,good,SENS003,BATCH003
-2024-01-01 15:15:00,EXP003,12.87,control_group,final,ensemble,publication,0.16,good,SENS003,BATCH003
-2024-01-02 08:00:00,EXP004,14.12,combined_groups,training,linear_regression,exploratory,0.14,good,SENS001,BATCH004
-2024-01-02 08:15:00,EXP004,14.28,combined_groups,training,linear_regression,exploratory,0.17,good,SENS001,BATCH004
-2024-01-02 08:30:00,EXP004,14.45,combined_groups,training,linear_regression,exploratory,0.12,excellent,SENS001,BATCH004
-2024-01-02 08:45:00,EXP004,14.61,combined_groups,training,linear_regression,exploratory,0.15,good,SENS001,BATCH004
-2024-01-02 09:00:00,EXP004,14.78,combined_groups,training,linear_regression,exploratory,0.18,good,SENS001,BATCH004
-2024-01-02 09:15:00,EXP004,14.94,combined_groups,training,linear_regression,exploratory,0.13,good,SENS001,BATCH004
-2024-01-02 09:30:00,EXP004,15.11,combined_groups,training,linear_regression,exploratory,0.16,good,SENS001,BATCH004
-2024-01-02 09:45:00,EXP004,15.27,combined_groups,training,linear_regression,exploratory,0.19,good,SENS001,BATCH004
-2024-01-02 10:00:00,EXP004,15.44,combined_groups,training,linear_regression,exploratory,0.11,excellent,SENS001,BATCH004
-2024-01-02 10:15:00,EXP004,15.60,combined_groups,training,linear_regression,exploratory,0.14,good,SENS001,BATCH004
-2024-01-02 10:30:00,EXP004,15.77,combined_groups,training,linear_regression,exploratory,0.17,good,SENS001,BATCH004
-2024-01-02 10:45:00,EXP004,15.93,combined_groups,training,linear_regression,exploratory,0.15,good,SENS001,BATCH004
-2024-01-02 11:00:00,EXP004,16.10,combined_groups,training,linear_regression,exploratory,0.12,excellent,SENS001,BATCH004
-2024-01-02 11:15:00,EXP004,16.26,combined_groups,training,linear_regression,exploratory,0.18,good,SENS001,BATCH004
-2024-01-02 11:30:00,EXP004,16.43,combined_groups,training,linear_regression,exploratory,0.16,good,SENS001,BATCH004
-2024-01-02 11:45:00,EXP004,16.59,combined_groups,training,linear_regression,exploratory,0.13,good,SENS001,BATCH004
-2024-01-02 12:00:00,EXP004,16.76,combined_groups,training,linear_regression,exploratory,0.20,fair,SENS001,BATCH004
-2024-01-02 12:15:00,EXP004,16.92,combined_groups,validation,linear_regression,presentation,0.14,good,SENS001,BATCH004
-2024-01-02 12:30:00,EXP004,17.09,combined_groups,validation,linear_regression,presentation,0.17,good,SENS001,BATCH004
-2024-01-02 12:45:00,EXP004,17.25,combined_groups,validation,linear_regression,presentation,0.15,good,SENS001,BATCH004
-2024-01-02 13:00:00,EXP004,17.42,combined_groups,validation,linear_regression,presentation,0.11,excellent,SENS001,BATCH004
-2024-01-02 13:15:00,EXP004,17.58,combined_groups,validation,linear_regression,presentation,0.18,good,SENS001,BATCH004
-2024-01-02 13:30:00,EXP004,17.75,combined_groups,validation,linear_regression,presentation,0.16,good,SENS001,BATCH004
-2024-01-02 13:45:00,EXP004,17.91,combined_groups,validation,linear_regression,presentation,0.13,good,SENS001,BATCH004
-2024-01-02 14:00:00,EXP004,18.08,combined_groups,validation,linear_regression,presentation,0.19,good,SENS001,BATCH004
-2024-01-02 14:15:00,EXP004,18.24,combined_groups,testing,linear_regression,publication,0.12,excellent,SENS001,BATCH004
-2024-01-02 14:30:00,EXP004,18.41,combined_groups,testing,linear_regression,publication,0.15,good,SENS001,BATCH004
-2024-01-02 14:45:00,EXP004,18.57,combined_groups,testing,linear_regression,publication,0.17,good,SENS001,BATCH004
-2024-01-02 15:00:00,EXP004,18.74,combined_groups,testing,linear_regression,publication,0.14,good,SENS001,BATCH004
-2024-01-02 15:15:00,EXP004,18.90,combined_groups,final,linear_regression,publication,0.10,excellent,SENS001,BATCH004
-2024-01-03 08:00:00,EXP005,11.34,treatment_group_a,training,random_forest,exploratory,0.16,good,SENS002,BATCH005
-2024-01-03 08:15:00,EXP005,11.52,treatment_group_a,training,random_forest,exploratory,0.19,good,SENS002,BATCH005
-2024-01-03 08:30:00,EXP005,11.69,treatment_group_a,training,random_forest,exploratory,0.14,good,SENS002,BATCH005
-2024-01-03 08:45:00,EXP005,11.87,treatment_group_a,training,random_forest,exploratory,0.17,good,SENS002,BATCH005
-2024-01-03 09:00:00,EXP005,12.04,treatment_group_a,training,random_forest,exploratory,0.21,good,SENS002,BATCH005
-2024-01-03 09:15:00,EXP005,12.22,treatment_group_a,training,random_forest,exploratory,0.15,good,SENS002,BATCH005
-2024-01-03 09:30:00,EXP005,12.39,treatment_group_a,training,random_forest,exploratory,0.18,good,SENS002,BATCH005
-2024-01-03 09:45:00,EXP005,12.57,treatment_group_a,training,random_forest,exploratory,0.13,good,SENS002,BATCH005
-2024-01-03 10:00:00,EXP005,12.74,treatment_group_a,training,random_forest,exploratory,0.20,fair,SENS002,BATCH005
-2024-01-03 10:15:00,EXP005,12.92,treatment_group_a,training,random_forest,exploratory,0.16,good,SENS002,BATCH005
-2024-01-03 10:30:00,EXP005,13.09,treatment_group_a,training,random_forest,exploratory,0.22,good,SENS002,BATCH005
-2024-01-03 10:45:00,EXP005,13.27,treatment_group_a,training,random_forest,exploratory,0.14,good,SENS002,BATCH005
-2024-01-03 11:00:00,EXP005,13.44,treatment_group_a,training,random_forest,exploratory,0.18,good,SENS002,BATCH005
-2024-01-03 11:15:00,EXP005,13.62,treatment_group_a,training,random_forest,exploratory,0.17,good,SENS002,BATCH005
-2024-01-03 11:30:00,EXP005,13.79,treatment_group_a,training,random_forest,exploratory,0.15,good,SENS002,BATCH005
-2024-01-03 11:45:00,EXP005,13.97,treatment_group_a,training,random_forest,exploratory,0.19,good,SENS002,BATCH005
-2024-01-03 12:00:00,EXP005,14.14,treatment_group_a,training,random_forest,exploratory,0.21,good,SENS002,BATCH005
-2024-01-03 12:15:00,EXP005,14.32,treatment_group_a,validation,random_forest,presentation,0.12,excellent,SENS002,BATCH005
-2024-01-03 12:30:00,EXP005,14.49,treatment_group_a,validation,random_forest,presentation,0.16,good,SENS002,BATCH005
-2024-01-03 12:45:00,EXP005,14.67,treatment_group_a,validation,random_forest,presentation,0.18,good,SENS002,BATCH005
-2024-01-03 13:00:00,EXP005,14.84,treatment_group_a,validation,random_forest,presentation,0.14,good,SENS002,BATCH005
-2024-01-03 13:15:00,EXP005,15.02,treatment_group_a,validation,random_forest,presentation,0.20,fair,SENS002,BATCH005
-2024-01-03 13:30:00,EXP005,15.19,treatment_group_a,validation,random_forest,presentation,0.17,good,SENS002,BATCH005
-2024-01-03 13:45:00,EXP005,15.37,treatment_group_a,validation,random_forest,presentation,0.13,good,SENS002,BATCH005
-2024-01-03 14:00:00,EXP005,15.54,treatment_group_a,validation,random_forest,presentation,0.19,good,SENS002,BATCH005
-2024-01-03 14:15:00,EXP005,15.72,treatment_group_a,testing,random_forest,publication,0.11,excellent,SENS002,BATCH005
-2024-01-03 14:30:00,EXP005,15.89,treatment_group_a,testing,random_forest,publication,0.15,good,SENS002,BATCH005
-2024-01-03 14:45:00,EXP005,16.07,treatment_group_a,testing,random_forest,publication,0.17,good,SENS002,BATCH005
-2024-01-03 15:00:00,EXP005,16.24,treatment_group_a,testing,random_forest,publication,0.14,good,SENS002,BATCH005
-2024-01-03 15:15:00,EXP005,16.42,treatment_group_a,final,random_forest,publication,0.10,excellent,SENS002,BATCH005
-2024-01-04 08:00:00,EXP006,9.78,control_group,training,linear_regression,exploratory,0.25,good,SENS003,BATCH006
-2024-01-04 08:15:00,EXP006,9.93,control_group,training,linear_regression,exploratory,0.28,fair,SENS003,BATCH006
-2024-01-04 08:30:00,EXP006,10.08,control_group,training,linear_regression,exploratory,0.22,good,SENS003,BATCH006
-2024-01-04 08:45:00,EXP006,10.23,control_group,training,linear_regression,exploratory,0.26,good,SENS003,BATCH006
-2024-01-04 09:00:00,EXP006,10.38,control_group,training,linear_regression,exploratory,0.30,fair,SENS003,BATCH006
-2024-01-04 09:15:00,EXP006,10.53,control_group,training,linear_regression,exploratory,0.24,good,SENS003,BATCH006
-2024-01-04 09:30:00,EXP006,10.68,control_group,training,linear_regression,exploratory,0.27,good,SENS003,BATCH006
-2024-01-04 09:45:00,EXP006,10.83,control_group,training,linear_regression,exploratory,0.23,good,SENS003,BATCH006
-2024-01-04 10:00:00,EXP006,10.98,control_group,training,linear_regression,exploratory,0.29,fair,SENS003,BATCH006
-2024-01-04 10:15:00,EXP006,11.13,control_group,training,linear_regression,exploratory,0.21,good,SENS003,BATCH006
-2024-01-04 10:30:00,EXP006,11.28,control_group,training,linear_regression,exploratory,0.25,good,SENS003,BATCH006
-2024-01-04 10:45:00,EXP006,11.43,control_group,training,linear_regression,exploratory,0.27,good,SENS003,BATCH006
-2024-01-04 11:00:00,EXP006,11.58,control_group,training,linear_regression,exploratory,0.24,good,SENS003,BATCH006
-2024-01-04 11:15:00,EXP006,11.73,control_group,training,linear_regression,exploratory,0.28,fair,SENS003,BATCH006
-2024-01-04 11:30:00,EXP006,11.88,control_group,training,linear_regression,exploratory,0.22,good,SENS003,BATCH006
-2024-01-04 11:45:00,EXP006,12.03,control_group,training,linear_regression,exploratory,0.26,good,SENS003,BATCH006
-2024-01-04 12:00:00,EXP006,12.18,control_group,training,linear_regression,exploratory,0.25,good,SENS003,BATCH006
-2024-01-04 12:15:00,EXP006,12.33,control_group,validation,linear_regression,presentation,0.20,good,SENS003,BATCH006
-2024-01-04 12:30:00,EXP006,12.48,control_group,validation,linear_regression,presentation,0.23,good,SENS003,BATCH006
-2024-01-04 12:45:00,EXP006,12.63,control_group,validation,linear_regression,presentation,0.26,good,SENS003,BATCH006
-2024-01-04 13:00:00,EXP006,12.78,control_group,validation,linear_regression,presentation,0.21,good,SENS003,BATCH006
-2024-01-04 13:15:00,EXP006,12.93,control_group,validation,linear_regression,presentation,0.24,good,SENS003,BATCH006
-2024-01-04 13:30:00,EXP006,13.08,control_group,validation,linear_regression,presentation,0.27,good,SENS003,BATCH006
-2024-01-04 13:45:00,EXP006,13.23,control_group,validation,linear_regression,presentation,0.22,good,SENS003,BATCH006
-2024-01-04 14:00:00,EXP006,13.38,control_group,validation,linear_regression,presentation,0.25,good,SENS003,BATCH006
-2024-01-04 14:15:00,EXP006,13.53,control_group,testing,linear_regression,publication,0.18,good,SENS003,BATCH006
-2024-01-04 14:30:00,EXP006,13.68,control_group,testing,linear_regression,publication,0.21,good,SENS003,BATCH006
-2024-01-04 14:45:00,EXP006,13.83,control_group,testing,linear_regression,publication,0.19,good,SENS003,BATCH006
-2024-01-04 15:00:00,EXP006,13.98,control_group,testing,linear_regression,publication,0.22,good,SENS003,BATCH006
-2024-01-04 15:15:00,EXP006,14.13,control_group,final,linear_regression,publication,0.16,good,SENS003,BATCH006
+timestamp,experiment_id,measurement_type,measurement_value,measurement_uncertainty,epoch,batch_id,validation_metric,quality_score,temperature_c,humidity_percent,equipment_id,researcher_notes
+2024-01-15T08:00:00Z,EXP001,training_loss,0.8542,0.0124,1,1,0.1234,0.95,23.2,45.8,SPEC001,"Initial baseline measurement for treatment group A"
+2024-01-15T08:15:00Z,EXP001,training_loss,0.7831,0.0118,2,1,0.1567,0.94,23.4,46.2,SPEC001,"Steady decline in loss observed"
+2024-01-15T08:30:00Z,EXP001,training_loss,0.7234,0.0112,3,1,0.1823,0.96,23.6,46.5,SPEC001,"Training stabilizing at expected rate"
+2024-01-15T08:45:00Z,EXP001,training_loss,0.6789,0.0108,4,1,0.2145,0.97,23.8,46.8,SPEC001,"Performance improvement continuing"
+2024-01-15T09:00:00Z,EXP001,training_loss,0.6234,0.0105,5,1,0.2456,0.98,24.0,47.1,SPEC001,"Approaching convergence threshold"
+2024-01-15T09:15:00Z,EXP001,validation_accuracy,0.6789,0.0087,5,1,0.6789,0.99,24.2,47.4,SPEC001,"First validation checkpoint reached"
+2024-01-15T09:30:00Z,EXP001,training_loss,0.5823,0.0098,6,1,0.2734,0.98,24.1,47.0,SPEC001,"Loss reduction maintaining momentum"
+2024-01-15T09:45:00Z,EXP001,training_loss,0.5456,0.0094,7,1,0.2987,0.97,23.9,46.7,SPEC001,"Gradual improvement as expected"
+2024-01-15T10:00:00Z,EXP001,training_loss,0.5123,0.0091,8,1,0.3234,0.98,23.7,46.4,SPEC001,"Steady progress toward target performance"
+2024-01-15T10:15:00Z,EXP001,training_loss,0.4834,0.0089,9,1,0.3456,0.99,23.5,46.1,SPEC001,"Approaching first major milestone"
+2024-01-15T10:30:00Z,EXP001,validation_accuracy,0.7234,0.0076,10,1,0.7234,0.99,23.3,45.8,SPEC001,"Validation accuracy improving significantly"
+2024-01-15T10:45:00Z,EXP001,training_loss,0.4567,0.0086,11,1,0.3678,0.98,23.1,45.5,SPEC001,"Continued optimization progress"
+2024-01-15T11:00:00Z,EXP001,training_loss,0.4321,0.0084,12,1,0.3887,0.97,22.9,45.2,SPEC001,"Loss stabilization beginning to emerge"
+2024-01-16T08:00:00Z,EXP002,training_loss,0.9123,0.0134,1,1,0.0987,0.92,22.8,44.9,SPEC002,"Treatment group B baseline higher than A"
+2024-01-16T08:15:00Z,EXP002,training_loss,0.8567,0.0129,2,1,0.1234,0.93,23.0,45.1,SPEC002,"Similar initial reduction pattern"
+2024-01-16T08:30:00Z,EXP002,training_loss,0.8012,0.0125,3,1,0.1456,0.94,23.2,45.4,SPEC002,"Group B showing slower convergence"
+2024-01-16T08:45:00Z,EXP002,training_loss,0.7534,0.0121,4,1,0.1687,0.95,23.4,45.7,SPEC002,"Performance gap maintained with group A"
+2024-01-16T09:00:00Z,EXP002,training_loss,0.7089,0.0118,5,1,0.1923,0.96,23.6,46.0,SPEC002,"Steady improvement but below group A"
+2024-01-16T09:15:00Z,EXP002,validation_accuracy,0.6234,0.0098,5,1,0.6234,0.97,23.8,46.3,SPEC002,"Validation confirms lower performance"
+2024-01-16T09:30:00Z,EXP002,training_loss,0.6678,0.0115,6,1,0.2134,0.95,23.7,46.1,SPEC002,"Continued training progress observed"
+2024-01-16T09:45:00Z,EXP002,training_loss,0.6287,0.0112,7,1,0.2345,0.94,23.5,45.8,SPEC002,"Group B maintaining characteristic pattern"
+2024-01-16T10:00:00Z,EXP002,training_loss,0.5923,0.0109,8,1,0.2567,0.95,23.3,45.5,SPEC002,"Loss reduction continuing steadily"
+2024-01-16T10:15:00Z,EXP002,training_loss,0.5589,0.0107,9,1,0.2789,0.96,23.1,45.2,SPEC002,"Approaching intermediate milestone"
+2024-01-16T10:30:00Z,EXP002,validation_accuracy,0.6789,0.0089,10,1,0.6789,0.97,22.9,44.9,SPEC002,"Validation improvement slower than A"
+2024-01-16T10:45:00Z,EXP002,training_loss,0.5278,0.0104,11,1,0.2987,0.95,22.7,44.6,SPEC002,"Group B characteristics maintained"
+2024-01-16T11:00:00Z,EXP002,training_loss,0.4989,0.0102,12,1,0.3123,0.94,22.5,44.3,SPEC002,"Final epoch showing continued progress"
+2024-01-17T08:00:00Z,EXP003,training_loss,0.9987,0.0156,1,1,0.0234,0.88,22.3,44.0,SPEC003,"Control group baseline significantly higher"
+2024-01-17T08:15:00Z,EXP003,training_loss,0.9823,0.0154,2,1,0.0345,0.87,22.4,44.2,SPEC003,"Minimal improvement as expected"
+2024-01-17T08:30:00Z,EXP003,training_loss,0.9678,0.0152,3,1,0.0456,0.86,22.6,44.5,SPEC003,"Control showing expected poor performance"
+2024-01-17T08:45:00Z,EXP003,training_loss,0.9567,0.0151,4,1,0.0567,0.85,22.8,44.8,SPEC003,"Negligible training progress"
+2024-01-17T09:00:00Z,EXP003,training_loss,0.9456,0.0149,5,1,0.0678,0.84,23.0,45.1,SPEC003,"Control group maintaining poor metrics"
+2024-01-17T09:15:00Z,EXP003,validation_accuracy,0.1234,0.0234,5,1,0.1234,0.83,23.2,45.4,SPEC003,"Validation confirms control group behavior"
+2024-01-17T09:30:00Z,EXP003,training_loss,0.9389,0.0148,6,1,0.0789,0.82,23.1,45.2,SPEC003,"Minimal loss reduction observed"
+2024-01-17T09:45:00Z,EXP003,training_loss,0.9323,0.0147,7,1,0.0834,0.81,22.9,44.9,SPEC003,"Control group pattern consistent"
+2024-01-17T10:00:00Z,EXP003,training_loss,0.9267,0.0146,8,1,0.0887,0.80,22.7,44.6,SPEC003,"Expected poor performance maintained"
+2024-01-17T10:15:00Z,EXP003,training_loss,0.9214,0.0145,9,1,0.0923,0.79,22.5,44.3,SPEC003,"Control group approaching plateau"
+2024-01-17T10:30:00Z,EXP003,validation_accuracy,0.1456,0.0287,10,1,0.1456,0.78,22.3,44.0,SPEC003,"Validation accuracy remains very low"
+2024-01-17T10:45:00Z,EXP003,training_loss,0.9167,0.0144,11,1,0.0956,0.77,22.1,43.7,SPEC003,"Control showing expected lack of progress"
+2024-01-17T11:00:00Z,EXP003,training_loss,0.9123,0.0143,12,1,0.0978,0.76,21.9,43.4,SPEC003,"Final control measurements confirm baseline"
+2024-01-22T08:00:00Z,EXP004,precision_score,0.7234,0.0089,1,2,0.7234,0.96,21.7,43.1,SPEC004,"Validation phase precision measurement"
+2024-01-22T08:30:00Z,EXP004,recall_score,0.6789,0.0098,1,2,0.6789,0.95,21.8,43.3,SPEC004,"Recall metrics for validation dataset"
+2024-01-22T09:00:00Z,EXP004,f1_score,0.7001,0.0087,1,2,0.7001,0.97,22.0,43.6,SPEC004,"F1 score combining precision and recall"
+2024-01-22T09:30:00Z,EXP004,auc_score,0.8234,0.0076,1,2,0.8234,0.98,22.2,43.9,SPEC004,"Area under curve showing strong performance"
+2024-01-22T10:00:00Z,EXP004,precision_score,0.7456,0.0084,2,2,0.7456,0.97,22.4,44.2,SPEC004,"Precision improvement in epoch 2"
+2024-01-22T10:30:00Z,EXP004,recall_score,0.6934,0.0093,2,2,0.6934,0.96,22.6,44.5,SPEC004,"Recall showing consistent performance"
+2024-01-22T11:00:00Z,EXP004,f1_score,0.7187,0.0082,2,2,0.7187,0.98,22.8,44.8,SPEC004,"F1 score maintaining upward trend"
+2024-01-22T11:30:00Z,EXP004,auc_score,0.8456,0.0071,2,2,0.8456,0.99,23.0,45.1,SPEC004,"AUC continuing to improve significantly"
+2024-01-23T08:00:00Z,EXP005,precision_score,0.6789,0.0098,1,2,0.6789,0.94,23.2,45.4,SPEC005,"Group B validation precision baseline"
+2024-01-23T08:30:00Z,EXP005,recall_score,0.6234,0.0108,1,2,0.6234,0.93,23.1,45.2,SPEC005,"Recall lower than group A as expected"
+2024-01-23T09:00:00Z,EXP005,f1_score,0.6504,0.0098,1,2,0.6504,0.94,22.9,44.9,SPEC005,"F1 reflecting lower overall performance"
+2024-01-23T09:30:00Z,EXP005,auc_score,0.7678,0.0087,1,2,0.7678,0.95,22.7,44.6,SPEC005,"AUC showing group B characteristics"
+2024-01-23T10:00:00Z,EXP005,precision_score,0.6923,0.0094,2,2,0.6923,0.95,22.5,44.3,SPEC005,"Precision showing modest improvement"
+2024-01-23T10:30:00Z,EXP005,recall_score,0.6378,0.0103,2,2,0.6378,0.94,22.3,44.0,SPEC005,"Recall improvement consistent with pattern"
+2024-01-23T11:00:00Z,EXP005,f1_score,0.6642,0.0093,2,2,0.6642,0.95,22.1,43.7,SPEC005,"F1 score gradual improvement maintained"
+2024-01-23T11:30:00Z,EXP005,auc_score,0.7834,0.0082,2,2,0.7834,0.96,21.9,43.4,SPEC005,"AUC showing continued but slower progress"
+2024-01-24T08:00:00Z,EXP006,precision_score,0.1567,0.0234,1,2,0.1567,0.82,21.7,43.1,SPEC006,"Control validation precision very low"
+2024-01-24T08:30:00Z,EXP006,recall_score,0.1234,0.0267,1,2,0.1234,0.81,21.8,43.3,SPEC006,"Control recall confirming poor performance"
+2024-01-24T09:00:00Z,EXP006,f1_score,0.1389,0.0245,1,2,0.1389,0.80,22.0,43.6,SPEC006,"F1 score reflecting control baseline"
+2024-01-24T09:30:00Z,EXP006,auc_score,0.4789,0.0198,1,2,0.4789,0.79,22.2,43.9,SPEC006,"AUC near random performance as expected"
+2024-01-24T10:00:00Z,EXP006,precision_score,0.1623,0.0229,2,2,0.1623,0.83,22.4,44.2,SPEC006,"Control precision minimal change"
+2024-01-24T10:30:00Z,EXP006,recall_score,0.1289,0.0262,2,2,0.1289,0.82,22.6,44.5,SPEC006,"Recall showing expected control behavior"
+2024-01-24T11:00:00Z,EXP006,f1_score,0.1442,0.0241,2,2,0.1442,0.81,22.8,44.8,SPEC006,"F1 maintaining control group pattern"
+2024-01-24T11:30:00Z,EXP006,auc_score,0.4856,0.0194,2,2,0.4856,0.80,23.0,45.1,SPEC006,"AUC remaining near chance level"
+2024-02-01T08:00:00Z,EXP007,combined_metric,0.7612,0.0067,1,3,0.7612,0.98,23.2,45.4,SPEC007,"Combined groups meta-analysis baseline"
+2024-02-01T09:00:00Z,EXP007,combined_metric,0.7834,0.0063,2,3,0.7834,0.99,23.4,45.7,SPEC007,"Meta-analysis showing improved performance"
+2024-02-01T10:00:00Z,EXP007,combined_metric,0.8012,0.0059,3,3,0.8012,0.99,23.6,46.0,SPEC007,"Combined analysis achieving target metrics"
+2024-02-01T11:00:00Z,EXP007,combined_metric,0.8156,0.0056,4,3,0.8156,1.00,23.8,46.3,SPEC007,"Final combined analysis exceeding expectations"
+2024-02-05T08:00:00Z,EXP008,biomarker_expression,2.34,0.12,1,1,0.7234,0.93,24.0,46.6,SPEC008,"Initial biomarker screening for cohort 1"
+2024-02-05T08:30:00Z,EXP008,biomarker_expression,2.67,0.11,2,1,0.7456,0.94,24.1,46.8,SPEC008,"Biomarker levels showing expected variation"
+2024-02-05T09:00:00Z,EXP008,biomarker_expression,2.89,0.10,3,1,0.7678,0.95,24.2,47.0,SPEC008,"Expression levels trending upward"
+2024-02-05T09:30:00Z,EXP008,biomarker_expression,3.12,0.09,4,1,0.7890,0.96,24.3,47.2,SPEC008,"Biomarker response showing clear pattern"
+2024-02-05T10:00:00Z,EXP008,biomarker_expression,3.34,0.08,5,1,0.8012,0.97,24.4,47.4,SPEC008,"Strong biomarker signal established"
+2024-02-06T08:00:00Z,EXP009,biomarker_expression,2.12,0.14,1,1,0.6789,0.91,24.2,47.1,SPEC009,"Cohort 2 baseline lower than cohort 1"
+2024-02-06T08:30:00Z,EXP009,biomarker_expression,2.43,0.13,2,1,0.7001,0.92,24.0,46.8,SPEC009,"Biomarker progression slower in cohort 2"
+2024-02-06T09:00:00Z,EXP009,biomarker_expression,2.68,0.12,3,1,0.7234,0.93,23.8,46.5,SPEC009,"Expression pattern distinct from cohort 1"
+2024-02-06T09:30:00Z,EXP009,biomarker_expression,2.91,0.11,4,1,0.7456,0.94,23.6,46.2,SPEC009,"Cohort 2 showing characteristic response"
+2024-02-06T10:00:00Z,EXP009,biomarker_expression,3.08,0.10,5,1,0.7678,0.95,23.4,45.9,SPEC009,"Final cohort 2 measurements confirm pattern"
+2024-02-07T08:00:00Z,EXP010,biomarker_expression,0.89,0.23,1,1,0.0987,0.76,23.2,45.6,SPEC010,"Control cohort biomarker baseline very low"
+2024-02-07T08:30:00Z,EXP010,biomarker_expression,0.92,0.22,2,1,0.1012,0.77,23.0,45.3,SPEC010,"Minimal biomarker activity as expected"
+2024-02-07T09:00:00Z,EXP010,biomarker_expression,0.95,0.21,3,1,0.1034,0.78,22.8,45.0,SPEC010,"Control showing expected low expression"
+2024-02-07T09:30:00Z,EXP010,biomarker_expression,0.98,0.20,4,1,0.1056,0.79,22.6,44.7,SPEC010,"Biomarker levels remaining at baseline"
+2024-02-07T10:00:00Z,EXP010,biomarker_expression,1.01,0.19,5,1,0.1078,0.80,22.4,44.4,SPEC010,"Control cohort confirming negative results"
+2024-02-12T08:00:00Z,EXP011,ml_prediction_accuracy,0.7567,0.0076,1,2,0.7567,0.97,22.2,44.1,SPEC011,"Machine learning validation for cohort 1"
+2024-02-12T09:00:00Z,EXP011,ml_prediction_accuracy,0.7789,0.0071,2,2,0.7789,0.98,22.0,43.8,SPEC011,"ML model showing improved accuracy"
+2024-02-12T10:00:00Z,EXP011,ml_prediction_accuracy,0.7923,0.0068,3,2,0.7923,0.99,21.8,43.5,SPEC011,"Random forest approach proving effective"
+2024-02-12T11:00:00Z,EXP011,ml_prediction_accuracy,0.8067,0.0064,4,2,0.8067,0.99,21.6,43.2,SPEC011,"Final ML validation exceeding targets"
+2024-02-13T08:00:00Z,EXP012,ml_prediction_accuracy,0.7123,0.0087,1,2,0.7123,0.95,21.4,42.9,SPEC012,"Cohort 2 ML baseline lower performance"
+2024-02-13T09:00:00Z,EXP012,ml_prediction_accuracy,0.7356,0.0082,2,2,0.7356,0.96,21.5,43.1,SPEC012,"ML improvement pattern similar to cohort 1"
+2024-02-13T10:00:00Z,EXP012,ml_prediction_accuracy,0.7534,0.0078,3,2,0.7534,0.97,21.7,43.4,SPEC012,"Random forest showing consistent gains"
+2024-02-13T11:00:00Z,EXP012,ml_prediction_accuracy,0.7689,0.0074,4,2,0.7689,0.98,21.9,43.7,SPEC012,"Cohort 2 achieving strong ML performance"
+2024-02-20T08:00:00Z,EXP013,ensemble_accuracy,0.7834,0.0056,1,3,0.7834,0.99,22.1,44.0,SPEC013,"All cohorts ensemble baseline measurement"
+2024-02-20T10:00:00Z,EXP013,ensemble_accuracy,0.8012,0.0052,2,3,0.8012,1.00,22.3,44.3,SPEC013,"Ensemble approach showing strong results"
+2024-02-20T12:00:00Z,EXP013,ensemble_accuracy,0.8156,0.0049,3,3,0.8156,1.00,22.5,44.6,SPEC013,"Final ensemble validation achieving targets"
+2024-03-01T08:00:00Z,EXP014,dose_response,0.4234,0.0156,1,1,0.4234,0.89,22.7,44.9,SPEC014,"Low dose baseline response measurement"
+2024-03-01T10:00:00Z,EXP014,dose_response,0.4567,0.0143,2,1,0.4567,0.91,22.9,45.2,SPEC014,"Low dose showing gradual response increase"
+2024-03-01T12:00:00Z,EXP014,dose_response,0.4789,0.0138,3,1,0.4789,0.93,23.1,45.5,SPEC014,"Low dose approaching threshold effectiveness"
+2024-03-01T14:00:00Z,EXP014,dose_response,0.4923,0.0134,4,1,0.4923,0.94,23.3,45.8,SPEC014,"Low dose final measurements confirm efficacy"
+2024-03-02T08:00:00Z,EXP015,dose_response,0.8567,0.0067,1,1,0.8567,0.98,23.5,46.1,SPEC015,"High dose baseline showing strong response"
+2024-03-02T10:00:00Z,EXP015,dose_response,0.8834,0.0062,2,1,0.8834,0.99,23.7,46.4,SPEC015,"High dose maintaining excellent efficacy"
+2024-03-02T12:00:00Z,EXP015,dose_response,0.9012,0.0058,3,1,0.9012,0.99,23.9,46.7,SPEC015,"High dose approaching maximum response"
+2024-03-02T14:00:00Z,EXP015,dose_response,0.9156,0.0055,4,1,0.9156,1.00,24.1,47.0,SPEC015,"High dose achieving near-optimal efficacy"
+2024-03-03T08:00:00Z,EXP016,dose_response,0.0867,0.0234,1,1,0.0867,0.78,24.0,46.8,SPEC016,"Placebo baseline confirming expected low response"
+2024-03-03T10:00:00Z,EXP016,dose_response,0.0923,0.0229,2,1,0.0923,0.79,23.8,46.5,SPEC016,"Placebo showing minimal change as expected"
+2024-03-03T12:00:00Z,EXP016,dose_response,0.0978,0.0225,3,1,0.0978,0.80,23.6,46.2,SPEC016,"Placebo maintaining low response pattern"
+2024-03-03T14:00:00Z,EXP016,dose_response,0.1012,0.0222,4,1,0.1012,0.81,23.4,45.9,SPEC016,"Placebo final measurement confirms baseline"
+2024-03-08T08:00:00Z,EXP017,dose_validation,0.4789,0.0134,1,2,0.4789,0.95,23.2,45.6,SPEC017,"Low dose validation confirming initial results"
+2024-03-08T12:00:00Z,EXP017,dose_validation,0.5012,0.0128,2,2,0.5012,0.96,23.0,45.3,SPEC017,"Validation showing slightly improved response"
+2024-03-08T16:00:00Z,EXP017,dose_validation,0.5156,0.0124,3,2,0.5156,0.97,22.8,45.0,SPEC017,"Low dose validation exceeding training metrics"
+2024-03-09T08:00:00Z,EXP018,dose_validation,0.8834,0.0059,1,2,0.8834,0.99,22.6,44.7,SPEC018,"High dose validation maintaining excellence"
+2024-03-09T12:00:00Z,EXP018,dose_validation,0.8923,0.0056,2,2,0.8923,0.99,22.4,44.4,SPEC018,"High dose showing consistent high efficacy"
+2024-03-09T16:00:00Z,EXP018,dose_validation,0.8978,0.0054,3,2,0.8978,1.00,22.2,44.1,SPEC018,"High dose validation confirming optimal response"
+2024-03-15T08:00:00Z,EXP019,dose_series_analysis,0.6789,0.0089,1,3,0.6789,0.97,22.0,43.8,SPEC019,"Complete dose series baseline analysis"
+2024-03-15T12:00:00Z,EXP019,dose_series_analysis,0.7012,0.0084,2,3,0.7012,0.98,21.8,43.5,SPEC019,"Dose-response curve showing clear relationship"
+2024-03-15T16:00:00Z,EXP019,dose_series_analysis,0.7234,0.0079,3,3,0.7234,0.99,21.6,43.2,SPEC019,"Final dose series analysis ready for publication"
+2024-03-20T08:00:00Z,EXP020,longitudinal_response,0.5567,0.0123,1,1,0.5567,0.94,21.4,42.9,SPEC020,"Week 1 longitudinal study baseline"
+2024-03-21T08:00:00Z,EXP020,longitudinal_response,0.5789,0.0119,2,1,0.5789,0.95,21.5,43.1,SPEC020,"Day 2 showing early response indicators"
+2024-03-22T08:00:00Z,EXP020,longitudinal_response,0.5923,0.0116,3,1,0.5923,0.96,21.7,43.4,SPEC020,"Day 3 response continuing to improve"
+2024-03-23T08:00:00Z,EXP020,longitudinal_response,0.6067,0.0113,4,1,0.6067,0.97,21.9,43.7,SPEC020,"Day 4 establishing response trajectory"
+2024-03-24T08:00:00Z,EXP020,longitudinal_response,0.6189,0.0111,5,1,0.6189,0.98,22.1,44.0,SPEC020,"Day 5 response showing sustained improvement"
+2024-03-25T08:00:00Z,EXP020,longitudinal_response,0.6289,0.0109,6,1,0.6289,0.98,22.3,44.3,SPEC020,"Day 6 continuing positive response trend"
+2024-03-26T08:00:00Z,EXP020,longitudinal_response,0.6378,0.0107,7,1,0.6378,0.99,22.5,44.6,SPEC020,"Week 1 final measurement showing good progress"
+2024-04-10T08:00:00Z,EXP021,longitudinal_response,0.7234,0.0089,1,1,0.7234,0.98,22.7,44.9,SPEC021,"Week 4 showing significant improvement over week 1"
+2024-04-11T08:00:00Z,EXP021,longitudinal_response,0.7356,0.0086,2,1,0.7356,0.98,22.9,45.2,SPEC021,"Week 4 day 2 maintaining improvement trajectory"
+2024-04-12T08:00:00Z,EXP021,longitudinal_response,0.7467,0.0084,3,1,0.7467,0.99,23.1,45.5,SPEC021,"Week 4 day 3 showing continued gains"
+2024-04-13T08:00:00Z,EXP021,longitudinal_response,0.7567,0.0082,4,1,0.7567,0.99,23.3,45.8,SPEC021,"Week 4 day 4 approaching target performance"
+2024-04-14T08:00:00Z,EXP021,longitudinal_response,0.7656,0.0080,5,1,0.7656,0.99,23.5,46.1,SPEC021,"Week 4 day 5 showing excellent progress"
+2024-04-15T08:00:00Z,EXP021,longitudinal_response,0.7734,0.0078,6,1,0.7734,1.00,23.7,46.4,SPEC021,"Week 4 day 6 maintaining high performance"
+2024-04-16T08:00:00Z,EXP021,longitudinal_response,0.7801,0.0076,7,1,0.7801,1.00,23.9,46.7,SPEC021,"Week 4 final showing sustained improvement"
+2024-05-08T08:00:00Z,EXP022,longitudinal_validation,0.8234,0.0067,1,2,0.8234,0.99,24.1,47.0,SPEC022,"Week 8 validation showing peak performance"
+2024-05-09T08:00:00Z,EXP022,longitudinal_validation,0.8289,0.0065,2,2,0.8289,0.99,24.0,46.8,SPEC022,"Week 8 day 2 maintaining peak response"
+2024-05-10T08:00:00Z,EXP022,longitudinal_validation,0.8334,0.0064,3,2,0.8334,1.00,23.8,46.5,SPEC022,"Week 8 day 3 achieving maximum efficacy"
+2024-05-11T08:00:00Z,EXP022,longitudinal_validation,0.8367,0.0062,4,2,0.8367,1.00,23.6,46.2,SPEC022,"Week 8 day 4 sustaining optimal performance"
+2024-05-12T08:00:00Z,EXP022,longitudinal_validation,0.8389,0.0061,5,2,0.8389,1.00,23.4,45.9,SPEC022,"Week 8 day 5 maintaining peak efficacy"
+2024-05-13T08:00:00Z,EXP022,longitudinal_validation,0.8401,0.0060,6,2,0.8401,1.00,23.2,45.6,SPEC022,"Week 8 day 6 confirming sustained response"
+2024-05-14T08:00:00Z,EXP022,longitudinal_validation,0.8412,0.0059,7,2,0.8412,1.00,23.0,45.3,SPEC022,"Week 8 final confirming peak performance period"
+2024-06-05T08:00:00Z,EXP023,longitudinal_final,0.8123,0.0071,1,3,0.8123,0.99,22.8,45.0,SPEC023,"Week 12 final measurement phase beginning"
+2024-06-06T08:00:00Z,EXP023,longitudinal_final,0.8156,0.0069,2,3,0.8156,0.99,22.6,44.7,SPEC023,"Week 12 day 2 maintaining sustained efficacy"
+2024-06-07T08:00:00Z,EXP023,longitudinal_final,0.8178,0.0068,3,3,0.8178,1.00,22.4,44.4,SPEC023,"Week 12 day 3 showing sustained response"
+2024-06-08T08:00:00Z,EXP023,longitudinal_final,0.8189,0.0067,4,3,0.8189,1.00,22.2,44.1,SPEC023,"Week 12 day 4 confirming sustained efficacy"
+2024-06-09T08:00:00Z,EXP023,longitudinal_final,0.8198,0.0066,5,3,0.8198,1.00,22.0,43.8,SPEC023,"Week 12 day 5 maintaining excellent response"
+2024-06-10T08:00:00Z,EXP023,longitudinal_final,0.8205,0.0065,6,3,0.8205,1.00,21.8,43.5,SPEC023,"Week 12 day 6 demonstrating sustained benefit"
+2024-06-11T08:00:00Z,EXP023,longitudinal_final,0.8210,0.0064,7,3,0.8210,1.00,21.6,43.2,SPEC023,"Week 12 final confirming long-term sustained efficacy"
+2024-04-01T08:00:00Z,EXP024,safety_score,0.9234,0.0023,1,1,0.9234,1.00,21.4,42.9,SPEC024,"Safety cohort baseline showing excellent profile"
+2024-04-01T12:00:00Z,EXP024,safety_score,0.9267,0.0022,2,1,0.9267,1.00,21.5,43.1,SPEC024,"Safety measurements maintaining high scores"
+2024-04-01T16:00:00Z,EXP024,safety_score,0.9289,0.0021,3,1,0.9289,1.00,21.7,43.4,SPEC024,"Safety profile showing continued excellence"
+2024-04-01T20:00:00Z,EXP024,safety_score,0.9305,0.0020,4,1,0.9305,1.00,21.9,43.7,SPEC024,"Safety cohort final showing optimal profile"
+2024-04-02T08:00:00Z,EXP025,safety_score,0.8834,0.0034,1,1,0.8834,0.99,22.1,44.0,SPEC025,"Alternative treatment safety baseline"
+2024-04-02T12:00:00Z,EXP025,safety_score,0.8867,0.0033,2,1,0.8867,0.99,22.3,44.3,SPEC025,"Alternative showing comparable safety"
+2024-04-02T16:00:00Z,EXP025,safety_score,0.8889,0.0032,3,1,0.8889,0.99,22.5,44.6,SPEC025,"Safety profile similar to primary treatment"
+2024-04-02T20:00:00Z,EXP025,safety_score,0.8906,0.0031,4,1,0.8906,1.00,22.7,44.9,SPEC025,"Alternative treatment confirming safety profile"
+2024-04-03T08:00:00Z,EXP026,safety_score,0.9634,0.0012,1,1,0.9634,1.00,22.9,45.2,SPEC026,"Safety control showing highest scores"
+2024-04-03T12:00:00Z,EXP026,safety_score,0.9656,0.0011,2,1,0.9656,1.00,23.1,45.5,SPEC026,"Control group maintaining excellent safety"
+2024-04-03T16:00:00Z,EXP026,safety_score,0.9667,0.0010,3,1,0.9667,1.00,23.3,45.8,SPEC026,"Safety control showing expected high profile"
+2024-04-03T20:00:00Z,EXP026,safety_score,0.9675,0.0009,4,1,0.9675,1.00,23.5,46.1,SPEC026,"Control final confirming optimal safety"
+2024-04-15T08:00:00Z,EXP027,combined_safety,0.9134,0.0018,1,2,0.9134,1.00,23.7,46.4,SPEC027,"Combined safety analysis baseline"
+2024-04-15T16:00:00Z,EXP027,combined_safety,0.9156,0.0017,2,2,0.9156,1.00,23.9,46.7,SPEC027,"Overall safety profile showing excellent results"
+2024-04-16T08:00:00Z,EXP027,combined_safety,0.9172,0.0016,3,2,0.9172,1.00,24.1,47.0,SPEC027,"Combined analysis confirming favorable profile"
+2024-04-20T08:00:00Z,EXP028,pathway_activity,3.567,0.167,1,1,0.7123,0.95,24.0,46.8,SPEC028,"Pathway A mechanistic baseline measurement"
+2024-04-20T12:00:00Z,EXP028,pathway_activity,3.789,0.156,2,1,0.7234,0.96,23.8,46.5,SPEC028,"Pathway A showing increased activity"
+2024-04-20T16:00:00Z,EXP028,pathway_activity,3.923,0.148,3,1,0.7345,0.97,23.6,46.2,SPEC028,"Pathway A demonstrating target engagement"
+2024-04-20T20:00:00Z,EXP028,pathway_activity,4.067,0.142,4,1,0.7456,0.98,23.4,45.9,SPEC028,"Pathway A final showing strong mechanism"
+2024-04-21T08:00:00Z,EXP029,pathway_activity,3.234,0.178,1,1,0.6789,0.94,23.2,45.6,SPEC029,"Pathway B mechanistic baseline lower"
+2024-04-21T12:00:00Z,EXP029,pathway_activity,3.456,0.167,2,1,0.6901,0.95,23.0,45.3,SPEC029,"Pathway B showing alternative mechanism"
+2024-04-21T16:00:00Z,EXP029,pathway_activity,3.634,0.159,3,1,0.7012,0.96,22.8,45.0,SPEC029,"Pathway B demonstrating distinct engagement"
+2024-04-21T20:00:00Z,EXP029,pathway_activity,3.789,0.152,4,1,0.7123,0.97,22.6,44.7,SPEC029,"Pathway B final confirming alternative mechanism"
+2024-04-22T08:00:00Z,EXP030,pathway_activity,0.567,0.234,1,1,0.0456,0.78,22.4,44.4,SPEC030,"Untreated control pathway baseline very low"
+2024-04-22T12:00:00Z,EXP030,pathway_activity,0.589,0.229,2,1,0.0467,0.79,22.2,44.1,SPEC030,"Control showing minimal pathway activity"
+2024-04-22T16:00:00Z,EXP030,pathway_activity,0.601,0.225,3,1,0.0478,0.80,22.0,43.8,SPEC030,"Pathway control maintaining low activity"
+2024-04-22T20:00:00Z,EXP030,pathway_activity,0.612,0.221,4,1,0.0489,0.81,21.8,43.5,SPEC030,"Control final confirming minimal pathway engagement"
+2024-05-01T08:00:00Z,EXP031,integrated_pathway,3.789,0.134,1,3,0.6934,0.97,21.6,43.2,SPEC031,"Integrated pathway analysis baseline"
+2024-05-01T16:00:00Z,EXP031,integrated_pathway,3.923,0.128,2,3,0.7067,0.98,21.4,42.9,SPEC031,"Systems biology approach showing integration"
+2024-05-02T08:00:00Z,EXP031,integrated_pathway,4.012,0.123,3,3,0.7189,0.99,21.5,43.1,SPEC031,"All pathways analysis confirming mechanisms"
+2024-05-10T08:00:00Z,EXP032,standard_care_response,0.6456,0.0123,1,2,0.6456,0.95,21.7,43.4,SPEC032,"Standard care baseline for comparison"
+2024-05-10T16:00:00Z,EXP032,standard_care_response,0.6567,0.0118,2,2,0.6567,0.96,21.9,43.7,SPEC032,"Standard care showing expected response"
+2024-05-11T08:00:00Z,EXP032,standard_care_response,0.6634,0.0114,3,2,0.6634,0.97,22.1,44.0,SPEC032,"Standard care maintaining baseline performance"
+2024-05-11T08:00:00Z,EXP033,experimental_response,0.8123,0.0076,1,2,0.8123,0.98,22.3,44.3,SPEC033,"Experimental treatment baseline superior"
+2024-05-11T16:00:00Z,EXP033,experimental_response,0.8234,0.0072,2,2,0.8234,0.99,22.5,44.6,SPEC033,"Experimental showing clear superiority"
+2024-05-12T08:00:00Z,EXP033,experimental_response,0.8312,0.0069,3,2,0.8312,0.99,22.7,44.9,SPEC033,"Experimental treatment confirming advantage"
+2024-05-20T08:00:00Z,EXP034,head_to_head_comparison,0.7589,0.0089,1,3,0.7589,0.98,22.9,45.2,SPEC034,"Direct comparison baseline favoring experimental"
+2024-05-20T16:00:00Z,EXP034,head_to_head_comparison,0.7678,0.0084,2,3,0.7678,0.99,23.1,45.5,SPEC034,"Head-to-head showing experimental superiority"
+2024-05-21T08:00:00Z,EXP034,head_to_head_comparison,0.7734,0.0081,3,3,0.7734,0.99,23.3,45.8,SPEC034,"Final comparison confirming experimental advantage"
+2024-06-01T08:00:00Z,EXP035,pilot_efficacy,0.7123,0.0167,1,1,0.7123,0.93,23.5,46.1,SPEC035,"Pilot study baseline for new indication"
+2024-06-01T16:00:00Z,EXP035,pilot_efficacy,0.7234,0.0159,2,1,0.7234,0.94,23.7,46.4,SPEC035,"Pilot showing promising initial results"
+2024-06-02T08:00:00Z,EXP035,pilot_efficacy,0.7312,0.0153,3,1,0.7312,0.95,23.9,46.7,SPEC035,"Pilot efficacy trending positive"
+2024-06-02T08:00:00Z,EXP036,pilot_control,0.1123,0.0289,1,1,0.1123,0.83,24.1,47.0,SPEC036,"Pilot control baseline as expected"
+2024-06-02T16:00:00Z,EXP036,pilot_control,0.1156,0.0284,2,1,0.1156,0.84,24.0,46.8,SPEC036,"Pilot control maintaining low response"
+2024-06-03T08:00:00Z,EXP036,pilot_control,0.1178,0.0279,3,1,0.1178,0.85,23.8,46.5,SPEC036,"Control confirming baseline for new indication"
+2024-06-10T08:00:00Z,EXP037,pilot_analysis,0.6078,0.0123,1,2,0.6078,0.94,23.6,46.2,SPEC037,"Pilot analysis supporting larger trial design"
+2024-06-10T16:00:00Z,EXP037,pilot_analysis,0.6156,0.0118,2,2,0.6156,0.95,23.4,45.9,SPEC037,"Pilot results justifying expanded study"
+2024-06-11T08:00:00Z,EXP037,pilot_analysis,0.6212,0.0114,3,2,0.6212,0.96,23.2,45.6,SPEC037,"Final pilot analysis confirming feasibility"
+2024-06-15T08:00:00Z,EXP038,historical_a_analysis,0.7456,0.0089,1,3,0.7456,0.97,23.0,45.3,SPEC038,"Historical treatment A retrospective baseline"
+2024-06-15T16:00:00Z,EXP038,historical_a_analysis,0.7523,0.0084,2,3,0.7523,0.98,22.8,45.0,SPEC038,"Historical A showing consistent performance"
+2024-06-16T08:00:00Z,EXP038,historical_a_analysis,0.7578,0.0081,3,3,0.7578,0.99,22.6,44.7,SPEC038,"Historical treatment A retrospective complete"
+2024-06-16T08:00:00Z,EXP039,historical_b_analysis,0.7089,0.0098,1,3,0.7089,0.96,22.4,44.4,SPEC039,"Historical treatment B retrospective baseline"
+2024-06-16T16:00:00Z,EXP039,historical_b_analysis,0.7156,0.0093,2,3,0.7156,0.97,22.2,44.1,SPEC039,"Historical B showing expected pattern"
+2024-06-17T08:00:00Z,EXP039,historical_b_analysis,0.7201,0.0089,3,3,0.7201,0.98,22.0,43.8,SPEC039,"Historical treatment B analysis complete"
+2024-06-25T08:00:00Z,EXP040,meta_analysis,0.7312,0.0067,1,3,0.7312,0.99,21.8,43.5,SPEC040,"Meta-analysis of all historical data baseline"
+2024-06-25T16:00:00Z,EXP040,meta_analysis,0.7356,0.0064,2,3,0.7356,0.99,21.6,43.2,SPEC040,"Comprehensive meta-analysis progression"
+2024-06-26T08:00:00Z,EXP040,meta_analysis,0.7389,0.0062,3,3,0.7389,1.00,21.4,42.9,SPEC040,"Final meta-analysis ready for publication"
