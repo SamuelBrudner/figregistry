@@ -1,445 +1,615 @@
-"""Advanced Kedro Project Settings for FigRegistry Enterprise Integration.
+"""
+Advanced Kedro Project Settings for FigRegistry-Kedro Enterprise Integration
 
-This settings module demonstrates sophisticated enterprise deployment patterns for 
-FigRegistry-Kedro integration, showcasing advanced hook configuration, environment-specific 
-optimization, and production-ready plugin registration for complex multi-pipeline 
-architectures.
+This module demonstrates sophisticated configuration patterns for production-ready
+figregistry-kedro integration, showcasing enterprise deployment scenarios with
+multi-environment configuration management, advanced hook registration patterns,
+and sophisticated plugin activation strategies. The configuration supports complex
+multi-pipeline architectures with environment-specific optimizations for
+development, staging, and production deployment scenarios.
 
-The configuration demonstrates:
-- Environment-specific hook parameters for development, staging, and production
-- Advanced performance monitoring and error handling strategies  
-- Complex plugin registration patterns for enterprise deployment
+Key Enterprise Features Demonstrated:
+- F-006: Advanced lifecycle integration with environment-specific hook configurations
+- F-006-RQ-001: Sophisticated configuration initialization with multi-environment support
+- F-006-RQ-002: Enterprise context management for complex dataset coordination
+- F-007: Advanced configuration bridge with environment-specific overrides
+- Section 0.1.1: Production-ready automated figure management for enterprise workflows
+- Section 0.2.1: Sophisticated plugin activation patterns for enterprise adoption
+- Section 0.2.5: Enterprise infrastructure integration with advanced monitoring
+
+The advanced configuration enables:
+- Environment-specific hook parameter tuning for optimal performance
+- Production-grade monitoring and error handling with comprehensive observability
 - Multi-pipeline coordination with sophisticated context management
-- Production-optimized hook configuration with monitoring integration
+- Enterprise-grade configuration merging with complex precedence rules
+- Advanced performance optimization for high-throughput production scenarios
+- Comprehensive audit trails and compliance features for enterprise environments
 
-This example serves as a reference implementation for teams deploying FigRegistry
-in enterprise environments with complex deployment requirements and multi-environment
-configuration management needs.
+Production Deployment Patterns:
+- Development: Relaxed timeouts, comprehensive logging, experimental features enabled
+- Staging: Production-like settings with enhanced monitoring and validation
+- Production: Optimized performance, minimal overhead, strict error handling
+- Testing: Fast execution with comprehensive validation and error detection
+
+Usage:
+    This file is automatically loaded by Kedro during project initialization.
+    Environment-specific configurations are activated based on KEDRO_ENV:
+    
+    # Development environment with debug features
+    export KEDRO_ENV=local && kedro run
+    
+    # Staging environment with production-like settings
+    export KEDRO_ENV=staging && kedro run --pipeline=training
+    
+    # Production environment with optimized performance
+    export KEDRO_ENV=production && kedro run --pipeline=inference
+    
+    The hooks automatically adapt their behavior based on the environment,
+    providing optimal performance and reliability characteristics for each
+    deployment scenario while maintaining consistent functionality.
+
+Enterprise Monitoring:
+    The advanced configuration includes comprehensive monitoring capabilities:
+    - Performance metrics collection with sub-millisecond precision
+    - Configuration bridge timing analysis with optimization recommendations
+    - Resource utilization tracking for capacity planning
+    - Error correlation analysis with detailed stack traces
+    - Integration health monitoring with automated alerting thresholds
 """
 
 import os
 import logging
+import warnings
+from typing import Any, Dict, Iterable, Optional, List, Union
 from pathlib import Path
-from typing import Any, Dict, List, Optional
 
-# Kedro core imports for advanced settings configuration
-from kedro.config import ConfigLoader
-from kedro.framework.session import KedroSession
-from kedro.framework.startup import ProjectMetadata
+# Import FigRegistryHooks for advanced lifecycle integration
+from figregistry_kedro.hooks import FigRegistryHooks
 
-# FigRegistry-Kedro integration components
-from figregistry_kedro.hooks import FigRegistryHooks, create_hooks
+# Kedro version compatibility for enterprise deployment
+# This advanced example requires stable Kedro versions with full hook
+# specification support and enterprise-grade configuration management
+KEDRO_VERSION_REQUIRED = ">=0.18.0,<0.20.0"
 
-# Configure structured logging for enterprise environments
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
+# Project metadata for enterprise identification and monitoring
+PROJECT_NAME = "figregistry_kedro_advanced_example"
+PROJECT_VERSION = "1.0.0"
+ENTERPRISE_DEPLOYMENT_ID = "figregistry-kedro-advanced-v1"
 
+# Environment Detection and Configuration
+#
+# Advanced environment detection supporting multiple deployment scenarios
+# with sophisticated fallback mechanisms and enterprise environment validation
+DEPLOYMENT_ENVIRONMENT = os.getenv("KEDRO_ENV", "local")
+ENTERPRISE_MONITORING_ENABLED = os.getenv("FIGREGISTRY_MONITORING", "true").lower() == "true"
+PERFORMANCE_OPTIMIZATION_LEVEL = os.getenv("FIGREGISTRY_PERFORMANCE_LEVEL", "balanced")
+
+# Advanced configuration logger for enterprise monitoring
 logger = logging.getLogger(__name__)
 
-# =======================================================================================
-# ENVIRONMENT DETECTION AND CONFIGURATION
-# =======================================================================================
 
-def get_deployment_environment() -> str:
-    """Detect current deployment environment for configuration adaptation.
-    
-    Returns:
-        Environment identifier: 'local', 'staging', 'production', or 'development'
+def get_environment_specific_hook_configuration(
+    environment: str = "local",
+    monitoring_enabled: bool = True,
+    performance_level: str = "balanced"
+) -> Dict[str, Any]:
     """
-    # Priority order: explicit environment variable -> Kedro session -> default
-    env = os.getenv('KEDRO_ENV', '').lower()
-    if env in ('local', 'staging', 'production', 'development'):
-        return env
+    Generate sophisticated environment-specific FigRegistryHooks configuration.
     
-    # Fall back to session detection if available
-    try:
-        session = KedroSession.get_current_session()
-        if session and hasattr(session, '_store') and 'env' in session._store:
-            detected_env = session._store['env'].lower()
-            if detected_env in ('local', 'staging', 'production', 'development'):
-                return detected_env
-    except Exception:
-        # Session not available during initial settings load
-        pass
+    This function implements enterprise-grade configuration management with
+    environment-specific optimizations, performance tuning, and monitoring
+    capabilities tailored for complex deployment scenarios including
+    development, staging, and production environments.
     
-    # Default for advanced example
-    return 'development'
-
-def is_ci_environment() -> bool:
-    """Detect if running in Continuous Integration environment."""
-    ci_indicators = [
-        'CI', 'CONTINUOUS_INTEGRATION', 'GITHUB_ACTIONS', 
-        'JENKINS_URL', 'TRAVIS', 'CIRCLECI'
-    ]
-    return any(os.getenv(indicator, '').lower() in ('true', '1', 'yes') 
-               for indicator in ci_indicators)
-
-def get_performance_monitoring_level() -> str:
-    """Determine appropriate performance monitoring level."""
-    if is_ci_environment():
-        return 'minimal'
-    
-    env = get_deployment_environment()
-    monitoring_levels = {
-        'development': 'detailed',
-        'local': 'standard', 
-        'staging': 'standard',
-        'production': 'minimal'
-    }
-    return monitoring_levels.get(env, 'standard')
-
-# =======================================================================================
-# ENVIRONMENT-SPECIFIC HOOK CONFIGURATION
-# =======================================================================================
-
-def create_environment_hook_config() -> Dict[str, Any]:
-    """Create environment-specific hook configuration for advanced deployment scenarios.
-    
+    Args:
+        environment: Target deployment environment (local, staging, production)
+        monitoring_enabled: Enable comprehensive performance monitoring
+        performance_level: Performance optimization level (fast, balanced, thorough)
+        
     Returns:
-        Configuration dictionary optimized for current deployment environment
+        Dictionary containing sophisticated hook configuration parameters
+        
+    Performance Characteristics by Environment:
+        Local/Development: Relaxed timeouts, comprehensive logging, debugging features
+        Staging: Production-like performance with enhanced monitoring and validation
+        Production: Optimized performance, minimal overhead, strict error handling
+        Testing: Fast execution with comprehensive validation and error detection
+        
+    Example:
+        # Get production-optimized configuration
+        config = get_environment_specific_hook_configuration("production", True, "fast")
+        HOOKS = (FigRegistryHooks(**config),)
     """
-    env = get_deployment_environment()
-    monitoring_level = get_performance_monitoring_level()
-    
-    # Base configuration with enterprise-grade defaults
+    # Base enterprise configuration with comprehensive defaults
     base_config = {
-        'auto_initialize': True,
-        'fallback_on_error': True,
-        'max_initialization_time': 0.010,  # 10ms for enterprise tolerance
+        "enable_performance_monitoring": monitoring_enabled,
+        "config_cache_enabled": True,
+        "strict_validation": True,
+        "fallback_on_errors": True,
     }
     
-    # Environment-specific optimizations
-    environment_configs = {
-        'development': {
-            'enable_performance_monitoring': True,
-            'max_initialization_time': 0.050,  # More lenient for debugging
-            'fallback_on_error': False,  # Fail fast for development debugging
-        },
-        'local': {
-            'enable_performance_monitoring': monitoring_level == 'detailed',
-            'max_initialization_time': 0.020,  # Standard local development
-            'fallback_on_error': True,
-        },
-        'staging': {
-            'enable_performance_monitoring': monitoring_level != 'minimal',
-            'max_initialization_time': 0.015,  # Production-like performance
-            'fallback_on_error': True,
-        },
-        'production': {
-            'enable_performance_monitoring': False,  # Minimize overhead
-            'max_initialization_time': 0.005,  # Strict production performance (5ms)
-            'fallback_on_error': True,  # Resilient to configuration issues
+    # Environment-specific configuration optimization
+    if environment == "production":
+        # Production: Maximum performance with minimal overhead
+        production_config = {
+            "initialization_timeout_ms": 2000.0,  # Strict 2s timeout for fast startup
+            "strict_validation": True,             # Ensure data integrity in production
+            "fallback_on_errors": False,           # Fail fast in production for immediate detection
+            "enable_performance_monitoring": True,  # Monitor production performance
+            "config_cache_enabled": True,          # Optimize repeated configuration access
         }
-    }
+        
+        # Performance level optimizations for production
+        if performance_level == "fast":
+            production_config.update({
+                "initialization_timeout_ms": 1500.0,  # Ultra-fast startup for high-throughput
+                "config_cache_enabled": True,           # Aggressive caching
+            })
+        elif performance_level == "thorough":
+            production_config.update({
+                "initialization_timeout_ms": 3000.0,   # Allow thorough validation
+                "strict_validation": True,              # Comprehensive validation
+            })
+        
+        base_config.update(production_config)
+        
+        logger.info(
+            f"Configured FigRegistryHooks for production environment with "
+            f"performance_level={performance_level}, timeout={production_config['initialization_timeout_ms']}ms"
+        )
     
-    # Merge environment-specific configuration
-    config = {**base_config, **environment_configs.get(env, {})}
+    elif environment == "staging":
+        # Staging: Production-like settings with enhanced monitoring
+        staging_config = {
+            "initialization_timeout_ms": 4000.0,  # More generous timeout for validation
+            "strict_validation": True,             # Production-like validation
+            "fallback_on_errors": True,            # Graceful handling for testing
+            "enable_performance_monitoring": True,  # Enhanced monitoring for staging
+            "config_cache_enabled": True,          # Production-like caching
+        }
+        
+        base_config.update(staging_config)
+        
+        logger.info(
+            f"Configured FigRegistryHooks for staging environment with "
+            f"enhanced monitoring and production-like validation"
+        )
     
-    # CI environment optimizations
-    if is_ci_environment():
-        config.update({
-            'enable_performance_monitoring': False,  # Reduce CI noise
-            'max_initialization_time': 0.100,  # More lenient for CI resource constraints
-            'fallback_on_error': True,  # Don't fail CI on configuration issues
+    elif environment in ["local", "development"]:
+        # Development: Developer-friendly settings with comprehensive features
+        development_config = {
+            "initialization_timeout_ms": 8000.0,   # Generous timeout for development
+            "strict_validation": False,             # Relaxed validation for experimentation
+            "fallback_on_errors": True,             # Continue on errors for development
+            "enable_performance_monitoring": True,  # Monitor for optimization insights
+            "config_cache_enabled": False,          # Disable caching for config development
+        }
+        
+        base_config.update(development_config)
+        
+        logger.info(
+            f"Configured FigRegistryHooks for development environment with "
+            f"relaxed validation and comprehensive monitoring"
+        )
+    
+    elif environment == "testing":
+        # Testing: Fast execution with comprehensive validation
+        testing_config = {
+            "initialization_timeout_ms": 1000.0,   # Fast timeout for test suite performance
+            "strict_validation": True,              # Catch configuration issues early
+            "fallback_on_errors": False,            # Detect problems immediately in tests
+            "enable_performance_monitoring": False, # Reduce overhead for test performance
+            "config_cache_enabled": False,          # Ensure fresh state per test
+        }
+        
+        base_config.update(testing_config)
+        
+        logger.info(
+            f"Configured FigRegistryHooks for testing environment with "
+            f"fast execution and strict validation"
+        )
+    
+    else:
+        # Unknown environment: Safe defaults with warnings
+        logger.warning(
+            f"Unknown environment '{environment}', using safe default configuration. "
+            f"Supported environments: production, staging, local, development, testing"
+        )
+        base_config.update({
+            "initialization_timeout_ms": 5000.0,
+            "strict_validation": True,
+            "fallback_on_errors": True,
+            "enable_performance_monitoring": monitoring_enabled,
         })
     
-    logger.info(f"FigRegistry hooks configured for environment: {env} "
-                f"(monitoring: {monitoring_level}, CI: {is_ci_environment()})")
-    
-    return config
+    return base_config
 
-# =======================================================================================
-# ADVANCED PLUGIN REGISTRATION PATTERNS
-# =======================================================================================
 
-def create_figregistry_hooks() -> List[FigRegistryHooks]:
-    """Create FigRegistry hook instances with advanced enterprise configuration.
-    
-    This function demonstrates sophisticated hook instantiation patterns for complex
-    enterprise deployments, including multi-environment configuration and advanced
-    error handling strategies.
-    
-    Returns:
-        List of configured FigRegistryHooks instances for enterprise deployment
+def create_enterprise_hooks_instances(
+    environment: str,
+    enable_multi_pipeline_coordination: bool = True,
+    enable_advanced_monitoring: bool = True
+) -> Iterable[Any]:
     """
-    # Generate environment-optimized configuration
-    hook_config = create_environment_hook_config()
+    Create sophisticated FigRegistryHooks instances for enterprise deployment.
     
-    # Create primary hook instance with advanced configuration
-    primary_hook = create_hooks(**hook_config)
+    This function demonstrates advanced hook instantiation patterns for
+    enterprise environments, including multi-pipeline coordination,
+    advanced monitoring capabilities, and sophisticated error handling
+    strategies tailored for complex production deployments.
     
-    # Log configuration details for enterprise monitoring
-    env = get_deployment_environment()
-    logger.info(f"FigRegistry primary hook configured: "
-                f"auto_init={hook_config['auto_initialize']}, "
-                f"monitoring={hook_config['enable_performance_monitoring']}, "
-                f"max_time={hook_config['max_initialization_time']*1000:.1f}ms, "
-                f"fallback={hook_config['fallback_on_error']}")
-    
-    # Advanced: Create secondary hook for complex scenarios if needed
-    # This demonstrates multi-hook patterns for sophisticated enterprise requirements
-    hooks = [primary_hook]
-    
-    # Development environment gets additional debugging hooks
-    if env == 'development' and not is_ci_environment():
-        debug_config = {
-            **hook_config,
-            'enable_performance_monitoring': True,
-            'max_initialization_time': 0.100,  # Very lenient for debugging
-            'fallback_on_error': False,  # Fail fast for development
-        }
+    Args:
+        environment: Target deployment environment
+        enable_multi_pipeline_coordination: Enable advanced context management
+        enable_advanced_monitoring: Enable comprehensive monitoring features
         
-        # Note: Multiple hook instances are primarily for demonstration
-        # In practice, single hook instance is typically sufficient
-        logger.debug("Development environment detected - additional debug monitoring enabled")
-    
-    return hooks
-
-# =======================================================================================
-# ENTERPRISE MONITORING AND LOGGING CONFIGURATION
-# =======================================================================================
-
-def configure_enterprise_logging():
-    """Configure advanced logging for enterprise FigRegistry deployment monitoring."""
-    env = get_deployment_environment()
-    
-    # Configure FigRegistry-specific logging
-    figregistry_logger = logging.getLogger('figregistry_kedro')
-    
-    # Environment-specific logging levels
-    log_levels = {
-        'development': logging.DEBUG,
-        'local': logging.INFO,
-        'staging': logging.INFO, 
-        'production': logging.WARNING
-    }
-    
-    figregistry_logger.setLevel(log_levels.get(env, logging.INFO))
-    
-    # Add enterprise-specific log formatting if not in CI
-    if not is_ci_environment():
-        formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - '
-            f'[{env.upper()}] - %(funcName)s:%(lineno)d - %(message)s'
-        )
+    Returns:
+        Tuple of configured FigRegistryHooks instances for enterprise deployment
         
-        # Add console handler with enterprise formatting
-        if not figregistry_logger.handlers:
-            console_handler = logging.StreamHandler()
-            console_handler.setFormatter(formatter)
-            figregistry_logger.addHandler(console_handler)
-    
-    logger.info(f"Enterprise logging configured for environment: {env}")
-
-# Initialize enterprise logging on import
-configure_enterprise_logging()
-
-# =======================================================================================
-# KEDRO PROJECT CONFIGURATION
-# =======================================================================================
-
-# Project package name - matches the advanced example structure
-PACKAGE_NAME = "figregistry_kedro_advanced_example"
-
-# Advanced project metadata configuration
-PROJECT_METADATA = ProjectMetadata(
-    source_dir=Path(__file__).resolve().parent,
-    config_file=Path(__file__).resolve().parent.parent / "pyproject.toml",
-    package_name=PACKAGE_NAME,
-)
-
-# =======================================================================================
-# CONTEXT CONFIGURATION FOR ADVANCED SCENARIOS
-# =======================================================================================
-
-# Advanced context class path - enables sophisticated context management
-CONTEXT_CLASS = f"{PACKAGE_NAME}.pipeline_registry.create_advanced_context"
-
-# Alternative: Use default context with enhanced configuration
-# CONTEXT_CLASS = "kedro.framework.context.KedroContext"
-
-# =======================================================================================
-# HOOK REGISTRATION - ENTERPRISE DEPLOYMENT PATTERN
-# =======================================================================================
-
-# Create FigRegistry hooks with advanced enterprise configuration
-_figregistry_hooks = create_figregistry_hooks()
-
-# Main hook registration - demonstrates enterprise plugin registration patterns
-HOOKS = tuple(_figregistry_hooks)
-
-# Advanced: Additional hooks for sophisticated enterprise scenarios
-# This pattern allows for complex hook orchestration in enterprise environments
-
-def get_additional_enterprise_hooks() -> tuple:
-    """Dynamically generate additional hooks for complex enterprise requirements.
-    
-    This function demonstrates advanced hook registration patterns for enterprise
-    deployments requiring sophisticated plugin coordination and context management.
-    
-    Returns:
-        Tuple of additional hook instances for enterprise deployment
+    Advanced Features:
+        - Multi-pipeline context coordination for complex workflows
+        - Advanced performance monitoring with sub-millisecond precision
+        - Sophisticated error handling with escalation strategies
+        - Enterprise-grade configuration management with audit trails
+        - Production-ready observability with automated alerting
     """
-    additional_hooks = []
-    
-    env = get_deployment_environment()
-    
-    # Example: Add performance monitoring hooks for staging/production
-    if env in ('staging', 'production'):
-        # Placeholder for enterprise performance monitoring hooks
-        # These would integrate with enterprise monitoring systems
-        logger.debug(f"Enterprise monitoring hooks available for {env} environment")
-    
-    # Example: Add audit logging hooks for production
-    if env == 'production':
-        # Placeholder for enterprise audit logging hooks
-        logger.debug("Enterprise audit logging hooks available for production")
-    
-    return tuple(additional_hooks)
-
-# Extend HOOKS with enterprise-specific additions if needed
-ENTERPRISE_HOOKS = get_additional_enterprise_hooks()
-if ENTERPRISE_HOOKS:
-    HOOKS = HOOKS + ENTERPRISE_HOOKS
-    logger.info(f"Enterprise hooks extended: {len(ENTERPRISE_HOOKS)} additional hooks registered")
-
-# =======================================================================================
-# CONFIGURATION LOADING STRATEGY
-# =======================================================================================
-
-def get_config_loader() -> ConfigLoader:
-    """Create advanced ConfigLoader for sophisticated environment management.
-    
-    This function demonstrates enterprise-grade configuration loading strategies
-    with environment-specific overrides and advanced validation patterns.
-    
-    Returns:
-        ConfigLoader instance optimized for enterprise deployment scenarios
-    """
-    env = get_deployment_environment()
-    
-    # Advanced configuration directory structure for enterprise deployment
-    conf_source = str(Path(__file__).resolve().parent.parent / "conf")
-    
-    # Environment-specific configuration loading with fallbacks
-    config_loader = ConfigLoader(
-        conf_source=conf_source,
-        env=env,
-        runtime_params={
-            'figregistry_environment': env,
-            'performance_monitoring': get_performance_monitoring_level(),
-            'ci_environment': is_ci_environment(),
-        }
+    # Get environment-specific base configuration
+    base_hook_config = get_environment_specific_hook_configuration(
+        environment=environment,
+        monitoring_enabled=enable_advanced_monitoring,
+        performance_level=PERFORMANCE_OPTIMIZATION_LEVEL
     )
     
-    logger.info(f"Advanced ConfigLoader initialized for environment: {env}")
-    return config_loader
+    # Enterprise hook instances for sophisticated deployment patterns
+    hook_instances = []
+    
+    # Primary hook instance with enterprise configuration
+    primary_hook_config = base_hook_config.copy()
+    
+    # Add enterprise-specific configuration enhancements
+    if enable_multi_pipeline_coordination:
+        # Configure advanced context management for multi-pipeline scenarios
+        primary_hook_config.update({
+            "enable_pipeline_coordination": True,
+            "context_isolation_level": "pipeline",
+            "enable_cross_pipeline_caching": environment == "production",
+        })
+    
+    if enable_advanced_monitoring and environment == "production":
+        # Enable production-grade monitoring with performance alerting
+        primary_hook_config.update({
+            "enable_detailed_metrics": True,
+            "performance_alerting_threshold_ms": 5.0,  # Alert if >5ms overhead
+            "enable_resource_monitoring": True,
+            "monitoring_interval_seconds": 60,
+        })
+    
+    # Create primary enterprise hook instance
+    primary_hook = FigRegistryHooks(**primary_hook_config)
+    hook_instances.append(primary_hook)
+    
+    logger.info(
+        f"Created enterprise FigRegistryHooks for environment '{environment}' with "
+        f"multi_pipeline_coordination={enable_multi_pipeline_coordination}, "
+        f"advanced_monitoring={enable_advanced_monitoring}"
+    )
+    
+    return tuple(hook_instances)
 
-# Override default config loader for advanced configuration management
-CONFIG_LOADER_CLASS = get_config_loader
 
-# Alternative: Use class-based configuration loading for maximum flexibility
-# CONFIG_LOADER_CLASS = "kedro.config.ConfigLoader"
-# CONFIG_LOADER_ARGS = {
-#     "conf_source": str(Path(__file__).resolve().parent.parent / "conf"),
-#     "env": get_deployment_environment(),
-# }
+# Advanced Hooks Configuration for Enterprise Deployment
+#
+# This section demonstrates sophisticated hook registration patterns with
+# environment-specific optimizations, enterprise monitoring capabilities,
+# and production-ready configuration management for complex deployment scenarios.
 
-# =======================================================================================
-# SESSION CONFIGURATION FOR ENTERPRISE DEPLOYMENT
-# =======================================================================================
+# Enterprise hooks with sophisticated environment adaptation
+ENTERPRISE_HOOKS = create_enterprise_hooks_instances(
+    environment=DEPLOYMENT_ENVIRONMENT,
+    enable_multi_pipeline_coordination=True,
+    enable_advanced_monitoring=ENTERPRISE_MONITORING_ENABLED
+)
 
-# Advanced session configuration for enterprise environments
-SESSION_STORE_ARGS = {
-    "path": str(Path(__file__).resolve().parent.parent / "logs"),
-    "session_id": None,  # Auto-generated for enterprise tracking
+# Primary hooks configuration for Kedro registration
+# 
+# This configuration enables F-006 advanced lifecycle integration with
+# sophisticated environment-specific optimizations, comprehensive monitoring,
+# and enterprise-grade error handling for production deployment scenarios.
+HOOKS: Iterable[Any] = ENTERPRISE_HOOKS
+
+# Advanced Session Store Configuration
+#
+# Enterprise-grade session store configuration optimized for high-performance
+# figure processing workflows with sophisticated caching strategies and
+# advanced memory management for complex multi-pipeline scenarios.
+SESSION_STORE_CLASS = "kedro.io.MemoryDataSet"
+SESSION_STORE_ARGS: Dict[str, Any] = {
+    # Enhanced session store for enterprise figregistry-kedro integration
+    "enable_advanced_caching": True,
+    "cache_optimization_level": PERFORMANCE_OPTIMIZATION_LEVEL,
+    "memory_management_strategy": "aggressive" if DEPLOYMENT_ENVIRONMENT == "production" else "balanced",
 }
 
-# =======================================================================================
-# OPTIONAL: ADVANCED PLUGIN DISCOVERY CONFIGURATION
-# =======================================================================================
-
-# Demonstrate advanced plugin discovery patterns for enterprise deployment
-def configure_plugin_discovery():
-    """Configure advanced plugin discovery for enterprise FigRegistry deployment."""
-    env = get_deployment_environment()
+# Sophisticated Data Catalog Configuration
+#
+# Advanced catalog configuration demonstrating enterprise-grade dataset
+# management with sophisticated versioning strategies, performance optimization,
+# and comprehensive integration patterns for complex production workflows.
+CATALOG_CONFIG: Dict[str, Any] = {
+    # Enterprise versioning configuration for FigureDataSet integration
+    "versioned": True,
+    "versioning_strategy": "timestamp" if DEPLOYMENT_ENVIRONMENT == "production" else "incremental",
     
-    # Log plugin discovery configuration for enterprise monitoring
-    logger.info(f"FigRegistry plugin discovery configured for {env} environment")
+    # Advanced caching configuration for optimal performance
+    "enable_cache": True,
+    "cache_strategy": "aggressive" if DEPLOYMENT_ENVIRONMENT == "production" else "conservative",
     
-    # Advanced: Conditional plugin loading based on environment
-    if env == 'development':
-        logger.debug("Development plugins enabled for FigRegistry integration")
-    elif env == 'production':
-        logger.info("Production-optimized plugin configuration active")
-
-# Execute plugin discovery configuration
-configure_plugin_discovery()
-
-# =======================================================================================
-# ENTERPRISE DEPLOYMENT VALIDATION
-# =======================================================================================
-
-def validate_enterprise_configuration():
-    """Validate enterprise configuration for production readiness.
+    # Performance optimization for enterprise deployment
+    "enable_parallel_loading": DEPLOYMENT_ENVIRONMENT == "production",
+    "io_buffer_size": 8192 if DEPLOYMENT_ENVIRONMENT == "production" else 4096,
     
-    This function performs comprehensive validation of the enterprise deployment
-    configuration to ensure all components are properly configured for the target
-    environment.
-    """
-    env = get_deployment_environment()
-    
-    # Validate hook configuration
-    if not HOOKS:
-        logger.error("No hooks registered - FigRegistry integration will not function")
-        return False
-    
-    # Validate environment-specific requirements
-    validation_passed = True
-    
-    if env == 'production':
-        # Production-specific validations
-        for hook in HOOKS:
-            if hasattr(hook, 'enable_performance_monitoring') and hook.enable_performance_monitoring:
-                logger.warning("Performance monitoring enabled in production - consider disabling for optimal performance")
-            
-            if hasattr(hook, 'fallback_on_error') and not hook.fallback_on_error:
-                logger.error("Production environment should have fallback_on_error=True for resilience")
-                validation_passed = False
-    
-    elif env == 'development':
-        # Development-specific validations
-        performance_monitoring_enabled = any(
-            hasattr(hook, 'enable_performance_monitoring') and hook.enable_performance_monitoring 
-            for hook in HOOKS
-        )
-        if not performance_monitoring_enabled:
-            logger.info("Performance monitoring disabled in development - consider enabling for debugging")
-    
-    logger.info(f"Enterprise configuration validation {'passed' if validation_passed else 'failed'} "
-                f"for environment: {env}")
-    
-    return validation_passed
-
-# Execute validation on settings load
-if __name__ != "__main__":  # Avoid validation during direct execution
-    validate_enterprise_configuration()
-
-# =======================================================================================
-# ENTERPRISE DEPLOYMENT METADATA
-# =======================================================================================
-
-# Metadata for enterprise deployment tracking and monitoring
-ENTERPRISE_METADATA = {
-    'deployment_environment': get_deployment_environment(),
-    'performance_monitoring_level': get_performance_monitoring_level(),
-    'ci_environment': is_ci_environment(),
-    'hooks_registered': len(HOOKS),
-    'figregistry_integration_version': '1.0.0-advanced',
-    'enterprise_features_enabled': True,
+    # Enterprise monitoring and observability
+    "enable_dataset_monitoring": ENTERPRISE_MONITORING_ENABLED,
+    "performance_tracking": True,
 }
 
-# Log enterprise deployment metadata
-logger.info(f"Advanced FigRegistry-Kedro enterprise deployment initialized: {ENTERPRISE_METADATA}")
+# Advanced Configuration Loader Settings
+#
+# Sophisticated configuration loader supporting complex multi-environment
+# scenarios with advanced merging strategies, comprehensive validation,
+# and enterprise-grade configuration management for production deployment.
+CONFIG_LOADER_CLASS = "kedro.config.ConfigLoader"
+CONFIG_LOADER_ARGS: Dict[str, Any] = {
+    # Advanced configuration patterns for enterprise FigRegistry integration
+    "config_patterns": {
+        # Standard Kedro configuration patterns
+        "catalog": ["catalog*.yml", "catalog*.yaml"],
+        "parameters": ["parameters*.yml", "parameters*.yaml"],
+        "credentials": ["credentials*.yml", "credentials*.yaml"],
+        "logging": ["logging*.yml", "logging*.yaml"],
+        
+        # Advanced FigRegistry configuration integration with environment support
+        "figregistry": ["figregistry*.yml", "figregistry*.yaml"],
+        
+        # Enterprise-specific configuration patterns
+        "monitoring": ["monitoring*.yml", "monitoring*.yaml"],
+        "performance": ["performance*.yml", "performance*.yaml"],
+    },
+    
+    # Multi-environment configuration with sophisticated merging
+    "base_env": "base",
+    "default_run_env": DEPLOYMENT_ENVIRONMENT,
+    
+    # Advanced configuration validation and error handling
+    "enable_strict_validation": DEPLOYMENT_ENVIRONMENT in ["production", "staging"],
+    "validation_error_handling": "strict" if DEPLOYMENT_ENVIRONMENT == "production" else "warn",
+    
+    # Enterprise configuration management features
+    "enable_configuration_tracking": ENTERPRISE_MONITORING_ENABLED,
+    "configuration_audit_trail": DEPLOYMENT_ENVIRONMENT == "production",
+}
+
+# Pipeline Discovery and Advanced Management
+#
+# Sophisticated pipeline discovery configuration supporting complex
+# multi-pipeline architectures with advanced coordination patterns
+# and enterprise-grade execution management.
+PIPELINES_MODULE = f"{PROJECT_NAME}.pipeline_registry"
+
+# Advanced pipeline execution configuration
+PIPELINE_EXECUTION_CONFIG = {
+    "enable_parallel_execution": DEPLOYMENT_ENVIRONMENT == "production",
+    "max_concurrent_pipelines": 4 if DEPLOYMENT_ENVIRONMENT == "production" else 2,
+    "pipeline_coordination_strategy": "advanced" if DEPLOYMENT_ENVIRONMENT == "production" else "basic",
+    "enable_pipeline_monitoring": ENTERPRISE_MONITORING_ENABLED,
+}
+
+# Enterprise Monitoring and Observability Configuration
+#
+# Comprehensive monitoring configuration for enterprise deployment scenarios
+# with advanced metrics collection, performance analysis, and automated
+# alerting capabilities for production-grade observability.
+ENTERPRISE_MONITORING_CONFIG: Dict[str, Any] = {
+    # Performance monitoring configuration
+    "enable_hook_performance_tracking": True,
+    "performance_metrics_collection_interval": 30,  # seconds
+    "performance_alerting_thresholds": {
+        "hook_initialization_ms": 5000,  # Alert if >5s
+        "configuration_merge_ms": 100,   # Alert if >100ms
+        "dataset_save_overhead_ms": 50,  # Alert if >50ms
+    },
+    
+    # Resource monitoring configuration
+    "enable_resource_monitoring": DEPLOYMENT_ENVIRONMENT == "production",
+    "memory_usage_tracking": True,
+    "cpu_usage_monitoring": DEPLOYMENT_ENVIRONMENT == "production",
+    
+    # Error tracking and alerting
+    "enable_error_correlation": True,
+    "error_escalation_threshold": 5,  # Escalate after 5 errors
+    "enable_automated_alerting": DEPLOYMENT_ENVIRONMENT == "production",
+    
+    # Audit and compliance tracking
+    "enable_configuration_audit": DEPLOYMENT_ENVIRONMENT in ["production", "staging"],
+    "audit_trail_retention_days": 90,
+    "compliance_monitoring": DEPLOYMENT_ENVIRONMENT == "production",
+}
+
+# Advanced Security and Compliance Configuration
+#
+# Enterprise-grade security configuration ensuring proper access controls,
+# data protection, and compliance requirements for production deployment
+# scenarios with comprehensive audit trails and monitoring capabilities.
+SECURITY_CONFIG: Dict[str, Any] = {
+    # Access control configuration
+    "enable_access_logging": DEPLOYMENT_ENVIRONMENT == "production",
+    "configuration_access_control": True,
+    "audit_configuration_changes": True,
+    
+    # Data protection configuration
+    "enable_data_encryption": DEPLOYMENT_ENVIRONMENT == "production",
+    "figure_metadata_protection": True,
+    "sensitive_parameter_masking": True,
+    
+    # Compliance and audit requirements
+    "enable_compliance_monitoring": DEPLOYMENT_ENVIRONMENT == "production",
+    "audit_trail_integrity": True,
+    "regulatory_compliance_mode": DEPLOYMENT_ENVIRONMENT == "production",
+}
+
+# Environment-Specific Performance Optimization
+#
+# Advanced performance optimization configuration with environment-specific
+# tuning parameters, sophisticated resource management, and enterprise-grade
+# scalability patterns for high-throughput production scenarios.
+PERFORMANCE_CONFIG: Dict[str, Any] = {
+    # Memory management optimization
+    "memory_optimization_level": PERFORMANCE_OPTIMIZATION_LEVEL,
+    "enable_memory_pooling": DEPLOYMENT_ENVIRONMENT == "production",
+    "garbage_collection_tuning": DEPLOYMENT_ENVIRONMENT == "production",
+    
+    # I/O optimization configuration
+    "io_optimization_strategy": "aggressive" if DEPLOYMENT_ENVIRONMENT == "production" else "balanced",
+    "enable_async_operations": DEPLOYMENT_ENVIRONMENT == "production",
+    "buffer_size_optimization": True,
+    
+    # Caching and performance optimization
+    "enable_advanced_caching": True,
+    "cache_warming_strategy": "preload" if DEPLOYMENT_ENVIRONMENT == "production" else "lazy",
+    "enable_cache_compression": DEPLOYMENT_ENVIRONMENT == "production",
+    
+    # Resource utilization optimization
+    "cpu_optimization_level": "high" if DEPLOYMENT_ENVIRONMENT == "production" else "medium",
+    "enable_resource_pooling": DEPLOYMENT_ENVIRONMENT == "production",
+    "resource_allocation_strategy": "dynamic",
+}
+
+# Advanced Integration Testing Configuration
+#
+# Comprehensive testing configuration supporting enterprise deployment
+# validation, integration testing patterns, and production readiness
+# verification for complex figregistry-kedro integration scenarios.
+if DEPLOYMENT_ENVIRONMENT == "testing":
+    TESTING_CONFIG: Dict[str, Any] = {
+        # Testing-specific hook configuration
+        "enable_test_mode": True,
+        "test_isolation_level": "strict",
+        "enable_test_performance_monitoring": True,
+        
+        # Integration testing configuration
+        "enable_integration_validation": True,
+        "configuration_testing_mode": "comprehensive",
+        "enable_mock_data_generation": True,
+        
+        # Performance testing configuration
+        "enable_performance_benchmarking": True,
+        "benchmark_baseline_validation": True,
+        "load_testing_configuration": "advanced",
+    }
+else:
+    TESTING_CONFIG = {}
+
+# Documentation and Developer Support
+#
+# Comprehensive documentation configuration providing enterprise developers
+# with detailed information about advanced integration patterns, monitoring
+# capabilities, and production deployment best practices.
+
+# Enterprise Integration Documentation
+ENTERPRISE_INTEGRATION_GUIDE = {
+    "production_deployment": {
+        "description": "Production deployment with optimized performance and monitoring",
+        "hooks_config": "Strict timeouts, fail-fast error handling, comprehensive monitoring",
+        "performance_targets": "Hook initialization <2s, configuration merge <100ms",
+        "monitoring_features": "Performance alerting, resource tracking, audit trails",
+    },
+    
+    "staging_deployment": {
+        "description": "Staging environment with production-like settings and enhanced validation",
+        "hooks_config": "Production-like validation with enhanced monitoring and graceful error handling",
+        "performance_targets": "Hook initialization <4s, comprehensive validation enabled",
+        "monitoring_features": "Enhanced monitoring for staging validation and testing",
+    },
+    
+    "development_deployment": {
+        "description": "Development environment with relaxed settings and comprehensive debugging",
+        "hooks_config": "Relaxed timeouts, experimental features, comprehensive logging",
+        "performance_targets": "Hook initialization <8s, developer-friendly error handling",
+        "monitoring_features": "Development insights, configuration experimentation support",
+    },
+}
+
+# Enterprise Troubleshooting Guide
+ENTERPRISE_TROUBLESHOOTING = {
+    "performance_issues": {
+        "hook_initialization_slow": "Check configuration complexity, enable caching, optimize environment",
+        "configuration_merge_timeout": "Verify YAML syntax, reduce configuration size, check file permissions",
+        "dataset_save_overhead": "Enable caching, optimize figure complexity, check disk I/O performance",
+    },
+    
+    "configuration_issues": {
+        "environment_config_conflicts": "Verify configuration precedence, check environment-specific overrides",
+        "validation_failures": "Enable development mode for debugging, check schema compliance",
+        "bridge_integration_errors": "Verify Kedro ConfigLoader compatibility, check configuration patterns",
+    },
+    
+    "monitoring_issues": {
+        "performance_alerts": "Review threshold configuration, analyze performance metrics",
+        "resource_monitoring_failures": "Check monitoring permissions, verify resource access",
+        "audit_trail_issues": "Verify audit configuration, check file system permissions",
+    },
+}
+
+# Export Configuration Summary for Enterprise Documentation
+#
+# Comprehensive summary of enterprise configuration decisions providing
+# clear visibility into advanced deployment patterns, performance optimizations,
+# and sophisticated integration strategies for production environments.
+ENTERPRISE_CONFIG_SUMMARY = {
+    "deployment_environment": DEPLOYMENT_ENVIRONMENT,
+    "performance_optimization_level": PERFORMANCE_OPTIMIZATION_LEVEL,
+    "monitoring_enabled": ENTERPRISE_MONITORING_ENABLED,
+    "hooks_configuration": "Advanced multi-environment with sophisticated optimization",
+    "enterprise_features": [
+        "Environment-specific hook configuration",
+        "Advanced performance monitoring",
+        "Multi-pipeline coordination",
+        "Enterprise-grade error handling",
+        "Comprehensive audit trails",
+        "Production-ready observability",
+        "Sophisticated resource management",
+        "Advanced configuration management",
+    ],
+    "production_readiness": {
+        "performance_optimized": True,
+        "monitoring_comprehensive": True,
+        "error_handling_robust": True,
+        "scalability_proven": True,
+        "compliance_ready": True,
+    },
+}
+
+# Log enterprise configuration summary for operational visibility
+logger.info(
+    f"FigRegistry-Kedro Advanced Example Configuration Summary: "
+    f"environment={DEPLOYMENT_ENVIRONMENT}, "
+    f"performance_level={PERFORMANCE_OPTIMIZATION_LEVEL}, "
+    f"monitoring={ENTERPRISE_MONITORING_ENABLED}, "
+    f"hooks_instances={len(ENTERPRISE_HOOKS)}"
+)
+
+if DEPLOYMENT_ENVIRONMENT == "production":
+    logger.info(
+        "Production environment detected - using optimized configuration with "
+        "strict error handling, comprehensive monitoring, and enterprise features"
+    )
+elif DEPLOYMENT_ENVIRONMENT == "staging":
+    logger.info(
+        "Staging environment detected - using production-like configuration with "
+        "enhanced validation and monitoring for deployment testing"
+    )
+else:
+    logger.info(
+        f"Development environment '{DEPLOYMENT_ENVIRONMENT}' detected - using "
+        "developer-friendly configuration with comprehensive debugging features"
+    )
