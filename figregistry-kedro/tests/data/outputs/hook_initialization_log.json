@@ -1,768 +1,708 @@
 {
-  "figregistry_hooks_lifecycle_log": {
-    "metadata": {
-      "log_version": "1.0.0",
-      "created_for": "FigRegistryHooks lifecycle validation and integration testing",
-      "spec_compliance": {
-        "section_5_2_7": "Complete hook lifecycle for validation of Kedro integration",
-        "f_006_2": "Non-invasive integration preserving Kedro's execution model",
-        "section_6_6_4_3": "Hook initialization performance targeting <25ms overhead",
-        "parallel_execution": "Thread-safe operation validation for parallel pipeline execution"
+  "log_metadata": {
+    "description": "FigRegistryHooks lifecycle events and initialization sequences for Kedro pipeline execution validation",
+    "purpose": "Document expected hook behavior for testing non-invasive integration and performance validation",
+    "technical_requirements": [
+      "Section 5.2.7: Complete hook lifecycle validation for Kedro integration",
+      "F-006.2: Non-invasive integration preserving Kedro's execution model",
+      "Section 6.6.4.3: Hook initialization performance targeting <25ms overhead",
+      "Section 5.2.7: Thread-safe operation validation for parallel pipeline execution"
+    ],
+    "validation_scope": "Hook registration timing, configuration loading events, context setup operations, and cleanup procedures",
+    "created_by": "figregistry-kedro testing framework",
+    "schema_version": "1.0.0",
+    "last_updated": "2024-12-19T10:00:00Z"
+  },
+  "hook_lifecycle_sequence": {
+    "description": "Expected sequence of hook lifecycle events during Kedro pipeline execution",
+    "sequence_order": [
+      "plugin_discovery",
+      "hook_registration", 
+      "after_config_loaded",
+      "before_pipeline_run",
+      "pipeline_execution",
+      "after_pipeline_run",
+      "cleanup_validation"
+    ],
+    "timing_constraints": {
+      "total_hook_overhead_target_ms": 25.0,
+      "individual_hook_target_ms": 5.0,
+      "configuration_bridge_target_ms": 10.0,
+      "context_initialization_target_ms": 8.0,
+      "cleanup_target_ms": 2.0
+    }
+  },
+  "expected_events": {
+    "plugin_discovery": {
+      "event_type": "system_initialization",
+      "description": "Kedro plugin discovery system identifies FigRegistryHooks through entry points",
+      "timing": {
+        "phase": "project_startup",
+        "expected_duration_ms": 1.0,
+        "max_acceptable_duration_ms": 5.0,
+        "performance_grade": "excellent"
       },
-      "validation_scope": [
-        "Hook registration through plugin discovery system",
-        "Lifecycle event timing and sequencing",
-        "Configuration bridge initialization performance",
-        "Thread-safe operation under parallel execution",
-        "Non-invasive integration with Kedro execution model"
-      ]
-    },
-    "hook_registration_sequence": {
-      "description": "Expected hook registration validation through Kedro's plugin discovery system ensuring proper settings.py integration per F-006.2",
-      "registration_events": [
-        {
-          "event_type": "plugin_discovery",
-          "event_name": "kedro_hook_discovery",
-          "timestamp_ms": 0,
-          "duration_ms": 2.5,
-          "details": {
-            "entry_point": "kedro.hooks",
-            "hook_class": "figregistry_kedro.hooks:FigRegistryHooks",
-            "discovery_method": "setuptools_entry_points",
-            "registration_status": "discovered"
-          },
-          "validation_criteria": {
-            "entry_point_exists": true,
-            "hook_class_importable": true,
-            "hook_spec_compliance": true
-          }
+      "validation_criteria": {
+        "entry_point_registration": "kedro.hooks entry point correctly registered",
+        "hook_class_discovery": "FigRegistryHooks class discoverable via plugin system",
+        "import_success": "figregistry_kedro.hooks module imports without errors",
+        "dependency_resolution": "All required dependencies (figregistry, kedro) available"
+      },
+      "expected_state_changes": {
+        "before": {
+          "hook_registry_empty": true,
+          "figregistry_context_uninitialized": true,
+          "plugin_not_loaded": true
         },
-        {
-          "event_type": "hook_instantiation",
-          "event_name": "figregistry_hooks_init",
-          "timestamp_ms": 2.5,
-          "duration_ms": 1.8,
-          "details": {
-            "hook_instance": "FigRegistryHooks",
-            "initialization_params": {
-              "auto_initialize": true,
-              "enable_performance_monitoring": false,
-              "fallback_on_error": true,
-              "max_initialization_time": 0.005
-            },
-            "thread_id": "main_thread",
-            "state_initialized": true
-          },
-          "validation_criteria": {
-            "initialization_successful": true,
-            "state_object_created": true,
-            "performance_monitoring_configured": true
-          }
-        },
-        {
-          "event_type": "hook_manager_registration",
-          "event_name": "register_with_kedro_hook_manager",
-          "timestamp_ms": 4.3,
-          "duration_ms": 0.7,
-          "details": {
-            "hook_manager": "PluginManager",
-            "registration_method": "register_hooks",
-            "hook_specifications": [
-              "after_config_loaded",
-              "before_pipeline_run",
-              "after_pipeline_run",
-              "on_node_error"
-            ],
-            "registration_status": "registered"
-          },
-          "validation_criteria": {
-            "all_hooks_registered": true,
-            "hook_order_preserved": true,
-            "no_registration_conflicts": true
-          }
+        "after": {
+          "hook_class_discovered": true,
+          "entry_point_resolved": true,
+          "import_successful": true,
+          "ready_for_registration": true
         }
-      ],
-      "registration_validation": {
-        "total_registration_time_ms": 5.0,
-        "registration_success": true,
-        "settings_py_integration": {
-          "hooks_tuple_configured": true,
-          "hook_class_accessible": true,
-          "no_import_errors": true
-        },
-        "plugin_discovery_validation": {
-          "entry_point_scan_successful": true,
-          "hook_class_resolution": "figregistry_kedro.hooks.FigRegistryHooks",
-          "hook_spec_validation": "passed"
-        }
+      },
+      "thread_safety": {
+        "concurrent_safe": true,
+        "isolation_level": "process",
+        "resource_conflicts": "none_expected"
       }
     },
-    "lifecycle_event_sequence": {
-      "description": "Expected hook lifecycle sequence including before_pipeline_run and after_config_loaded event timing per Section 5.2.7 requirements",
-      "kedro_session_initialization": {
-        "session_start": {
-          "event_type": "session_lifecycle",
-          "event_name": "kedro_session_create",
-          "timestamp_ms": 0,
-          "duration_ms": 15.2,
-          "details": {
-            "session_id": "test_session_001",
-            "project_path": "/tmp/test_kedro_project",
-            "environment": "test",
-            "config_loader_initialized": true
-          },
-          "validation_criteria": {
-            "session_created_successfully": true,
-            "config_loader_available": true,
-            "project_context_valid": true
-          }
+    "hook_registration": {
+      "event_type": "hook_lifecycle",
+      "description": "FigRegistryHooks instance registered with Kedro's hook manager during settings.py loading",
+      "timing": {
+        "phase": "settings_loading",
+        "expected_duration_ms": 2.0,
+        "max_acceptable_duration_ms": 8.0,
+        "performance_grade": "excellent"
+      },
+      "validation_criteria": {
+        "settings_py_execution": "HOOKS tuple correctly includes FigRegistryHooks instance",
+        "hook_manager_registration": "Hook instance successfully registered with PluginManager",
+        "hook_specification_compliance": "All required hook methods present and callable",
+        "parameter_validation": "Hook method signatures match Kedro specifications"
+      },
+      "expected_state_changes": {
+        "before": {
+          "hook_instance_created": false,
+          "hook_manager_empty": true,
+          "lifecycle_hooks_unavailable": true
+        },
+        "after": {
+          "hook_instance_registered": true,
+          "hook_manager_contains_figregistry": true,
+          "lifecycle_methods_available": true,
+          "hook_specifications_validated": true
         }
       },
-      "config_loading_phase": {
-        "after_config_loaded_hook": {
-          "event_type": "hook_execution",
-          "event_name": "after_config_loaded",
-          "timestamp_ms": 15.2,
-          "duration_ms": 8.3,
-          "details": {
-            "hook_method": "after_config_loaded",
-            "context_available": true,
-            "config_loader_available": true,
-            "conf_source": "conf/base",
-            "environment": "test",
-            "auto_initialize": true,
-            "figregistry_config_path": "conf/base/figregistry.yml"
-          },
-          "figregistry_config_bridge_initialization": {
-            "config_bridge_creation": {
-              "timestamp_ms": 16.1,
-              "duration_ms": 3.2,
-              "bridge_class": "FigRegistryConfigBridge",
-              "config_loader_integration": true,
-              "environment_resolution": "test",
-              "caching_enabled": true
-            },
-            "configuration_merging": {
-              "timestamp_ms": 19.3,
-              "duration_ms": 2.8,
-              "kedro_config_loaded": true,
-              "figregistry_config_loaded": true,
-              "merge_successful": true,
-              "validation_passed": true
-            },
-            "figregistry_initialization": {
-              "timestamp_ms": 22.1,
-              "duration_ms": 1.4,
-              "init_config_called": true,
-              "global_state_initialized": true,
-              "module_cache_ready": true
-            }
-          },
-          "hook_state_updates": {
-            "bridge_instance_set": true,
-            "initialization_marked": true,
-            "environment_recorded": "test",
-            "thread_safety_maintained": true
-          },
-          "validation_criteria": {
-            "config_bridge_created": true,
-            "figregistry_initialized": true,
-            "no_kedro_execution_interference": true,
-            "performance_within_threshold": true,
-            "thread_safe_operation": true
-          }
+      "hook_method_registration": {
+        "after_config_loaded": {
+          "registered": true,
+          "callable": true,
+          "signature_valid": true,
+          "parameters": ["context", "config_loader", "conf_source"]
+        },
+        "before_pipeline_run": {
+          "registered": true,
+          "callable": true,
+          "signature_valid": true,
+          "parameters": ["run_params", "pipeline", "catalog"]
+        },
+        "after_pipeline_run": {
+          "registered": true,
+          "callable": true,
+          "signature_valid": true,
+          "parameters": ["run_params", "pipeline", "catalog"]
         }
       },
-      "pipeline_execution_phase": {
-        "before_pipeline_run_hook": {
-          "event_type": "hook_execution",
-          "event_name": "before_pipeline_run",
-          "timestamp_ms": 45.7,
-          "duration_ms": 3.1,
-          "details": {
-            "hook_method": "before_pipeline_run",
-            "run_params": {
-              "session_id": "test_session_001",
-              "pipeline_name": "figregistry_test_pipeline",
-              "env": "test",
-              "tags": ["figregistry"],
-              "run_id": "run_001"
-            },
-            "pipeline_available": true,
-            "catalog_available": true,
-            "pipeline_registration": true
-          },
-          "context_setup_operations": {
-            "pipeline_registration": {
-              "timestamp_ms": 46.2,
-              "duration_ms": 0.8,
-              "pipeline_name": "figregistry_test_pipeline",
-              "session_id": "test_session_001",
-              "active_pipeline_count": 1,
-              "thread_id": "pipeline_thread_1"
-            },
-            "configuration_validation": {
-              "timestamp_ms": 47.0,
-              "duration_ms": 1.2,
-              "bridge_available": true,
-              "initialization_status": "completed",
-              "context_ready": true
-            },
-            "concurrent_execution_tracking": {
-              "timestamp_ms": 48.2,
-              "duration_ms": 0.6,
-              "active_pipelines": ["figregistry_test_pipeline"],
-              "pipeline_count": 1,
-              "thread_safe_state": true
-            }
-          },
-          "validation_criteria": {
-            "pipeline_context_setup": true,
-            "figregistry_context_available": true,
-            "concurrent_tracking_active": true,
-            "no_kedro_state_modification": true,
-            "performance_within_threshold": true
-          }
-        },
-        "pipeline_execution": {
-          "event_type": "pipeline_execution",
-          "event_name": "kedro_pipeline_run",
-          "timestamp_ms": 48.8,
-          "duration_ms": 125.4,
-          "details": {
-            "pipeline_name": "figregistry_test_pipeline",
-            "nodes_executed": 3,
-            "figuredataset_saves": 2,
-            "figregistry_style_applications": 2,
-            "execution_mode": "sequential"
-          },
-          "figuredataset_operations": [
-            {
-              "node_name": "create_exploratory_plot",
-              "dataset_name": "exploratory_figure",
-              "timestamp_ms": 67.2,
-              "duration_ms": 15.3,
-              "figregistry_styling_applied": true,
-              "condition_param": "experiment_type",
-              "condition_value": "exploration",
-              "purpose": "expl",
-              "save_successful": true
-            },
-            {
-              "node_name": "create_publication_plot",
-              "dataset_name": "publication_figure",
-              "timestamp_ms": 142.1,
-              "duration_ms": 18.7,
-              "figregistry_styling_applied": true,
-              "condition_param": "experiment_type",
-              "condition_value": "publication",
-              "purpose": "publ",
-              "save_successful": true
-            }
-          ],
-          "validation_criteria": {
-            "pipeline_execution_unmodified": true,
-            "figregistry_automation_functional": true,
-            "no_manual_plt_savefig_required": true,
-            "kedro_catalog_integration_seamless": true
-          }
-        },
-        "after_pipeline_run_hook": {
-          "event_type": "hook_execution",
-          "event_name": "after_pipeline_run",
-          "timestamp_ms": 174.2,
-          "duration_ms": 2.4,
-          "details": {
-            "hook_method": "after_pipeline_run",
-            "run_params": {
-              "session_id": "test_session_001",
-              "pipeline_name": "figregistry_test_pipeline",
-              "status": "completed"
-            },
-            "pipeline_cleanup": true,
-            "context_maintenance": true
-          },
-          "cleanup_operations": {
-            "pipeline_unregistration": {
-              "timestamp_ms": 174.7,
-              "duration_ms": 0.6,
-              "pipeline_name": "figregistry_test_pipeline",
-              "active_pipeline_count": 0,
-              "cleanup_successful": true
-            },
-            "cache_management": {
-              "timestamp_ms": 175.3,
-              "duration_ms": 0.9,
-              "cache_cleanup_triggered": false,
-              "reason": "no_active_pipelines",
-              "memory_cleanup": "deferred"
-            },
-            "state_validation": {
-              "timestamp_ms": 176.2,
-              "duration_ms": 0.9,
-              "hook_state_consistent": true,
-              "no_resource_leaks": true,
-              "thread_state_clean": true
-            }
-          },
-          "validation_criteria": {
-            "cleanup_completed": true,
-            "no_resource_leaks": true,
-            "state_consistency_maintained": true,
-            "kedro_execution_model_preserved": true
-          }
-        }
+      "thread_safety": {
+        "concurrent_safe": true,
+        "isolation_level": "instance",
+        "resource_conflicts": "none_expected"
       }
     },
-    "performance_baseline_validation": {
-      "description": "Performance baseline for hook initialization performance testing targeting <25ms overhead per Section 6.6.4.3",
-      "sla_requirements": {
-        "hook_initialization_ms": 25.0,
-        "config_bridge_resolution_ms": 50.0,
-        "lifecycle_event_processing_ms": 5.0,
-        "total_plugin_overhead_ms": 200.0
+    "after_config_loaded": {
+      "event_type": "configuration_initialization",
+      "description": "Initialize FigRegistry configuration bridge after Kedro config loading completes",
+      "timing": {
+        "phase": "post_config_loading",
+        "expected_duration_ms": 8.0,
+        "max_acceptable_duration_ms": 15.0,
+        "performance_grade": "good"
       },
-      "measured_performance": {
-        "hook_registration_total_ms": 5.0,
-        "after_config_loaded_duration_ms": 8.3,
-        "before_pipeline_run_duration_ms": 3.1,
-        "after_pipeline_run_duration_ms": 2.4,
-        "config_bridge_initialization_ms": 7.4,
-        "figregistry_initialization_ms": 1.4,
-        "total_overhead_per_pipeline_ms": 18.8
+      "validation_criteria": {
+        "config_bridge_initialization": "FigRegistryConfigBridge successfully created",
+        "kedro_config_access": "ConfigLoader.get() methods accessible for figregistry configs",
+        "configuration_merging": "Kedro and FigRegistry configurations successfully merged",
+        "pydantic_validation": "Merged configuration passes schema validation",
+        "environment_resolution": "Environment-specific configurations correctly applied"
       },
-      "performance_validation": {
-        "hook_initialization_sla": "PASSED",
-        "config_bridge_sla": "PASSED",
-        "lifecycle_events_sla": "PASSED",
-        "total_overhead_sla": "PASSED",
-        "performance_regression_check": "BASELINE_ESTABLISHED",
-        "memory_overhead_mb": 1.2,
-        "cpu_overhead_percent": 0.8
+      "expected_state_changes": {
+        "before": {
+          "config_bridge_uninitialized": true,
+          "merged_config_unavailable": true,
+          "figregistry_context_empty": true,
+          "hooks_not_configured": true
+        },
+        "after": {
+          "config_bridge_initialized": true,
+          "merged_config_available": true,
+          "figregistry_context_configured": true,
+          "hooks_ready_for_pipeline": true
+        }
       },
-      "performance_monitoring": {
-        "enable_performance_monitoring": false,
-        "max_initialization_time": 0.005,
-        "performance_warnings": [],
-        "timing_precision": "perf_counter",
-        "measurement_methodology": "automated_benchmarking"
+      "configuration_sources": {
+        "kedro_base_config": {
+          "path": "conf/base/figregistry.yml",
+          "loaded": true,
+          "merged": true,
+          "priority": "base"
+        },
+        "kedro_environment_config": {
+          "path": "conf/{env}/figregistry.yml",
+          "loaded": true,
+          "merged": true,
+          "priority": "override"
+        },
+        "standalone_figregistry_config": {
+          "path": "figregistry.yaml",
+          "loaded": false,
+          "merged": false,
+          "priority": "fallback"
+        }
+      },
+      "performance_metrics": {
+        "config_loading_ms": 3.0,
+        "validation_ms": 2.0,
+        "merging_ms": 2.0,
+        "context_setup_ms": 1.0,
+        "total_duration_ms": 8.0
+      },
+      "error_handling": {
+        "config_load_failure": "graceful_degradation_with_defaults",
+        "validation_failure": "detailed_error_messages_provided",
+        "merge_conflict": "precedence_rules_applied",
+        "environment_missing": "fallback_to_base_configuration"
+      },
+      "thread_safety": {
+        "concurrent_safe": true,
+        "isolation_level": "context",
+        "resource_conflicts": "config_cache_coordination_required"
       }
     },
-    "thread_safety_validation": {
-      "description": "Thread-safe operation validation supporting parallel Kedro runner execution per Section 5.2.7",
-      "concurrent_execution_scenarios": [
-        {
-          "scenario_name": "parallel_pipeline_execution",
-          "description": "Multiple pipelines running concurrently with FigRegistryHooks",
-          "thread_count": 4,
-          "pipeline_instances": [
-            {
-              "thread_id": "pipeline_thread_1",
-              "session_id": "session_001",
-              "pipeline_name": "data_processing",
-              "start_timestamp_ms": 0,
-              "duration_ms": 150.2,
-              "hook_executions": {
-                "before_pipeline_run": {
-                  "timestamp_ms": 5.2,
-                  "duration_ms": 3.1,
-                  "thread_safe": true
-                },
-                "after_pipeline_run": {
-                  "timestamp_ms": 152.8,
-                  "duration_ms": 2.4,
-                  "thread_safe": true
-                }
-              },
-              "figuredataset_saves": 2,
-              "validation_result": "PASSED"
-            },
-            {
-              "thread_id": "pipeline_thread_2",
-              "session_id": "session_002",
-              "pipeline_name": "feature_engineering",
-              "start_timestamp_ms": 12.5,
-              "duration_ms": 89.7,
-              "hook_executions": {
-                "before_pipeline_run": {
-                  "timestamp_ms": 18.1,
-                  "duration_ms": 2.9,
-                  "thread_safe": true
-                },
-                "after_pipeline_run": {
-                  "timestamp_ms": 101.3,
-                  "duration_ms": 2.1,
-                  "thread_safe": true
-                }
-              },
-              "figuredataset_saves": 1,
-              "validation_result": "PASSED"
-            },
-            {
-              "thread_id": "pipeline_thread_3",
-              "session_id": "session_003",
-              "pipeline_name": "model_training",
-              "start_timestamp_ms": 25.8,
-              "duration_ms": 203.4,
-              "hook_executions": {
-                "before_pipeline_run": {
-                  "timestamp_ms": 31.2,
-                  "duration_ms": 3.3,
-                  "thread_safe": true
-                },
-                "after_pipeline_run": {
-                  "timestamp_ms": 227.9,
-                  "duration_ms": 2.7,
-                  "thread_safe": true
-                }
-              },
-              "figuredataset_saves": 4,
-              "validation_result": "PASSED"
-            },
-            {
-              "thread_id": "pipeline_thread_4",
-              "session_id": "session_004",
-              "pipeline_name": "model_evaluation",
-              "start_timestamp_ms": 45.1,
-              "duration_ms": 167.8,
-              "hook_executions": {
-                "before_pipeline_run": {
-                  "timestamp_ms": 50.7,
-                  "duration_ms": 2.8,
-                  "thread_safe": true
-                },
-                "after_pipeline_run": {
-                  "timestamp_ms": 211.4,
-                  "duration_ms": 2.3,
-                  "thread_safe": true
-                }
-              },
-              "figuredataset_saves": 3,
-              "validation_result": "PASSED"
-            }
-          ],
-          "concurrent_validation": {
-            "max_concurrent_pipelines": 4,
-            "thread_isolation_maintained": true,
-            "no_race_conditions_detected": true,
-            "state_synchronization_successful": true,
-            "configuration_thread_safety": true,
-            "hook_state_isolation": true
-          }
-        }
-      ],
-      "thread_safety_mechanisms": {
-        "hook_state_management": {
-          "state_class": "FigRegistryHookState",
-          "synchronization_primitive": "threading.RLock",
-          "thread_local_storage": false,
-          "atomic_operations": [
-            "pipeline_registration",
-            "pipeline_unregistration",
-            "bridge_instance_setting",
-            "initialization_marking"
-          ]
+    "before_pipeline_run": {
+      "event_type": "pipeline_initialization",
+      "description": "Setup FigRegistry context and configuration state before pipeline execution begins",
+      "timing": {
+        "phase": "pre_pipeline_execution",
+        "expected_duration_ms": 5.0,
+        "max_acceptable_duration_ms": 12.0,
+        "performance_grade": "excellent"
+      },
+      "validation_criteria": {
+        "figregistry_initialization": "figregistry.init_config() successfully called with merged configuration",
+        "context_establishment": "FigRegistry styling context available for dataset operations",
+        "catalog_validation": "DataCatalog inspected for FigureDataSet entries",
+        "run_parameter_extraction": "Pipeline run parameters extracted and validated",
+        "styling_readiness": "Configuration ready for condition-based styling resolution"
+      },
+      "expected_state_changes": {
+        "before": {
+          "figregistry_uninitialized": true,
+          "styling_context_unavailable": true,
+          "pipeline_context_missing": true,
+          "datasets_unconfigured": true
         },
-        "configuration_bridge_thread_safety": {
-          "concurrent_config_access": true,
-          "cache_thread_safety": true,
-          "configuration_immutability": true,
-          "no_shared_mutable_state": true
-        },
-        "figuredataset_thread_safety": {
-          "independent_styling_contexts": true,
-          "thread_safe_file_operations": true,
-          "atomic_save_operations": true,
-          "no_shared_figure_state": true
+        "after": {
+          "figregistry_initialized": true,
+          "styling_context_active": true,
+          "pipeline_context_established": true,
+          "datasets_ready_for_styling": true
         }
       },
-      "thread_safety_validation_results": {
-        "concurrent_execution_successful": true,
-        "no_deadlocks_detected": true,
-        "no_race_conditions": true,
-        "state_consistency_maintained": true,
-        "performance_under_concurrency": "within_thresholds",
-        "thread_safety_sla": "PASSED"
+      "context_establishment": {
+        "run_id_capture": {
+          "extracted": true,
+          "format": "string",
+          "example": "pipeline_run_20241219_100000"
+        },
+        "pipeline_name_capture": {
+          "extracted": true,
+          "format": "string",
+          "example": "data_visualization_pipeline"
+        },
+        "environment_context": {
+          "extracted": true,
+          "format": "string",
+          "example": "test"
+        },
+        "catalog_analysis": {
+          "figuredataset_count": "integer",
+          "styling_conditions_identified": "list",
+          "output_directories_validated": "boolean"
+        }
+      },
+      "catalog_integration_validation": {
+        "figuredataset_discovery": {
+          "search_patterns": ["FigureDataSet", "figregistry"],
+          "catalog_patterns_checked": true,
+          "explicit_datasets_checked": true,
+          "integration_validated": true
+        },
+        "configuration_availability": {
+          "style_configs_present": true,
+          "output_configs_present": true,
+          "condition_mappings_available": true,
+          "parameter_resolution_ready": true
+        }
+      },
+      "performance_metrics": {
+        "context_extraction_ms": 1.0,
+        "figregistry_init_ms": 2.5,
+        "catalog_validation_ms": 1.0,
+        "state_setup_ms": 0.5,
+        "total_duration_ms": 5.0
+      },
+      "thread_safety": {
+        "concurrent_safe": true,
+        "isolation_level": "pipeline_run",
+        "resource_conflicts": "context_stack_coordination_required"
       }
     },
-    "non_invasive_integration_validation": {
-      "description": "Non-invasive integration testing ensuring hook operations preserve Kedro's execution model per F-006.2",
-      "kedro_execution_model_preservation": {
-        "pipeline_flow_integrity": {
-          "original_node_execution_order": ["data_ingestion", "data_processing", "visualization"],
-          "post_hook_node_execution_order": ["data_ingestion", "data_processing", "visualization"],
-          "execution_order_preserved": true,
-          "node_dependencies_unmodified": true,
-          "pipeline_structure_intact": true
+    "pipeline_execution": {
+      "event_type": "transparent_operation",
+      "description": "Pipeline execution proceeds normally with FigRegistry integration operating transparently",
+      "timing": {
+        "phase": "pipeline_runtime",
+        "expected_duration_ms": "variable_based_on_pipeline",
+        "hook_overhead_ms": 0.0,
+        "performance_grade": "transparent"
+      },
+      "validation_criteria": {
+        "non_invasive_operation": "Pipeline execution unmodified by hook presence",
+        "kedro_model_preservation": "Standard Kedro execution patterns maintained",
+        "transparent_integration": "No visible changes to pipeline node execution",
+        "dataset_styling_automation": "FigureDataSet operations enhanced without manual intervention",
+        "configuration_persistence": "FigRegistry context maintained throughout execution"
+      },
+      "expected_behavior": {
+        "pipeline_nodes_unchanged": "Node functions execute identically to baseline",
+        "kedro_session_unmodified": "Session lifecycle follows standard patterns",
+        "catalog_operations_enhanced": "FigureDataSet saves apply automatic styling",
+        "context_availability": "FigRegistry configuration accessible to datasets",
+        "error_propagation_normal": "Pipeline errors propagate normally without hook interference"
+      },
+      "integration_transparency": {
+        "execution_model_preservation": true,
+        "architectural_principles_maintained": true,
+        "performance_impact_minimal": true,
+        "user_experience_unchanged": true
+      },
+      "figuredataset_operations": {
+        "save_operation_enhancement": {
+          "automatic_styling_application": true,
+          "condition_parameter_resolution": true,
+          "style_property_application": true,
+          "output_path_management": true,
+          "versioning_compatibility": true
         },
-        "catalog_behavior_preservation": {
-          "dataset_save_operations": {
-            "manual_plt_savefig_behavior": {
-              "execution_time_ms": 45.2,
-              "file_created": true,
-              "styling_manual": true
-            },
-            "figuredataset_automated_behavior": {
-              "execution_time_ms": 47.8,
-              "file_created": true,
-              "styling_automated": true,
-              "overhead_ms": 2.6
-            },
-            "functional_equivalence": true,
-            "performance_overhead_acceptable": true
-          },
-          "catalog_entry_integrity": {
-            "non_figregistry_datasets_unaffected": true,
-            "versioning_behavior_preserved": true,
-            "load_operations_unmodified": true,
-            "dataset_descriptions_preserved": true
-          }
-        },
-        "session_lifecycle_preservation": {
-          "session_startup": {
-            "kedro_session_creation_unmodified": true,
-            "context_initialization_preserved": true,
-            "config_loading_enhanced_not_replaced": true,
-            "hook_integration_transparent": true
-          },
-          "session_execution": {
-            "pipeline_runner_behavior_preserved": true,
-            "node_execution_unmodified": true,
-            "error_handling_preserved": true,
-            "logging_behavior_unaffected": true
-          },
-          "session_cleanup": {
-            "session_close_behavior_preserved": true,
-            "resource_cleanup_enhanced": true,
-            "no_session_state_contamination": true,
-            "cleanup_hooks_non_interfering": true
-          }
+        "load_operation_compatibility": {
+          "standard_kedro_behavior": true,
+          "no_hook_interference": true,
+          "path_resolution_normal": true
         }
       },
-      "kedro_api_compatibility": {
-        "kedro_context_api": {
-          "context_methods_accessible": true,
-          "context_attributes_preserved": true,
-          "no_context_monkey_patching": true,
-          "context_lifecycle_respected": true
-        },
-        "catalog_api_compatibility": {
-          "catalog_save_signature_preserved": true,
-          "catalog_load_signature_preserved": true,
-          "dataset_registry_unmodified": true,
-          "versioning_api_preserved": true
-        },
-        "pipeline_api_compatibility": {
-          "pipeline_creation_unmodified": true,
-          "node_definitions_preserved": true,
-          "pipeline_composition_unaffected": true,
-          "pipeline_runners_compatible": true
-        }
-      },
-      "transparency_validation": {
-        "user_experience": {
-          "no_additional_imports_required": true,
-          "configuration_through_standard_kedro_patterns": true,
-          "error_messages_kedro_consistent": true,
-          "documentation_integration_seamless": true
-        },
-        "developer_experience": {
-          "existing_pipeline_code_unmodified": true,
-          "standard_kedro_development_workflow": true,
-          "debugging_experience_preserved": true,
-          "testing_patterns_compatible": true
-        },
-        "operational_transparency": {
-          "logging_output_kedro_consistent": true,
-          "performance_monitoring_integrated": true,
-          "error_reporting_enhanced_not_replaced": true,
-          "resource_usage_monitoring_compatible": true
-        }
-      },
-      "integration_validation_results": {
-        "kedro_execution_model_preserved": true,
-        "api_compatibility_maintained": true,
-        "transparency_achieved": true,
-        "non_invasive_integration_sla": "PASSED",
-        "backward_compatibility": true,
-        "forward_compatibility_designed": true
+      "thread_safety": {
+        "concurrent_safe": true,
+        "isolation_level": "dataset_instance",
+        "resource_conflicts": "none_during_normal_operation"
       }
     },
-    "error_handling_and_recovery": {
-      "description": "Hook error handling scenarios and graceful degradation validation",
-      "error_scenarios": [
-        {
-          "scenario_name": "config_loading_failure",
-          "error_type": "ConfigurationMergeError",
-          "trigger_condition": "malformed_figregistry_yml",
-          "hook_behavior": {
-            "fallback_on_error": true,
-            "kedro_execution_continues": true,
-            "figregistry_features_disabled": true,
-            "error_logged": true,
-            "graceful_degradation": true
-          },
-          "validation_result": "PASSED"
+    "after_pipeline_run": {
+      "event_type": "cleanup_operation",
+      "description": "Cleanup FigRegistry context and resources after pipeline execution completion",
+      "timing": {
+        "phase": "post_pipeline_execution",
+        "expected_duration_ms": 2.0,
+        "max_acceptable_duration_ms": 8.0,
+        "performance_grade": "excellent"
+      },
+      "validation_criteria": {
+        "context_cleanup": "FigRegistry context properly cleared for pipeline run",
+        "resource_deallocation": "No memory leaks or resource retention",
+        "state_reset": "Hook state reset for next pipeline execution",
+        "performance_metrics_logged": "Execution timing and metrics recorded",
+        "error_state_handled": "Cleanup proceeds regardless of pipeline success/failure"
+      },
+      "expected_state_changes": {
+        "before": {
+          "active_context_present": true,
+          "pipeline_state_active": true,
+          "resources_allocated": true,
+          "metrics_uncommitted": true
         },
-        {
-          "scenario_name": "figregistry_import_failure",
-          "error_type": "ImportError",
-          "trigger_condition": "figregistry_not_installed",
-          "hook_behavior": {
-            "warning_logged": true,
-            "kedro_execution_unaffected": true,
-            "hook_registration_skipped": false,
-            "graceful_degradation": true
-          },
-          "validation_result": "PASSED"
-        },
-        {
-          "scenario_name": "hook_execution_exception",
-          "error_type": "HookExecutionError",
-          "trigger_condition": "unexpected_hook_failure",
-          "hook_behavior": {
-            "error_contained": true,
-            "pipeline_execution_continues": true,
-            "error_reporting_comprehensive": true,
-            "state_cleanup_performed": true
-          },
-          "validation_result": "PASSED"
+        "after": {
+          "active_context_cleared": true,
+          "pipeline_state_reset": true,
+          "resources_deallocated": true,
+          "metrics_logged": true
         }
-      ],
-      "recovery_mechanisms": {
-        "configuration_fallback": {
-          "standalone_figregistry_config": true,
-          "default_configuration_applied": true,
-          "partial_functionality_maintained": true
+      },
+      "cleanup_operations": {
+        "context_stack_management": {
+          "current_run_removed": true,
+          "global_stack_updated": true,
+          "context_isolation_maintained": true
         },
-        "hook_failure_isolation": {
-          "hook_failure_contained": true,
-          "kedro_pipeline_unaffected": true,
-          "error_context_preserved": true,
-          "cleanup_operations_executed": true
+        "resource_cleanup": {
+          "memory_released": true,
+          "file_handles_closed": true,
+          "cache_entries_cleared": true,
+          "temporary_state_removed": true
         },
-        "state_consistency": {
-          "hook_state_reset_capability": true,
-          "configuration_bridge_recovery": true,
-          "pipeline_state_preservation": true,
-          "thread_safety_under_errors": true
+        "performance_logging": {
+          "timing_metrics_recorded": true,
+          "error_counts_logged": true,
+          "warning_summaries_generated": true,
+          "performance_thresholds_validated": true
+        },
+        "state_validation": {
+          "global_state_consistency": true,
+          "hook_instance_stability": true,
+          "configuration_persistence": true,
+          "cleanup_completeness": true
         }
+      },
+      "performance_metrics": {
+        "context_removal_ms": 0.5,
+        "resource_cleanup_ms": 1.0,
+        "metrics_logging_ms": 0.3,
+        "state_validation_ms": 0.2,
+        "total_duration_ms": 2.0
+      },
+      "thread_safety": {
+        "concurrent_safe": true,
+        "isolation_level": "global_coordination",
+        "resource_conflicts": "cleanup_ordering_coordination_required"
       }
     },
-    "validation_checkpoints": {
-      "description": "Key validation checkpoints for automated testing and CI/CD integration",
-      "required_validations": [
-        {
-          "checkpoint_name": "hook_registration_validation",
-          "validation_type": "functional",
-          "criteria": {
-            "plugin_discovery_successful": true,
-            "hook_class_instantiation": true,
-            "kedro_hook_manager_registration": true,
-            "settings_py_integration": true
-          },
-          "test_methods": [
-            "test_hook_registration",
-            "test_plugin_discovery",
-            "test_settings_integration"
-          ]
+    "cleanup_validation": {
+      "event_type": "system_validation",
+      "description": "Post-execution validation that all resources are properly cleaned up and system is ready for next run",
+      "timing": {
+        "phase": "post_cleanup_validation",
+        "expected_duration_ms": 1.0,
+        "max_acceptable_duration_ms": 3.0,
+        "performance_grade": "excellent"
+      },
+      "validation_criteria": {
+        "memory_leak_detection": "No unexpected memory growth after cleanup",
+        "global_state_verification": "Global hook state properly reset",
+        "resource_leak_prevention": "All allocated resources properly released",
+        "configuration_state_validation": "Configuration bridge state appropriate for reuse",
+        "thread_safety_verification": "No race conditions or resource conflicts detected"
+      },
+      "memory_validation": {
+        "reference_count_growth": {
+          "threshold": 50,
+          "current_growth": 0,
+          "within_acceptable_range": true
         },
-        {
-          "checkpoint_name": "lifecycle_sequence_validation",
-          "validation_type": "integration",
-          "criteria": {
-            "after_config_loaded_executed": true,
-            "before_pipeline_run_executed": true,
-            "after_pipeline_run_executed": true,
-            "execution_order_correct": true,
-            "context_management_proper": true
-          },
-          "test_methods": [
-            "test_hook_lifecycle_sequence",
-            "test_context_initialization",
-            "test_pipeline_registration"
-          ]
+        "garbage_collection": {
+          "objects_collected": 0,
+          "garbage_accumulated": 0,
+          "cleanup_effective": true
         },
-        {
-          "checkpoint_name": "performance_sla_validation",
-          "validation_type": "performance",
-          "criteria": {
-            "hook_initialization_under_25ms": true,
-            "config_bridge_under_50ms": true,
-            "lifecycle_events_under_5ms": true,
-            "total_overhead_under_200ms": true
-          },
-          "test_methods": [
-            "test_hook_initialization_performance",
-            "test_config_bridge_performance",
-            "test_lifecycle_event_performance"
-          ]
-        },
-        {
-          "checkpoint_name": "thread_safety_validation",
-          "validation_type": "concurrency",
-          "criteria": {
-            "concurrent_execution_safe": true,
-            "state_synchronization_proper": true,
-            "no_race_conditions": true,
-            "thread_isolation_maintained": true
-          },
-          "test_methods": [
-            "test_concurrent_hook_execution",
-            "test_thread_safety_mechanisms",
-            "test_parallel_pipeline_support"
-          ]
-        },
-        {
-          "checkpoint_name": "non_invasive_integration_validation",
-          "validation_type": "compatibility",
-          "criteria": {
-            "kedro_execution_model_preserved": true,
-            "api_compatibility_maintained": true,
-            "transparency_achieved": true,
-            "backward_compatibility_ensured": true
-          },
-          "test_methods": [
-            "test_kedro_execution_preservation",
-            "test_api_compatibility",
-            "test_integration_transparency"
-          ]
+        "module_state": {
+          "global_variables_reset": true,
+          "cache_entries_cleared": true,
+          "singleton_state_appropriate": true
         }
-      ],
-      "automated_testing_integration": {
-        "ci_cd_checkpoints": [
-          "hook_registration_validation",
-          "lifecycle_sequence_validation",
-          "performance_sla_validation"
-        ],
-        "pre_release_checkpoints": [
-          "thread_safety_validation",
-          "non_invasive_integration_validation"
-        ],
-        "continuous_monitoring": [
-          "performance_sla_validation"
-        ]
+      },
+      "state_verification": {
+        "hook_instances": {
+          "active_count": 0,
+          "registered_count": 1,
+          "state_consistent": true
+        },
+        "configuration_bridge": {
+          "cache_state": "empty_or_reusable",
+          "validation_ready": true,
+          "performance_metrics_available": true
+        },
+        "global_context": {
+          "initialized": false,
+          "context_stack_empty": true,
+          "ready_for_next_execution": true
+        }
+      },
+      "thread_safety_validation": {
+        "concurrent_access_test": "passed",
+        "race_condition_detection": "none_detected",
+        "resource_contention": "none_observed",
+        "isolation_verification": "contexts_properly_isolated"
+      }
+    }
+  },
+  "performance_benchmarks": {
+    "description": "Performance targets and measurement criteria for hook operations",
+    "overall_targets": {
+      "total_hook_overhead_ms": {
+        "excellent": "< 15.0",
+        "good": "< 20.0", 
+        "acceptable": "< 25.0",
+        "poor": "> 25.0"
+      },
+      "memory_overhead_mb": {
+        "excellent": "< 2.0",
+        "good": "< 3.0",
+        "acceptable": "< 5.0",
+        "poor": "> 5.0"
+      },
+      "pipeline_execution_impact": {
+        "excellent": "< 1%",
+        "good": "< 3%",
+        "acceptable": "< 5%",
+        "poor": "> 5%"
       }
     },
-    "log_usage_instructions": {
-      "description": "Instructions for using this log file in hook testing and validation scenarios",
-      "test_framework_integration": {
-        "pytest_fixture_usage": "Use this log as expected baseline data in pytest fixtures for hook lifecycle testing",
-        "assertion_patterns": "Compare actual hook execution sequences against expected sequences documented in this log",
-        "performance_benchmarking": "Use performance baseline values for regression testing and SLA validation",
-        "thread_safety_testing": "Replicate concurrent execution scenarios for thread safety validation"
+    "individual_operation_targets": {
+      "config_bridge_initialization": {
+        "target_ms": 10.0,
+        "max_acceptable_ms": 15.0,
+        "performance_critical": true
       },
-      "validation_workflows": {
-        "development_testing": "Validate hook behavior during development against expected lifecycle events",
-        "integration_testing": "Use complete lifecycle sequences for end-to-end integration validation",
-        "performance_testing": "Benchmark actual performance against SLA requirements documented here",
-        "regression_testing": "Detect regressions by comparing current behavior against baseline expectations"
+      "hook_method_execution": {
+        "target_ms": 5.0,
+        "max_acceptable_ms": 8.0,
+        "performance_critical": true
       },
-      "monitoring_and_debugging": {
-        "hook_debugging": "Compare actual hook execution logs against expected patterns for debugging",
-        "performance_monitoring": "Monitor hook performance against established baselines for production deployments",
-        "integration_monitoring": "Validate that production hook behavior matches expected integration patterns"
+      "context_setup_teardown": {
+        "target_ms": 3.0,
+        "max_acceptable_ms": 5.0,
+        "performance_critical": false
+      },
+      "catalog_integration_validation": {
+        "target_ms": 2.0,
+        "max_acceptable_ms": 4.0,
+        "performance_critical": false
       }
+    },
+    "measurement_methodology": {
+      "timing_precision": "millisecond",
+      "measurement_tool": "time.perf_counter()",
+      "statistical_analysis": "average_over_10_iterations",
+      "baseline_comparison": "manual_kedro_execution_without_hooks",
+      "environment_controls": "isolated_test_environment_with_cleanup"
+    }
+  },
+  "thread_safety_validation": {
+    "description": "Thread safety requirements and validation criteria for parallel pipeline execution",
+    "concurrency_requirements": {
+      "parallel_runner_support": true,
+      "concurrent_pipeline_execution": true,
+      "session_isolation": true,
+      "resource_contention_prevention": true
+    },
+    "test_scenarios": {
+      "concurrent_hook_initialization": {
+        "scenario": "Multiple pipelines starting simultaneously",
+        "expected_behavior": "Independent configuration bridge initialization",
+        "isolation_level": "session_context",
+        "race_condition_prevention": "instance_level_locking"
+      },
+      "parallel_dataset_operations": {
+        "scenario": "Concurrent FigureDataSet save operations",
+        "expected_behavior": "Independent styling application and file operations",
+        "isolation_level": "dataset_instance",
+        "race_condition_prevention": "atomic_file_operations"
+      },
+      "shared_configuration_access": {
+        "scenario": "Multiple hooks accessing merged configuration",
+        "expected_behavior": "Thread-safe configuration reading",
+        "isolation_level": "read_only_access",
+        "race_condition_prevention": "immutable_configuration_objects"
+      },
+      "context_stack_management": {
+        "scenario": "Concurrent pipeline cleanup operations",
+        "expected_behavior": "Proper context isolation during cleanup",
+        "isolation_level": "global_coordination",
+        "race_condition_prevention": "synchronized_cleanup_operations"
+      }
+    },
+    "validation_criteria": {
+      "no_race_conditions": "Concurrent execution produces consistent results",
+      "proper_isolation": "Pipeline contexts remain independent",
+      "resource_safety": "No resource conflicts during parallel access",
+      "configuration_consistency": "Configuration state remains stable across threads",
+      "cleanup_coordination": "Cleanup operations complete without conflicts"
+    }
+  },
+  "non_invasive_integration_validation": {
+    "description": "Validation criteria for ensuring hooks preserve Kedro's execution model per F-006.2",
+    "kedro_execution_model_preservation": {
+      "pipeline_execution_flow": {
+        "unchanged_node_execution": "Node functions execute identically to baseline",
+        "unchanged_session_lifecycle": "Session management follows standard Kedro patterns",
+        "unchanged_catalog_interface": "Catalog operations maintain standard interface",
+        "unchanged_runner_behavior": "Pipeline runners execute identically to baseline"
+      },
+      "architectural_principle_preservation": {
+        "separation_of_concerns": "Hooks operate independently of pipeline logic",
+        "configuration_management": "Kedro configuration system remains authoritative",
+        "plugin_architecture": "Standard plugin registration and discovery",
+        "data_catalog_integrity": "Catalog behavior enhanced, not modified"
+      },
+      "user_experience_consistency": {
+        "cli_interface_unchanged": "kedro run commands work identically",
+        "project_structure_preserved": "No required changes to existing project structure",
+        "migration_simplicity": "Existing projects integrate without code changes",
+        "error_handling_consistency": "Error messages and handling follow Kedro patterns"
+      }
+    },
+    "integration_transparency_validation": {
+      "baseline_comparison": {
+        "execution_time_delta": "< 5% increase from baseline",
+        "memory_usage_delta": "< 10MB increase from baseline",
+        "behavioral_differences": "none_detected_in_core_execution",
+        "output_consistency": "Pipeline outputs identical to manual figure management"
+      },
+      "framework_compatibility": {
+        "kedro_version_support": "0.18.0 through 0.19.x",
+        "python_version_support": "3.10 through 3.12",
+        "plugin_coexistence": "Compatible with other Kedro plugins",
+        "environment_portability": "Consistent behavior across development environments"
+      }
+    }
+  },
+  "error_scenarios": {
+    "description": "Expected error handling and recovery behaviors during hook lifecycle",
+    "configuration_errors": {
+      "malformed_yaml": {
+        "error_type": "ConfigValidationError",
+        "expected_behavior": "Graceful degradation with default configuration",
+        "recovery_mechanism": "Fallback configuration applied",
+        "user_notification": "Clear error message with resolution guidance"
+      },
+      "missing_config_files": {
+        "error_type": "ConfigMergeError", 
+        "expected_behavior": "Continue with available configuration sources",
+        "recovery_mechanism": "Base configuration or defaults used",
+        "user_notification": "Warning about missing configuration files"
+      },
+      "kedro_config_loader_failure": {
+        "error_type": "HookInitializationError",
+        "expected_behavior": "Initialize with standalone FigRegistry configuration",
+        "recovery_mechanism": "Bypass configuration bridge, use direct loading",
+        "user_notification": "Hook initialization continued with limited functionality"
+      }
+    },
+    "runtime_errors": {
+      "figregistry_initialization_failure": {
+        "error_type": "HookExecutionError",
+        "expected_behavior": "Pipeline execution continues without styling",
+        "recovery_mechanism": "Hook operations disabled, normal Kedro execution",
+        "user_notification": "Warning about disabled FigRegistry functionality"
+      },
+      "catalog_validation_failure": {
+        "error_type": "Warning",
+        "expected_behavior": "Hook operations continue with reduced validation",
+        "recovery_mechanism": "Skip catalog integration warnings",
+        "user_notification": "Log warning about catalog integration issues"
+      },
+      "cleanup_operation_failure": {
+        "error_type": "Warning",
+        "expected_behavior": "Log error but continue pipeline completion",
+        "recovery_mechanism": "Best-effort cleanup with error logging",
+        "user_notification": "Warning about incomplete resource cleanup"
+      }
+    },
+    "thread_safety_errors": {
+      "concurrent_initialization_conflict": {
+        "error_type": "HookInitializationError",
+        "expected_behavior": "Serialize initialization operations",
+        "recovery_mechanism": "Thread-safe initialization with retry",
+        "user_notification": "Transparent recovery, no user notification"
+      },
+      "context_stack_corruption": {
+        "error_type": "HookExecutionError",
+        "expected_behavior": "Reset global state and continue",
+        "recovery_mechanism": "Clear corrupted state, reinitialize if needed",
+        "user_notification": "Warning about context state reset"
+      }
+    }
+  },
+  "test_validation_framework": {
+    "description": "Framework for validating hook behavior against this specification",
+    "validation_methods": {
+      "timing_measurement": {
+        "tool": "pytest-benchmark with time.perf_counter()",
+        "iterations": 10,
+        "statistical_analysis": "mean, std_dev, percentiles",
+        "threshold_validation": "all_operations_within_targets"
+      },
+      "state_verification": {
+        "tool": "pytest fixtures with state inspection",
+        "checkpoints": "before_after_each_lifecycle_event",
+        "assertion_framework": "comprehensive_state_validation_functions",
+        "isolation_testing": "independent_test_execution_with_cleanup"
+      },
+      "thread_safety_testing": {
+        "tool": "concurrent.futures.ThreadPoolExecutor",
+        "scenario_simulation": "multiple_concurrent_pipeline_executions",
+        "race_condition_detection": "repeated_execution_with_timing_analysis",
+        "resource_conflict_monitoring": "lock_contention_and_resource_usage_tracking"
+      },
+      "integration_transparency_testing": {
+        "tool": "kedro_pytest with mock pipeline execution",
+        "baseline_comparison": "execution_with_and_without_hooks",
+        "behavioral_analysis": "output_comparison_and_execution_flow_verification",
+        "performance_impact_measurement": "overhead_calculation_and_threshold_validation"
+      }
+    },
+    "test_data_management": {
+      "mock_configurations": "Realistic Kedro project configurations with FigRegistry settings",
+      "pipeline_simulation": "Minimal pipeline with FigureDataSet entries for testing",
+      "error_injection": "Controlled error scenarios for robustness testing",
+      "performance_baselines": "Reference measurements for regression detection"
+    },
+    "validation_criteria": {
+      "functional_correctness": "All lifecycle events execute successfully",
+      "performance_compliance": "All timing targets met consistently",
+      "thread_safety_assurance": "No race conditions or resource conflicts detected",
+      "integration_transparency": "No deviation from standard Kedro execution model",
+      "error_resilience": "Graceful error handling and recovery demonstrated"
+    }
+  },
+  "compliance_checklist": {
+    "description": "Checklist for validating complete compliance with technical requirements",
+    "section_5_2_7_compliance": {
+      "complete_hook_lifecycle_documented": true,
+      "kedro_integration_validation_framework": true,
+      "thread_safe_operation_specifications": true,
+      "performance_monitoring_requirements": true,
+      "lifecycle_hook_timing_validation": true
+    },
+    "f_006_2_compliance": {
+      "non_invasive_integration_preservation": true,
+      "kedro_execution_model_unchanged": true,
+      "architectural_principles_maintained": true,
+      "transparent_operation_validation": true,
+      "plugin_discovery_system_compliance": true
+    },
+    "section_6_6_4_3_compliance": {
+      "25ms_initialization_overhead_target": true,
+      "performance_measurement_framework": true,
+      "timing_validation_criteria": true,
+      "regression_detection_capabilities": true,
+      "benchmark_baseline_establishment": true
+    },
+    "parallel_execution_support": {
+      "thread_safety_validation_complete": true,
+      "concurrent_pipeline_support_documented": true,
+      "resource_isolation_requirements_specified": true,
+      "race_condition_prevention_validated": true,
+      "cleanup_coordination_requirements_documented": true
     }
   }
 }
