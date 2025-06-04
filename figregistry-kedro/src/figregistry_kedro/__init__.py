@@ -1,175 +1,118 @@
-"""FigRegistry-Kedro Plugin.
+"""
+FigRegistry-Kedro Integration Plugin
 
-A bridge between FigRegistry's scientific visualization management capabilities 
-and Kedro's machine learning pipeline framework. This plugin enables automated 
-figure styling, versioning, and management within Kedro data science workflows 
-while maintaining FigRegistry's core principle of zero external dependencies.
+This package extends FigRegistry's scientific visualization management capabilities
+into the Kedro machine learning pipeline framework through a dedicated plugin that
+enables automated figure styling, versioning, and management within Kedro data
+science workflows while maintaining FigRegistry's core principle of zero external
+dependencies.
 
 The plugin provides three core integration components:
-
-- **FigureDataSet**: Custom Kedro AbstractDataSet for matplotlib figures with 
-  automated FigRegistry styling and versioning
-- **FigRegistryHooks**: Lifecycle hooks for non-invasive FigRegistry initialization 
-  and context management throughout Kedro pipeline execution
-- **FigRegistryConfigBridge**: Configuration translation layer that merges Kedro's 
-  ConfigLoader output with FigRegistry's YAML-based configuration system
+- FigureDataSet: Custom Kedro AbstractDataSet for automated figure styling
+- FigRegistryHooks: Lifecycle hooks for configuration initialization
+- FigRegistryConfigBridge: Configuration translation between frameworks
 
 Key Features:
-- Zero-touch figure management in Kedro workflows
-- Automatic condition-based styling without manual intervention
-- Seamless integration with Kedro's catalog versioning system
+- Automated condition-based styling through FigRegistry integration (F-005)
+- Non-invasive lifecycle integration preserving Kedro's execution model (F-006)
+- Configuration merging with clear precedence rules (F-007)
+- Plugin packaging and distribution following modern Python standards (F-008)
 - Thread-safe operation for parallel pipeline execution
-- <5% performance overhead compared to manual figure operations
-- Environment-specific configuration support
+- <5% performance overhead compared to manual matplotlib operations
+- Full compatibility with Kedro versioning and experiment tracking
 
-Installation:
-    ```bash
-    pip install figregistry-kedro
-    ```
-
-Quick Start:
-    1. Add FigRegistry hooks to your Kedro project's settings.py:
-    
-    ```python
-    from figregistry_kedro import FigRegistryHooks
-    
+Usage:
+    # Register hooks in Kedro project settings.py
+    from figregistry_kedro.hooks import FigRegistryHooks
     HOOKS = (FigRegistryHooks(),)
-    ```
     
-    2. Configure FigureDataSet in your catalog.yml:
-    
-    ```yaml
-    experiment_plots:
-      type: figregistry_kedro.FigureDataSet
-      filepath: data/08_reporting/experiment_results.png
-      purpose: presentation
-      condition_param: experiment_condition
-    ```
-    
-    3. Return matplotlib figures from your pipeline nodes:
-    
-    ```python
-    def create_visualization(data):
-        fig, ax = plt.subplots()
-        # ... create your plot ...
-        return fig  # FigRegistry styling applied automatically
-    ```
+    # Configure datasets in Kedro catalog.yml
+    my_figure:
+        type: figregistry_kedro.FigureDataSet
+        filepath: data/08_reporting/my_figure.png
+        purpose: presentation
+        condition_param: experiment_condition
 
-Dependencies:
-- figregistry>=0.3.0: Core visualization management system
-- kedro>=0.18.0,<0.20.0: Machine learning pipeline framework
-- matplotlib>=3.9.0: Plotting backend (inherited from figregistry)
-- pydantic>=2.9.0: Configuration validation (inherited from figregistry)
-
-Compatibility:
-- Python 3.10, 3.11, 3.12, 3.13
-- Cross-platform support (macOS, Linux, Windows)
-- Thread-safe for parallel Kedro runners
-
-Examples:
-    For detailed examples and migration guides, see the `examples/` directory 
-    in the source repository or visit the documentation.
+Version Compatibility:
+- figregistry>=0.3.0: Core visualization functionality
+- kedro>=0.18.0,<0.20.0: Pipeline framework integration
+- Python>=3.10: Advanced type annotation support
 """
 
-import warnings
-from typing import Optional
-
-# Package metadata
+# Package metadata following semantic versioning (Section 3.2.3.1)
 __version__ = "0.1.0"
-__author__ = "FigRegistry Team"
-__email__ = "support@figregistry.io"
-__description__ = "Kedro plugin for FigRegistry scientific visualization management"
+__author__ = "FigRegistry Development Team"
+__email__ = "figregistry@example.com"
+__description__ = "FigRegistry integration plugin for Kedro machine learning pipelines"
 __url__ = "https://github.com/figregistry/figregistry-kedro"
 
-# Compatibility requirements
-__requires_python__ = ">=3.10"
-__requires_figregistry__ = ">=0.3.0"
-__requires_kedro__ = ">=0.18.0,<0.20.0"
+# Import core integration components for public API (Section 0.1.2)
+from .datasets import (
+    FigureDataSet,
+    FigureDatasetError,
+    validate_figure_dataset_config,
+    get_available_purposes,
+    get_performance_summary
+)
 
-# Import core components with graceful fallback for missing dependencies
-try:
-    from .datasets import FigureDataSet, FigureDataSetError
-    _datasets_available = True
-except ImportError as e:
-    warnings.warn(
-        f"FigureDataSet not available: {e}. "
-        f"Please ensure figregistry>={__requires_figregistry__} and "
-        f"kedro{__requires_kedro__} are installed.",
-        ImportWarning
-    )
-    FigureDataSet = None
-    FigureDataSetError = None
-    _datasets_available = False
+from .hooks import (
+    FigRegistryHooks,
+    HookInitializationError,
+    HookExecutionError,
+    get_global_hook_state,
+    clear_global_hook_state
+)
 
-try:
-    from .hooks import FigRegistryHooks, HookExecutionError
-    _hooks_available = True
-except ImportError as e:
-    warnings.warn(
-        f"FigRegistryHooks not available: {e}. "
-        f"Please ensure kedro{__requires_kedro__} is installed.",
-        ImportWarning
-    )
-    FigRegistryHooks = None
-    HookExecutionError = None
-    _hooks_available = False
+from .config import (
+    FigRegistryConfigBridge,
+    FigRegistryConfigSchema,
+    ConfigMergeError,
+    ConfigValidationError,
+    init_config,
+    get_merged_config
+)
 
-try:
-    from .config import FigRegistryConfigBridge, ConfigurationMergeError
-    _config_available = True
-except ImportError as e:
-    warnings.warn(
-        f"FigRegistryConfigBridge not available: {e}. "
-        f"Please ensure figregistry>={__requires_figregistry__} and "
-        f"kedro{__requires_kedro__} are installed.",
-        ImportWarning
-    )
-    FigRegistryConfigBridge = None
-    ConfigurationMergeError = None
-    _config_available = False
+# Define public API for convenient access to plugin functionality
+__all__ = [
+    # Version and metadata
+    "__version__",
+    "__author__",
+    "__description__",
+    
+    # Core dataset component (F-005: Kedro FigureDataSet Integration)
+    "FigureDataSet",
+    "FigureDatasetError",
+    "validate_figure_dataset_config",
+    "get_available_purposes",
+    "get_performance_summary",
+    
+    # Lifecycle hooks component (F-006: Kedro Lifecycle Hooks)
+    "FigRegistryHooks", 
+    "HookInitializationError",
+    "HookExecutionError",
+    "get_global_hook_state",
+    "clear_global_hook_state",
+    
+    # Configuration bridge component (F-007: FigRegistry-Kedro Config Bridge)
+    "FigRegistryConfigBridge",
+    "FigRegistryConfigSchema",
+    "ConfigMergeError", 
+    "ConfigValidationError",
+    "init_config",
+    "get_merged_config"
+]
 
-# Convenience imports for common configuration functions
-try:
-    from .config import init_config, get_config_bridge
-    _config_functions_available = True
-except ImportError:
-    init_config = None
-    get_config_bridge = None
-    _config_functions_available = False
-
-# Convenience function for creating hooks with configuration
-try:
-    from .hooks import create_hooks
-    _hook_factory_available = True
-except ImportError:
-    create_hooks = None
-    _hook_factory_available = False
-
-# Convenience function for creating datasets
-try:
-    from .datasets import create_figure_dataset, validate_figure_dataset_config
-    _dataset_utilities_available = True
-except ImportError:
-    create_figure_dataset = None
-    validate_figure_dataset_config = None
-    _dataset_utilities_available = False
-
-
-def get_plugin_info() -> dict:
-    """Get comprehensive plugin information and availability status.
+# Plugin discovery metadata for Kedro (F-008: Plugin Packaging and Distribution)
+def get_plugin_info():
+    """
+    Return plugin information for Kedro plugin discovery system.
+    
+    This function provides metadata required for Kedro's plugin ecosystem,
+    enabling automatic discovery and registration of the figregistry-kedro
+    plugin when installed in a Python environment alongside Kedro.
     
     Returns:
-        Dictionary containing plugin metadata, version information, 
-        dependency status, and component availability.
-        
-    Example:
-        ```python
-        from figregistry_kedro import get_plugin_info
-        
-        info = get_plugin_info()
-        print(f"Plugin version: {info['version']}")
-        print(f"All components available: {info['fully_functional']}")
-        ```
+        Dictionary containing plugin metadata for Kedro registration
     """
     return {
         "name": "figregistry-kedro",
@@ -177,167 +120,201 @@ def get_plugin_info() -> dict:
         "description": __description__,
         "author": __author__,
         "url": __url__,
-        "requires_python": __requires_python__,
-        "requires_figregistry": __requires_figregistry__,
-        "requires_kedro": __requires_kedro__,
         "components": {
-            "FigureDataSet": _datasets_available,
-            "FigRegistryHooks": _hooks_available,
-            "FigRegistryConfigBridge": _config_available,
-            "config_functions": _config_functions_available,
-            "hook_factory": _hook_factory_available,
-            "dataset_utilities": _dataset_utilities_available
+            "datasets": ["FigureDataSet"],
+            "hooks": ["FigRegistryHooks"],
+            "config": ["FigRegistryConfigBridge"]
         },
-        "fully_functional": all([
-            _datasets_available,
-            _hooks_available,
-            _config_available,
-            _config_functions_available,
-            _hook_factory_available,
-            _dataset_utilities_available
-        ])
+        "requirements": {
+            "figregistry": ">=0.3.0",
+            "kedro": ">=0.18.0,<0.20.0",
+            "python": ">=3.10"
+        },
+        "features": [
+            "automated_figure_styling",
+            "condition_based_visualization", 
+            "kedro_lifecycle_integration",
+            "configuration_merging",
+            "versioned_figure_management"
+        ]
     }
 
+# Package initialization logging for development and debugging
+import logging
+logger = logging.getLogger(__name__)
 
-def check_dependencies() -> bool:
-    """Check if all required dependencies are available.
-    
-    Returns:
-        True if all dependencies are available and plugin is fully functional,
-        False otherwise.
-        
-    Example:
-        ```python
-        from figregistry_kedro import check_dependencies
-        
-        if check_dependencies():
-            print("All dependencies available - plugin ready to use")
-        else:
-            print("Missing dependencies - check installation")
-        ```
-    """
-    info = get_plugin_info()
-    return info["fully_functional"]
-
-
-def get_version() -> str:
-    """Get the plugin version string.
-    
-    Returns:
-        Semantic version string (e.g., "0.1.0")
-        
-    Example:
-        ```python
-        from figregistry_kedro import get_version
-        
-        print(f"Using figregistry-kedro version {get_version()}")
-        ```
-    """
-    return __version__
-
-
-# Public API exports
-# Only export components that are successfully imported
-__all__ = [
-    # Package metadata
-    "__version__",
-    "__author__", 
-    "__email__",
-    "__description__",
-    "__url__",
-    "__requires_python__",
-    "__requires_figregistry__",
-    "__requires_kedro__",
-    
-    # Utility functions (always available)
-    "get_plugin_info",
-    "check_dependencies", 
-    "get_version"
-]
-
-# Add core components to exports if available
-if _datasets_available:
-    __all__.extend([
-        "FigureDataSet",
-        "FigureDataSetError"
-    ])
-
-if _hooks_available:
-    __all__.extend([
-        "FigRegistryHooks", 
-        "HookExecutionError"
-    ])
-
-if _config_available:
-    __all__.extend([
-        "FigRegistryConfigBridge",
-        "ConfigurationMergeError"
-    ])
-
-# Add convenience functions to exports if available
-if _config_functions_available:
-    __all__.extend([
-        "init_config",
-        "get_config_bridge"
-    ])
-
-if _hook_factory_available:
-    __all__.append("create_hooks")
-
-if _dataset_utilities_available:
-    __all__.extend([
-        "create_figure_dataset",
-        "validate_figure_dataset_config"
-    ])
-
-# Verify plugin initialization
-if not check_dependencies():
-    warnings.warn(
-        "figregistry-kedro plugin is not fully functional due to missing dependencies. "
-        f"Please ensure figregistry>={__requires_figregistry__} and "
-        f"kedro{__requires_kedro__} are installed. "
-        "Run `pip install figregistry kedro` to install missing dependencies.",
-        ImportWarning
-    )
-
-
-# Plugin compatibility validation
-def _validate_plugin_compatibility():
-    """Validate plugin compatibility with installed versions."""
+def _log_initialization_info():
+    """Log package initialization information for debugging purposes."""
     try:
-        import figregistry
-        import kedro
-        from packaging import version
+        # Check for required dependencies
+        dependencies_status = {}
         
-        # Check FigRegistry version compatibility
-        if hasattr(figregistry, '__version__'):
-            figregistry_version = figregistry.__version__
-            if version.parse(figregistry_version) < version.parse(__requires_figregistry__.replace('>=', '')):
-                warnings.warn(
-                    f"FigRegistry version {figregistry_version} may not be fully compatible. "
-                    f"Recommended: {__requires_figregistry__}",
-                    UserWarning
-                )
+        try:
+            import figregistry
+            dependencies_status["figregistry"] = getattr(figregistry, "__version__", "unknown")
+        except ImportError:
+            dependencies_status["figregistry"] = "not_available"
         
-        # Check Kedro version compatibility  
-        if hasattr(kedro, '__version__'):
-            kedro_version = kedro.__version__
-            min_kedro = __requires_kedro__.split(',')[0].replace('>=', '')
-            max_kedro = __requires_kedro__.split(',')[1].replace('<', '')
+        try:
+            import kedro
+            dependencies_status["kedro"] = getattr(kedro, "__version__", "unknown")
+        except ImportError:
+            dependencies_status["kedro"] = "not_available"
+        
+        try:
+            import matplotlib
+            dependencies_status["matplotlib"] = getattr(matplotlib, "__version__", "unknown")
+        except ImportError:
+            dependencies_status["matplotlib"] = "not_available"
+        
+        logger.debug(
+            f"figregistry-kedro v{__version__} initialized with dependencies: "
+            f"figregistry={dependencies_status['figregistry']}, "
+            f"kedro={dependencies_status['kedro']}, " 
+            f"matplotlib={dependencies_status['matplotlib']}"
+        )
+        
+        # Log any dependency warnings
+        if dependencies_status["figregistry"] == "not_available":
+            logger.warning("FigRegistry not available - styling features will be disabled")
+        
+        if dependencies_status["kedro"] == "not_available":
+            logger.warning("Kedro not available - plugin integration will be disabled")
             
-            if not (version.parse(min_kedro) <= version.parse(kedro_version) < version.parse(max_kedro)):
-                warnings.warn(
-                    f"Kedro version {kedro_version} may not be fully compatible. "
-                    f"Recommended: {__requires_kedro__}",
-                    UserWarning
-                )
-                
-    except ImportError:
-        # Dependencies not available - warnings already issued above
-        pass
     except Exception as e:
-        # Ignore version checking errors in production
-        pass
+        logger.debug(f"Package initialization logging failed: {e}")
 
-# Run compatibility validation on import
-_validate_plugin_compatibility()
+# Initialize package logging
+_log_initialization_info()
+
+# Compatibility validation for version constraints (Section 3.2.3.1)
+def validate_version_compatibility():
+    """
+    Validate that installed dependency versions meet plugin requirements.
+    
+    This function checks installed versions of figregistry and kedro against
+    the plugin's compatibility requirements, providing early warning of
+    potential compatibility issues during development and deployment.
+    
+    Returns:
+        Boolean indicating if all version requirements are satisfied
+    
+    Raises:
+        ImportError: When required dependencies are missing
+        ValueError: When installed versions don't meet requirements
+    """
+    import pkg_resources
+    
+    requirements = {
+        "figregistry": ">=0.3.0",
+        "kedro": ">=0.18.0,<0.20.0"
+    }
+    
+    for package, version_spec in requirements.items():
+        try:
+            pkg_resources.require(f"{package}{version_spec}")
+            logger.debug(f"Version compatibility validated for {package}{version_spec}")
+        except pkg_resources.DistributionNotFound:
+            raise ImportError(f"Required package not found: {package}")
+        except pkg_resources.VersionConflict as e:
+            raise ValueError(f"Version compatibility issue: {e}")
+    
+    return True
+
+# Performance monitoring initialization for enterprise environments
+_performance_metrics = {
+    "plugin_load_time": None,
+    "import_start_time": None
+}
+
+def get_plugin_performance_metrics():
+    """
+    Get plugin performance metrics for monitoring and optimization.
+    
+    Returns:
+        Dictionary containing plugin-level performance statistics
+    """
+    return {
+        "version": __version__,
+        "performance_metrics": _performance_metrics.copy(),
+        "component_metrics": {
+            "datasets": get_performance_summary(),
+            "hooks": get_global_hook_state(),
+            "config": {}  # ConfigBridge metrics available through instance
+        }
+    }
+
+# Record plugin initialization completion
+import time
+_performance_metrics["import_start_time"] = time.time()
+
+# Export convenience functions for common plugin operations
+def create_figure_dataset(**kwargs):
+    """
+    Convenience function for creating FigureDataSet instances.
+    
+    Args:
+        **kwargs: Parameters passed to FigureDataSet constructor
+    
+    Returns:
+        Configured FigureDataSet instance
+    
+    Usage:
+        dataset = figregistry_kedro.create_figure_dataset(
+            filepath="data/08_reporting/analysis.png",
+            purpose="publication",
+            condition_param="experiment_type"
+        )
+    """
+    return FigureDataSet(**kwargs)
+
+def create_hooks(**kwargs):
+    """
+    Convenience function for creating FigRegistryHooks instances.
+    
+    Args:
+        **kwargs: Parameters passed to FigRegistryHooks constructor
+    
+    Returns:
+        Configured FigRegistryHooks instance
+    
+    Usage:
+        hooks = figregistry_kedro.create_hooks(
+            enable_performance_monitoring=True,
+            strict_validation=True
+        )
+    """
+    return FigRegistryHooks(**kwargs)
+
+def create_config_bridge(**kwargs):
+    """
+    Convenience function for creating FigRegistryConfigBridge instances.
+    
+    Args:
+        **kwargs: Parameters passed to FigRegistryConfigBridge constructor
+    
+    Returns:
+        Configured FigRegistryConfigBridge instance
+    
+    Usage:
+        bridge = figregistry_kedro.create_config_bridge(
+            cache_enabled=True,
+            validation_strict=True
+        )
+    """
+    return FigRegistryConfigBridge(**kwargs)
+
+# Add convenience functions to public API
+__all__.extend([
+    "get_plugin_info",
+    "validate_version_compatibility", 
+    "get_plugin_performance_metrics",
+    "create_figure_dataset",
+    "create_hooks",
+    "create_config_bridge"
+])
+
+# Complete plugin initialization
+_performance_metrics["plugin_load_time"] = (time.time() - _performance_metrics["import_start_time"]) * 1000
+
+logger.debug(f"figregistry-kedro plugin initialization completed in {_performance_metrics['plugin_load_time']:.2f}ms")
