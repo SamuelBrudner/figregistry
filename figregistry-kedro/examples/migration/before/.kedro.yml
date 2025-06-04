@@ -1,49 +1,251 @@
-# Kedro project configuration for traditional manual figure management example
-# This file demonstrates standard Kedro project setup without figregistry-kedro integration,
-# representing the baseline state that requires manual plt.savefig() calls and hardcoded styling
+# Traditional Kedro Project Configuration - Manual Figure Management
+# ===================================================================
+#
+# This Kedro project configuration represents a conventional data science
+# project that relies on manual matplotlib figure management workflows.
+# This configuration serves as the baseline "before" state for migration
+# comparison, demonstrating traditional approaches that require scattered
+# plt.savefig() calls, hardcoded styling, and manual file management.
+#
+# Traditional Workflow Patterns Demonstrated:
+# - Manual plt.savefig() calls scattered throughout pipeline nodes
+# - Hardcoded styling parameters duplicated across functions
+# - Manual file path management and output directory creation
+# - Inconsistent figure formatting and naming conventions
+# - No automated condition-based styling capabilities
+# - Manual figure versioning and experiment tracking
+#
+# Pain Points and Maintenance Overhead:
+# - Code duplication across pipeline nodes for styling configuration
+# - Inconsistent figure output formats and quality settings
+# - Manual coordinate of figure paths with experiment parameters
+# - Lack of centralized configuration for visualization standards
+# - Time-consuming manual figure management tasks
+# - Error-prone manual file naming and organization
+#
+# Technical Baseline Specifications:
+# - Standard Kedro project structure without plugin integration
+# - Kedro version compatibility: >=0.18.0 for framework comparison
+# - Traditional ConfigLoader without figregistry configuration bridge
+# - Standard data catalog without FigureDataSet automation
+# - No lifecycle hooks for automated initialization
+# - Manual configuration management patterns throughout
 
-# Project identification following standard Kedro conventions
-project_name: "Manual Figure Management Example"
-package_name: "kedro_manual_example"
+# ===================================================================
+# STANDARD PROJECT METADATA
+# ===================================================================
 
-# Standard Kedro project structure
-source_dir: "src"
+# Traditional project identity and naming conventions
+context_path: src/kedro_manual_example
+package_name: kedro_manual_example
 
-# Kedro framework compatibility - same version range as figregistry-kedro
-# but without automated figure management capabilities
-kedro_init_version: "0.18.0"
-kedro_version: ">=0.18.0,<0.20.0"
+# Project identification for baseline demonstration
+project_name: Traditional Kedro Manual Figure Management
+project_version: "1.0.0"
 
-# Traditional project configuration settings
-tools: ""
-example_pipeline: "True"
+# ===================================================================
+# STANDARD KEDRO FRAMEWORK CONFIGURATION
+# ===================================================================
 
-# Standard environment management
-default_environment: "base"
-config_source: "conf"
+# Standard Kedro version demonstrating traditional approach
+kedro_version: "0.18.14"
 
-# Conventional package structure
-pipelines_package: "pipelines"
-main_module: "__main__"
+# Standard Kedro configuration without plugin enhancements
+tools:
+  # Traditional configuration management approach
+  kedro.config:
+    # Standard ConfigLoader without figregistry integration
+    config_loader_class: kedro.config.ConfigLoader
+    config_loader_args:
+      base_env: base
+      default_run_env: local
+      # Traditional configuration patterns without automation
+      config_patterns:
+        parameters: ["parameters*"]
+        catalog: ["catalog*"]
+        logging: ["logging*"]
 
-# Traditional project metadata highlighting manual approach
-description: "Baseline example demonstrating traditional manual matplotlib figure management in Kedro pipelines"
-purpose: "migration_baseline"
+# ===================================================================
+# TRADITIONAL PROJECT STRUCTURE
+# ===================================================================
 
-# Manual approach characteristics (what figregistry-kedro eliminates)
-manual_workflows:
-  - "Scattered plt.savefig() calls throughout pipeline nodes"
-  - "Hardcoded styling parameters in individual functions" 
-  - "Manual file path construction and naming"
-  - "Code duplication for styling across multiple nodes"
-  - "Inconsistent experimental condition handling"
-  - "No automated versioning or systematic organization"
+# Standard source code organization for manual approach
+source_dir: src
+package_dir: src/kedro_manual_example
 
-# Problems this traditional approach creates
-maintenance_issues:
-  - "Styling changes require updates across multiple files"
-  - "Inconsistent figure output formats and naming"
-  - "No systematic condition-based styling management"
-  - "Manual intervention required for figure organization"
-  - "Difficult to maintain consistent visual standards"
-  - "No automated version control for figure outputs"
+# Traditional pipeline discovery patterns
+pipeline_discovery:
+  # Standard pipeline discovery without automation
+  patterns:
+    - "src/kedro_manual_example/pipelines/**/pipeline.py"
+
+# Standard package discovery for traditional project
+package_discovery:
+  # Traditional package patterns for manual project structure
+  include_patterns:
+    - "src/kedro_manual_example/**/*.py"
+  exclude_patterns:
+    - "**/__pycache__/**"
+    - "**/tests/**"
+    - "**/*.pyc"
+
+# ===================================================================
+# TRADITIONAL DATA PROCESSING CONFIGURATION
+# ===================================================================
+
+# Standard data processing without automated figure management
+data_processing:
+  # Traditional data catalog approach without FigureDataSet
+  catalog_management:
+    versioning_enabled: true          # Standard Kedro versioning only
+    auto_registration: false          # Manual catalog entry management
+    
+  # Manual figure management approach
+  figure_management:
+    automated_styling: false          # No automated styling capabilities
+    manual_savefig_required: true     # Traditional plt.savefig() calls
+    hardcoded_styling: true           # Scattered styling configuration
+    manual_path_management: true      # Manual output path handling
+
+# ===================================================================
+# BASELINE WORKFLOW SETTINGS
+# ===================================================================
+
+# Traditional workflow configuration demonstrating manual approaches
+workflow_settings:
+  # Manual visualization management patterns
+  visualization_approach:
+    styling_method: "manual"          # Hardcoded styling parameters
+    output_management: "manual"       # Manual plt.savefig() calls
+    path_organization: "manual"       # Manual directory creation
+    condition_handling: "manual"      # Manual condition-based logic
+    
+  # Traditional experiment tracking
+  experiment_tracking:
+    figure_versioning: "manual"       # Manual timestamp management
+    parameter_mapping: "manual"       # Manual condition resolution
+    output_organization: "manual"     # Manual file naming schemes
+    
+  # Manual configuration management
+  configuration_management:
+    style_configuration: "scattered"  # Styling config throughout codebase
+    parameter_handling: "hardcoded"   # Parameters embedded in functions
+    condition_mapping: "manual"       # Manual condition-style mapping
+
+# ===================================================================
+# TRADITIONAL PROJECT CHARACTERISTICS
+# ===================================================================
+
+# Baseline characteristics demonstrating manual approach limitations
+project_characteristics:
+  # Code maintenance challenges
+  maintenance_issues:
+    code_duplication: true            # Styling code repeated across nodes
+    scattered_configuration: true     # Config spread throughout project
+    manual_coordination: true         # Manual sync of params and outputs
+    inconsistent_formatting: true     # Variable figure quality/format
+    
+  # Manual workflow overhead
+  workflow_overhead:
+    manual_figure_saves: true         # plt.savefig() in every node
+    hardcoded_paths: true             # Fixed output paths in code
+    manual_styling: true              # Style parameters in each function
+    manual_versioning: true           # Manual timestamp handling
+    
+  # Traditional limitations
+  traditional_limitations:
+    no_automated_styling: true        # No condition-based automation
+    no_centralized_config: true       # No single configuration source
+    no_lifecycle_integration: true    # No hooks for initialization
+    no_plugin_benefits: true          # No figregistry automation
+
+# ===================================================================
+# COMPATIBILITY AND MIGRATION BASELINE
+# ===================================================================
+
+# Migration baseline specifications for comparison
+migration_baseline:
+  # Current state characteristics
+  current_approach:
+    framework: "kedro_only"           # Standard Kedro without plugins
+    figure_management: "manual"       # Traditional plt.savefig() approach
+    styling_approach: "hardcoded"     # Embedded styling parameters
+    configuration: "scattered"        # Config throughout codebase
+    
+  # Compatibility requirements for migration
+  compatibility_requirements:
+    kedro_version: ">=0.18.0"         # Minimum for plugin compatibility
+    python_version: ">=3.10"          # Standard requirements
+    matplotlib_version: ">=3.0.0"     # Basic matplotlib support
+    
+  # Migration evaluation criteria
+  evaluation_criteria:
+    code_reduction_target: "90%"      # Styling code elimination goal
+    configuration_centralization: true # Single config source target
+    automation_introduction: true     # Automated workflow goal
+    maintenance_improvement: true     # Reduced overhead target
+
+# ===================================================================
+# PROJECT METADATA AND BASELINE DOCUMENTATION
+# ===================================================================
+
+# Baseline project metadata for migration comparison
+project_metadata:
+  # Traditional approach characteristics
+  approach_classification:
+    methodology: "manual_figure_management"
+    automation_level: "none"
+    configuration_approach: "scattered"
+    maintenance_overhead: "high"
+    
+  # Demonstration objectives
+  demonstration_objectives:
+    primary_goal: "Show traditional manual figure management overhead"
+    comparison_purpose: "Baseline for figregistry-kedro migration benefits"
+    educational_value: "Highlight pain points eliminated by automation"
+    
+  # Traditional workflow pain points
+  demonstrated_pain_points:
+    - "Scattered plt.savefig() calls throughout pipeline nodes"
+    - "Hardcoded styling parameters duplicated across functions"
+    - "Manual file path management and directory creation"
+    - "Inconsistent figure formatting and quality settings"
+    - "Time-consuming manual configuration coordination"
+    - "Error-prone manual figure versioning and naming"
+    
+  # Migration value proposition
+  migration_benefits:
+    code_reduction: "Eliminate 90% of styling code duplication"
+    centralized_config: "Single figregistry.yaml configuration source"
+    automated_styling: "Condition-based styling without manual coding"
+    lifecycle_integration: "Automated initialization and context management"
+    zero_touch_management: "Eliminate manual plt.savefig() requirements"
+    
+  # Example classification
+  example_classification:
+    purpose: "migration_baseline"
+    complexity_level: "traditional"
+    target_audience: "teams_evaluating_figregistry_kedro"
+    comparison_scope: "before_after_automation_benefits"
+
+# ===================================================================
+# END OF TRADITIONAL KEDRO PROJECT CONFIGURATION
+# ===================================================================
+
+# This configuration file demonstrates a standard Kedro project setup
+# representing the traditional manual figure management approach that
+# exists before figregistry-kedro plugin integration. The configuration
+# highlights the scattered, manual nature of traditional workflows and
+# serves as the baseline for measuring automation benefits.
+#
+# Key demonstration points:
+# - Standard Kedro configuration without plugin integration
+# - Manual figure management requiring plt.savefig() throughout codebase
+# - Scattered styling configuration duplicated across pipeline nodes
+# - Manual file path management and output directory coordination
+# - Traditional experiment tracking without automated condition mapping
+# - High maintenance overhead eliminated by figregistry-kedro automation
+#
+# This baseline configuration enables clear before/after comparison
+# demonstrating the value proposition of figregistry-kedro integration
+# for teams evaluating workflow automation benefits and migration ROI.
