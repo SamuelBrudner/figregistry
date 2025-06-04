@@ -1,2304 +1,1846 @@
 """
 Performance testing data generators and utilities for figregistry-kedro plugin.
 
-This module provides comprehensive data generation functions and utilities for performance 
-testing and benchmarking of figregistry-kedro plugin operations. It supports validation 
-of plugin overhead targets including <200ms FigureDataSet overhead, <50ms configuration 
-bridge resolution, and <25ms hook initialization per technical specification requirements.
+This module provides comprehensive data generation capabilities for performance testing and
+benchmarking of the figregistry-kedro plugin operations against technical specification 
+requirements per Section 6.6.4.3:
 
-Key Performance Targets (per Section 6.6.4.3):
-- Configuration Bridge Merge Time: < 50ms per pipeline run
-- FigureDataSet Save Overhead: < 200ms per save operation
-- Hook Initialization Overhead: < 25ms per project startup
-- Plugin Memory Overhead: < 5MB total footprint
-- Pipeline Execution Overhead: < 200ms per FigureDataSet save
+Performance Targets:
+- Plugin Pipeline Execution Overhead: <200ms per FigureDataSet save
+- Configuration Bridge Merge Time: <50ms per pipeline run  
+- Hook Initialization Overhead: <25ms per project startup
+- Plugin Memory Footprint: <5MB overhead
 
-The module is structured to support comprehensive performance validation across:
-- Large-scale configuration scenarios for testing bridge merge performance
-- High-volume catalog entries for concurrent execution testing
-- Complex figure objects for dataset save performance benchmarking
-- Concurrent execution scenarios for parallel Kedro runner validation
-- Memory usage patterns for plugin footprint validation
-- Stress testing data for high-load scenario validation
+Key Capabilities:
+- Large-scale configuration scenario generation for config bridge performance testing
+- High-volume catalog entry generation for concurrent execution validation
+- Complex matplotlib figure generation with varying complexity levels
+- Concurrent execution test data for parallel Kedro runner scenarios
+- Memory usage profiling scenarios for plugin footprint validation
+- Precision timing utilities for performance measurement and SLA validation
+- Stress testing data generators for high-load scenario validation
 
-Dependencies:
-- numpy: For data generation and mathematical operations
-- matplotlib: For complex figure generation and performance testing
-- pandas: For structured data creation and manipulation
-- scipy: For scientific computing patterns in test data
-- typing: For comprehensive type hints and annotations
+This module integrates with pytest-benchmark for automated performance regression testing
+and provides utilities for measuring plugin overhead against manual matplotlib operations.
 """
 
+import gc
 import time
-import psutil
 import threading
-import concurrent.futures
-from pathlib import Path
-from typing import Dict, List, Any, Tuple, Optional, Generator, Callable, Union
-from dataclasses import dataclass, field
+import multiprocessing
+import psutil
+import random
+import string
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from contextlib import contextmanager
-from functools import wraps
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, Iterator, Callable, Generator, Union
+from dataclasses import dataclass, field
+from collections import defaultdict
+from datetime import datetime, timedelta
 
 import numpy as np
 import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
-import matplotlib.figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg
-
-# Performance measurement utilities
-try:
-    import memory_profiler
-    MEMORY_PROFILER_AVAILABLE = True
-except ImportError:
-    MEMORY_PROFILER_AVAILABLE = False
-
-# Type definitions for performance testing
-ConfigDict = Dict[str, Any]
-CatalogConfig = Dict[str, Dict[str, Any]]
-FigureObject = matplotlib.figure.Figure
-TimingResult = Dict[str, float]
-MemoryResult = Dict[str, Union[float, int]]
-PerformanceMetrics = Dict[str, Union[float, int, str]]
+from matplotlib.figure import Figure
 
 
 # =============================================================================
-# PERFORMANCE BASELINE AND TARGET DEFINITIONS
+# PERFORMANCE TESTING CONFIGURATION
 # =============================================================================
 
 @dataclass
 class PerformanceTargets:
-    """
-    Performance targets for figregistry-kedro plugin operations.
+    """Performance targets from Section 6.6.4.3 for validation."""
     
-    These targets align with technical specification requirements in Section 6.6.4.3
-    and ensure plugin integration maintains acceptable overhead for scientific
-    computing workflows.
-    """
-    # Configuration bridge performance targets
-    config_bridge_merge_time_ms: float = 50.0  # Maximum merge time per pipeline run
-    config_load_time_ms: float = 100.0  # Maximum configuration loading time
-    config_validation_time_ms: float = 25.0  # Maximum validation time
+    # Plugin-specific performance targets (milliseconds)
+    figuredataset_save_overhead: float = 200.0  # <200ms per FigureDataSet save
+    config_bridge_resolution: float = 50.0     # <50ms per pipeline run
+    hook_initialization: float = 25.0          # <25ms per project startup
     
-    # FigureDataSet performance targets  
-    figure_dataset_save_overhead_ms: float = 200.0  # Maximum save overhead
-    style_resolution_time_ms: float = 10.0  # Maximum style resolution time
-    figure_processing_time_ms: float = 100.0  # Maximum figure processing time
+    # Memory targets (megabytes)
+    plugin_memory_overhead: float = 5.0        # <5MB plugin overhead
+    max_concurrent_figures: int = 10           # Maximum concurrent open figures
     
-    # Hook initialization performance targets
-    hook_initialization_time_ms: float = 25.0  # Maximum hook init time
-    hook_registration_time_ms: float = 5.0  # Maximum registration time
-    hook_execution_overhead_ms: float = 5.0  # Maximum per-hook execution overhead
-    
-    # Memory usage targets
-    plugin_memory_overhead_mb: float = 5.0  # Maximum plugin memory footprint
-    config_cache_memory_mb: float = 2.0  # Maximum configuration cache memory
-    per_figure_memory_overhead_mb: float = 0.5  # Maximum per-figure memory overhead
-    
-    # Pipeline execution targets
-    pipeline_execution_overhead_ms: float = 200.0  # Maximum per-FigureDataSet overhead
-    concurrent_execution_degradation_percent: float = 10.0  # Maximum performance degradation
+    # Core performance targets for comparison
+    configuration_load: float = 100.0          # <100ms config load
+    style_lookup: float = 1.0                  # <1ms style lookup
+    file_io_operation: float = 50.0            # <50ms file I/O
+    api_overhead: float = 10.0                 # <10ms API overhead
 
 
-@dataclass  
-class StressTestLimits:
-    """
-    Stress testing limits for validating plugin behavior under high-load scenarios.
+@dataclass
+class PerformanceMetrics:
+    """Container for performance measurement results."""
     
-    These limits define the boundary conditions for stress testing to ensure
-    plugin reliability and graceful degradation under extreme conditions.
-    """
-    # Configuration stress limits
-    max_config_size_mb: float = 10.0  # Maximum configuration file size
-    max_style_conditions: int = 1000  # Maximum number of style conditions
-    max_config_nesting_levels: int = 10  # Maximum configuration nesting depth
+    operation_name: str
+    execution_time_ms: float
+    memory_usage_mb: float
+    cpu_usage_percent: float
+    timestamp: datetime = field(default_factory=datetime.now)
+    metadata: Dict[str, Any] = field(default_factory=dict)
     
-    # Catalog stress limits
-    max_catalog_entries: int = 500  # Maximum FigureDataSet catalog entries
-    max_concurrent_saves: int = 20  # Maximum concurrent figure save operations
-    max_parallel_pipelines: int = 8  # Maximum parallel pipeline executions
+    def meets_target(self, target_ms: float) -> bool:
+        """Check if execution time meets target."""
+        return self.execution_time_ms <= target_ms
     
-    # Figure complexity limits
-    max_figure_subplots: int = 20  # Maximum subplots per figure
-    max_data_points_per_plot: int = 100000  # Maximum data points per plot
-    max_figure_memory_mb: float = 50.0  # Maximum figure memory usage
-    
-    # Memory stress limits
-    max_total_memory_mb: float = 1000.0  # Maximum total memory during stress test
-    memory_leak_tolerance_mb: float = 5.0  # Acceptable memory increase per operation
-
-
-# Global performance targets instance
-PERFORMANCE_TARGETS = PerformanceTargets()
-STRESS_TEST_LIMITS = StressTestLimits()
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary for reporting."""
+        return {
+            'operation_name': self.operation_name,
+            'execution_time_ms': self.execution_time_ms,
+            'memory_usage_mb': self.memory_usage_mb,
+            'cpu_usage_percent': self.cpu_usage_percent,
+            'timestamp': self.timestamp.isoformat(),
+            'metadata': self.metadata
+        }
 
 
 # =============================================================================
 # LARGE CONFIGURATION GENERATORS
 # =============================================================================
 
-def generate_large_figregistry_config(
-    num_conditions: int = 100,
-    num_style_properties: int = 50,
-    config_complexity: str = "medium"
-) -> ConfigDict:
+def large_config_generators() -> Iterator[Tuple[str, Dict[str, Any], float]]:
     """
-    Generate large-scale FigRegistry configuration for testing configuration bridge merge performance.
+    Generate large-scale configuration scenarios for testing configuration bridge 
+    merge performance per Section 6.6.4.3.
     
-    Creates complex configuration scenarios with numerous conditions, style mappings,
-    and nested structures to validate that configuration bridge merge operations
-    remain within the 50ms target per Section 6.6.4.3.
+    Creates progressively complex configuration scenarios to validate that
+    FigRegistryConfigBridge resolution remains under 50ms target even with
+    enterprise-scale configuration complexity.
     
-    Args:
-        num_conditions: Number of experimental conditions to generate
-        num_style_properties: Number of style properties per condition
-        config_complexity: Complexity level ('simple', 'medium', 'complex')
-        
-    Returns:
-        Large configuration dictionary suitable for bridge merge testing
-        
-    Examples:
-        >>> config = generate_large_figregistry_config(num_conditions=200)
-        >>> len(config['conditions'])
-        200
-        >>> 'styles' in config and 'outputs' in config
-        True
+    Yields:
+        Tuple of (scenario_name, config_dict, expected_time_ms)
     """
-    complexity_multipliers = {
-        'simple': 1.0,
-        'medium': 2.0,  
-        'complex': 5.0
-    }
     
-    multiplier = complexity_multipliers.get(config_complexity, 2.0)
-    effective_conditions = int(num_conditions * multiplier)
-    effective_properties = int(num_style_properties * multiplier)
-    
-    # Generate base style properties
-    base_style_properties = [
-        'figure.figsize', 'axes.grid', 'axes.grid.alpha', 'font.size',
-        'axes.labelsize', 'axes.titlesize', 'legend.fontsize', 'xtick.labelsize',
-        'ytick.labelsize', 'axes.linewidth', 'grid.linewidth', 'lines.linewidth',
-        'figure.facecolor', 'axes.facecolor', 'axes.edgecolor', 'text.color',
-        'axes.labelcolor', 'xtick.color', 'ytick.color', 'legend.frameon',
-        'legend.fancybox', 'legend.shadow', 'axes.spines.top', 'axes.spines.right',
-        'axes.spines.bottom', 'axes.spines.left', 'savefig.dpi', 'savefig.bbox',
-        'savefig.pad_inches', 'savefig.facecolor', 'savefig.edgecolor'
-    ]
-    
-    # Extend with generated properties if needed
-    if effective_properties > len(base_style_properties):
-        for i in range(len(base_style_properties), effective_properties):
-            base_style_properties.append(f'custom.property_{i}')
-    
-    style_properties = base_style_properties[:effective_properties]
-    
-    # Generate styles section
-    styles = {}
-    for i in range(effective_conditions):
-        condition_name = f"condition_{i}"
-        style_dict = {}
-        
-        for j, prop in enumerate(style_properties):
-            if 'figsize' in prop:
-                style_dict[prop] = [8 + (i % 4), 6 + (i % 3)]
-            elif 'size' in prop and 'fig' not in prop:
-                style_dict[prop] = 10 + (i % 8)
-            elif 'alpha' in prop or 'width' in prop:
-                style_dict[prop] = 0.1 + (i % 10) * 0.1
-            elif 'color' in prop:
-                colors = ['black', 'blue', 'red', 'green', 'purple', 'orange', 'brown']
-                style_dict[prop] = colors[i % len(colors)]
-            elif prop.endswith('on') or 'grid' in prop:
-                style_dict[prop] = bool(i % 2)
-            elif 'dpi' in prop:
-                style_dict[prop] = 100 + (i % 5) * 50
-            elif 'pad' in prop:
-                style_dict[prop] = 0.1 + (i % 5) * 0.05
-            else:
-                style_dict[prop] = f"value_{i}_{j}"
-        
-        styles[condition_name] = style_dict
-    
-    # Generate conditions section with pattern mapping
-    conditions = {}
-    for i in range(effective_conditions):
-        experiment_type = f"experiment_type_{i}"
-        condition_mapping = {}
-        
-        for j in range(min(5, effective_conditions // 10)):  # Up to 5 values per condition
-            key = f"value_{j}"
-            target_condition = f"condition_{(i + j) % effective_conditions}"
-            condition_mapping[key] = target_condition
-            
-        conditions[experiment_type] = condition_mapping
-    
-    # Generate outputs section
-    outputs = {
-        'base_path': f'data/08_reporting/figures/performance_test_{effective_conditions}',
-        'timestamp_format': '%Y%m%d_%H%M%S_%f',
-        'path_aliases': {
-            f'alias_{i}': f'condition_{i}' for i in range(min(20, effective_conditions))
+    # Small baseline configuration
+    yield ("baseline_small", {
+        "figregistry_version": "0.3.0",
+        "styles": {
+            "exploratory": {"color": "#1f77b4", "marker": "o"},
+            "presentation": {"color": "#ff7f0e", "marker": "s"},
+            "publication": {"color": "#2ca02c", "marker": "^"}
         },
-        'versioning': {
-            'enabled': True,
-            'strategy': 'timestamp',
-            'format': 'iso8601'
+        "outputs": {
+            "base_path": "data/08_reporting",
+            "format": "png",
+            "dpi": 300
         }
-    }
+    }, 5.0)
     
-    # Add nested configuration structures for complexity testing
-    if config_complexity == 'complex':
-        outputs['advanced_settings'] = {
-            'performance_monitoring': {
-                'enabled': True,
-                'metrics': ['timing', 'memory', 'file_size'],
-                'thresholds': {
-                    'max_save_time_ms': 200,
-                    'max_memory_mb': 5,
-                    'max_file_size_mb': 10
+    # Medium complexity with multiple conditions
+    medium_styles = {}
+    for i in range(50):
+        medium_styles[f"condition_{i}"] = {
+            "color": f"#{random.randint(0, 16777215):06x}",
+            "marker": random.choice(["o", "s", "^", "v", "D", "p", "*"]),
+            "linestyle": random.choice(["-", "--", "-.", ":"]),
+            "linewidth": random.uniform(0.5, 3.0),
+            "markersize": random.uniform(4, 12)
+        }
+    
+    yield ("medium_complexity", {
+        "figregistry_version": "0.3.0",
+        "styles": medium_styles,
+        "outputs": {
+            "base_path": "data/08_reporting",
+            "format": "png",
+            "dpi": 300,
+            "timestamp": True,
+            "versioning": "kedro"
+        },
+        "environments": {
+            "development": {"dpi": 150},
+            "staging": {"dpi": 200},
+            "production": {"dpi": 300}
+        }
+    }, 15.0)
+    
+    # Large enterprise-scale configuration
+    large_styles = {}
+    for category in ["exploratory", "presentation", "publication", "report", "thesis"]:
+        for experiment in range(100):
+            for variant in ["default", "high_contrast", "colorblind", "print"]:
+                condition = f"{category}_{experiment}_{variant}"
+                large_styles[condition] = {
+                    "color": f"#{random.randint(0, 16777215):06x}",
+                    "marker": random.choice(["o", "s", "^", "v", "D", "p", "*", "h", "H", "+"]),
+                    "linestyle": random.choice(["-", "--", "-.", ":"]),
+                    "linewidth": random.uniform(0.5, 5.0),
+                    "markersize": random.uniform(2, 15),
+                    "alpha": random.uniform(0.3, 1.0),
+                    "markerfacecolor": f"#{random.randint(0, 16777215):06x}",
+                    "markeredgecolor": f"#{random.randint(0, 16777215):06x}",
+                    "markeredgewidth": random.uniform(0.1, 2.0)
                 }
-            },
-            'cache_settings': {
-                'style_cache_size': 1000,
-                'config_cache_ttl': 3600,
-                'memory_cache_limit_mb': 50
-            },
-            'integration_settings': {
-                'kedro_compatibility': {
-                    'version_range': '>=0.18.0,<0.20.0',
-                    'hook_priority': 100,
-                    'dataset_registration': 'automatic'
-                }
-            }
-        }
     
-    return {
-        'styles': styles,
-        'conditions': conditions, 
-        'outputs': outputs,
-        'metadata': {
-            'generated_conditions': effective_conditions,
-            'generated_properties': effective_properties,
-            'complexity_level': config_complexity,
-            'generation_timestamp': time.time()
-        }
-    }
-
-
-def generate_kedro_environment_configs(
-    base_config: ConfigDict,
-    num_environments: int = 5
-) -> Dict[str, ConfigDict]:
-    """
-    Generate multiple Kedro environment-specific configurations for merge testing.
-    
-    Creates environment-specific configuration overrides that test the configuration
-    bridge's ability to efficiently merge multiple configuration sources while
-    maintaining the 50ms merge time target.
-    
-    Args:
-        base_config: Base FigRegistry configuration to override
-        num_environments: Number of environment configurations to generate
-        
-    Returns:
-        Dictionary mapping environment names to configuration overrides
-        
-    Examples:
-        >>> base = generate_large_figregistry_config(num_conditions=50)
-        >>> envs = generate_kedro_environment_configs(base, num_environments=3)
-        >>> 'local' in envs and 'staging' in envs and 'production' in envs
-        True
-    """
-    environments = ['local', 'staging', 'production', 'testing', 'development']
+    # Complex nested configuration with multiple environments
     environment_configs = {}
-    
-    for i in range(min(num_environments, len(environments))):
-        env_name = environments[i]
-        
-        # Create environment-specific overrides
-        env_config = {
-            'outputs': {
-                'base_path': f'data/08_reporting/figures/{env_name}',
-                'timestamp_format': base_config['outputs']['timestamp_format'],
-                'environment': env_name
+    for env in ["development", "testing", "staging", "production", "research"]:
+        environment_configs[env] = {
+            "outputs": {
+                "base_path": f"data/08_reporting/{env}",
+                "dpi": random.choice([150, 200, 300, 600]),
+                "format": random.choice(["png", "pdf", "svg"]),
+                "transparent": random.choice([True, False])
             },
-            'styles': {},
-            'conditions': {}
+            "style_overrides": {
+                condition: {
+                    "dpi": random.choice([150, 200, 300]),
+                    "format": random.choice(["png", "pdf"])
+                } for condition in random.sample(list(large_styles.keys()), 50)
+            }
         }
-        
-        # Override subset of styles for environment-specific behavior
-        base_styles = base_config.get('styles', {})
-        for j, (style_name, style_dict) in enumerate(list(base_styles.items())[:10]):
-            if j % (i + 1) == 0:  # Vary which styles get overridden
-                env_style = style_dict.copy()
-                
-                # Environment-specific modifications
-                if env_name == 'production':
-                    env_style['figure.figsize'] = [12, 8]  # Larger production figures
-                    env_style['savefig.dpi'] = 300  # Higher DPI for production
-                elif env_name == 'local':
-                    env_style['figure.figsize'] = [8, 6]  # Smaller local figures
-                    env_style['savefig.dpi'] = 100  # Lower DPI for local development
-                elif env_name == 'staging':
-                    env_style['axes.grid'] = True  # Always show grid in staging
-                    env_style['axes.grid.alpha'] = 0.5
-                
-                env_config['styles'][style_name] = env_style
-        
-        # Add environment-specific conditions
-        env_config['conditions'][f'{env_name}_experiments'] = {
-            'baseline': f'condition_{i}',
-            'optimized': f'condition_{i + 10}',
-            'final': f'condition_{i + 20}'
+    
+    yield ("enterprise_large", {
+        "figregistry_version": "0.3.0",
+        "styles": large_styles,
+        "outputs": {
+            "base_path": "data/08_reporting",
+            "format": "png",
+            "dpi": 300,
+            "timestamp": True,
+            "versioning": "kedro",
+            "path_aliases": {
+                alias: f"path/to/{alias}" for alias in 
+                [''.join(random.choices(string.ascii_lowercase, k=8)) for _ in range(100)]
+            }
+        },
+        "environments": environment_configs,
+        "metadata": {
+            "created_by": "performance_test_generator",
+            "complexity_level": "enterprise_large",
+            "style_count": len(large_styles),
+            "environment_count": len(environment_configs)
         }
-        
-        environment_configs[env_name] = env_config
+    }, 40.0)
     
-    return environment_configs
-
-
-def generate_complex_merge_scenarios(
-    base_conditions: int = 100,
-    merge_complexity: str = "high"
-) -> List[Tuple[ConfigDict, List[ConfigDict]]]:
-    """
-    Generate complex configuration merge scenarios for stress testing bridge performance.
+    # Stress test configuration - maximum complexity
+    stress_styles = {}
+    for i in range(1000):
+        condition_name = f"stress_test_condition_{i:04d}"
+        stress_styles[condition_name] = {
+            # Full matplotlib rcParams coverage
+            "figure.figsize": [random.uniform(4, 16), random.uniform(3, 12)],
+            "figure.dpi": random.choice([100, 150, 200, 300, 600]),
+            "figure.facecolor": f"#{random.randint(0, 16777215):06x}",
+            "figure.edgecolor": f"#{random.randint(0, 16777215):06x}",
+            "axes.linewidth": random.uniform(0.5, 3.0),
+            "axes.spines.left": random.choice([True, False]),
+            "axes.spines.bottom": random.choice([True, False]),
+            "axes.spines.top": random.choice([True, False]),
+            "axes.spines.right": random.choice([True, False]),
+            "axes.facecolor": f"#{random.randint(0, 16777215):06x}",
+            "axes.edgecolor": f"#{random.randint(0, 16777215):06x}",
+            "axes.labelsize": random.uniform(8, 16),
+            "axes.titlesize": random.uniform(10, 20),
+            "xtick.labelsize": random.uniform(6, 14),
+            "ytick.labelsize": random.uniform(6, 14),
+            "legend.fontsize": random.uniform(8, 14),
+            "font.family": random.choice(["sans-serif", "serif", "monospace"]),
+            "font.size": random.uniform(8, 16),
+            "lines.linewidth": random.uniform(0.5, 4.0),
+            "lines.markersize": random.uniform(2, 12),
+            "grid.alpha": random.uniform(0.1, 0.8),
+            "grid.linewidth": random.uniform(0.3, 1.5)
+        }
     
-    Creates challenging merge scenarios with overlapping keys, nested structures,
-    and type conflicts to validate configuration bridge robustness and performance
-    under complex merge operations.
-    
-    Args:
-        base_conditions: Number of base conditions in primary config
-        merge_complexity: Complexity level for merge scenarios
-        
-    Returns:
-        List of (base_config, override_configs) tuples for merge testing
-        
-    Examples:
-        >>> scenarios = generate_complex_merge_scenarios(base_conditions=50)
-        >>> len(scenarios) > 0
-        True
-        >>> all(len(scenario[1]) > 0 for scenario in scenarios)
-        True
-    """
-    scenarios = []
-    
-    complexity_settings = {
-        'low': {'num_scenarios': 3, 'overrides_per_scenario': 2, 'conflict_rate': 0.1},
-        'medium': {'num_scenarios': 5, 'overrides_per_scenario': 3, 'conflict_rate': 0.3},
-        'high': {'num_scenarios': 8, 'overrides_per_scenario': 5, 'conflict_rate': 0.5}
-    }
-    
-    settings = complexity_settings.get(merge_complexity, complexity_settings['medium'])
-    
-    for scenario_idx in range(settings['num_scenarios']):
-        # Generate base configuration
-        base_config = generate_large_figregistry_config(
-            num_conditions=base_conditions,
-            config_complexity='medium'
-        )
-        
-        override_configs = []
-        
-        for override_idx in range(settings['overrides_per_scenario']):
-            override_config = {'styles': {}, 'conditions': {}, 'outputs': {}}
-            
-            # Create overlapping style definitions with conflicts
-            base_styles = base_config.get('styles', {})
-            for style_name, style_dict in list(base_styles.items())[:20]:
-                if np.random.random() < settings['conflict_rate']:
-                    # Create conflicting override
-                    conflicting_style = {}
-                    for prop, value in style_dict.items():
-                        if 'figsize' in prop and isinstance(value, list):
-                            conflicting_style[prop] = [value[0] + 2, value[1] + 1]
-                        elif isinstance(value, (int, float)):
-                            conflicting_style[prop] = value * 1.5
-                        elif isinstance(value, bool):
-                            conflicting_style[prop] = not value
-                        elif isinstance(value, str):
-                            conflicting_style[prop] = f"override_{value}"
-                        else:
-                            conflicting_style[prop] = value
-                    
-                    override_config['styles'][style_name] = conflicting_style
-            
-            # Add new style definitions
-            for new_idx in range(5):
-                new_style_name = f"override_style_{scenario_idx}_{override_idx}_{new_idx}"
-                override_config['styles'][new_style_name] = {
-                    'figure.figsize': [10 + new_idx, 8 + new_idx],
-                    'font.size': 12 + new_idx,
-                    'axes.grid': bool(new_idx % 2)
+    yield ("stress_maximum", {
+        "figregistry_version": "0.3.0",
+        "styles": stress_styles,
+        "outputs": {
+            "base_path": "data/08_reporting",
+            "format": "png",
+            "dpi": 300,
+            "timestamp": True,
+            "versioning": "kedro",
+            "path_aliases": {
+                f"alias_{i:04d}": f"path/level1/level2/level3/{i:04d}"
+                for i in range(500)
+            }
+        },
+        "environments": {
+            f"env_{i:02d}": {
+                "outputs": {"dpi": random.choice([150, 300, 600])},
+                "style_overrides": {
+                    f"stress_test_condition_{j:04d}": {"alpha": random.uniform(0.1, 1.0)}
+                    for j in random.sample(range(1000), 100)
                 }
-            
-            # Create complex nested structure conflicts
-            override_config['outputs'] = {
-                'base_path': f'override_path_{scenario_idx}_{override_idx}',
-                'advanced_settings': {
-                    'performance_monitoring': {
-                        'enabled': False,  # Conflict with base
-                        'custom_metrics': [f'metric_{i}' for i in range(override_idx + 1)]
-                    }
+            } for i in range(20)
+        },
+        "metadata": {
+            "complexity_level": "stress_maximum",
+            "total_conditions": 1000,
+            "total_environments": 20,
+            "expected_resolution_time_ms": 45.0
+        }
+    }, 45.0)
+
+
+def generate_kedro_config_scenarios() -> Iterator[Tuple[str, Dict[str, Any], Dict[str, Any]]]:
+    """
+    Generate Kedro-specific configuration scenarios for testing config bridge merge behavior.
+    
+    Creates scenarios testing the merge behavior between Kedro's environment-specific
+    configuration system and FigRegistry's traditional YAML configuration structure.
+    
+    Yields:
+        Tuple of (scenario_name, kedro_config, figregistry_config)
+    """
+    
+    # Basic merge scenario
+    yield ("basic_merge", {
+        # Kedro conf/base/figregistry.yml
+        "figregistry": {
+            "styles": {
+                "default": {"color": "#1f77b4", "marker": "o"}
+            },
+            "outputs": {
+                "base_path": "${base.data_path}/08_reporting",
+                "dpi": 300
+            }
+        }
+    }, {
+        # Traditional figregistry.yaml
+        "figregistry_version": "0.3.0",
+        "styles": {
+            "default": {"color": "#ff7f0e", "marker": "s"},  # Should be overridden
+            "exploratory": {"color": "#2ca02c", "marker": "^"}
+        },
+        "outputs": {
+            "format": "png",
+            "timestamp": True
+        }
+    })
+    
+    # Complex environment override scenario
+    yield ("environment_override", {
+        # Kedro configuration with environment-specific overrides
+        "figregistry": {
+            "styles": {
+                "development": {"color": "#ff0000", "dpi": 150},
+                "production": {"color": "#0000ff", "dpi": 600}
+            },
+            "outputs": {
+                "base_path": "${runtime.environment_path}/figures",
+                "format": "pdf"
+            },
+            "environment_specific": {
+                "local": {
+                    "outputs": {"dpi": 100, "format": "png"}
+                },
+                "production": {
+                    "outputs": {"dpi": 600, "format": "pdf"}
                 }
             }
-            
-            override_configs.append(override_config)
-        
-        scenarios.append((base_config, override_configs))
+        }
+    }, {
+        # FigRegistry base configuration
+        "figregistry_version": "0.3.0",
+        "styles": {
+            "default": {"color": "#888888", "marker": "o"},
+            "development": {"color": "#00ff00", "dpi": 200},  # Should be overridden
+            "production": {"color": "#ffff00", "dpi": 300}    # Should be overridden
+        },
+        "outputs": {
+            "base_path": "default/path",
+            "dpi": 300,
+            "timestamp": False
+        }
+    })
     
-    return scenarios
+    # Parameter substitution scenario
+    yield ("parameter_substitution", {
+        # Kedro with parameter substitution
+        "figregistry": {
+            "styles": {
+                "${experiment.type}": {
+                    "color": "${experiment.color}",
+                    "marker": "${experiment.marker}",
+                    "linewidth": "${experiment.linewidth}"
+                }
+            },
+            "outputs": {
+                "base_path": "${paths.reporting}/${experiment.name}",
+                "dpi": "${output.dpi}",
+                "format": "${output.format}"
+            }
+        },
+        "experiment": {
+            "type": "machine_learning",
+            "name": "model_evaluation",
+            "color": "#e74c3c",
+            "marker": "D",
+            "linewidth": 2.5
+        },
+        "paths": {
+            "reporting": "data/08_reporting"
+        },
+        "output": {
+            "dpi": 300,
+            "format": "svg"
+        }
+    }, {
+        # Static FigRegistry configuration
+        "figregistry_version": "0.3.0",
+        "styles": {
+            "machine_learning": {"color": "#3498db", "marker": "o"},  # Should be overridden
+            "baseline": {"color": "#95a5a6", "marker": "s"}
+        },
+        "outputs": {
+            "base_path": "static/path",
+            "dpi": 150,
+            "format": "png"
+        }
+    })
 
 
 # =============================================================================
-# HIGH VOLUME CATALOG GENERATORS  
+# HIGH-VOLUME CATALOG GENERATORS
 # =============================================================================
 
-def generate_high_volume_catalog_config(
-    num_figure_datasets: int = 100,
-    concurrent_access_pattern: str = "mixed"
-) -> CatalogConfig:
+def high_volume_catalog_generators() -> Iterator[Tuple[str, List[Dict[str, Any]], int]]:
     """
-    Generate high-volume Kedro catalog configurations with multiple FigureDataSet entries.
+    Generate high-volume catalog entries for concurrent execution testing per Section 5.2.8.
     
-    Creates large catalog configurations for testing concurrent execution performance
-    and validating that plugin operations scale efficiently with catalog size while
-    maintaining per-dataset performance targets.
+    Creates large numbers of FigureDataSet catalog entries to validate plugin performance
+    under concurrent execution scenarios with parallel Kedro runners.
     
-    Args:
-        num_figure_datasets: Number of FigureDataSet entries to generate
-        concurrent_access_pattern: Access pattern ('sequential', 'parallel', 'mixed')
-        
-    Returns:
-        Kedro catalog configuration with multiple FigureDataSet entries
-        
-    Examples:
-        >>> catalog = generate_high_volume_catalog_config(num_figure_datasets=50)
-        >>> len([k for k in catalog.keys() if 'figure' in k.lower()]) == 50
-        True
+    Yields:
+        Tuple of (scenario_name, catalog_entries_list, expected_concurrent_load)
     """
-    catalog_config = {}
     
-    # Define figure output categories
-    categories = ['exploratory', 'presentation', 'publication', 'diagnostic', 'comparison']
-    formats = ['png', 'pdf', 'svg', 'eps']
-    condition_params = ['experiment_type', 'analysis_mode', 'data_version', 'model_variant']
+    # Small concurrent load - 10 concurrent figures
+    small_entries = []
+    for i in range(10):
+        small_entries.append({
+            "type": "figregistry_kedro.datasets.FigureDataSet",
+            "filepath": f"data/08_reporting/concurrent_small_{i:02d}.png",
+            "purpose": "exploratory",
+            "condition_param": "experiment_type",
+            "style_params": {
+                "color": f"#{random.randint(0, 16777215):06x}",
+                "marker": random.choice(["o", "s", "^"]),
+                "dpi": 300
+            },
+            "versioned": True
+        })
     
-    for i in range(num_figure_datasets):
-        dataset_name = f"figure_dataset_{i:03d}"
-        category = categories[i % len(categories)]
-        format_ext = formats[i % len(formats)]
-        condition_param = condition_params[i % len(condition_params)]
+    yield ("concurrent_small", small_entries, 10)
+    
+    # Medium concurrent load - 50 concurrent figures
+    medium_entries = []
+    purposes = ["exploratory", "presentation", "publication"]
+    conditions = ["baseline", "treatment_a", "treatment_b", "control"]
+    
+    for i in range(50):
+        medium_entries.append({
+            "type": "figregistry_kedro.datasets.FigureDataSet",
+            "filepath": f"data/08_reporting/concurrent_medium_{i:03d}.png",
+            "purpose": random.choice(purposes),
+            "condition_param": "experiment_condition",
+            "style_params": {
+                "color": f"#{random.randint(0, 16777215):06x}",
+                "marker": random.choice(["o", "s", "^", "v", "D"]),
+                "linestyle": random.choice(["-", "--", "-.", ":"]),
+                "linewidth": random.uniform(1.0, 3.0),
+                "markersize": random.uniform(6, 12),
+                "alpha": random.uniform(0.5, 1.0),
+                "dpi": random.choice([150, 200, 300])
+            },
+            "save_args": {
+                "bbox_inches": "tight",
+                "pad_inches": 0.1,
+                "transparent": random.choice([True, False])
+            },
+            "versioned": True
+        })
+    
+    yield ("concurrent_medium", medium_entries, 50)
+    
+    # Large concurrent load - 200 concurrent figures
+    large_entries = []
+    
+    for i in range(200):
+        # Simulate complex pipeline with multiple experiment conditions
+        experiment_id = f"exp_{i//20:02d}"
+        condition_id = f"condition_{i%10}"
+        figure_type = random.choice(["line_plot", "scatter", "histogram", "boxplot", "heatmap"])
         
-        # Create dataset configuration
-        dataset_config = {
-            'type': 'figregistry_kedro.datasets.FigureDataSet',
-            'filepath': f'data/08_reporting/figures/{category}/figure_{i:03d}.{format_ext}',
-            'purpose': category,
-            'condition_param': condition_param,
-            'save_args': {
-                'dpi': 150 + (i % 3) * 50,  # Vary DPI: 150, 200, 250
-                'bbox_inches': 'tight',
-                'transparent': bool(i % 2)
+        large_entries.append({
+            "type": "figregistry_kedro.datasets.FigureDataSet",
+            "filepath": f"data/08_reporting/{experiment_id}/{condition_id}/{figure_type}_{i:03d}.png",
+            "purpose": random.choice(["exploratory", "presentation", "publication", "report"]),
+            "condition_param": "experiment_condition",
+            "style_params": {
+                # Complex styling to stress-test style resolution
+                "figure.figsize": [random.uniform(6, 16), random.uniform(4, 12)],
+                "figure.dpi": random.choice([150, 200, 300, 600]),
+                "axes.linewidth": random.uniform(0.5, 2.0),
+                "axes.labelsize": random.uniform(10, 16),
+                "axes.titlesize": random.uniform(12, 18),
+                "lines.linewidth": random.uniform(1.0, 4.0),
+                "lines.markersize": random.uniform(4, 14),
+                "font.size": random.uniform(8, 14),
+                "legend.fontsize": random.uniform(8, 12),
+                "grid.alpha": random.uniform(0.2, 0.7),
+                "color": f"#{random.randint(0, 16777215):06x}",
+                "marker": random.choice(["o", "s", "^", "v", "D", "p", "*", "h", "H", "+"]),
+                "linestyle": random.choice(["-", "--", "-.", ":"]),
+                "alpha": random.uniform(0.3, 1.0)
+            },
+            "save_args": {
+                "format": random.choice(["png", "pdf", "svg"]),
+                "dpi": random.choice([200, 300, 600]),
+                "bbox_inches": "tight",
+                "pad_inches": random.uniform(0.05, 0.2),
+                "transparent": random.choice([True, False]),
+                "facecolor": "white" if random.random() > 0.3 else "none"
+            },
+            "versioned": True,
+            "metadata": {
+                "experiment_id": experiment_id,
+                "condition_id": condition_id,
+                "figure_type": figure_type,
+                "complexity_level": "high"
             }
-        }
+        })
+    
+    yield ("concurrent_large", large_entries, 200)
+    
+    # Stress test - 500 concurrent figures with complex dependencies
+    stress_entries = []
+    
+    # Simulate enterprise pipeline with multiple teams and experiments
+    teams = ["data_science", "ml_research", "analytics", "visualization", "reporting"]
+    projects = ["project_alpha", "project_beta", "project_gamma", "project_delta"]
+    
+    for i in range(500):
+        team = random.choice(teams)
+        project = random.choice(projects)
+        pipeline_stage = random.choice(["preprocessing", "training", "evaluation", "reporting"])
         
-        # Add versioning for subset of datasets
-        if i % 3 == 0:
-            dataset_config['versioned'] = True
-            
-        # Add style parameter overrides for complexity
-        if i % 5 == 0:
-            dataset_config['style_params'] = {
-                'figure.figsize': [8 + (i % 4), 6 + (i % 3)],
-                'font.size': 10 + (i % 6),
-                'axes.grid': bool(i % 2)
+        stress_entries.append({
+            "type": "figregistry_kedro.datasets.FigureDataSet",
+            "filepath": f"data/08_reporting/{team}/{project}/{pipeline_stage}/figure_{i:04d}.png",
+            "purpose": random.choice(["exploratory", "presentation", "publication", "report", "thesis"]),
+            "condition_param": f"{team}_condition",
+            "style_params": {
+                # Maximum styling complexity
+                "figure.figsize": [random.uniform(8, 20), random.uniform(6, 16)],
+                "figure.dpi": random.choice([150, 200, 300, 600, 1200]),
+                "figure.facecolor": f"#{random.randint(0, 16777215):06x}",
+                "figure.edgecolor": f"#{random.randint(0, 16777215):06x}",
+                "axes.linewidth": random.uniform(0.5, 3.0),
+                "axes.spines.left": random.choice([True, False]),
+                "axes.spines.bottom": random.choice([True, False]),
+                "axes.spines.top": random.choice([True, False]),
+                "axes.spines.right": random.choice([True, False]),
+                "axes.facecolor": f"#{random.randint(0, 16777215):06x}",
+                "axes.edgecolor": f"#{random.randint(0, 16777215):06x}",
+                "axes.labelsize": random.uniform(8, 18),
+                "axes.titlesize": random.uniform(10, 24),
+                "xtick.labelsize": random.uniform(6, 16),
+                "ytick.labelsize": random.uniform(6, 16),
+                "legend.fontsize": random.uniform(6, 16),
+                "font.family": random.choice(["sans-serif", "serif", "monospace"]),
+                "font.size": random.uniform(8, 18),
+                "lines.linewidth": random.uniform(0.5, 5.0),
+                "lines.markersize": random.uniform(2, 16),
+                "grid.alpha": random.uniform(0.1, 0.9),
+                "grid.linewidth": random.uniform(0.2, 2.0),
+                "color": f"#{random.randint(0, 16777215):06x}",
+                "marker": random.choice(["o", "s", "^", "v", "D", "p", "*", "h", "H", "+", "x", "X", "d"]),
+                "linestyle": random.choice(["-", "--", "-.", ":"]),
+                "alpha": random.uniform(0.2, 1.0),
+                "markerfacecolor": f"#{random.randint(0, 16777215):06x}",
+                "markeredgecolor": f"#{random.randint(0, 16777215):06x}",
+                "markeredgewidth": random.uniform(0.1, 2.0)
+            },
+            "save_args": {
+                "format": random.choice(["png", "pdf", "svg", "eps"]),
+                "dpi": random.choice([150, 200, 300, 600, 1200]),
+                "bbox_inches": random.choice(["tight", None]),
+                "pad_inches": random.uniform(0.0, 0.3),
+                "transparent": random.choice([True, False]),
+                "facecolor": random.choice(["white", "none", "auto"]),
+                "edgecolor": random.choice(["white", "none", "auto"])
+            },
+            "versioned": True,
+            "metadata": {
+                "team": team,
+                "project": project,
+                "pipeline_stage": pipeline_stage,
+                "complexity_level": "stress_maximum",
+                "concurrent_index": i
             }
-            
-        # Configure for concurrent access patterns
-        if concurrent_access_pattern == "parallel":
-            dataset_config['load_args'] = {'thread_safe': True}
-        elif concurrent_access_pattern == "mixed":
-            if i % 2 == 0:
-                dataset_config['load_args'] = {'thread_safe': True}
-        
-        catalog_config[dataset_name] = dataset_config
+        })
     
-    # Add non-figure datasets for realistic catalog simulation
-    for i in range(num_figure_datasets // 5):  # 20% non-figure datasets
-        dataset_name = f"data_input_{i:03d}"
-        catalog_config[dataset_name] = {
-            'type': 'pandas.CSVDataSet',
-            'filepath': f'data/01_raw/input_{i:03d}.csv'
-        }
-        
-        dataset_name = f"processed_data_{i:03d}"
-        catalog_config[dataset_name] = {
-            'type': 'pandas.ParquetDataSet', 
-            'filepath': f'data/03_primary/processed_{i:03d}.parquet'
-        }
-    
-    return catalog_config
-
-
-def generate_concurrent_catalog_scenarios(
-    base_catalog_size: int = 50,
-    concurrency_levels: List[int] = None
-) -> List[Tuple[CatalogConfig, int]]:
-    """
-    Generate catalog configurations for concurrent execution testing.
-    
-    Creates multiple catalog scenarios with different concurrency characteristics
-    to validate plugin performance under parallel Kedro runner execution patterns.
-    
-    Args:
-        base_catalog_size: Base number of datasets in each catalog
-        concurrency_levels: List of concurrency levels to test
-        
-    Returns:
-        List of (catalog_config, concurrency_level) tuples for testing
-        
-    Examples:
-        >>> scenarios = generate_concurrent_catalog_scenarios(base_catalog_size=20)
-        >>> len(scenarios) > 0
-        True
-        >>> all(isinstance(scenario[1], int) for scenario in scenarios)
-        True
-    """
-    if concurrency_levels is None:
-        concurrency_levels = [1, 2, 4, 8, 16]
-    
-    scenarios = []
-    
-    for concurrency_level in concurrency_levels:
-        # Adjust catalog size based on concurrency level
-        adjusted_catalog_size = min(base_catalog_size * concurrency_level, 
-                                   STRESS_TEST_LIMITS.max_catalog_entries)
-        
-        # Generate catalog with concurrency-appropriate configuration
-        catalog_config = generate_high_volume_catalog_config(
-            num_figure_datasets=adjusted_catalog_size,
-            concurrent_access_pattern="parallel" if concurrency_level > 1 else "sequential"
-        )
-        
-        # Add concurrency-specific configuration
-        for dataset_name, dataset_config in catalog_config.items():
-            if 'figregistry_kedro.datasets.FigureDataSet' in dataset_config.get('type', ''):
-                # Add concurrency hints
-                dataset_config['metadata'] = {
-                    'concurrency_level': concurrency_level,
-                    'thread_safety': concurrency_level > 1,
-                    'performance_priority': 'throughput' if concurrency_level > 4 else 'latency'
-                }
-        
-        scenarios.append((catalog_config, concurrency_level))
-    
-    return scenarios
-
-
-def generate_catalog_stress_scenarios(
-    max_datasets: int = None
-) -> List[CatalogConfig]:
-    """
-    Generate stress test catalog configurations for validating plugin limits.
-    
-    Creates increasingly large catalog configurations to identify performance
-    boundaries and validate graceful degradation under extreme load conditions.
-    
-    Args:
-        max_datasets: Maximum number of datasets (defaults to stress test limit)
-        
-    Returns:
-        List of stress test catalog configurations
-        
-    Examples:
-        >>> stress_catalogs = generate_catalog_stress_scenarios()
-        >>> len(stress_catalogs) > 0
-        True
-        >>> all(len(catalog) > 50 for catalog in stress_catalogs)
-        True
-    """
-    if max_datasets is None:
-        max_datasets = STRESS_TEST_LIMITS.max_catalog_entries
-    
-    stress_scenarios = []
-    
-    # Progressive stress levels
-    stress_levels = [50, 100, 200, 350, max_datasets]
-    
-    for stress_level in stress_levels:
-        if stress_level > max_datasets:
-            continue
-            
-        catalog_config = generate_high_volume_catalog_config(
-            num_figure_datasets=stress_level,
-            concurrent_access_pattern="mixed"
-        )
-        
-        # Add stress-specific configuration
-        for dataset_name, dataset_config in catalog_config.items():
-            if 'figregistry_kedro.datasets.FigureDataSet' in dataset_config.get('type', ''):
-                # Configure for stress conditions
-                dataset_config['stress_test'] = {
-                    'target_datasets': stress_level,
-                    'memory_monitoring': True,
-                    'performance_tracking': True
-                }
-                
-                # Add complex style parameters for higher stress
-                if stress_level > 100:
-                    dataset_config['style_params'] = {
-                        'figure.figsize': [12, 10],
-                        'axes.grid': True,
-                        'axes.grid.alpha': 0.3,
-                        'font.size': 12,
-                        'axes.labelsize': 14,
-                        'axes.titlesize': 16,
-                        'legend.fontsize': 11,
-                        'xtick.labelsize': 10,
-                        'ytick.labelsize': 10
-                    }
-        
-        stress_scenarios.append(catalog_config)
-    
-    return stress_scenarios
+    yield ("concurrent_stress", stress_entries, 500)
 
 
 # =============================================================================
 # COMPLEX FIGURE GENERATORS
 # =============================================================================
 
-def generate_simple_figure(
-    figsize: Tuple[int, int] = (8, 6),
-    data_points: int = 100
-) -> FigureObject:
+def complex_figure_generators() -> Iterator[Tuple[str, Figure, Dict[str, Any], float]]:
     """
-    Generate simple matplotlib figure for baseline performance testing.
+    Generate matplotlib figures with varying complexity levels for dataset save 
+    performance benchmarking.
     
-    Creates basic figure with single plot for measuring baseline FigureDataSet
-    save performance without complex rendering overhead.
+    Creates figures ranging from simple line plots to complex multi-panel visualizations
+    to validate FigureDataSet save operations maintain <200ms overhead target.
     
-    Args:
-        figsize: Figure size in inches (width, height)
-        data_points: Number of data points in the plot
-        
-    Returns:
-        Matplotlib figure object for performance testing
-        
-    Examples:
-        >>> fig = generate_simple_figure(figsize=(10, 8), data_points=50)
-        >>> fig.get_size_inches()[0] == 10.0
-        True
-        >>> len(fig.axes) == 1
-        True
+    Yields:
+        Tuple of (complexity_level, figure_object, metadata, expected_save_time_ms)
     """
-    fig, ax = plt.subplots(figsize=figsize)
     
-    # Generate simple data
-    x = np.linspace(0, 10, data_points)
-    y = np.sin(x) + np.random.normal(0, 0.1, data_points)
+    # Simple figure - baseline performance
+    fig_simple, ax_simple = plt.subplots(figsize=(8, 6))
+    x_simple = np.linspace(0, 10, 100)
+    y_simple = np.sin(x_simple)
+    ax_simple.plot(x_simple, y_simple, 'b-', linewidth=2)
+    ax_simple.set_xlabel('X values')
+    ax_simple.set_ylabel('Y values')
+    ax_simple.set_title('Simple Performance Test Figure')
+    ax_simple.grid(True, alpha=0.3)
     
-    # Create basic plot
-    ax.plot(x, y, 'b-', linewidth=2, label='Data')
-    ax.set_xlabel('X Values')
-    ax.set_ylabel('Y Values') 
-    ax.set_title('Simple Performance Test Figure')
-    ax.legend()
-    ax.grid(True, alpha=0.3)
+    yield ("simple", fig_simple, {
+        "data_points": 100,
+        "plot_elements": 1,
+        "complexity_score": 1,
+        "expected_memory_mb": 0.5
+    }, 20.0)
     
-    return fig
-
-
-def generate_complex_figure(
-    complexity_level: str = "medium",
-    num_subplots: int = None,
-    data_points_per_subplot: int = None
-) -> FigureObject:
-    """
-    Generate complex matplotlib figure for advanced performance testing.
+    # Medium complexity - multiple series and annotations
+    fig_medium, ax_medium = plt.subplots(figsize=(12, 8))
     
-    Creates multi-subplot figures with various plot types to test FigureDataSet
-    performance with complex rendering and styling requirements.
+    # Multiple data series
+    x_medium = np.linspace(0, 20, 1000)
+    for i in range(5):
+        y_series = np.sin(x_medium + i) * np.exp(-x_medium / 20) + np.random.normal(0, 0.1, len(x_medium))
+        ax_medium.plot(x_medium, y_series, linewidth=2, label=f'Series {i+1}', 
+                      marker='o', markersize=4, alpha=0.8)
     
-    Args:
-        complexity_level: Complexity level ('low', 'medium', 'high', 'extreme')
-        num_subplots: Number of subplots (auto-determined by complexity if None)
-        data_points_per_subplot: Data points per subplot (auto-determined if None)
-        
-    Returns:
-        Complex matplotlib figure object for stress testing
-        
-    Examples:
-        >>> fig = generate_complex_figure(complexity_level="medium")
-        >>> len(fig.axes) >= 4
-        True
-        >>> fig.get_size_inches()[0] >= 10
-        True
-    """
-    complexity_settings = {
-        'low': {'subplots': 2, 'points': 500, 'figsize': (10, 6)},
-        'medium': {'subplots': 4, 'points': 1000, 'figsize': (12, 8)}, 
-        'high': {'subplots': 9, 'points': 2000, 'figsize': (15, 12)},
-        'extreme': {'subplots': 16, 'points': 5000, 'figsize': (20, 16)}
-    }
+    # Add annotations and styling
+    ax_medium.set_xlabel('Time (s)', fontsize=14)
+    ax_medium.set_ylabel('Amplitude', fontsize=14)
+    ax_medium.set_title('Medium Complexity Performance Test', fontsize=16)
+    ax_medium.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    ax_medium.grid(True, alpha=0.4)
     
-    settings = complexity_settings.get(complexity_level, complexity_settings['medium'])
+    # Add text annotations
+    for i in range(3):
+        ax_medium.annotate(f'Peak {i+1}', 
+                          xy=(i*7 + 2, 0.8), 
+                          xytext=(i*7 + 4, 1.2),
+                          arrowprops=dict(arrowstyle='->', color='red', alpha=0.7),
+                          fontsize=10)
     
-    if num_subplots is not None:
-        settings['subplots'] = min(num_subplots, STRESS_TEST_LIMITS.max_figure_subplots)
-    if data_points_per_subplot is not None:
-        settings['points'] = min(data_points_per_subplot, 
-                               STRESS_TEST_LIMITS.max_data_points_per_plot)
+    plt.tight_layout()
     
-    # Calculate subplot layout
-    rows = int(np.ceil(np.sqrt(settings['subplots'])))
-    cols = int(np.ceil(settings['subplots'] / rows))
+    yield ("medium", fig_medium, {
+        "data_points": 5000,
+        "plot_elements": 8,  # 5 series + 3 annotations
+        "complexity_score": 5,
+        "expected_memory_mb": 2.0
+    }, 50.0)
     
-    fig, axes = plt.subplots(rows, cols, figsize=settings['figsize'])
-    if settings['subplots'] == 1:
-        axes = [axes]
-    elif isinstance(axes, np.ndarray):
-        axes = axes.flatten()
+    # High complexity - multi-panel with various plot types
+    fig_complex = plt.figure(figsize=(16, 12))
     
-    # Plot types for variety
-    plot_types = ['line', 'scatter', 'bar', 'histogram', 'heatmap', 'contour']
+    # Create complex subplot layout
+    gs = fig_complex.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
     
-    for i in range(settings['subplots']):
-        if i >= len(axes):
-            break
-            
-        ax = axes[i]
+    # Large main plot
+    ax_main = fig_complex.add_subplot(gs[0, :])
+    x_main = np.linspace(0, 50, 5000)
+    y_main = np.sin(x_main) * np.cos(x_main/3) + np.random.normal(0, 0.1, len(x_main))
+    ax_main.plot(x_main, y_main, 'b-', linewidth=1, alpha=0.7)
+    ax_main.fill_between(x_main, y_main, alpha=0.3)
+    ax_main.set_title('Main Time Series Analysis', fontsize=16)
+    ax_main.grid(True, alpha=0.3)
+    
+    # Histogram
+    ax_hist = fig_complex.add_subplot(gs[1, 0])
+    hist_data = np.random.normal(0, 1, 10000)
+    ax_hist.hist(hist_data, bins=50, alpha=0.7, color='green', edgecolor='black')
+    ax_hist.set_title('Distribution')
+    ax_hist.grid(True, alpha=0.3)
+    
+    # Scatter plot with color mapping
+    ax_scatter = fig_complex.add_subplot(gs[1, 1])
+    x_scatter = np.random.randn(1000)
+    y_scatter = x_scatter * 2 + np.random.randn(1000)
+    colors = np.random.rand(1000)
+    scatter = ax_scatter.scatter(x_scatter, y_scatter, c=colors, alpha=0.6, s=50)
+    ax_scatter.set_title('Correlation Analysis')
+    plt.colorbar(scatter, ax=ax_scatter)
+    
+    # Heatmap
+    ax_heatmap = fig_complex.add_subplot(gs[1, 2])
+    heatmap_data = np.random.rand(20, 20)
+    im = ax_heatmap.imshow(heatmap_data, cmap='viridis', aspect='auto')
+    ax_heatmap.set_title('Feature Heatmap')
+    plt.colorbar(im, ax=ax_heatmap)
+    
+    # Box plots
+    ax_box = fig_complex.add_subplot(gs[2, 0])
+    box_data = [np.random.normal(0, std, 1000) for std in range(1, 5)]
+    ax_box.boxplot(box_data, labels=[f'Group {i+1}' for i in range(4)])
+    ax_box.set_title('Group Comparisons')
+    ax_box.grid(True, alpha=0.3)
+    
+    # Bar chart
+    ax_bar = fig_complex.add_subplot(gs[2, 1])
+    categories = ['A', 'B', 'C', 'D', 'E']
+    values = [random.uniform(10, 100) for _ in categories]
+    bars = ax_bar.bar(categories, values, color=['red', 'green', 'blue', 'orange', 'purple'])
+    ax_bar.set_title('Category Analysis')
+    ax_bar.grid(True, alpha=0.3)
+    
+    # Add value labels on bars
+    for bar, value in zip(bars, values):
+        ax_bar.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
+                   f'{value:.1f}', ha='center', va='bottom')
+    
+    # Polar plot
+    ax_polar = fig_complex.add_subplot(gs[2, 2], projection='polar')
+    theta = np.linspace(0, 2*np.pi, 100)
+    r = 1 + 0.3 * np.sin(4*theta) + 0.1 * np.random.randn(100)
+    ax_polar.plot(theta, r, 'r-', linewidth=2)
+    ax_polar.fill(theta, r, alpha=0.3)
+    ax_polar.set_title('Polar Analysis')
+    
+    plt.suptitle('Complex Multi-Panel Performance Test', fontsize=20)
+    
+    yield ("high", fig_complex, {
+        "data_points": 17200,  # Sum of all data points across subplots
+        "plot_elements": 15,   # Multiple plots, colorbars, annotations
+        "complexity_score": 10,
+        "expected_memory_mb": 8.0
+    }, 150.0)
+    
+    # Stress test figure - maximum complexity
+    fig_stress = plt.figure(figsize=(24, 18))
+    
+    # Create massive subplot grid
+    rows, cols = 6, 6
+    
+    plot_types = ['line', 'scatter', 'histogram', 'contour', 'bar', 'pie']
+    
+    for i in range(rows * cols):
+        ax = plt.subplot(rows, cols, i + 1)
         plot_type = plot_types[i % len(plot_types)]
         
-        # Generate data based on plot type
         if plot_type == 'line':
-            x = np.linspace(0, 10, settings['points'])
-            y = np.sin(x * (i + 1)) + np.random.normal(0, 0.1, settings['points'])
-            ax.plot(x, y, linewidth=1.5, label=f'Series {i+1}')
+            x = np.linspace(0, 10, 1000)
+            for j in range(3):
+                y = np.sin(x + j) + np.random.normal(0, 0.1, len(x))
+                ax.plot(x, y, linewidth=1.5, alpha=0.8, label=f'Series {j+1}')
+            ax.legend(fontsize=6)
             
         elif plot_type == 'scatter':
-            x = np.random.randn(settings['points'])
-            y = np.random.randn(settings['points'])
-            ax.scatter(x, y, alpha=0.6, s=20)
-            
-        elif plot_type == 'bar':
-            categories = [f'Cat{j}' for j in range(min(20, settings['points'] // 50))]
-            values = np.random.randint(10, 100, len(categories))
-            ax.bar(categories, values, alpha=0.7)
-            ax.tick_params(axis='x', rotation=45)
+            x = np.random.randn(2000)
+            y = x * 2 + np.random.randn(2000)
+            colors = np.random.rand(2000)
+            ax.scatter(x, y, c=colors, alpha=0.5, s=10)
             
         elif plot_type == 'histogram':
-            data = np.random.normal(0, 1, settings['points'])
-            ax.hist(data, bins=50, alpha=0.7, density=True)
-            
-        elif plot_type == 'heatmap':
-            size = min(50, int(np.sqrt(settings['points'])))
-            data = np.random.randn(size, size)
-            im = ax.imshow(data, aspect='auto', cmap='viridis')
-            plt.colorbar(im, ax=ax)
+            data = np.random.gamma(2, 2, 5000)
+            ax.hist(data, bins=30, alpha=0.7, edgecolor='black', linewidth=0.5)
             
         elif plot_type == 'contour':
-            size = min(50, int(np.sqrt(settings['points'])))
-            x = np.linspace(-3, 3, size)
-            y = np.linspace(-3, 3, size)
+            x = np.linspace(-3, 3, 100)
+            y = np.linspace(-3, 3, 100)
             X, Y = np.meshgrid(x, y)
-            Z = np.sin(X) * np.cos(Y) + np.random.normal(0, 0.1, (size, size))
+            Z = np.exp(-(X**2 + Y**2))
             ax.contour(X, Y, Z, levels=10)
+            
+        elif plot_type == 'bar':
+            categories = [f'Cat{j}' for j in range(8)]
+            values = [random.uniform(1, 10) for _ in categories]
+            ax.bar(categories, values, alpha=0.7)
+            ax.tick_params(axis='x', rotation=45, labelsize=6)
+            
+        elif plot_type == 'pie':
+            sizes = [random.uniform(1, 10) for _ in range(6)]
+            ax.pie(sizes, autopct='%1.1f%%', textprops={'fontsize': 6})
         
-        # Add labels and formatting
-        ax.set_title(f'{plot_type.title()} Plot {i+1}')
-        ax.grid(True, alpha=0.3)
-        
-        if plot_type in ['line']:
-            ax.legend()
-    
-    # Remove empty subplots
-    for i in range(settings['subplots'], len(axes)):
-        fig.delaxes(axes[i])
-    
-    plt.tight_layout()
-    return fig
-
-
-def generate_memory_intensive_figure(
-    memory_target_mb: float = 10.0
-) -> FigureObject:
-    """
-    Generate memory-intensive figure for memory usage testing.
-    
-    Creates figure designed to use specific amount of memory to test plugin
-    memory overhead calculations and validate memory usage targets.
-    
-    Args:
-        memory_target_mb: Target memory usage in megabytes
-        
-    Returns:
-        Memory-intensive matplotlib figure for memory testing
-        
-    Examples:
-        >>> fig = generate_memory_intensive_figure(memory_target_mb=5.0)
-        >>> fig is not None
-        True
-    """
-    # Estimate data points needed for target memory
-    # Rough estimate: 8 bytes per float64 point * 2 (x,y) * overhead factor
-    bytes_per_point = 16  # Conservative estimate including overhead
-    target_bytes = memory_target_mb * 1024 * 1024
-    estimated_points = int(target_bytes / bytes_per_point)
-    
-    # Cap at stress test limits
-    estimated_points = min(estimated_points, STRESS_TEST_LIMITS.max_data_points_per_plot)
-    
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-    axes = axes.flatten()
-    
-    points_per_subplot = estimated_points // 4
-    
-    for i, ax in enumerate(axes):
-        # Generate large datasets
-        x = np.linspace(0, 100, points_per_subplot)
-        y = np.sin(x * 0.1) + np.random.normal(0, 0.1, points_per_subplot)
-        
-        if i == 0:
-            # Dense line plot
-            ax.plot(x, y, linewidth=0.5, alpha=0.8)
-        elif i == 1:
-            # Dense scatter plot
-            ax.scatter(x, y, s=1, alpha=0.5)
-        elif i == 2:
-            # High-resolution histogram
-            ax.hist(y, bins=200, alpha=0.7, density=True)
-        else:
-            # High-resolution heatmap
-            size = int(np.sqrt(points_per_subplot))
-            if size > 0:
-                data = np.random.randn(size, size)
-                im = ax.imshow(data, aspect='auto', cmap='plasma', interpolation='bilinear')
-                plt.colorbar(im, ax=ax)
-        
-        ax.set_title(f'Memory Test Subplot {i+1}')
+        ax.set_title(f'{plot_type.title()} {i+1}', fontsize=8)
         ax.grid(True, alpha=0.2)
+        ax.tick_params(labelsize=6)
     
-    plt.suptitle(f'Memory Intensive Figure (Target: {memory_target_mb:.1f} MB)')
+    plt.suptitle('Stress Test: Maximum Complexity Figure', fontsize=24)
     plt.tight_layout()
     
-    return fig
-
-
-def generate_figure_dataset_batch(
-    batch_size: int = 10,
-    complexity_distribution: List[str] = None
-) -> List[FigureObject]:
-    """
-    Generate batch of figures for concurrent execution testing.
-    
-    Creates multiple figures of varying complexity for testing concurrent
-    FigureDataSet save operations and parallel pipeline execution scenarios.
-    
-    Args:
-        batch_size: Number of figures to generate
-        complexity_distribution: List of complexity levels for each figure
-        
-    Returns:
-        List of matplotlib figure objects for batch testing
-        
-    Examples:
-        >>> figures = generate_figure_dataset_batch(batch_size=5)
-        >>> len(figures) == 5
-        True
-        >>> all(isinstance(fig, matplotlib.figure.Figure) for fig in figures)
-        True
-    """
-    if complexity_distribution is None:
-        complexity_distribution = ['low', 'medium', 'high'] * (batch_size // 3 + 1)
-    
-    figures = []
-    
-    for i in range(batch_size):
-        complexity = complexity_distribution[i % len(complexity_distribution)]
-        
-        if complexity == 'simple':
-            fig = generate_simple_figure(
-                figsize=(8 + i % 4, 6 + i % 3),
-                data_points=100 + i * 50
-            )
-        else:
-            fig = generate_complex_figure(
-                complexity_level=complexity,
-                num_subplots=None,  # Auto-determined by complexity
-                data_points_per_subplot=None  # Auto-determined by complexity
-            )
-        
-        # Add batch metadata for tracking
-        fig.batch_index = i
-        fig.complexity_level = complexity
-        fig.generation_timestamp = time.time()
-        
-        figures.append(fig)
-    
-    return figures
+    yield ("stress", fig_stress, {
+        "data_points": 50000,  # Massive dataset across all subplots
+        "plot_elements": 36,   # 6x6 grid of plots
+        "complexity_score": 20,
+        "expected_memory_mb": 15.0
+    }, 180.0)
 
 
 # =============================================================================
 # CONCURRENT EXECUTION DATA
 # =============================================================================
 
-def generate_concurrent_execution_scenarios(
-    max_concurrency: int = None
-) -> List[Dict[str, Any]]:
+def concurrent_execution_data() -> Iterator[Tuple[str, Dict[str, Any], int]]:
     """
-    Generate concurrent execution scenarios for parallel Kedro runner testing.
+    Generate test scenarios for parallel Kedro runner validation per thread-safety requirements.
     
-    Creates test scenarios with different concurrency patterns to validate
-    plugin thread-safety and performance under parallel execution conditions.
+    Creates data structures and scenarios for testing plugin behavior under concurrent
+    execution with multiple pipeline runners and parallel processing scenarios.
     
-    Args:
-        max_concurrency: Maximum concurrency level (defaults to system CPU count)
-        
-    Returns:
-        List of concurrent execution scenario configurations
-        
-    Examples:
-        >>> scenarios = generate_concurrent_execution_scenarios(max_concurrency=4)
-        >>> len(scenarios) > 0
-        True
-        >>> all('concurrency_level' in scenario for scenario in scenarios)
-        True
+    Yields:
+        Tuple of (scenario_name, execution_config, concurrent_thread_count)
     """
-    if max_concurrency is None:
-        max_concurrency = min(psutil.cpu_count(), STRESS_TEST_LIMITS.max_parallel_pipelines)
     
-    scenarios = []
-    
-    # Define concurrency patterns
-    concurrency_levels = [1, 2, 4, 8, 16]
-    execution_patterns = ['sequential', 'burst', 'sustained', 'mixed']
-    
-    for concurrency in concurrency_levels:
-        if concurrency > max_concurrency:
-            continue
-            
-        for pattern in execution_patterns:
-            scenario = {
-                'concurrency_level': concurrency,
-                'execution_pattern': pattern,
-                'total_operations': concurrency * 10,  # 10 operations per thread
-                'operation_duration': 1.0,  # 1 second per operation
-                'figure_complexity': 'medium',
-                'memory_limit_mb': 100,
-                'timeout_seconds': 60
-            }
-            
-            # Pattern-specific configuration
-            if pattern == 'sequential':
-                scenario['delay_between_operations'] = 0.1
-                scenario['concurrent_batches'] = 1
-            elif pattern == 'burst':
-                scenario['delay_between_operations'] = 0.0
-                scenario['concurrent_batches'] = concurrency
-                scenario['burst_size'] = concurrency
-            elif pattern == 'sustained':
-                scenario['delay_between_operations'] = 0.05
-                scenario['concurrent_batches'] = max(1, concurrency // 2)
-                scenario['duration_seconds'] = 30
-            elif pattern == 'mixed':
-                scenario['delay_between_operations'] = 0.02
-                scenario['concurrent_batches'] = concurrency
-                scenario['burst_intervals'] = [2, 5, 10]  # Burst every N operations
-            
-            # Add performance expectations
-            scenario['performance_expectations'] = {
-                'max_operation_time_ms': PERFORMANCE_TARGETS.figure_dataset_save_overhead_ms,
-                'max_memory_per_thread_mb': PERFORMANCE_TARGETS.plugin_memory_overhead_mb,
-                'max_total_memory_mb': PERFORMANCE_TARGETS.plugin_memory_overhead_mb * concurrency,
-                'throughput_degradation_threshold': PERFORMANCE_TARGETS.concurrent_execution_degradation_percent
-            }
-            
-            scenarios.append(scenario)
-    
-    return scenarios
-
-
-def generate_thread_safety_test_data(
-    num_threads: int = 8,
-    operations_per_thread: int = 50
-) -> Dict[str, Any]:
-    """
-    Generate test data for thread safety validation.
-    
-    Creates shared data structures and execution patterns for testing plugin
-    thread safety under concurrent access to configuration, styling, and
-    file operations.
-    
-    Args:
-        num_threads: Number of concurrent threads to simulate
-        operations_per_thread: Number of operations per thread
-        
-    Returns:
-        Thread safety test configuration and data
-        
-    Examples:
-        >>> test_data = generate_thread_safety_test_data(num_threads=4)
-        >>> test_data['num_threads'] == 4
-        True
-        >>> 'shared_resources' in test_data
-        True
-    """
-    # Generate shared configuration data
-    shared_config = generate_large_figregistry_config(
-        num_conditions=100,
-        config_complexity='medium'
-    )
-    
-    # Generate shared catalog configuration
-    shared_catalog = generate_high_volume_catalog_config(
-        num_figure_datasets=num_threads * 5,
-        concurrent_access_pattern='parallel'
-    )
-    
-    # Generate figure data for each thread
-    thread_figures = {}
-    for thread_id in range(num_threads):
-        thread_figures[thread_id] = generate_figure_dataset_batch(
-            batch_size=operations_per_thread,
-            complexity_distribution=['low', 'medium'] * (operations_per_thread // 2 + 1)
-        )
-    
-    # Define shared resources and conflict scenarios
-    shared_resources = {
-        'output_directories': [
-            f'data/08_reporting/thread_{i}' for i in range(num_threads)
-        ],
-        'shared_output_directory': 'data/08_reporting/shared',
-        'configuration_cache': shared_config,
-        'style_cache': {},  # To be populated during testing
-        'file_locks': {},  # To track file access conflicts
-    }
-    
-    # Define conflict scenarios
-    conflict_scenarios = [
-        {
-            'name': 'same_file_different_threads',
-            'threads': list(range(num_threads)),
-            'target_file': 'data/08_reporting/shared/conflict_test.png',
-            'expected_behavior': 'serialized_access'
-        },
-        {
-            'name': 'same_config_different_conditions',
-            'threads': list(range(min(4, num_threads))),
-            'conditions': [f'condition_{i}' for i in range(min(4, num_threads))],
-            'expected_behavior': 'parallel_resolution'
-        },
-        {
-            'name': 'cache_invalidation_race',
-            'threads': [0, 1],  # Two threads only
-            'cache_operations': ['read', 'write', 'invalidate'],
-            'expected_behavior': 'consistent_state'
-        }
-    ]
-    
-    # Performance benchmarks for thread safety
-    performance_benchmarks = {
-        'single_thread_baseline': {
-            'operations': operations_per_thread,
-            'expected_time_ms': operations_per_thread * 200,  # 200ms per operation
-            'max_memory_mb': 10
-        },
-        'multi_thread_target': {
-            'operations': operations_per_thread * num_threads,
-            'max_time_ms': operations_per_thread * 250,  # 25% overhead acceptable
-            'max_memory_mb': 10 * num_threads,
-            'scalability_efficiency': 0.8  # 80% efficiency target
-        }
-    }
-    
-    return {
-        'num_threads': num_threads,
-        'operations_per_thread': operations_per_thread,
-        'shared_config': shared_config,
-        'shared_catalog': shared_catalog,
-        'thread_figures': thread_figures,
-        'shared_resources': shared_resources,
-        'conflict_scenarios': conflict_scenarios,
-        'performance_benchmarks': performance_benchmarks,
-        'test_duration_seconds': 30,
-        'monitoring_interval_ms': 100
-    }
-
-
-def generate_parallel_pipeline_scenarios(
-    num_pipelines: int = 4,
-    pipeline_complexity: str = "medium"
-) -> List[Dict[str, Any]]:
-    """
-    Generate parallel Kedro pipeline execution scenarios.
-    
-    Creates multiple pipeline configurations for testing concurrent Kedro
-    pipeline execution with FigRegistry plugin integration.
-    
-    Args:
-        num_pipelines: Number of parallel pipelines to configure
-        pipeline_complexity: Complexity level of each pipeline
-        
-    Returns:
-        List of pipeline configuration scenarios
-        
-    Examples:
-        >>> pipelines = generate_parallel_pipeline_scenarios(num_pipelines=3)
-        >>> len(pipelines) == 3
-        True
-        >>> all('pipeline_id' in pipeline for pipeline in pipelines)
-        True
-    """
-    complexity_settings = {
-        'simple': {'nodes': 3, 'figures_per_node': 1, 'processing_time': 5},
-        'medium': {'nodes': 5, 'figures_per_node': 2, 'processing_time': 10},
-        'complex': {'nodes': 8, 'figures_per_node': 3, 'processing_time': 20}
-    }
-    
-    settings = complexity_settings.get(pipeline_complexity, complexity_settings['medium'])
-    scenarios = []
-    
-    for pipeline_id in range(num_pipelines):
-        # Generate pipeline-specific catalog
-        pipeline_catalog = generate_high_volume_catalog_config(
-            num_figure_datasets=settings['nodes'] * settings['figures_per_node'],
-            concurrent_access_pattern='parallel'
-        )
-        
-        # Add pipeline-specific namespace
-        namespaced_catalog = {}
-        for dataset_name, dataset_config in pipeline_catalog.items():
-            namespaced_name = f"pipeline_{pipeline_id}_{dataset_name}"
-            namespaced_config = dataset_config.copy()
-            
-            # Update file paths to prevent conflicts
-            if 'filepath' in namespaced_config:
-                original_path = namespaced_config['filepath']
-                namespaced_config['filepath'] = original_path.replace(
-                    'data/08_reporting', 
-                    f'data/08_reporting/pipeline_{pipeline_id}'
-                )
-            
-            namespaced_catalog[namespaced_name] = namespaced_config
-        
-        # Generate pipeline configuration
-        pipeline_scenario = {
-            'pipeline_id': pipeline_id,
-            'pipeline_name': f'parallel_test_pipeline_{pipeline_id}',
-            'catalog_config': namespaced_catalog,
-            'num_nodes': settings['nodes'],
-            'figures_per_node': settings['figures_per_node'],
-            'estimated_execution_time': settings['processing_time'],
-            'complexity_level': pipeline_complexity,
-            'resource_requirements': {
-                'memory_mb': 50 + pipeline_id * 10,
-                'cpu_cores': 1,
-                'disk_space_mb': 100
+    # Basic concurrent execution - 2 threads
+    yield ("basic_concurrent", {
+        "execution_type": "parallel_simple",
+        "pipeline_configs": [
+            {
+                "pipeline_name": "pipeline_a",
+                "figregistry_config": {
+                    "styles": {"baseline": {"color": "#1f77b4", "marker": "o"}},
+                    "outputs": {"base_path": "data/08_reporting/pipeline_a"}
+                },
+                "catalog_entries": {
+                    "figure_a1": {
+                        "type": "figregistry_kedro.datasets.FigureDataSet",
+                        "filepath": "data/08_reporting/pipeline_a/figure_a1.png",
+                        "condition_param": "baseline"
+                    }
+                },
+                "execution_time_target_ms": 100
             },
-            'dependencies': [],  # No inter-pipeline dependencies for parallel testing
-            'performance_targets': {
-                'max_execution_time_seconds': settings['processing_time'] * 2,
-                'max_memory_usage_mb': 100,
-                'min_throughput_figures_per_second': 1.0
+            {
+                "pipeline_name": "pipeline_b", 
+                "figregistry_config": {
+                    "styles": {"treatment": {"color": "#ff7f0e", "marker": "s"}},
+                    "outputs": {"base_path": "data/08_reporting/pipeline_b"}
+                },
+                "catalog_entries": {
+                    "figure_b1": {
+                        "type": "figregistry_kedro.datasets.FigureDataSet",
+                        "filepath": "data/08_reporting/pipeline_b/figure_b1.png",
+                        "condition_param": "treatment"
+                    }
+                },
+                "execution_time_target_ms": 100
             }
+        ],
+        "thread_safety_requirements": {
+            "configuration_isolation": True,
+            "figure_object_isolation": True,
+            "file_output_isolation": True
         }
-        
-        # Add inter-pipeline dependencies for some scenarios
-        if pipeline_id > 0 and pipeline_complexity == 'complex':
-            # Complex scenarios may have dependencies
-            dependency_probability = 0.3
-            if np.random.random() < dependency_probability:
-                dependency_id = np.random.randint(0, pipeline_id)
-                pipeline_scenario['dependencies'].append(f'parallel_test_pipeline_{dependency_id}')
-        
-        scenarios.append(pipeline_scenario)
+    }, 2)
     
-    return scenarios
+    # Medium concurrent execution - 4 threads with shared config
+    yield ("medium_concurrent", {
+        "execution_type": "parallel_shared_config",
+        "shared_figregistry_config": {
+            "styles": {
+                "experiment_a": {"color": "#e74c3c", "marker": "^"},
+                "experiment_b": {"color": "#3498db", "marker": "v"},
+                "experiment_c": {"color": "#2ecc71", "marker": "D"},
+                "control": {"color": "#95a5a6", "marker": "o"}
+            },
+            "outputs": {
+                "base_path": "data/08_reporting/shared",
+                "timestamp": True,
+                "versioning": "kedro"
+            }
+        },
+        "pipeline_configs": [
+            {
+                "pipeline_name": f"experiment_{chr(65+i)}", 
+                "condition": f"experiment_{chr(97+i)}" if i < 3 else "control",
+                "catalog_entries": {
+                    f"figure_{chr(97+i)}{j}": {
+                        "type": "figregistry_kedro.datasets.FigureDataSet",
+                        "filepath": f"data/08_reporting/shared/exp_{chr(97+i)}/figure_{j:02d}.png",
+                        "condition_param": f"experiment_{chr(97+i)}" if i < 3 else "control",
+                        "versioned": True
+                    } for j in range(3)
+                },
+                "execution_time_target_ms": 150
+            } for i in range(4)
+        ],
+        "concurrency_challenges": {
+            "shared_configuration_access": True,
+            "concurrent_file_creation": True,
+            "memory_pressure_simulation": True
+        }
+    }, 4)
+    
+    # High concurrent execution - 8 threads with complex interactions
+    yield ("high_concurrent", {
+        "execution_type": "parallel_complex",
+        "pipeline_configs": [
+            {
+                "pipeline_name": f"complex_pipeline_{i:02d}",
+                "figregistry_config": {
+                    "styles": {
+                        f"condition_{i}_{j}": {
+                            "color": f"#{random.randint(0, 16777215):06x}",
+                            "marker": random.choice(["o", "s", "^", "v", "D"]),
+                            "linewidth": random.uniform(1.0, 3.0),
+                            "alpha": random.uniform(0.5, 1.0)
+                        } for j in range(5)
+                    },
+                    "outputs": {
+                        "base_path": f"data/08_reporting/complex_{i:02d}",
+                        "dpi": random.choice([150, 200, 300]),
+                        "format": random.choice(["png", "pdf", "svg"])
+                    }
+                },
+                "catalog_entries": {
+                    f"figure_{i:02d}_{j:02d}": {
+                        "type": "figregistry_kedro.datasets.FigureDataSet",
+                        "filepath": f"data/08_reporting/complex_{i:02d}/figure_{j:02d}.png",
+                        "condition_param": f"condition_{i}_{j%5}",
+                        "style_params": {
+                            "dpi": random.choice([200, 300, 600]),
+                            "transparent": random.choice([True, False])
+                        },
+                        "versioned": True
+                    } for j in range(10)
+                },
+                "execution_time_target_ms": 200,
+                "memory_target_mb": 10
+            } for i in range(8)
+        ],
+        "stress_factors": {
+            "high_memory_usage": True,
+            "complex_style_resolution": True,
+            "concurrent_file_io": True,
+            "configuration_cache_pressure": True
+        }
+    }, 8)
+    
+    # Stress concurrent execution - 16 threads maximum load
+    yield ("stress_concurrent", {
+        "execution_type": "parallel_stress_maximum",
+        "global_config": {
+            "figregistry_version": "0.3.0",
+            "memory_limit_mb": 100,
+            "concurrent_figure_limit": 10,
+            "cache_size_limit": 50
+        },
+        "pipeline_configs": [
+            {
+                "pipeline_name": f"stress_pipeline_{i:02d}",
+                "team": f"team_{i//4}",
+                "project": f"project_{chr(65 + i%4)}",
+                "figregistry_config": {
+                    "styles": {
+                        f"stress_condition_{i}_{j}": {
+                            # Complex styling that stresses resolution system
+                            "figure.figsize": [random.uniform(8, 16), random.uniform(6, 12)],
+                            "figure.dpi": random.choice([150, 200, 300, 600]),
+                            "axes.linewidth": random.uniform(0.5, 2.0),
+                            "lines.linewidth": random.uniform(1.0, 4.0),
+                            "lines.markersize": random.uniform(4, 12),
+                            "font.size": random.uniform(8, 16),
+                            "color": f"#{random.randint(0, 16777215):06x}",
+                            "marker": random.choice(["o", "s", "^", "v", "D", "p", "*"]),
+                            "alpha": random.uniform(0.3, 1.0)
+                        } for j in range(20)
+                    },
+                    "outputs": {
+                        "base_path": f"data/08_reporting/stress/team_{i//4}/project_{chr(65 + i%4)}",
+                        "dpi": random.choice([200, 300, 600]),
+                        "format": random.choice(["png", "pdf", "svg"]),
+                        "timestamp": True,
+                        "versioning": "kedro"
+                    }
+                },
+                "catalog_entries": {
+                    f"stress_figure_{i:02d}_{j:03d}": {
+                        "type": "figregistry_kedro.datasets.FigureDataSet",
+                        "filepath": f"data/08_reporting/stress/team_{i//4}/project_{chr(65 + i%4)}/figure_{j:03d}.png",
+                        "condition_param": f"stress_condition_{i}_{j%20}",
+                        "style_params": {
+                            "dpi": random.choice([150, 200, 300, 600]),
+                            "transparent": random.choice([True, False]),
+                            "bbox_inches": "tight",
+                            "pad_inches": random.uniform(0.05, 0.2)
+                        },
+                        "versioned": True,
+                        "metadata": {
+                            "stress_level": "maximum",
+                            "concurrent_index": j,
+                            "team": f"team_{i//4}",
+                            "project": f"project_{chr(65 + i%4)}"
+                        }
+                    } for j in range(25)
+                },
+                "execution_time_target_ms": 250,
+                "memory_target_mb": 6,
+                "concurrency_stress_level": "maximum"
+            } for i in range(16)
+        ],
+        "maximum_stress_factors": {
+            "extreme_memory_pressure": True,
+            "maximum_concurrent_io": True,
+            "configuration_cache_thrashing": True,
+            "figure_object_memory_pressure": True,
+            "thread_contention_simulation": True
+        }
+    }, 16)
 
 
 # =============================================================================
 # MEMORY USAGE SCENARIOS
 # =============================================================================
 
-def generate_memory_usage_scenarios(
-    target_memory_levels: List[float] = None
-) -> List[Dict[str, Any]]:
+def memory_usage_scenarios() -> Iterator[Tuple[str, Dict[str, Any], float]]:
     """
-    Generate memory usage test scenarios for plugin footprint validation.
+    Generate memory usage scenarios for testing plugin memory footprint targeting 
+    <5MB overhead per Section 6.6.4.3.
     
-    Creates scenarios with different memory usage patterns to validate plugin
-    memory overhead remains within the 5MB target per technical specifications.
+    Creates scenarios that stress-test memory usage patterns to validate plugin
+    memory efficiency and prevent memory leaks during extended pipeline execution.
     
-    Args:
-        target_memory_levels: List of target memory levels in MB
-        
-    Returns:
-        List of memory usage test scenario configurations
-        
-    Examples:
-        >>> scenarios = generate_memory_usage_scenarios()
-        >>> len(scenarios) > 0
-        True
-        >>> all('target_memory_mb' in scenario for scenario in scenarios)
-        True
+    Yields:
+        Tuple of (scenario_name, memory_test_config, expected_memory_mb)
     """
-    if target_memory_levels is None:
-        target_memory_levels = [1.0, 2.5, 5.0, 7.5, 10.0]  # MB
     
-    scenarios = []
-    
-    for target_memory in target_memory_levels:
-        # Create memory usage scenario
-        scenario = {
-            'target_memory_mb': target_memory,
-            'scenario_name': f'memory_test_{target_memory:.1f}mb',
-            'memory_allocation_strategy': 'gradual',
-            'measurement_interval_ms': 100,
-            'test_duration_seconds': 30
-        }
-        
-        # Configure memory usage patterns
-        if target_memory <= 2.0:
-            # Low memory scenario
-            scenario.update({
-                'config_complexity': 'simple',
-                'num_catalog_entries': 10,
-                'figure_complexity': 'low',
-                'concurrent_operations': 1,
-                'cache_size_limit': '500KB'
-            })
-        elif target_memory <= 5.0:
-            # Target memory scenario (plugin target)
-            scenario.update({
-                'config_complexity': 'medium',
-                'num_catalog_entries': 50,
-                'figure_complexity': 'medium',
-                'concurrent_operations': 2,
-                'cache_size_limit': '2MB'
-            })
-        else:
-            # High memory scenario (stress testing)
-            scenario.update({
-                'config_complexity': 'complex',
-                'num_catalog_entries': 200,
-                'figure_complexity': 'high',
-                'concurrent_operations': 4,
-                'cache_size_limit': '5MB'
-            })
-        
-        # Add memory monitoring configuration
-        scenario['memory_monitoring'] = {
-            'track_plugin_memory': True,
-            'track_process_memory': True,
-            'track_system_memory': True,
-            'memory_profiling_enabled': MEMORY_PROFILER_AVAILABLE,
-            'gc_monitoring': True,
-            'allocation_tracking': True
-        }
-        
-        # Define memory test operations
-        scenario['test_operations'] = [
-            {
-                'operation': 'load_large_config',
-                'params': {'num_conditions': 100 * int(target_memory)},
-                'expected_memory_delta_mb': target_memory * 0.2
-            },
-            {
-                'operation': 'generate_complex_figures',
-                'params': {'batch_size': int(target_memory * 2)},
-                'expected_memory_delta_mb': target_memory * 0.4
-            },
-            {
-                'operation': 'concurrent_saves',
-                'params': {'concurrency': min(4, int(target_memory))},
-                'expected_memory_delta_mb': target_memory * 0.3
-            },
-            {
-                'operation': 'cache_stress',
-                'params': {'cache_operations': int(target_memory * 100)},
-                'expected_memory_delta_mb': target_memory * 0.1
-            }
-        ]
-        
-        scenarios.append(scenario)
-    
-    return scenarios
-
-
-def generate_memory_leak_detection_data(
-    num_iterations: int = 100,
-    operation_types: List[str] = None
-) -> Dict[str, Any]:
-    """
-    Generate test data for memory leak detection.
-    
-    Creates repetitive operation patterns to detect memory leaks in plugin
-    components through sustained operation monitoring.
-    
-    Args:
-        num_iterations: Number of iterations to run each operation
-        operation_types: List of operation types to test for leaks
-        
-    Returns:
-        Memory leak detection test configuration
-        
-    Examples:
-        >>> leak_test = generate_memory_leak_detection_data(num_iterations=50)
-        >>> leak_test['num_iterations'] == 50
-        True
-        >>> 'operations' in leak_test
-        True
-    """
-    if operation_types is None:
-        operation_types = [
-            'config_loading',
-            'style_resolution', 
-            'figure_saving',
-            'cache_operations',
-            'concurrent_access'
-        ]
-    
-    # Generate test operations for each type
-    operations = {}
-    
-    for op_type in operation_types:
-        if op_type == 'config_loading':
-            operations[op_type] = {
-                'function': 'load_and_merge_config',
-                'params': {
-                    'config_size': 'medium',
-                    'environments': ['local', 'staging']
-                },
-                'cleanup_required': True,
-                'expected_memory_stable': True
-            }
-            
-        elif op_type == 'style_resolution':
-            operations[op_type] = {
-                'function': 'resolve_style_conditions',
-                'params': {
-                    'conditions': [f'condition_{i}' for i in range(20)],
-                    'cache_enabled': True
-                },
-                'cleanup_required': False,
-                'expected_memory_stable': True
-            }
-            
-        elif op_type == 'figure_saving':
-            operations[op_type] = {
-                'function': 'save_figure_with_styling',
-                'params': {
-                    'figure_complexity': 'medium',
-                    'formats': ['png', 'pdf'],
-                    'cleanup_files': True
-                },
-                'cleanup_required': True,
-                'expected_memory_stable': True
-            }
-            
-        elif op_type == 'cache_operations':
-            operations[op_type] = {
-                'function': 'cache_stress_test',
-                'params': {
-                    'cache_size': 1000,
-                    'invalidation_rate': 0.1
-                },
-                'cleanup_required': True,
-                'expected_memory_stable': True
-            }
-            
-        elif op_type == 'concurrent_access':
-            operations[op_type] = {
-                'function': 'concurrent_operation_test',
-                'params': {
-                    'num_threads': 4,
-                    'operations_per_thread': 10
-                },
-                'cleanup_required': True,
-                'expected_memory_stable': True
-            }
-    
-    # Memory leak detection configuration
-    detection_config = {
-        'baseline_measurements': 10,  # Initial measurements for baseline
-        'measurement_interval': 5,   # Measure every N iterations
-        'leak_threshold_mb': STRESS_TEST_LIMITS.memory_leak_tolerance_mb,
-        'trend_analysis_window': 20,  # Analyze trend over N measurements
-        'gc_frequency': 10,  # Force GC every N iterations
-        'memory_profiling': MEMORY_PROFILER_AVAILABLE
-    }
-    
-    return {
-        'num_iterations': num_iterations,
-        'operations': operations,
-        'detection_config': detection_config,
-        'performance_targets': {
-            'max_memory_increase_mb': STRESS_TEST_LIMITS.memory_leak_tolerance_mb,
-            'max_iteration_time_ms': 500,
-            'gc_efficiency_threshold': 0.9
+    # Baseline memory usage
+    yield ("baseline_minimal", {
+        "scenario_type": "minimal_plugin_load",
+        "configuration_size": "minimal",
+        "figregistry_config": {
+            "figregistry_version": "0.3.0",
+            "styles": {"default": {"color": "#1f77b4"}},
+            "outputs": {"base_path": "data/08_reporting"}
         },
-        'monitoring_settings': {
-            'track_rss_memory': True,
-            'track_heap_memory': True,
-            'track_gc_collections': True,
-            'track_object_counts': True,
-            'detailed_profiling': False  # Enable for detailed analysis
+        "catalog_entries": 1,
+        "expected_operations": ["hook_initialization", "config_loading"],
+        "memory_tracking": {
+            "track_hook_memory": True,
+            "track_config_memory": True,
+            "track_dataset_memory": True
         }
-    }
-
-
-def calculate_memory_footprint_baseline() -> Dict[str, float]:
-    """
-    Calculate baseline memory footprint for plugin components.
+    }, 1.0)
     
-    Measures baseline memory usage of plugin components to establish
-    reference values for memory overhead calculations.
+    # Standard configuration memory usage
+    yield ("standard_config", {
+        "scenario_type": "standard_configuration_load",
+        "configuration_size": "standard",
+        "figregistry_config": {
+            "figregistry_version": "0.3.0",
+            "styles": {
+                f"condition_{i}": {
+                    "color": f"#{random.randint(0, 16777215):06x}",
+                    "marker": random.choice(["o", "s", "^", "v", "D"]),
+                    "linewidth": random.uniform(1.0, 3.0),
+                    "alpha": random.uniform(0.5, 1.0)
+                } for i in range(50)
+            },
+            "outputs": {
+                "base_path": "data/08_reporting",
+                "dpi": 300,
+                "format": "png",
+                "timestamp": True
+            }
+        },
+        "catalog_entries": 10,
+        "concurrent_figures": 5,
+        "memory_tracking": {
+            "track_configuration_cache": True,
+            "track_style_resolution_cache": True,
+            "track_figure_object_memory": True
+        }
+    }, 2.5)
     
-    Returns:
-        Dictionary with baseline memory measurements in MB
-        
-    Examples:
-        >>> baseline = calculate_memory_footprint_baseline()
-        >>> 'process_baseline_mb' in baseline
-        True
-        >>> baseline['process_baseline_mb'] > 0
-        True
-    """
-    import gc
+    # Large configuration memory stress
+    yield ("large_config_stress", {
+        "scenario_type": "large_configuration_stress",
+        "configuration_size": "large",
+        "figregistry_config": {
+            "figregistry_version": "0.3.0",
+            "styles": {
+                f"complex_condition_{i}_{j}": {
+                    # Complex nested styling configuration
+                    "figure.figsize": [random.uniform(6, 16), random.uniform(4, 12)],
+                    "figure.dpi": random.choice([150, 200, 300, 600]),
+                    "axes.linewidth": random.uniform(0.5, 3.0),
+                    "axes.labelsize": random.uniform(8, 16),
+                    "lines.linewidth": random.uniform(0.5, 4.0),
+                    "lines.markersize": random.uniform(2, 12),
+                    "font.size": random.uniform(8, 16),
+                    "color": f"#{random.randint(0, 16777215):06x}",
+                    "marker": random.choice(["o", "s", "^", "v", "D", "p", "*", "h", "H", "+"]),
+                    "alpha": random.uniform(0.2, 1.0)
+                } for i in range(10) for j in range(50)
+            },
+            "outputs": {
+                "base_path": "data/08_reporting",
+                "path_aliases": {
+                    f"alias_{k}": f"path/level1/level2/{k}" for k in range(100)
+                }
+            },
+            "environments": {
+                f"env_{env}": {
+                    "outputs": {"dpi": random.choice([150, 300, 600])},
+                    "style_overrides": {
+                        f"complex_condition_{i}_{j}": {"alpha": random.uniform(0.1, 1.0)}
+                        for i in range(5) for j in range(10)
+                    }
+                } for env in range(10)
+            }
+        },
+        "catalog_entries": 50,
+        "concurrent_figures": 10,
+        "memory_tracking": {
+            "track_deep_configuration_memory": True,
+            "track_environment_resolution_memory": True,
+            "track_cache_growth_patterns": True
+        }
+    }, 4.5)
     
-    # Force garbage collection for clean baseline
-    gc.collect()
+    # Memory leak detection scenario
+    yield ("memory_leak_detection", {
+        "scenario_type": "memory_leak_detection",
+        "configuration_size": "medium",
+        "test_duration_minutes": 5,
+        "operations_per_minute": 100,
+        "figregistry_config": {
+            "figregistry_version": "0.3.0",
+            "styles": {
+                f"leak_test_condition_{i}": {
+                    "color": f"#{random.randint(0, 16777215):06x}",
+                    "marker": random.choice(["o", "s", "^"]),
+                    "linewidth": random.uniform(1.0, 2.0)
+                } for i in range(20)
+            },
+            "outputs": {"base_path": "data/08_reporting"}
+        },
+        "repeated_operations": {
+            "figure_creation_cycles": 1000,
+            "config_resolution_cycles": 500,
+            "style_application_cycles": 2000
+        },
+        "memory_tracking": {
+            "track_memory_growth": True,
+            "detect_memory_leaks": True,
+            "monitor_garbage_collection": True,
+            "track_figure_object_cleanup": True
+        },
+        "gc_settings": {
+            "force_gc_between_operations": True,
+            "track_gc_collections": True
+        }
+    }, 3.0)
     
-    # Get process memory info
-    process = psutil.Process()
-    memory_info = process.memory_info()
+    # Concurrent memory pressure scenario
+    yield ("concurrent_memory_pressure", {
+        "scenario_type": "concurrent_memory_pressure",
+        "configuration_size": "large",
+        "concurrent_threads": 8,
+        "figregistry_config": {
+            "figregistry_version": "0.3.0",
+            "styles": {
+                f"pressure_condition_{i}_{j}": {
+                    # Memory-intensive styling configuration
+                    "figure.figsize": [random.uniform(12, 20), random.uniform(8, 16)],
+                    "figure.dpi": random.choice([300, 600, 1200]),
+                    "complex_data": [random.random() for _ in range(1000)],  # Large data arrays
+                    "color_palette": [f"#{random.randint(0, 16777215):06x}" for _ in range(50)],
+                    "marker_styles": {
+                        f"marker_{k}": {
+                            "size": random.uniform(2, 15),
+                            "color": f"#{random.randint(0, 16777215):06x}",
+                            "alpha": random.uniform(0.1, 1.0)
+                        } for k in range(20)
+                    }
+                } for i in range(5) for j in range(10)
+            },
+            "outputs": {"base_path": "data/08_reporting"}
+        },
+        "concurrent_operations": {
+            "simultaneous_figure_creation": 8,
+            "simultaneous_config_resolution": 16,
+            "simultaneous_style_application": 32
+        },
+        "memory_tracking": {
+            "track_peak_memory_usage": True,
+            "track_memory_per_thread": True,
+            "monitor_memory_contention": True
+        }
+    }, 4.8)
     
-    baseline = {
-        'process_baseline_mb': memory_info.rss / (1024 * 1024),
-        'virtual_memory_mb': memory_info.vms / (1024 * 1024),
-        'shared_memory_mb': getattr(memory_info, 'shared', 0) / (1024 * 1024),
-        'system_available_mb': psutil.virtual_memory().available / (1024 * 1024),
-        'system_total_mb': psutil.virtual_memory().total / (1024 * 1024),
-        'cpu_count': psutil.cpu_count(),
-        'python_objects': len(gc.get_objects()),
-        'gc_collections': sum(gc.get_counts())
-    }
-    
-    # Add matplotlib baseline if imported
-    if 'matplotlib.pyplot' in globals():
-        baseline['matplotlib_figures'] = len(plt.get_fignums())
-    
-    return baseline
+    # Memory overflow prevention test
+    yield ("memory_overflow_prevention", {
+        "scenario_type": "memory_overflow_prevention",
+        "configuration_size": "maximum",
+        "stress_level": "extreme",
+        "figregistry_config": {
+            "figregistry_version": "0.3.0",
+            "styles": {
+                f"overflow_test_{i:04d}": {
+                    # Extremely large configuration entries
+                    "figure.figsize": [random.uniform(16, 24), random.uniform(12, 18)],
+                    "figure.dpi": 1200,  # Maximum DPI
+                    "massive_array": [random.random() for _ in range(10000)],  # Large arrays
+                    "complex_nested_data": {
+                        f"level_{j}": {
+                            f"sublevel_{k}": [random.random() for _ in range(100)]
+                            for k in range(10)
+                        } for j in range(10)
+                    },
+                    "color_gradients": [
+                        [f"#{random.randint(0, 16777215):06x}" for _ in range(100)]
+                        for _ in range(10)
+                    ]
+                } for i in range(100)
+            },
+            "outputs": {
+                "base_path": "data/08_reporting",
+                "massive_path_aliases": {
+                    f"path_alias_{i:04d}": f"very/deep/path/structure/level{i//10}/sublevel{i%10}"
+                    for i in range(1000)
+                }
+            }
+        },
+        "overflow_protection": {
+            "max_memory_limit_mb": 10,  # Hard limit above target
+            "memory_monitoring_interval_ms": 100,
+            "automatic_cleanup_threshold_mb": 8
+        },
+        "memory_tracking": {
+            "track_memory_ceiling": True,
+            "monitor_overflow_prevention": True,
+            "track_automatic_cleanup": True
+        }
+    }, 5.0)  # At the target limit
 
 
 # =============================================================================
 # BENCHMARK TIMING UTILITIES
 # =============================================================================
 
-class PerformanceTimer:
+class BenchmarkTimer:
     """
-    High-precision timing utility for plugin performance measurement.
-    
-    Provides context manager and decorator interfaces for measuring operation
-    timing with microsecond precision and statistical analysis capabilities.
+    Precision timing utilities for measuring hook initialization, config resolution,
+    and dataset operations per Section 6.6.4.3 performance requirements.
     """
     
-    def __init__(self, operation_name: str = "operation"):
-        self.operation_name = operation_name
-        self.start_time = None
-        self.end_time = None
-        self.duration_ms = None
-        self.measurements = []
-    
-    def __enter__(self):
-        self.start_time = time.perf_counter()
-        return self
-    
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.end_time = time.perf_counter()
-        self.duration_ms = (self.end_time - self.start_time) * 1000
-        self.measurements.append(self.duration_ms)
-    
-    def get_stats(self) -> Dict[str, float]:
-        """Get statistical summary of all measurements."""
-        if not self.measurements:
-            return {}
+    def __init__(self):
+        self.measurements: List[PerformanceMetrics] = []
+        self.targets = PerformanceTargets()
         
-        measurements = np.array(self.measurements)
-        return {
-            'count': len(measurements),
-            'mean_ms': float(np.mean(measurements)),
-            'median_ms': float(np.median(measurements)),
-            'std_ms': float(np.std(measurements)),
-            'min_ms': float(np.min(measurements)),
-            'max_ms': float(np.max(measurements)),
-            'p95_ms': float(np.percentile(measurements, 95)),
-            'p99_ms': float(np.percentile(measurements, 99))
-        }
-
-
-def time_function_calls(
-    func: Callable,
-    args_list: List[Tuple],
-    num_warmup: int = 5,
-    num_measurements: int = 20
-) -> Dict[str, Any]:
-    """
-    Time function calls with statistical analysis.
-    
-    Measures function execution time across multiple calls with warmup
-    iterations and statistical analysis of timing results.
-    
-    Args:
-        func: Function to time
-        args_list: List of argument tuples for function calls
-        num_warmup: Number of warmup iterations
-        num_measurements: Number of timing measurements
+    @contextmanager
+    def time_operation(self, operation_name: str, **metadata):
+        """
+        Context manager for timing operations with memory and CPU monitoring.
         
-    Returns:
-        Timing results with statistical analysis
+        Args:
+            operation_name: Name of the operation being timed
+            **metadata: Additional metadata to store with measurement
+        """
+        # Get initial system state
+        process = psutil.Process()
+        initial_memory = process.memory_info().rss / 1024 / 1024  # MB
+        initial_cpu = process.cpu_percent()
         
-    Examples:
-        >>> def test_func(x): return x * 2
-        >>> results = time_function_calls(test_func, [(1,), (2,)], num_warmup=2, num_measurements=5)
-        >>> 'mean_ms' in results
-        True
-    """
-    # Warmup iterations
-    for i in range(num_warmup):
-        args = args_list[i % len(args_list)]
-        func(*args)
-    
-    # Timing measurements
-    measurements = []
-    
-    for i in range(num_measurements):
-        args = args_list[i % len(args_list)]
-        
+        # Start timing
         start_time = time.perf_counter()
-        result = func(*args)
-        end_time = time.perf_counter()
         
-        duration_ms = (end_time - start_time) * 1000
-        measurements.append(duration_ms)
-    
-    # Statistical analysis
-    measurements = np.array(measurements)
-    
-    return {
-        'function_name': func.__name__,
-        'num_calls': num_measurements,
-        'measurements_ms': measurements.tolist(),
-        'mean_ms': float(np.mean(measurements)),
-        'median_ms': float(np.median(measurements)),
-        'std_ms': float(np.std(measurements)),
-        'min_ms': float(np.min(measurements)),
-        'max_ms': float(np.max(measurements)),
-        'p95_ms': float(np.percentile(measurements, 95)),
-        'p99_ms': float(np.percentile(measurements, 99)),
-        'coefficient_of_variation': float(np.std(measurements) / np.mean(measurements)),
-        'outliers': _detect_outliers(measurements).tolist()
-    }
-
-
-def benchmark_plugin_operations(
-    operation_configs: List[Dict[str, Any]],
-    iterations: int = 50
-) -> Dict[str, Dict[str, float]]:
-    """
-    Benchmark multiple plugin operations for performance validation.
-    
-    Runs comprehensive benchmarks across plugin operations to validate
-    performance targets and identify bottlenecks.
-    
-    Args:
-        operation_configs: List of operation configurations to benchmark
-        iterations: Number of iterations per operation
-        
-    Returns:
-        Benchmark results for all operations
-        
-    Examples:
-        >>> configs = [{'name': 'test_op', 'func': lambda: None, 'args': []}]
-        >>> results = benchmark_plugin_operations(configs, iterations=10)
-        >>> len(results) > 0
-        True
-    """
-    benchmark_results = {}
-    
-    for config in operation_configs:
-        operation_name = config['name']
-        operation_func = config['func']
-        operation_args = config.get('args', [])
-        
-        # Time the operation
-        with PerformanceTimer(operation_name) as timer:
-            for _ in range(iterations):
-                if operation_args:
-                    operation_func(*operation_args)
-                else:
-                    operation_func()
-        
-        # Store results
-        benchmark_results[operation_name] = timer.get_stats()
-        
-        # Add performance target comparison
-        target_key = f"{operation_name}_target_ms"
-        if hasattr(PERFORMANCE_TARGETS, target_key.replace('_target_ms', '_time_ms')):
-            target_value = getattr(PERFORMANCE_TARGETS, target_key.replace('_target_ms', '_time_ms'))
-            benchmark_results[operation_name]['target_ms'] = target_value
-            benchmark_results[operation_name]['meets_target'] = (
-                benchmark_results[operation_name]['mean_ms'] <= target_value
+        try:
+            yield
+        finally:
+            # End timing
+            end_time = time.perf_counter()
+            execution_time_ms = (end_time - start_time) * 1000
+            
+            # Get final system state
+            final_memory = process.memory_info().rss / 1024 / 1024  # MB
+            final_cpu = process.cpu_percent()
+            
+            # Create measurement record
+            measurement = PerformanceMetrics(
+                operation_name=operation_name,
+                execution_time_ms=execution_time_ms,
+                memory_usage_mb=final_memory - initial_memory,
+                cpu_usage_percent=final_cpu - initial_cpu,
+                metadata=metadata
             )
-    
-    return benchmark_results
-
-
-@contextmanager
-def memory_monitoring(
-    operation_name: str = "operation",
-    sampling_interval: float = 0.1
-):
-    """
-    Context manager for memory usage monitoring during operations.
-    
-    Monitors memory usage throughout operation execution with periodic
-    sampling to detect memory leaks and validate memory targets.
-    
-    Args:
-        operation_name: Name of operation being monitored
-        sampling_interval: Memory sampling interval in seconds
-        
-    Yields:
-        Memory monitoring results dictionary
-        
-    Examples:
-        >>> with memory_monitoring("test_op") as monitor:
-        ...     pass  # Some operation
-        >>> 'peak_memory_mb' in monitor
-        True
-    """
-    process = psutil.Process()
-    
-    # Initial memory measurement
-    initial_memory = process.memory_info().rss / (1024 * 1024)
-    
-    monitoring_data = {
-        'operation_name': operation_name,
-        'initial_memory_mb': initial_memory,
-        'memory_samples': [],
-        'timestamps': []
-    }
-    
-    def memory_sampler():
-        start_time = time.time()
-        while getattr(memory_sampler, 'running', True):
-            current_memory = process.memory_info().rss / (1024 * 1024)
-            current_time = time.time()
             
-            monitoring_data['memory_samples'].append(current_memory)
-            monitoring_data['timestamps'].append(current_time - start_time)
+            self.measurements.append(measurement)
+    
+    def time_hook_initialization(self, hook_callable: Callable) -> PerformanceMetrics:
+        """
+        Time FigRegistryHooks initialization targeting <25ms per Section 6.6.4.3.
+        
+        Args:
+            hook_callable: Function that initializes FigRegistryHooks
             
-            time.sleep(sampling_interval)
-    
-    # Start memory sampling in background thread
-    memory_sampler.running = True
-    sampling_thread = threading.Thread(target=memory_sampler, daemon=True)
-    sampling_thread.start()
-    
-    try:
-        yield monitoring_data
-    finally:
-        # Stop memory sampling
-        memory_sampler.running = False
-        sampling_thread.join(timeout=1.0)
+        Returns:
+            PerformanceMetrics with timing data
+        """
+        with self.time_operation("hook_initialization") as timer:
+            result = hook_callable()
         
-        # Final memory measurement
-        final_memory = process.memory_info().rss / (1024 * 1024)
+        measurement = self.measurements[-1]
+        measurement.metadata.update({
+            "target_ms": self.targets.hook_initialization,
+            "meets_target": measurement.meets_target(self.targets.hook_initialization),
+            "result": str(result)
+        })
         
-        # Calculate memory statistics
-        if monitoring_data['memory_samples']:
-            memory_samples = np.array(monitoring_data['memory_samples'])
-            monitoring_data.update({
-                'final_memory_mb': final_memory,
-                'peak_memory_mb': float(np.max(memory_samples)),
-                'min_memory_mb': float(np.min(memory_samples)),
-                'mean_memory_mb': float(np.mean(memory_samples)),
-                'memory_delta_mb': final_memory - initial_memory,
-                'max_memory_delta_mb': float(np.max(memory_samples) - initial_memory),
-                'num_samples': len(memory_samples)
-            })
-
-
-def _detect_outliers(data: np.ndarray, z_threshold: float = 2.0) -> np.ndarray:
-    """
-    Detect outliers in timing data using z-score method.
+        return measurement
     
-    Args:
-        data: Array of timing measurements
-        z_threshold: Z-score threshold for outlier detection
+    def time_config_bridge_resolution(self, bridge_callable: Callable) -> PerformanceMetrics:
+        """
+        Time FigRegistryConfigBridge resolution targeting <50ms per Section 6.6.4.3.
         
-    Returns:
-        Array of outlier indices
-    """
-    if len(data) < 3:
-        return np.array([])
+        Args:
+            bridge_callable: Function that performs config bridge resolution
+            
+        Returns:
+            PerformanceMetrics with timing data
+        """
+        with self.time_operation("config_bridge_resolution") as timer:
+            result = bridge_callable()
+        
+        measurement = self.measurements[-1]
+        measurement.metadata.update({
+            "target_ms": self.targets.config_bridge_resolution,
+            "meets_target": measurement.meets_target(self.targets.config_bridge_resolution),
+            "config_size_kb": len(str(result)) / 1024 if result else 0
+        })
+        
+        return measurement
     
-    z_scores = np.abs((data - np.mean(data)) / np.std(data))
-    outlier_indices = np.where(z_scores > z_threshold)[0]
+    def time_dataset_save_operation(self, dataset_save_callable: Callable) -> PerformanceMetrics:
+        """
+        Time FigureDataSet save operation targeting <200ms per Section 6.6.4.3.
+        
+        Args:
+            dataset_save_callable: Function that performs dataset save
+            
+        Returns:
+            PerformanceMetrics with timing data
+        """
+        with self.time_operation("dataset_save_operation") as timer:
+            result = dataset_save_callable()
+        
+        measurement = self.measurements[-1]
+        measurement.metadata.update({
+            "target_ms": self.targets.figuredataset_save_overhead,
+            "meets_target": measurement.meets_target(self.targets.figuredataset_save_overhead),
+            "file_path": str(result) if result else None
+        })
+        
+        return measurement
     
-    return outlier_indices
+    def batch_time_operations(self, operations: List[Tuple[str, Callable]], iterations: int = 10) -> Dict[str, List[PerformanceMetrics]]:
+        """
+        Time multiple operations with multiple iterations for statistical analysis.
+        
+        Args:
+            operations: List of (operation_name, callable) tuples
+            iterations: Number of iterations per operation
+            
+        Returns:
+            Dictionary mapping operation names to lists of measurements
+        """
+        results = defaultdict(list)
+        
+        for operation_name, operation_callable in operations:
+            for iteration in range(iterations):
+                with self.time_operation(f"{operation_name}_iter_{iteration}") as timer:
+                    operation_callable()
+                
+                measurement = self.measurements[-1]
+                measurement.metadata.update({
+                    "iteration": iteration,
+                    "total_iterations": iterations
+                })
+                
+                results[operation_name].append(measurement)
+        
+        return dict(results)
+    
+    def generate_performance_report(self) -> Dict[str, Any]:
+        """
+        Generate comprehensive performance report with SLA validation.
+        
+        Returns:
+            Dictionary containing performance analysis and recommendations
+        """
+        if not self.measurements:
+            return {"error": "No measurements available"}
+        
+        # Group measurements by operation type
+        operations = defaultdict(list)
+        for measurement in self.measurements:
+            base_operation = measurement.operation_name.split('_iter_')[0]
+            operations[base_operation].append(measurement)
+        
+        report = {
+            "summary": {
+                "total_measurements": len(self.measurements),
+                "operation_types": len(operations),
+                "measurement_period": {
+                    "start": min(m.timestamp for m in self.measurements).isoformat(),
+                    "end": max(m.timestamp for m in self.measurements).isoformat()
+                }
+            },
+            "performance_targets": {
+                "hook_initialization_ms": self.targets.hook_initialization,
+                "config_bridge_resolution_ms": self.targets.config_bridge_resolution,
+                "dataset_save_overhead_ms": self.targets.figuredataset_save_overhead,
+                "plugin_memory_overhead_mb": self.targets.plugin_memory_overhead
+            },
+            "operation_analysis": {},
+            "sla_compliance": {},
+            "recommendations": []
+        }
+        
+        # Analyze each operation type
+        for operation_name, measurements in operations.items():
+            times = [m.execution_time_ms for m in measurements]
+            memory_usage = [m.memory_usage_mb for m in measurements]
+            
+            # Statistical analysis
+            analysis = {
+                "count": len(measurements),
+                "timing_stats": {
+                    "mean_ms": np.mean(times),
+                    "median_ms": np.median(times),
+                    "std_ms": np.std(times),
+                    "min_ms": np.min(times),
+                    "max_ms": np.max(times),
+                    "p95_ms": np.percentile(times, 95),
+                    "p99_ms": np.percentile(times, 99)
+                },
+                "memory_stats": {
+                    "mean_mb": np.mean(memory_usage),
+                    "median_mb": np.median(memory_usage),
+                    "max_mb": np.max(memory_usage)
+                }
+            }
+            
+            # SLA compliance check
+            target_ms = getattr(self.targets, operation_name.replace('_operation', ''), None)
+            if target_ms:
+                compliant_count = sum(1 for t in times if t <= target_ms)
+                analysis["sla_compliance"] = {
+                    "target_ms": target_ms,
+                    "compliance_rate": compliant_count / len(times),
+                    "violations": len(times) - compliant_count,
+                    "worst_violation_ms": max(times) - target_ms if max(times) > target_ms else 0
+                }
+                
+                report["sla_compliance"][operation_name] = analysis["sla_compliance"]
+                
+                # Generate recommendations
+                if analysis["sla_compliance"]["compliance_rate"] < 0.95:
+                    report["recommendations"].append({
+                        "operation": operation_name,
+                        "issue": "SLA compliance below 95%",
+                        "current_rate": analysis["sla_compliance"]["compliance_rate"],
+                        "suggested_actions": [
+                            "Profile operation for bottlenecks",
+                            "Consider caching optimizations",
+                            "Review configuration complexity"
+                        ]
+                    })
+            
+            report["operation_analysis"][operation_name] = analysis
+        
+        return report
 
 
 # =============================================================================
 # STRESS TEST DATA GENERATORS
 # =============================================================================
 
-def generate_stress_test_configurations(
-    stress_level: str = "medium"
-) -> List[Dict[str, Any]]:
+def stress_test_data_generators() -> Iterator[Tuple[str, Dict[str, Any], Dict[str, float]]]:
     """
-    Generate stress test configurations for high-load scenario validation.
+    Generate stress testing data for validating plugin performance under high-load 
+    scenarios per performance requirements.
     
-    Creates configurations designed to stress plugin components to validate
-    graceful degradation and identify performance boundaries under extreme load.
+    Creates extreme scenarios that push plugin components to their limits while
+    validating graceful degradation and error handling under stress conditions.
     
-    Args:
-        stress_level: Stress level ('low', 'medium', 'high', 'extreme')
-        
-    Returns:
-        List of stress test configuration scenarios
-        
-    Examples:
-        >>> stress_configs = generate_stress_test_configurations(stress_level="medium")
-        >>> len(stress_configs) > 0
-        True
-        >>> all('stress_type' in config for config in stress_configs)
-        True
+    Yields:
+        Tuple of (stress_scenario_name, stress_config, performance_thresholds)
     """
-    stress_settings = {
-        'low': {
-            'config_conditions': 200,
-            'catalog_entries': 100,
-            'concurrent_operations': 4,
-            'memory_target_mb': 25,
-            'duration_seconds': 60
-        },
-        'medium': {
-            'config_conditions': 500,
-            'catalog_entries': 250,
-            'concurrent_operations': 8,
-            'memory_target_mb': 50,
-            'duration_seconds': 120
-        },
-        'high': {
-            'config_conditions': 1000,
-            'catalog_entries': 500,
-            'concurrent_operations': 16,
-            'memory_target_mb': 100,
-            'duration_seconds': 300
-        },
-        'extreme': {
-            'config_conditions': 2000,
-            'catalog_entries': 1000,
-            'concurrent_operations': 32,
-            'memory_target_mb': 200,
-            'duration_seconds': 600
-        }
-    }
     
-    settings = stress_settings.get(stress_level, stress_settings['medium'])
-    stress_configurations = []
-    
-    # Configuration stress test
-    config_stress = {
-        'stress_type': 'configuration_complexity',
-        'name': f'{stress_level}_config_stress',
-        'description': 'Test configuration bridge performance with large configurations',
-        'parameters': {
-            'num_conditions': settings['config_conditions'],
-            'num_environments': 5,
-            'nesting_depth': 8,
-            'merge_operations': 100
+    # Configuration complexity stress test
+    yield ("config_complexity_stress", {
+        "stress_type": "configuration_complexity",
+        "description": "Maximum configuration complexity with thousands of conditions",
+        "figregistry_config": {
+            "figregistry_version": "0.3.0",
+            "styles": {
+                f"stress_condition_{category}_{experiment}_{variant}_{iteration:04d}": {
+                    "figure.figsize": [random.uniform(8, 20), random.uniform(6, 16)],
+                    "figure.dpi": random.choice([150, 200, 300, 600, 1200]),
+                    "axes.linewidth": random.uniform(0.5, 3.0),
+                    "lines.linewidth": random.uniform(0.5, 5.0),
+                    "font.size": random.uniform(8, 18),
+                    "color": f"#{random.randint(0, 16777215):06x}",
+                    "marker": random.choice(["o", "s", "^", "v", "D", "p", "*", "h", "H", "+", "x", "X"]),
+                    "alpha": random.uniform(0.1, 1.0),
+                    "complex_nested_params": {
+                        f"param_{j}": random.random() for j in range(50)
+                    }
+                }
+                for category in ["exp", "ctrl", "treat", "base", "test"]
+                for experiment in range(20)
+                for variant in ["a", "b", "c", "d"]
+                for iteration in range(25)
+            },
+            "outputs": {
+                "base_path": "data/08_reporting/stress",
+                "path_aliases": {
+                    f"stress_alias_{i:05d}": f"deep/nested/path/level{i//1000}/sublevel{(i//100)%10}/item{i%100}"
+                    for i in range(10000)
+                }
+            }
         },
-        'targets': {
-            'max_merge_time_ms': PERFORMANCE_TARGETS.config_bridge_merge_time_ms * 2,
-            'max_memory_mb': settings['memory_target_mb'] * 0.3,
-            'success_rate': 0.95
-        },
-        'monitoring': {
-            'track_timing': True,
-            'track_memory': True,
-            'track_errors': True
+        "stress_parameters": {
+            "total_conditions": 10000,
+            "config_file_size_mb": 50,
+            "resolution_attempts": 1000,
+            "concurrent_resolutions": 16
         }
-    }
-    stress_configurations.append(config_stress)
-    
-    # Catalog volume stress test
-    catalog_stress = {
-        'stress_type': 'catalog_volume',
-        'name': f'{stress_level}_catalog_stress',
-        'description': 'Test plugin performance with high-volume catalog configurations',
-        'parameters': {
-            'num_datasets': settings['catalog_entries'],
-            'concurrent_saves': settings['concurrent_operations'],
-            'figure_complexity': 'high',
-            'versioning_enabled': True
-        },
-        'targets': {
-            'max_save_time_ms': PERFORMANCE_TARGETS.figure_dataset_save_overhead_ms * 1.5,
-            'max_memory_per_dataset_mb': 2.0,
-            'success_rate': 0.90
-        },
-        'monitoring': {
-            'track_throughput': True,
-            'track_memory_per_operation': True,
-            'track_file_system_pressure': True
-        }
-    }
-    stress_configurations.append(catalog_stress)
+    }, {
+        "config_bridge_resolution_ms": 100.0,  # Relaxed under stress
+        "memory_usage_mb": 10.0,  # Increased limit for stress test
+        "style_resolution_ms": 5.0
+    })
     
     # Concurrent execution stress test
-    concurrency_stress = {
-        'stress_type': 'concurrent_execution',
-        'name': f'{stress_level}_concurrency_stress',
-        'description': 'Test plugin thread safety under high concurrency',
-        'parameters': {
-            'num_threads': settings['concurrent_operations'],
-            'operations_per_thread': 50,
-            'shared_resources': True,
-            'contention_rate': 0.3
+    yield ("concurrent_execution_stress", {
+        "stress_type": "concurrent_execution",
+        "description": "Maximum concurrent pipeline execution with resource contention",
+        "concurrent_pipelines": 32,
+        "pipeline_template": {
+            "figregistry_config": {
+                "styles": {
+                    f"concurrent_condition_{i}": {
+                        "color": f"#{random.randint(0, 16777215):06x}",
+                        "marker": random.choice(["o", "s", "^", "v", "D"]),
+                        "linewidth": random.uniform(1.0, 3.0)
+                    } for i in range(100)
+                },
+                "outputs": {"base_path": "data/08_reporting/concurrent"}
+            },
+            "catalog_entries_per_pipeline": 50,
+            "figures_per_entry": 5
         },
-        'targets': {
-            'max_operation_time_ms': PERFORMANCE_TARGETS.figure_dataset_save_overhead_ms * 2,
-            'thread_safety_violations': 0,
-            'deadlock_timeout_seconds': 30
-        },
-        'monitoring': {
-            'track_thread_contention': True,
-            'track_race_conditions': True,
-            'track_resource_conflicts': True
+        "stress_parameters": {
+            "total_concurrent_operations": 1600,  # 32 pipelines * 50 entries
+            "memory_pressure_simulation": True,
+            "disk_io_contention": True,
+            "configuration_cache_thrashing": True
         }
-    }
-    stress_configurations.append(concurrency_stress)
+    }, {
+        "figuredataset_save_overhead_ms": 300.0,  # Relaxed under stress
+        "hook_initialization_ms": 50.0,
+        "memory_usage_per_pipeline_mb": 2.0,
+        "total_memory_usage_mb": 64.0
+    })
     
     # Memory pressure stress test
-    memory_stress = {
-        'stress_type': 'memory_pressure',
-        'name': f'{stress_level}_memory_stress',
-        'description': 'Test plugin behavior under memory pressure',
-        'parameters': {
-            'target_memory_mb': settings['memory_target_mb'],
-            'allocation_rate': 'aggressive',
-            'gc_frequency': 'reduced',
-            'memory_fragments': True
+    yield ("memory_pressure_stress", {
+        "stress_type": "memory_pressure",
+        "description": "Extreme memory usage with large figures and configurations",
+        "memory_intensive_config": {
+            "figregistry_version": "0.3.0",
+            "styles": {
+                f"memory_stress_{i:04d}": {
+                    # Memory-intensive configuration entries
+                    "large_data_arrays": [random.random() for _ in range(100000)],
+                    "complex_color_palettes": [
+                        [f"#{random.randint(0, 16777215):06x}" for _ in range(1000)]
+                        for _ in range(10)
+                    ],
+                    "nested_configuration": {
+                        f"level_{j}": {
+                            f"sublevel_{k}": {
+                                f"item_{l}": random.random()
+                                for l in range(100)
+                            } for k in range(10)
+                        } for j in range(10)
+                    }
+                } for i in range(500)
+            }
         },
-        'targets': {
-            'max_total_memory_mb': settings['memory_target_mb'],
-            'memory_leak_tolerance_mb': STRESS_TEST_LIMITS.memory_leak_tolerance_mb,
-            'gc_efficiency': 0.8
+        "figure_generation": {
+            "massive_figures": True,
+            "figure_sizes": [(24, 18), (32, 24), (40, 30)],
+            "data_points_per_figure": 1000000,
+            "concurrent_figure_limit": 20
         },
-        'monitoring': {
-            'track_memory_allocation': True,
-            'track_gc_performance': True,
-            'track_memory_fragmentation': True
+        "stress_parameters": {
+            "target_memory_usage_gb": 2.0,
+            "memory_leak_detection": True,
+            "garbage_collection_monitoring": True
         }
-    }
-    stress_configurations.append(memory_stress)
+    }, {
+        "memory_usage_mb": 15.0,  # Increased for stress test
+        "figuredataset_save_overhead_ms": 500.0,
+        "memory_leak_tolerance_mb": 1.0
+    })
     
-    # Sustained load stress test
-    sustained_load_stress = {
-        'stress_type': 'sustained_load',
-        'name': f'{stress_level}_sustained_load',
-        'description': 'Test plugin stability under sustained load',
-        'parameters': {
-            'duration_seconds': settings['duration_seconds'],
-            'operations_per_second': 10,
-            'load_variation': 'random',
-            'spike_frequency': 60  # Seconds between load spikes
+    # I/O throughput stress test
+    yield ("io_throughput_stress", {
+        "stress_type": "io_throughput",
+        "description": "Maximum I/O throughput with rapid figure generation and saving",
+        "io_intensive_scenario": {
+            "rapid_figure_generation": {
+                "figures_per_second": 100,
+                "test_duration_seconds": 60,
+                "concurrent_save_operations": 50
+            },
+            "file_format_diversity": {
+                "formats": ["png", "pdf", "svg", "eps"],
+                "dpi_settings": [150, 200, 300, 600, 1200],
+                "size_variations": [(8, 6), (12, 9), (16, 12), (20, 15)]
+            },
+            "directory_structure_stress": {
+                "deep_nesting_levels": 10,
+                "directories_per_level": 20,
+                "files_per_directory": 100
+            }
         },
-        'targets': {
-            'uptime_percentage': 99.5,
-            'performance_degradation_max': 20.0,  # Percent
-            'error_rate_max': 1.0  # Percent
-        },
-        'monitoring': {
-            'track_performance_trends': True,
-            'track_stability_metrics': True,
-            'track_resource_exhaustion': True
+        "stress_parameters": {
+            "total_files_generated": 6000,
+            "peak_io_operations_per_second": 200,
+            "disk_space_usage_gb": 5.0
         }
-    }
-    stress_configurations.append(sustained_load_stress)
+    }, {
+        "figuredataset_save_overhead_ms": 400.0,
+        "file_io_operation_ms": 200.0,
+        "directory_creation_ms": 50.0
+    })
     
-    return stress_configurations
+    # System resource exhaustion stress test  
+    yield ("resource_exhaustion_stress", {
+        "stress_type": "resource_exhaustion",
+        "description": "Resource exhaustion simulation with recovery testing",
+        "exhaustion_scenarios": {
+            "memory_exhaustion": {
+                "progressive_memory_increase": True,
+                "memory_limit_approach": 0.95,  # Approach 95% of available memory
+                "recovery_mechanisms": ["cache_cleanup", "figure_release", "gc_force"]
+            },
+            "cpu_exhaustion": {
+                "cpu_intensive_operations": True,
+                "complex_style_calculations": True,
+                "parallel_processing_load": 16
+            },
+            "disk_space_exhaustion": {
+                "large_file_generation": True,
+                "space_monitoring": True,
+                "cleanup_on_threshold": True
+            }
+        },
+        "recovery_testing": {
+            "graceful_degradation": True,
+            "error_handling_validation": True,
+            "automatic_recovery_mechanisms": True
+        }
+    }, {
+        "memory_usage_mb": 20.0,  # Higher limit for exhaustion testing
+        "cpu_usage_percent": 90.0,
+        "disk_usage_gb": 10.0,
+        "recovery_time_ms": 1000.0
+    })
 
 
-def generate_performance_regression_data(
-    baseline_metrics: Dict[str, float] = None
-) -> Dict[str, Any]:
+# =============================================================================
+# UTILITY FUNCTIONS
+# =============================================================================
+
+def create_performance_test_suite() -> Dict[str, Any]:
     """
-    Generate test data for performance regression detection.
+    Create a comprehensive performance test suite combining all generators.
     
-    Creates test scenarios for detecting performance regressions in plugin
-    operations by comparing against established baseline metrics.
+    Returns:
+        Dictionary containing all performance test data organized by category
+    """
+    suite = {
+        "metadata": {
+            "created_at": datetime.now().isoformat(),
+            "performance_targets": PerformanceTargets().__dict__,
+            "test_categories": [
+                "large_configs", "high_volume_catalogs", "complex_figures",
+                "concurrent_execution", "memory_usage", "stress_tests"
+            ]
+        },
+        "large_configs": list(large_config_generators()),
+        "kedro_config_scenarios": list(generate_kedro_config_scenarios()),
+        "high_volume_catalogs": list(high_volume_catalog_generators()),
+        "complex_figures": list(complex_figure_generators()),
+        "concurrent_execution": list(concurrent_execution_data()),
+        "memory_usage": list(memory_usage_scenarios()),
+        "stress_tests": list(stress_test_data_generators()),
+        "benchmark_timer": BenchmarkTimer(),
+        "utilities": {
+            "create_timer": lambda: BenchmarkTimer(),
+            "validate_performance": lambda metrics, targets: all(
+                m.meets_target(getattr(targets, m.operation_name.replace('_operation', ''), float('inf')))
+                for m in metrics
+            )
+        }
+    }
+    
+    return suite
+
+
+def validate_performance_targets(measurements: List[PerformanceMetrics]) -> Dict[str, bool]:
+    """
+    Validate performance measurements against Section 6.6.4.3 targets.
     
     Args:
-        baseline_metrics: Baseline performance metrics for comparison
+        measurements: List of performance measurements to validate
         
     Returns:
-        Performance regression test configuration
-        
-    Examples:
-        >>> regression_data = generate_performance_regression_data()
-        >>> 'baseline_metrics' in regression_data
-        True
-        >>> 'regression_tests' in regression_data
-        True
+        Dictionary mapping operation names to compliance status
     """
-    if baseline_metrics is None:
-        baseline_metrics = {
-            'config_merge_time_ms': PERFORMANCE_TARGETS.config_bridge_merge_time_ms * 0.8,
-            'figure_save_time_ms': PERFORMANCE_TARGETS.figure_dataset_save_overhead_ms * 0.8,
-            'hook_init_time_ms': PERFORMANCE_TARGETS.hook_initialization_time_ms * 0.8,
-            'memory_usage_mb': PERFORMANCE_TARGETS.plugin_memory_overhead_mb * 0.8,
-            'style_resolution_time_ms': PERFORMANCE_TARGETS.style_resolution_time_ms * 0.8
-        }
+    targets = PerformanceTargets()
+    compliance = {}
     
-    # Define regression test scenarios
-    regression_tests = [
-        {
-            'test_name': 'config_bridge_regression',
-            'operation': 'configuration_merge',
-            'baseline_metric': 'config_merge_time_ms',
-            'regression_threshold_percent': 15.0,  # 15% increase triggers alert
-            'test_parameters': {
-                'num_configs': 5,
-                'config_size': 'large',
-                'merge_complexity': 'high'
-            }
-        },
-        {
-            'test_name': 'figure_dataset_regression',
-            'operation': 'figure_save_with_styling',
-            'baseline_metric': 'figure_save_time_ms',
-            'regression_threshold_percent': 10.0,
-            'test_parameters': {
-                'figure_complexity': 'medium',
-                'style_complexity': 'high',
-                'file_formats': ['png', 'pdf']
-            }
-        },
-        {
-            'test_name': 'hook_initialization_regression',
-            'operation': 'hook_registration_and_init',
-            'baseline_metric': 'hook_init_time_ms',
-            'regression_threshold_percent': 20.0,
-            'test_parameters': {
-                'num_hooks': 3,
-                'config_complexity': 'medium',
-                'kedro_context_size': 'large'
-            }
-        },
-        {
-            'test_name': 'memory_usage_regression',
-            'operation': 'sustained_plugin_usage',
-            'baseline_metric': 'memory_usage_mb',
-            'regression_threshold_percent': 25.0,
-            'test_parameters': {
-                'duration_seconds': 300,
-                'operations_per_second': 2,
-                'concurrent_threads': 4
-            }
-        },
-        {
-            'test_name': 'style_resolution_regression',
-            'operation': 'style_condition_resolution',
-            'baseline_metric': 'style_resolution_time_ms',
-            'regression_threshold_percent': 30.0,
-            'test_parameters': {
-                'num_conditions': 100,
-                'cache_enabled': True,
-                'pattern_complexity': 'high'
-            }
-        }
-    ]
-    
-    # Generate test data for each regression test
-    test_data = {}
-    for test in regression_tests:
-        test_name = test['test_name']
-        params = test['test_parameters']
+    for measurement in measurements:
+        operation_base = measurement.operation_name.split('_iter_')[0]
         
-        if 'config' in test_name:
-            test_data[test_name] = generate_large_figregistry_config(
-                num_conditions=params.get('num_configs', 5) * 100,
-                config_complexity=params.get('config_size', 'medium')
-            )
-        elif 'figure' in test_name:
-            test_data[test_name] = generate_figure_dataset_batch(
-                batch_size=10,
-                complexity_distribution=[params.get('figure_complexity', 'medium')] * 10
-            )
-        elif 'memory' in test_name:
-            test_data[test_name] = generate_memory_usage_scenarios(
-                target_memory_levels=[5.0, 10.0, 15.0]
-            )
+        if 'hook_initialization' in operation_base:
+            compliance[operation_base] = measurement.meets_target(targets.hook_initialization)
+        elif 'config_bridge_resolution' in operation_base:
+            compliance[operation_base] = measurement.meets_target(targets.config_bridge_resolution)
+        elif 'dataset_save_operation' in operation_base:
+            compliance[operation_base] = measurement.meets_target(targets.figuredataset_save_overhead)
         else:
-            test_data[test_name] = {}
+            compliance[operation_base] = True  # Unknown operation, assume compliant
     
-    return {
-        'baseline_metrics': baseline_metrics,
-        'regression_tests': regression_tests,
-        'test_data': test_data,
-        'monitoring_config': {
-            'measurement_frequency': 'per_test',
-            'statistical_analysis': True,
-            'trend_detection': True,
-            'alert_thresholds': {
-                'performance_degradation': 15.0,  # Percent
-                'memory_increase': 25.0,  # Percent
-                'error_rate_increase': 5.0  # Percent
-            }
-        },
-        'reporting_config': {
-            'generate_trend_charts': True,
-            'compare_to_baseline': True,
-            'include_statistical_significance': True,
-            'export_raw_data': True
-        }
-    }
+    return compliance
 
 
-def create_load_testing_suite(
-    test_duration_minutes: int = 30
-) -> Dict[str, Any]:
+def generate_performance_summary_report(test_suite: Dict[str, Any]) -> str:
     """
-    Create comprehensive load testing suite for plugin validation.
-    
-    Combines multiple stress test scenarios into a comprehensive load testing
-    suite for validating plugin behavior under sustained production-like loads.
+    Generate a human-readable performance test summary report.
     
     Args:
-        test_duration_minutes: Total duration for load testing suite
+        test_suite: Complete performance test suite from create_performance_test_suite()
         
     Returns:
-        Complete load testing suite configuration
-        
-    Examples:
-        >>> load_suite = create_load_testing_suite(test_duration_minutes=15)
-        >>> 'test_phases' in load_suite
-        True
-        >>> len(load_suite['test_phases']) > 0
-        True
+        Formatted string report of performance test capabilities
     """
-    total_duration_seconds = test_duration_minutes * 60
-    
-    # Define load testing phases
-    test_phases = [
-        {
-            'phase_name': 'warmup',
-            'duration_seconds': total_duration_seconds * 0.1,  # 10% of total time
-            'description': 'System warmup with baseline load',
-            'load_characteristics': {
-                'concurrent_operations': 2,
-                'operations_per_second': 1,
-                'figure_complexity': 'low',
-                'config_size': 'small'
-            }
-        },
-        {
-            'phase_name': 'ramp_up',
-            'duration_seconds': total_duration_seconds * 0.2,  # 20% of total time
-            'description': 'Gradual load increase to target levels',
-            'load_characteristics': {
-                'concurrent_operations': 'increase_from_2_to_8',
-                'operations_per_second': 'increase_from_1_to_5',
-                'figure_complexity': 'medium',
-                'config_size': 'medium'
-            }
-        },
-        {
-            'phase_name': 'sustained_load',
-            'duration_seconds': total_duration_seconds * 0.5,  # 50% of total time
-            'description': 'Sustained high load testing',
-            'load_characteristics': {
-                'concurrent_operations': 8,
-                'operations_per_second': 5,
-                'figure_complexity': 'high',
-                'config_size': 'large'
-            }
-        },
-        {
-            'phase_name': 'spike_testing',
-            'duration_seconds': total_duration_seconds * 0.1,  # 10% of total time
-            'description': 'Load spikes to test elasticity',
-            'load_characteristics': {
-                'concurrent_operations': 16,
-                'operations_per_second': 10,
-                'figure_complexity': 'extreme',
-                'config_size': 'extreme',
-                'spike_pattern': 'random'
-            }
-        },
-        {
-            'phase_name': 'cool_down',
-            'duration_seconds': total_duration_seconds * 0.1,  # 10% of total time
-            'description': 'Gradual load reduction and cleanup',
-            'load_characteristics': {
-                'concurrent_operations': 'decrease_from_8_to_1',
-                'operations_per_second': 'decrease_from_5_to_1',
-                'figure_complexity': 'low',
-                'config_size': 'small'
-            }
-        }
+    report_lines = [
+        "=" * 80,
+        "FIGREGISTRY-KEDRO PLUGIN PERFORMANCE TEST DATA SUMMARY",
+        "=" * 80,
+        "",
+        f"Generated: {test_suite['metadata']['created_at']}",
+        "",
+        "PERFORMANCE TARGETS (Section 6.6.4.3):",
+        f"  • Plugin Pipeline Execution Overhead: <{test_suite['metadata']['performance_targets']['figuredataset_save_overhead']}ms",
+        f"  • Configuration Bridge Merge Time: <{test_suite['metadata']['performance_targets']['config_bridge_resolution']}ms", 
+        f"  • Hook Initialization Overhead: <{test_suite['metadata']['performance_targets']['hook_initialization']}ms",
+        f"  • Plugin Memory Footprint: <{test_suite['metadata']['performance_targets']['plugin_memory_overhead']}MB",
+        "",
+        "TEST DATA CATEGORIES:",
+        ""
     ]
     
-    # Generate test data for each phase
-    phase_test_data = {}
-    for phase in test_phases:
-        phase_name = phase['phase_name']
-        load_chars = phase['load_characteristics']
-        
-        # Generate configuration data
-        config_size = load_chars.get('config_size', 'medium')
-        config_complexity_map = {
-            'small': 50, 'medium': 200, 'large': 500, 'extreme': 1000
-        }
-        
-        phase_test_data[phase_name] = {
-            'config_data': generate_large_figregistry_config(
-                num_conditions=config_complexity_map.get(config_size, 200),
-                config_complexity=config_size
-            ),
-            'catalog_data': generate_high_volume_catalog_config(
-                num_figure_datasets=config_complexity_map.get(config_size, 200) // 4,
-                concurrent_access_pattern='parallel'
-            ),
-            'figure_data': generate_figure_dataset_batch(
-                batch_size=20,
-                complexity_distribution=[load_chars.get('figure_complexity', 'medium')] * 20
-            )
-        }
+    # Summarize each category
+    categories = [
+        ("large_configs", "Large Configuration Scenarios"),
+        ("kedro_config_scenarios", "Kedro Configuration Merge Scenarios"),
+        ("high_volume_catalogs", "High-Volume Catalog Entries"),
+        ("complex_figures", "Complex Figure Generation"),
+        ("concurrent_execution", "Concurrent Execution Scenarios"),
+        ("memory_usage", "Memory Usage Scenarios"),
+        ("stress_tests", "Stress Test Data")
+    ]
     
-    # Performance monitoring configuration
-    monitoring_config = {
-        'metrics_collection_interval_seconds': 10,
-        'detailed_profiling_phases': ['sustained_load', 'spike_testing'],
-        'memory_monitoring': {
-            'enabled': True,
-            'sampling_rate_hz': 1,
-            'alert_threshold_mb': 100
-        },
-        'performance_monitoring': {
-            'enabled': True,
-            'track_response_times': True,
-            'track_throughput': True,
-            'track_error_rates': True
-        },
-        'resource_monitoring': {
-            'cpu_usage': True,
-            'memory_usage': True,
-            'disk_io': True,
-            'file_system_pressure': True
-        }
-    }
+    for key, title in categories:
+        if key in test_suite:
+            count = len(test_suite[key])
+            report_lines.append(f"{title}:")
+            report_lines.append(f"  • {count} scenarios available")
+            
+            if key == "large_configs":
+                report_lines.append("  • Tests configuration bridge resolution performance")
+                report_lines.append("  • Validates <50ms merge target under load")
+            elif key == "high_volume_catalogs":
+                report_lines.append("  • Tests concurrent FigureDataSet operations")
+                report_lines.append("  • Validates thread-safety and resource contention")
+            elif key == "complex_figures":
+                report_lines.append("  • Tests figure save operation overhead")
+                report_lines.append("  • Validates <200ms dataset save target")
+            elif key == "concurrent_execution":
+                report_lines.append("  • Tests parallel Kedro runner scenarios")
+                report_lines.append("  • Validates plugin thread-safety")
+            elif key == "memory_usage":
+                report_lines.append("  • Tests plugin memory footprint")
+                report_lines.append("  • Validates <5MB overhead target")
+            elif key == "stress_tests":
+                report_lines.append("  • Tests extreme load scenarios")
+                report_lines.append("  • Validates graceful degradation")
+            
+            report_lines.append("")
     
-    # Success criteria and thresholds
-    success_criteria = {
-        'overall_success_rate': 95.0,  # Percent
-        'max_response_time_ms': PERFORMANCE_TARGETS.figure_dataset_save_overhead_ms * 2,
-        'max_memory_usage_mb': PERFORMANCE_TARGETS.plugin_memory_overhead_mb * 5,
-        'max_error_rate': 2.0,  # Percent
-        'resource_utilization_limits': {
-            'cpu_percent': 80.0,
-            'memory_percent': 70.0,
-            'disk_io_mbps': 100.0
-        }
-    }
+    report_lines.extend([
+        "UTILITIES AVAILABLE:",
+        "  • BenchmarkTimer: Precision timing with memory/CPU monitoring",
+        "  • Performance validation functions",
+        "  • Automated SLA compliance checking",
+        "  • Memory leak detection capabilities",
+        "  • Comprehensive reporting and analysis",
+        "",
+        "USAGE:",
+        "  from figregistry_kedro.tests.data.performance_test_data import create_performance_test_suite",
+        "  suite = create_performance_test_suite()",
+        "  timer = suite['benchmark_timer']",
+        "",
+        "=" * 80
+    ])
     
-    return {
-        'test_phases': test_phases,
-        'total_duration_seconds': total_duration_seconds,
-        'phase_test_data': phase_test_data,
-        'monitoring_config': monitoring_config,
-        'success_criteria': success_criteria,
-        'cleanup_config': {
-            'cleanup_between_phases': True,
-            'force_gc_between_phases': True,
-            'reset_caches_between_phases': True,
-            'cleanup_temp_files': True
-        },
-        'reporting_config': {
-            'generate_phase_reports': True,
-            'generate_overall_summary': True,
-            'include_performance_graphs': True,
-            'export_raw_metrics': True
-        }
-    }
+    return "\n".join(report_lines)
 
 
 # =============================================================================
-# MODULE INITIALIZATION AND EXPORTS
+# MODULE EXPORTS
 # =============================================================================
 
-# Export all public functions and classes
 __all__ = [
-    # Performance targets and limits
+    # Core classes
     'PerformanceTargets',
-    'StressTestLimits', 
-    'PERFORMANCE_TARGETS',
-    'STRESS_TEST_LIMITS',
+    'PerformanceMetrics', 
+    'BenchmarkTimer',
     
-    # Large configuration generators
-    'generate_large_figregistry_config',
-    'generate_kedro_environment_configs',
-    'generate_complex_merge_scenarios',
+    # Data generators
+    'large_config_generators',
+    'generate_kedro_config_scenarios',
+    'high_volume_catalog_generators',
+    'complex_figure_generators',
+    'concurrent_execution_data',
+    'memory_usage_scenarios',
+    'stress_test_data_generators',
     
-    # High volume catalog generators
-    'generate_high_volume_catalog_config',
-    'generate_concurrent_catalog_scenarios', 
-    'generate_catalog_stress_scenarios',
-    
-    # Complex figure generators
-    'generate_simple_figure',
-    'generate_complex_figure',
-    'generate_memory_intensive_figure',
-    'generate_figure_dataset_batch',
-    
-    # Concurrent execution data
-    'generate_concurrent_execution_scenarios',
-    'generate_thread_safety_test_data',
-    'generate_parallel_pipeline_scenarios',
-    
-    # Memory usage scenarios
-    'generate_memory_usage_scenarios',
-    'generate_memory_leak_detection_data',
-    'calculate_memory_footprint_baseline',
-    
-    # Benchmark timing utilities  
-    'PerformanceTimer',
-    'time_function_calls',
-    'benchmark_plugin_operations',
-    'memory_monitoring',
-    
-    # Stress test data generators
-    'generate_stress_test_configurations',
-    'generate_performance_regression_data', 
-    'create_load_testing_suite',
-    
-    # Type definitions
-    'ConfigDict',
-    'CatalogConfig',
-    'FigureObject',
-    'TimingResult',
-    'MemoryResult',
-    'PerformanceMetrics'
+    # Utility functions
+    'create_performance_test_suite',
+    'validate_performance_targets',
+    'generate_performance_summary_report'
 ]
 
 
-# Module metadata
-__version__ = "1.0.0"
-__author__ = "FigRegistry Development Team"
-__description__ = "Performance testing data generators for figregistry-kedro plugin"
+# Module initialization
+if __name__ == "__main__":
+    # Generate and display summary when run directly
+    suite = create_performance_test_suite()
+    print(generate_performance_summary_report(suite))
