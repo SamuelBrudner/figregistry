@@ -1,41 +1,23 @@
-qc_id,experiment_id,qc_category,pass_fail_status,quality_score,compliance_rate,deviation_magnitude,risk_level,instrument_id,measurement_type,threshold_value,actual_value,analysis_timestamp,qc_notes
-QC001,EXP001,calibration_check,passed,95.2,98.5,0.12,low,INST001,temperature,20.0,20.1,2024-01-15T08:30:00Z,Within acceptable calibration range
-QC002,EXP001,instrument_validation,passed,92.8,97.2,0.08,low,INST001,pressure,1013.25,1013.18,2024-01-15T08:35:00Z,Validation successful
-QC003,EXP001,control_sample,failed,45.3,76.8,2.35,critical,INST002,ph_level,7.0,5.2,2024-01-15T09:00:00Z,Control sample outside limits
-QC004,EXP001,drift_monitoring,warning,78.5,89.2,0.78,medium,INST001,flow_rate,2.5,2.7,2024-01-15T09:15:00Z,Slight drift detected
-QC005,EXP002,calibration_check,passed,97.8,99.1,0.05,low,INST003,temperature,25.0,25.0,2024-01-15T10:00:00Z,Excellent calibration stability
-QC006,EXP002,instrument_validation,critical,12.4,45.2,4.82,critical,INST002,conductivity,150.0,120.3,2024-01-15T10:30:00Z,Instrument requires immediate attention
-QC007,EXP002,control_sample,passed,88.9,94.5,0.31,low,INST003,dissolved_oxygen,8.5,8.7,2024-01-15T11:00:00Z,Control within specifications
-QC008,EXP002,drift_monitoring,warning,71.2,85.6,1.12,medium,INST002,turbidity,0.5,0.8,2024-01-15T11:30:00Z,Gradual drift trend observed
-QC009,EXP003,calibration_check,failed,52.1,72.4,1.98,high,INST004,viscosity,1.2,0.9,2024-01-16T08:15:00Z,Calibration drift beyond tolerance
-QC010,EXP003,instrument_validation,passed,91.6,96.8,0.19,low,INST004,density,1000.0,1001.2,2024-01-16T08:45:00Z,Validation within range
-QC011,EXP003,control_sample,warning,65.7,81.3,1.45,medium,INST005,chloride,200.0,185.5,2024-01-16T09:15:00Z,Control trending downward
-QC012,EXP003,drift_monitoring,passed,89.4,95.1,0.22,low,INST004,alkalinity,120.0,122.1,2024-01-16T09:45:00Z,Stable drift monitoring
-QC013,EXP004,calibration_check,critical,8.9,32.1,5.67,critical,INST006,fluoride,1.5,0.3,2024-01-16T14:00:00Z,Critical calibration failure
-QC014,EXP004,instrument_validation,warning,76.3,87.9,0.89,medium,INST005,sulfate,96.0,89.2,2024-01-16T14:30:00Z,Validation marginally acceptable
-QC015,EXP004,control_sample,passed,93.5,97.8,0.15,low,INST006,nitrate,10.0,10.2,2024-01-16T15:00:00Z,Control sample excellent
-QC016,EXP004,drift_monitoring,failed,38.7,65.4,2.89,high,INST005,phosphate,0.1,0.25,2024-01-16T15:30:00Z,Significant drift detected
-QC017,EXP005,calibration_check,passed,94.1,98.0,0.18,low,INST007,iron,0.3,0.32,2024-01-17T09:00:00Z,Calibration within tolerance
-QC018,EXP005,instrument_validation,passed,96.7,99.3,0.04,low,INST007,manganese,0.05,0.051,2024-01-17T09:30:00Z,Excellent validation results
-QC019,EXP005,control_sample,warning,68.2,82.7,1.33,medium,INST008,copper,1.3,1.6,2024-01-17T10:00:00Z,Control approaching upper limit
-QC020,EXP005,drift_monitoring,failed,41.5,68.9,2.45,high,INST008,zinc,5.0,7.8,2024-01-17T10:30:00Z,Instrument drift exceeds limits
-QC021,EXP006,calibration_check,warning,73.8,86.4,0.92,medium,INST009,lead,0.015,0.021,2024-01-17T13:15:00Z,Calibration trending high
-QC022,EXP006,instrument_validation,critical,15.2,48.6,4.12,critical,INST009,cadmium,0.005,0.018,2024-01-17T13:45:00Z,Validation failure - contamination
-QC023,EXP006,control_sample,passed,87.6,93.9,0.38,low,INST010,mercury,0.002,0.0025,2024-01-17T14:15:00Z,Control within specifications
-QC024,EXP006,drift_monitoring,passed,90.3,95.7,0.26,low,INST010,arsenic,0.01,0.012,2024-01-17T14:45:00Z,Drift monitoring acceptable
-QC025,EXP007,calibration_check,passed,98.5,99.6,0.02,low,INST011,selenium,0.05,0.051,2024-01-18T08:30:00Z,Outstanding calibration precision
-QC026,EXP007,instrument_validation,failed,44.8,71.2,2.67,high,INST011,chromium,0.1,0.18,2024-01-18T09:00:00Z,Validation outside acceptable range
-QC027,EXP007,control_sample,warning,72.1,85.8,1.08,medium,INST012,nickel,0.02,0.035,2024-01-18T09:30:00Z,Control sample elevated
-QC028,EXP007,drift_monitoring,critical,11.6,38.7,6.23,critical,INST012,cobalt,0.05,0.12,2024-01-18T10:00:00Z,Severe drift - immediate action required
-QC029,EXP008,calibration_check,passed,91.3,96.5,0.21,low,INST013,vanadium,0.1,0.11,2024-01-18T14:00:00Z,Calibration stable
-QC030,EXP008,instrument_validation,passed,89.7,94.8,0.29,low,INST013,molybdenum,0.07,0.075,2024-01-18T14:30:00Z,Validation satisfactory
-QC031,EXP008,control_sample,failed,49.2,73.6,2.18,high,INST014,beryllium,0.004,0.012,2024-01-18T15:00:00Z,Control sample contaminated
-QC032,EXP008,drift_monitoring,warning,66.9,81.5,1.56,medium,INST014,aluminum,200.0,175.2,2024-01-18T15:30:00Z,Downward drift trend
-QC033,EXP009,calibration_check,critical,9.7,35.4,5.89,critical,INST015,titanium,0.1,0.03,2024-01-19T09:15:00Z,Calibration complete failure
-QC034,EXP009,instrument_validation,warning,77.4,88.2,0.67,medium,INST015,boron,0.5,0.58,2024-01-19T09:45:00Z,Validation marginally passed
-QC035,EXP009,control_sample,passed,92.8,97.4,0.16,low,INST016,barium,1.0,1.02,2024-01-19T10:15:00Z,Control excellent precision
-QC036,EXP009,drift_monitoring,passed,86.1,92.6,0.44,low,INST016,strontium,3.0,3.2,2024-01-19T10:45:00Z,Drift within acceptable limits
-QC037,EXP010,calibration_check,passed,95.9,98.7,0.09,low,INST017,lithium,0.01,0.011,2024-01-19T13:30:00Z,Excellent calibration performance
-QC038,EXP010,instrument_validation,failed,36.5,62.8,3.45,high,INST017,cesium,0.001,0.004,2024-01-19T14:00:00Z,Validation significant deviation
-QC039,EXP010,control_sample,warning,69.8,83.4,1.21,medium,INST018,rubidium,0.1,0.125,2024-01-19T14:30:00Z,Control approaching limit
-QC040,EXP010,drift_monitoring,critical,13.4,41.6,4.78,critical,INST018,scandium,0.005,0.015,2024-01-19T15:00:00Z,Critical drift requiring shutdown
+qc_analysis_final_id,experiment_id,qc_category,overall_qc_status,quality_score,compliance_rate,deviation_magnitude,risk_level,total_tests,passed_tests,failed_tests,warning_tests,critical_issues,instrument_performance,trend_direction,action_required,validation_status,analysis_date,analyst_notes
+QCF001,EXP_2024_001,calibration_check,passed,0.92,95.2,0.025,low,4,3,1,0,0,excellent,stable,no,validated,2024-03-15,"All calibration checks within acceptable limits. Traditional visualization requires manual color coding: green for passed (>=0.9), yellow for warnings (0.7-0.9), red for failures (<0.7)"
+QCF002,EXP_2024_001,instrument_validation,warning,0.85,87.5,0.045,medium,4,3,0,1,0,good,mixed,yes,under_review,2024-03-15,"One instrument showing precision degradation. Manual styling needed: orange markers for degrading trend, different line styles for each instrument validation type"
+QCF003,EXP_2024_001,control_sample,passed,0.89,100.0,0.018,low,2,2,0,0,0,good,stable,no,validated,2024-03-15,"Control samples all within specification. Traditional approach requires hardcoded control chart styling with different symbols for each control type"
+QCF004,EXP_2024_002,calibration_check,failed,0.65,75.0,0.225,high,4,2,2,0,1,poor,degrading,yes,failed,2024-03-15,"Multiple calibration failures detected. Manual visualization requires: red backgrounds for failures, bold error markers, custom threshold lines with manual positioning"
+QCF005,EXP_2024_002,instrument_validation,warning,0.74,75.0,0.050,medium,4,2,0,2,0,acceptable,degrading,yes,under_review,2024-03-15,"Detector response and baseline issues. Manual styling decisions: gradient colors for degradation levels, custom legend positioning for multiple warning types"
+QCF006,EXP_2024_002,control_sample,passed,0.91,100.0,0.015,low,2,2,0,0,0,excellent,improving,no,validated,2024-03-15,"Control performance improving. Traditional approach needs manual trend line styling with confidence intervals"
+QCF007,EXP_2024_003,calibration_check,failed,0.58,66.7,0.283,high,3,1,2,0,1,poor,degrading,yes,failed,2024-03-15,"Concentration and pressure calibration issues. Manual QC plots require: custom color schemes for different failure types, manual threshold annotations"
+QCF008,EXP_2024_003,instrument_validation,warning,0.79,75.0,0.115,medium,4,2,0,2,0,acceptable,stable,yes,under_review,2024-03-15,"Sensitivity and reproducibility concerns. Manual visualization needs: different marker shapes for each test type, custom error bar styling"
+QCF009,EXP_2024_003,control_sample,passed,0.83,100.0,0.025,low,2,2,0,0,0,good,stable,no,validated,2024-03-15,"Matrix effects within limits. Traditional styling requires manual recovery plot formatting with spec limit lines"
+QCF010,EXP_2024_004,calibration_check,warning,0.69,75.0,0.084,medium,4,2,0,2,0,acceptable,mixed,yes,under_review,2024-03-15,"Volume accuracy and time calibration warnings. Manual approach requires: custom warning zone shading, different line patterns for each calibration type"
+QCF011,EXP_2024_004,instrument_validation,passed,0.88,100.0,0.019,low,4,4,0,0,0,good,stable,no,validated,2024-03-15,"All validation tests passed. Traditional visualization needs manual styling for passed tests: consistent green scheme with different transparency levels"
+QCF012,EXP_2024_004,control_sample,passed,0.90,100.0,0.012,low,2,2,0,0,0,excellent,stable,no,validated,2024-03-15,"Stability and control performance excellent. Manual control chart styling required with custom UCL/LCL line formatting"
+QCF013,EXP_2024_005,calibration_check,failed,0.62,66.7,0.165,high,3,1,2,0,1,poor,degrading,yes,failed,2024-03-15,"Response linearity and drift issues. Manual QC visualization requires: regression line styling, custom residual plot formatting, failure annotation positioning"
+QCF014,EXP_2024_005,instrument_validation,warning,0.76,75.0,0.095,medium,4,2,0,2,0,acceptable,mixed,yes,under_review,2024-03-15,"Signal noise ratio degradation. Manual styling decisions: spectrum plot colors, noise level threshold lines, custom axis scaling"
+QCF015,EXP_2024_005,control_sample,passed,0.89,100.0,0.020,low,2,2,0,0,0,good,stable,no,validated,2024-03-15,"Cross contamination controls acceptable. Traditional approach needs manual contamination level visualization with log scale formatting"
+QCF016,EXP_2024_006,calibration_check,warning,0.67,66.7,0.160,medium,3,1,0,2,0,acceptable,mixed,yes,under_review,2024-03-15,"Optical alignment and pump issues. Manual visualization requires: alignment scatter plots with custom trend lines, pump calibration curve styling"
+QCF017,EXP_2024_006,instrument_validation,passed,0.85,100.0,0.033,low,4,4,0,0,0,good,improving,no,validated,2024-03-15,"Method precision and accuracy good. Traditional styling needs: precision plot formatting, accuracy bias visualization with custom error representations"
+QCF018,EXP_2024_006,control_sample,passed,0.91,100.0,0.011,low,2,2,0,0,0,excellent,improving,no,validated,2024-03-15,"System suitability excellent. Manual control plot styling: system score trends with performance band visualization"
+QCF019,AGGREGATED_ANALYSIS,calibration_check,warning,0.72,76.0,0.138,medium,21,12,7,2,3,acceptable,mixed,yes,under_review,2024-03-15,"Overall calibration performance summary. Traditional QC dashboard requires: manual heatmap styling for pass/fail patterns, custom color schemes for different instrument types, manual threshold violation highlighting"
+QCF020,AGGREGATED_ANALYSIS,instrument_validation,warning,0.81,87.5,0.057,medium,24,19,0,5,0,good,stable,yes,validated,2024-03-15,"Instrument validation summary across all experiments. Manual visualization needs: multi-instrument comparison charts, validation trend analysis with custom line styling, performance matrix with manual color coding"
+QCF021,AGGREGATED_ANALYSIS,control_sample,passed,0.89,100.0,0.016,low,12,12,0,0,0,excellent,stable,no,validated,2024-03-15,"Control sample performance excellent overall. Traditional approach requires: control chart ensemble with manual statistical limit calculations, trend overlay with custom confidence intervals"
+QCF022,MONTHLY_SUMMARY,all_categories,warning,0.81,87.8,0.070,medium,57,43,7,7,3,good,stable,yes,validated,2024-03-15,"Monthly QC performance across all categories and experiments. Traditional QC reporting requires extensive manual styling: executive dashboard with custom KPI visualization, trend analysis with manual annotation placement, risk matrix with custom cell coloring, compliance tracking with manual threshold line positioning. This demonstrates the manual overhead that figregistry-kedro eliminates through automated condition-based styling."
