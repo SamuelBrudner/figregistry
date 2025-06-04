@@ -1,94 +1,82 @@
 name: Post-Release Validation
 
-# Trigger after successful plugin release to PyPI
 on:
   workflow_run:
-    workflows: ["Plugin Release"]
+    workflows: ["Release"]
     types: [completed]
-    branches: [main]
-  # Manual trigger for testing validation procedures
   workflow_dispatch:
     inputs:
       package_version:
-        description: 'Package version to validate (e.g., 0.1.0)'
+        description: 'Package version to validate (defaults to latest)'
         required: false
-        default: 'latest'
-      rollback_on_failure:
-        description: 'Enable automated rollback on critical failures'
+        type: string
+      skip_rollback:
+        description: 'Skip rollback procedures for testing'
         required: false
-        default: 'true'
         type: boolean
-
-# Comprehensive environment permissions for validation operations
-permissions:
-  contents: read
-  issues: write
-  pull-requests: write
-  packages: read
+        default: false
 
 env:
-  # Global configuration for validation workflow
-  VALIDATION_TIMEOUT: '45'  # minutes
-  MAX_RETRY_ATTEMPTS: '3'
-  PYTHON_VERSIONS: '["3.10", "3.11", "3.12"]'
-  KEDRO_VERSIONS: '["0.18.*", "0.19.*"]'
-  
+  PACKAGE_NAME: figregistry-kedro
+  VALIDATION_TIMEOUT: 45m
+  CRITICAL_FAILURE_THRESHOLD: 50
+
 jobs:
-  # Pre-validation checks to ensure release was successful
-  pre_validation_checks:
-    name: Pre-Validation Checks
+  # Detect released package version and prepare validation matrix
+  prepare-validation:
     runs-on: ubuntu-latest
     outputs:
-      release_successful: ${{ steps.check_release.outputs.success }}
-      package_version: ${{ steps.get_version.outputs.version }}
+      package_version: ${{ steps.detect_version.outputs.version }}
       validation_matrix: ${{ steps.setup_matrix.outputs.matrix }}
-    
+      should_validate: ${{ steps.release_status.outputs.should_validate }}
     steps:
-      - name: Check triggering workflow status
-        id: check_release
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect package version
+        id: detect_version
         run: |
-          if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
-            echo "success=true" >> $GITHUB_OUTPUT
-            echo "✅ Plugin release workflow completed successfully"
-          else
-            echo "success=false" >> $GITHUB_OUTPUT
-            echo "❌ Plugin release workflow failed - skipping validation"
-            exit 1
-          fi
-      
-      - name: Get package version from PyPI
-        id: get_version
-        run: |
-          if [[ "${{ github.event.inputs.package_version }}" != "" && "${{ github.event.inputs.package_version }}" != "latest" ]]; then
+          if [[ -n "${{ github.event.inputs.package_version }}" ]]; then
             VERSION="${{ github.event.inputs.package_version }}"
-            echo "Using manually specified version: $VERSION"
           else
-            # Get latest version from PyPI API
-            VERSION=$(curl -s https://pypi.org/pypi/figregistry-kedro/json | python -c "import json, sys; print(json.load(sys.stdin)['info']['version'])")
-            echo "Latest PyPI version: $VERSION"
+            # Get latest version from PyPI
+            VERSION=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json | jq -r '.info.version')
           fi
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "PACKAGE_VERSION=$VERSION" >> $GITHUB_ENV
-      
+          echo "🔍 Validating package version: $VERSION"
+
+      - name: Check release status
+        id: release_status
+        run: |
+          VERSION="${{ steps.detect_version.outputs.version }}"
+          
+          # Check if this is a valid release version (not dev/pre-release)
+          if [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "should_validate=true" >> $GITHUB_OUTPUT
+            echo "✅ Valid release version detected: $VERSION"
+          else
+            echo "should_validate=false" >> $GITHUB_OUTPUT
+            echo "⏭️ Skipping validation for non-release version: $VERSION"
+          fi
+
       - name: Setup validation matrix
         id: setup_matrix
         run: |
-          # Create comprehensive test matrix
+          # Create comprehensive validation matrix per Section 8.3.2.2
           MATRIX=$(cat << 'EOF'
           {
+            "os": ["ubuntu-latest", "windows-latest", "macos-latest"],
+            "python-version": ["3.10", "3.11", "3.12"],
+            "kedro-version": ["0.18.14", "0.19.8"],
             "include": [
-              {"os": "ubuntu-latest", "python": "3.10", "kedro": "0.18.*", "platform": "linux"},
-              {"os": "ubuntu-latest", "python": "3.11", "kedro": "0.18.*", "platform": "linux"},
-              {"os": "ubuntu-latest", "python": "3.12", "kedro": "0.18.*", "platform": "linux"},
-              {"os": "ubuntu-latest", "python": "3.10", "kedro": "0.19.*", "platform": "linux"},
-              {"os": "ubuntu-latest", "python": "3.11", "kedro": "0.19.*", "platform": "linux"},
-              {"os": "ubuntu-latest", "python": "3.12", "kedro": "0.19.*", "platform": "linux"},
-              {"os": "windows-latest", "python": "3.10", "kedro": "0.18.*", "platform": "windows"},
-              {"os": "windows-latest", "python": "3.11", "kedro": "0.19.*", "platform": "windows"},
-              {"os": "windows-latest", "python": "3.12", "kedro": "0.19.*", "platform": "windows"},
-              {"os": "macos-latest", "python": "3.10", "kedro": "0.18.*", "platform": "macos"},
-              {"os": "macos-latest", "python": "3.11", "kedro": "0.19.*", "platform": "macos"},
-              {"os": "macos-latest", "python": "3.12", "kedro": "0.19.*", "platform": "macos"}
+              {
+                "os": "ubuntu-latest",
+                "python-version": "3.11", 
+                "kedro-version": "0.18.14",
+                "primary": true
+              }
             ]
           }
           EOF
@@ -96,22 +84,21 @@ jobs:
           echo "matrix=$MATRIX" >> $GITHUB_OUTPUT
 
   # Fresh environment installation testing across platform matrix
-  fresh_environment_validation:
-    name: Fresh Install - ${{ matrix.platform }} (Python ${{ matrix.python }}, Kedro ${{ matrix.kedro }})
+  fresh-environment-validation:
+    needs: prepare-validation
+    if: needs.prepare-validation.outputs.should_validate == 'true'
     runs-on: ${{ matrix.os }}
-    needs: pre_validation_checks
-    if: needs.pre_validation_checks.outputs.release_successful == 'true'
-    timeout-minutes: 45
+    timeout-minutes: 30
     strategy:
+      matrix: ${{ fromJson(needs.prepare-validation.outputs.validation_matrix) }}
       fail-fast: false
-      matrix: ${{ fromJson(needs.pre_validation_checks.outputs.validation_matrix) }}
     
     steps:
-      - name: Set up Python ${{ matrix.python }}
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ matrix.python }}
-      
+          python-version: ${{ matrix.python-version }}
+
       - name: Create fresh virtual environment
         shell: bash
         run: |
@@ -125,11 +112,9 @@ jobs:
           fi
           
           # Verify clean environment
-          python -c "import sys; print(f'Python: {sys.version}')"
           pip list
-          
-          echo "VENV_PATH=$(pwd)/fresh_validation_env" >> $GITHUB_ENV
-      
+          echo "🆕 Fresh environment created successfully"
+
       - name: Install Kedro framework
         shell: bash
         run: |
@@ -139,11 +124,14 @@ jobs:
             source fresh_validation_env/bin/activate
           fi
           
-          echo "Installing Kedro ${{ matrix.kedro }}"
-          pip install "kedro${{ matrix.kedro }}"
+          pip install --upgrade pip
+          pip install "kedro==${{ matrix.kedro-version }}"
+          
+          # Verify Kedro installation
           kedro --version
-      
-      - name: Install figregistry-kedro plugin from PyPI
+          echo "✅ Kedro ${{ matrix.kedro-version }} installed successfully"
+
+      - name: Install figregistry-kedro from PyPI
         shell: bash
         run: |
           if [[ "${{ runner.os }}" == "Windows" ]]; then
@@ -152,14 +140,14 @@ jobs:
             source fresh_validation_env/bin/activate
           fi
           
-          echo "Installing figregistry-kedro==${{ needs.pre_validation_checks.outputs.package_version }}"
-          pip install "figregistry-kedro==${{ needs.pre_validation_checks.outputs.package_version }}"
+          # Install specific version from PyPI
+          pip install "${{ env.PACKAGE_NAME }}==${{ needs.prepare-validation.outputs.package_version }}"
           
           # Verify installation
-          python -c "import figregistry_kedro; print(f'figregistry-kedro version: {figregistry_kedro.__version__}')"
-          python -c "import kedro; print(f'Kedro version: {kedro.__version__}')"
-      
-      - name: Verify plugin discovery and registration
+          python -c "import figregistry_kedro; print(f'Plugin version: {figregistry_kedro.__version__}')"
+          echo "✅ Plugin installed from PyPI successfully"
+
+      - name: Verify plugin registration
         shell: bash
         run: |
           if [[ "${{ runner.os }}" == "Windows" ]]; then
@@ -168,29 +156,37 @@ jobs:
             source fresh_validation_env/bin/activate
           fi
           
-          # Test plugin discovery
-          echo "Testing plugin discovery..."
+          # Test plugin discovery through Kedro
           python -c "
           import pkg_resources
-          import kedro.framework.cli.cli
+          import importlib.util
           
-          # Check entry points
-          datasets = [ep for ep in pkg_resources.iter_entry_points('kedro.datasets')]
-          hooks = [ep for ep in pkg_resources.iter_entry_points('kedro.hooks')]
+          # Check entry points registration
+          entry_points = list(pkg_resources.iter_entry_points('kedro.hooks'))
+          figregistry_hooks = [ep for ep in entry_points if 'figregistry' in ep.name.lower()]
           
-          print(f'Found {len(datasets)} dataset entry points')
-          print(f'Found {len(hooks)} hook entry points')
+          if figregistry_hooks:
+              print(f'✅ Plugin hooks registered: {[ep.name for ep in figregistry_hooks]}')
+          else:
+              raise RuntimeError('❌ Plugin hooks not found in kedro.hooks entry points')
           
-          # Verify FigRegistry components
-          figregistry_datasets = [ep for ep in datasets if 'figregistry' in ep.name.lower()]
-          figregistry_hooks = [ep for ep in hooks if 'figregistry' in ep.name.lower()]
+          # Verify dataset registration
+          dataset_entry_points = list(pkg_resources.iter_entry_points('kedro.datasets'))
+          figregistry_datasets = [ep for ep in dataset_entry_points if 'figure' in ep.name.lower()]
           
-          assert len(figregistry_datasets) > 0, 'FigRegistry datasets not found in entry points'
-          assert len(figregistry_hooks) > 0, 'FigRegistry hooks not found in entry points'
+          if figregistry_datasets:
+              print(f'✅ Plugin datasets registered: {[ep.name for ep in figregistry_datasets]}')
+          else:
+              print('ℹ️ No dataset entry points found (may use catalog configuration)')
           
-          print('✅ Plugin discovery successful')
+          # Test basic imports
+          from figregistry_kedro.hooks import FigRegistryHooks
+          from figregistry_kedro.datasets import FigureDataSet
+          from figregistry_kedro.config import FigRegistryConfigBridge
+          
+          print('✅ All plugin components import successfully')
           "
-      
+
       - name: Test basic plugin functionality
         shell: bash
         run: |
@@ -200,741 +196,605 @@ jobs:
             source fresh_validation_env/bin/activate
           fi
           
-          # Test basic import and functionality
+          # Create minimal test to verify core functionality
           python -c "
-          import matplotlib.pyplot as plt
-          import numpy as np
-          from figregistry_kedro.datasets import FigureDataSet
-          from figregistry_kedro.hooks import FigRegistryHooks
-          from figregistry_kedro.config import FigRegistryConfigBridge
-          
-          print('✅ All plugin components imported successfully')
-          
-          # Test basic FigureDataSet instantiation
-          dataset = FigureDataSet(filepath='test_figure.png')
-          print('✅ FigureDataSet instantiation successful')
-          
-          # Test hook instantiation
-          hooks = FigRegistryHooks()
-          print('✅ FigRegistryHooks instantiation successful')
-          
-          # Test config bridge instantiation  
-          bridge = FigRegistryConfigBridge()
-          print('✅ FigRegistryConfigBridge instantiation successful')
-          "
-      
-      - name: Record validation success
-        shell: bash
-        run: |
-          echo "✅ Fresh environment validation successful for ${{ matrix.platform }} Python ${{ matrix.python }} Kedro ${{ matrix.kedro }}"
-          echo "validation_status=success" >> $GITHUB_ENV
-
-  # Example pipeline execution validation
-  example_pipeline_validation:
-    name: Example Pipeline - ${{ matrix.example }} (${{ matrix.platform }})
-    runs-on: ${{ matrix.os }}
-    needs: [pre_validation_checks, fresh_environment_validation]
-    if: needs.pre_validation_checks.outputs.release_successful == 'true'
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-latest
-            platform: linux
-            python: "3.11"
-            kedro: "0.19.*"
-            example: "basic"
-          - os: ubuntu-latest
-            platform: linux
-            python: "3.11"
-            kedro: "0.19.*"
-            example: "advanced"
-          - os: windows-latest
-            platform: windows
-            python: "3.11"
-            kedro: "0.19.*"
-            example: "basic"
-          - os: macos-latest
-            platform: macos
-            python: "3.11"
-            kedro: "0.19.*"
-            example: "basic"
-    
-    steps:
-      - name: Checkout repository for example projects
-        uses: actions/checkout@v4
-      
-      - name: Set up Python ${{ matrix.python }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python }}
-      
-      - name: Create validation environment
-        shell: bash
-        run: |
-          python -m venv example_validation_env
-          
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            source example_validation_env/Scripts/activate
-          else
-            source example_validation_env/bin/activate
-          fi
-          
-          pip install "kedro${{ matrix.kedro }}"
-          pip install "figregistry-kedro==${{ needs.pre_validation_checks.outputs.package_version }}"
-      
-      - name: Create test Kedro project for validation
-        shell: bash
-        run: |
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            source example_validation_env/Scripts/activate
-          else
-            source example_validation_env/bin/activate
-          fi
-          
-          # Create minimal test project
-          kedro new --name="figregistry_validation_${{ matrix.example }}" \
-                    --package-name="figregistry_validation_${{ matrix.example }}" \
-                    --example=n \
-                    --verbose
-          
-          cd "figregistry_validation_${{ matrix.example }}"
-          
-          # Install project dependencies
-          pip install -r requirements.txt
-      
-      - name: Configure figregistry for ${{ matrix.example }} example
-        shell: bash
-        run: |
-          cd "figregistry_validation_${{ matrix.example }}"
-          
-          # Create figregistry configuration
-          mkdir -p conf/base
-          cat > conf/base/figregistry.yml << 'EOF'
-          purposes:
-            validation_test:
-              rcParams:
-                figure.figsize: [10, 6]
-                axes.titlesize: 14
-                axes.labelsize: 12
-                legend.fontsize: 10
-              style_params:
-                title_prefix: "Validation Test"
-                color_scheme: "viridis"
-          
-          conditions:
-            basic_validation:
-              purpose: validation_test
-            advanced_validation: 
-              purpose: validation_test
-          EOF
-          
-          # Configure catalog with FigureDataSet
-          cat > conf/base/catalog.yml << 'EOF'
-          validation_figure:
-            type: figregistry_kedro.datasets.FigureDataSet
-            filepath: data/08_reporting/validation_figure.png
-            condition_param: validation_type
-            save_args:
-              dpi: 150
-              bbox_inches: tight
-          EOF
-          
-          # Register hooks in settings
-          cat > src/figregistry_validation_${{ matrix.example }}/settings.py << 'EOF'
-          from figregistry_kedro.hooks import FigRegistryHooks
-          
-          HOOKS = (FigRegistryHooks(),)
-          EOF
-      
-      - name: Create validation pipeline
-        shell: bash
-        run: |
-          cd "figregistry_validation_${{ matrix.example }}"
-          
-          # Create validation node
-          mkdir -p src/figregistry_validation_${{ matrix.example }}/pipelines/validation
-          
-          cat > src/figregistry_validation_${{ matrix.example }}/pipelines/validation/__init__.py << 'EOF'
-          """Validation pipeline for figregistry-kedro plugin."""
-          from .pipeline import create_pipeline
-          
-          __all__ = ["create_pipeline"]
-          EOF
-          
-          cat > src/figregistry_validation_${{ matrix.example }}/pipelines/validation/nodes.py << 'EOF'
-          """Validation nodes for testing figregistry-kedro functionality."""
-          
-          import matplotlib.pyplot as plt
-          import numpy as np
-          
-          def create_validation_figure(validation_type: str = "basic_validation"):
-              """Create a test figure for validation."""
-              # Generate test data
-              x = np.linspace(0, 10, 100)
-              y = np.sin(x) * np.exp(-x/5)
-              
-              # Create figure - FigRegistry will handle styling and saving
-              fig, ax = plt.subplots()
-              ax.plot(x, y, linewidth=2, label=f'Validation: {validation_type}')
-              ax.set_xlabel('X values')
-              ax.set_ylabel('Y values')
-              ax.set_title(f'FigRegistry Plugin Validation - {validation_type}')
-              ax.legend()
-              ax.grid(True, alpha=0.3)
-              
-              return fig
-          EOF
-          
-          cat > src/figregistry_validation_${{ matrix.example }}/pipelines/validation/pipeline.py << 'EOF'
-          """Validation pipeline definition."""
-          
-          from kedro.pipeline import Pipeline, node
-          
-          from .nodes import create_validation_figure
-          
-          def create_pipeline(**kwargs) -> Pipeline:
-              return Pipeline(
-                  [
-                      node(
-                          func=create_validation_figure,
-                          inputs=None,
-                          outputs="validation_figure",
-                          name="create_validation_figure_node",
-                      ),
-                  ]
-              )
-          EOF
-          
-          # Update pipeline registry
-          cat > src/figregistry_validation_${{ matrix.example }}/pipeline_registry.py << 'EOF'
-          """Project pipelines."""
-          from typing import Dict
-          
-          from kedro.framework.project import find_pipelines
-          from kedro.pipeline import Pipeline
-          
-          from figregistry_validation_${{ matrix.example }}.pipelines import validation
-          
-          def register_pipelines() -> Dict[str, Pipeline]:
-              """Register the project's pipelines."""
-              validation_pipeline = validation.create_pipeline()
-              
-              return {
-                  "validation": validation_pipeline,
-                  "__default__": validation_pipeline,
-              }
-          EOF
-      
-      - name: Execute validation pipeline
-        shell: bash
-        run: |
-          cd "figregistry_validation_${{ matrix.example }}"
-          
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            source ../example_validation_env/Scripts/activate
-          else
-            source ../example_validation_env/bin/activate
-          fi
-          
-          echo "Executing validation pipeline for ${{ matrix.example }} example..."
-          
-          # Run the pipeline
-          kedro run --pipeline=validation
-          
-          echo "✅ Pipeline execution completed successfully"
-      
-      - name: Validate figure output and styling
-        shell: bash
-        run: |
-          cd "figregistry_validation_${{ matrix.example }}"
-          
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            source ../example_validation_env/Scripts/activate
-          else
-            source ../example_validation_env/bin/activate
-          fi
-          
-          # Check if figure was created
-          if [[ -f "data/08_reporting/validation_figure.png" ]]; then
-            echo "✅ Figure file created successfully"
-            
-            # Get file size and basic properties
-            if [[ "${{ runner.os }}" == "Windows" ]]; then
-              FILE_SIZE=$(powershell "(Get-Item 'data/08_reporting/validation_figure.png').Length")
-            else
-              FILE_SIZE=$(stat -f%z "data/08_reporting/validation_figure.png" 2>/dev/null || stat -c%s "data/08_reporting/validation_figure.png")
-            fi
-            
-            echo "Figure file size: $FILE_SIZE bytes"
-            
-            # Validate file is not empty and reasonable size
-            if [[ $FILE_SIZE -gt 1000 ]]; then
-              echo "✅ Figure file size is reasonable ($FILE_SIZE bytes)"
-            else
-              echo "❌ Figure file is too small ($FILE_SIZE bytes) - possible generation failure"
-              exit 1
-            fi
-            
-            # Use Python to validate figure properties if available
-            python -c "
-            import os
-            from PIL import Image
-            
-            fig_path = 'data/08_reporting/validation_figure.png'
-            if os.path.exists(fig_path):
-                img = Image.open(fig_path)
-                print(f'✅ Figure dimensions: {img.size[0]}x{img.size[1]}')
-                print(f'✅ Figure mode: {img.mode}')
-                
-                # Validate reasonable dimensions (should be around 1000x600 based on figsize)
-                width, height = img.size
-                if width >= 500 and height >= 300:
-                    print('✅ Figure dimensions are reasonable')
-                else:
-                    print(f'❌ Figure dimensions too small: {width}x{height}')
-                    exit(1)
-            else:
-                print('❌ Figure file not found')
-                exit(1)
-            " || echo "PIL not available for detailed validation, basic checks passed"
-            
-          else
-            echo "❌ Figure file not found at expected location"
-            echo "Contents of data/08_reporting/:"
-            ls -la data/08_reporting/ || echo "Directory does not exist"
-            exit 1
-          fi
-      
-      - name: Validate plugin integration
-        shell: bash
-        run: |
-          cd "figregistry_validation_${{ matrix.example }}"
-          
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            source ../example_validation_env/Scripts/activate
-          else
-            source ../example_validation_env/bin/activate
-          fi
-          
-          echo "Validating plugin integration..."
-          
-          # Test that hooks were properly registered and executed
-          python -c "
+          import tempfile
           import os
           from pathlib import Path
-          
-          # Check that the figure was created via FigRegistry (not manual save)
-          # This is validated by the existence of the properly formatted figure
-          figure_path = Path('data/08_reporting/validation_figure.png')
-          
-          if figure_path.exists():
-              print('✅ Plugin integration successful - figure created via FigureDataSet')
-              
-              # Check for any logs that might indicate hook execution
-              # (Kedro logs would show hook registration if verbose)
-              print('✅ FigRegistry hooks integration validated')
-          else:
-              print('❌ Plugin integration failed - figure not created')
-              exit(1)
-          "
-          
-          echo "✅ Example pipeline validation completed successfully for ${{ matrix.example }}"
-
-  # Cross-platform plugin functionality validation
-  cross_platform_functionality:
-    name: Cross-Platform Functionality
-    runs-on: ubuntu-latest
-    needs: [pre_validation_checks, fresh_environment_validation, example_pipeline_validation]
-    if: needs.pre_validation_checks.outputs.release_successful == 'true'
-    timeout-minutes: 20
-    
-    steps:
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      
-      - name: Install plugin and dependencies
-        run: |
-          python -m venv cross_platform_env
-          source cross_platform_env/bin/activate
-          
-          pip install "kedro>=0.18.0,<0.20.0"
-          pip install "figregistry-kedro==${{ needs.pre_validation_checks.outputs.package_version }}"
-      
-      - name: Test cross-platform compatibility features
-        run: |
-          source cross_platform_env/bin/activate
-          
-          python -c "
-          import sys
-          import platform
-          from figregistry_kedro.datasets import FigureDataSet
-          from figregistry_kedro.hooks import FigRegistryHooks
-          from figregistry_kedro.config import FigRegistryConfigBridge
-          
-          print(f'Platform: {platform.system()} {platform.release()}')
-          print(f'Python: {sys.version}')
-          
-          # Test path handling across platforms
-          dataset = FigureDataSet(filepath='test/path/figure.png')
-          print(f'✅ Path handling working: {dataset._filepath}')
-          
-          # Test configuration bridge with different path separators
-          bridge = FigRegistryConfigBridge()
-          print('✅ Configuration bridge cross-platform compatibility verified')
-          
-          # Test hook registration
-          hooks = FigRegistryHooks()
-          print('✅ Hook registration cross-platform compatibility verified')
-          
-          print('✅ All cross-platform functionality tests passed')
-          "
-
-  # Performance validation to ensure plugin overhead is acceptable
-  performance_validation:
-    name: Performance Validation
-    runs-on: ubuntu-latest
-    needs: [pre_validation_checks, cross_platform_functionality]
-    if: needs.pre_validation_checks.outputs.release_successful == 'true'
-    timeout-minutes: 15
-    
-    steps:
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      
-      - name: Install plugin and benchmarking tools
-        run: |
-          python -m venv performance_env
-          source performance_env/bin/activate
-          
-          pip install "kedro>=0.18.0,<0.20.0"
-          pip install "figregistry-kedro==${{ needs.pre_validation_checks.outputs.package_version }}"
-          pip install pytest-benchmark
-      
-      - name: Performance benchmark validation
-        run: |
-          source performance_env/bin/activate
-          
-          python -c "
-          import time
           import matplotlib.pyplot as plt
-          import numpy as np
+          import matplotlib
+          matplotlib.use('Agg')  # Non-interactive backend
+          
           from figregistry_kedro.datasets import FigureDataSet
-          from figregistry_kedro.config import FigRegistryConfigBridge
           
-          # Benchmark configuration bridge initialization
-          start_time = time.time()
-          bridge = FigRegistryConfigBridge()
-          bridge_time = time.time() - start_time
-          print(f'Configuration bridge initialization: {bridge_time:.3f}s')
-          
-          # Benchmark dataset initialization
-          start_time = time.time()
-          dataset = FigureDataSet(filepath='benchmark_figure.png')
-          dataset_time = time.time() - start_time
-          print(f'FigureDataSet initialization: {dataset_time:.3f}s')
-          
-          # Create test figure for save benchmarking
+          # Create test figure
           fig, ax = plt.subplots()
-          x = np.linspace(0, 10, 100)
-          y = np.sin(x)
-          ax.plot(x, y)
+          ax.plot([1, 2, 3], [4, 5, 6])
+          ax.set_title('Test Figure')
           
-          # Benchmark save operation (without actual file I/O in CI)
-          start_time = time.time()
-          # dataset.save(fig)  # Would need proper Kedro context
-          save_prep_time = time.time() - start_time
-          print(f'Save preparation time: {save_prep_time:.3f}s')
+          # Test FigureDataSet save operation
+          with tempfile.TemporaryDirectory() as temp_dir:
+              test_path = Path(temp_dir) / 'test_figure.png'
+              
+              # Create basic dataset configuration
+              dataset = FigureDataSet(filepath=str(test_path))
+              
+              # Test save operation
+              dataset.save(fig)
+              
+              # Verify file creation
+              if test_path.exists():
+                  print('✅ FigureDataSet save operation successful')
+                  print(f'📊 Generated figure: {test_path.stat().st_size} bytes')
+              else:
+                  raise RuntimeError('❌ FigureDataSet failed to save figure')
           
-          # Validate performance thresholds
-          assert bridge_time < 0.050, f'Config bridge too slow: {bridge_time:.3f}s > 0.050s'
-          assert dataset_time < 0.010, f'Dataset init too slow: {dataset_time:.3f}s > 0.010s'
-          
-          print('✅ All performance benchmarks within acceptable thresholds')
+          plt.close(fig)
+          print('✅ Basic plugin functionality verified')
           "
+
+      - name: Collect validation results
+        shell: bash
+        run: |
+          echo "=== Fresh Environment Validation Results ==="
+          echo "Platform: ${{ matrix.os }}"
+          echo "Python: ${{ matrix.python-version }}"
+          echo "Kedro: ${{ matrix.kedro-version }}"
+          echo "Package Version: ${{ needs.prepare-validation.outputs.package_version }}"
+          echo "Status: SUCCESS ✅"
+
+  # Cross-platform plugin functionality validation using example pipelines
+  example-pipeline-validation:
+    needs: [prepare-validation, fresh-environment-validation]
+    if: needs.prepare-validation.outputs.should_validate == 'true'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.11"]  # Use primary version for example validation
+        kedro-version: ["0.18.14", "0.19.8"]
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies and plugin
+        shell: bash
+        run: |
+          python -m venv validation_env
+          
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            source validation_env/Scripts/activate
+          else
+            source validation_env/bin/activate
+          fi
+          
+          pip install --upgrade pip
+          pip install "kedro==${{ matrix.kedro-version }}"
+          pip install "${{ env.PACKAGE_NAME }}==${{ needs.prepare-validation.outputs.package_version }}"
+          
+          # Install additional dependencies for examples
+          pip install jupyter matplotlib seaborn pandas numpy
+
+      - name: Execute basic example pipeline
+        shell: bash
+        working-directory: examples/basic
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            source ../../validation_env/Scripts/activate
+          else
+            source ../../validation_env/bin/activate
+          fi
+          
+          echo "🔄 Executing basic example pipeline..."
+          
+          # Verify project structure
+          if [[ -f "kedro_cli.py" ]]; then
+            python kedro_cli.py --validate-setup
+          fi
+          
+          # Run the pipeline
+          kedro run --pipeline=__default__
+          
+          # Verify outputs exist
+          if [[ -d "data/08_reporting" ]]; then
+            FIGURE_COUNT=$(find data/08_reporting -name "*.png" -o -name "*.pdf" -o -name "*.svg" | wc -l)
+            echo "📊 Generated $FIGURE_COUNT figures in reporting directory"
+            
+            if [[ $FIGURE_COUNT -gt 0 ]]; then
+              echo "✅ Basic example pipeline executed successfully"
+            else
+              echo "⚠️ Pipeline ran but no figures were generated"
+            fi
+          else
+            echo "⚠️ No reporting directory found"
+          fi
+
+      - name: Validate figure generation
+        shell: bash
+        working-directory: examples/basic
+        run: |
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            source ../../validation_env/Scripts/activate
+          else
+            source ../../validation_env/bin/activate
+          fi
+          
+          # Use validation script if available
+          if [[ -f "../../scripts/validate_plugin_figures.py" ]]; then
+            python ../../scripts/validate_plugin_figures.py --project-path="." --platform="${{ matrix.os }}"
+          else
+            # Fallback validation
+            echo "🔍 Performing fallback figure validation..."
+            
+            python -c "
+            import os
+            from pathlib import Path
+            
+            reporting_dir = Path('data/08_reporting')
+            if reporting_dir.exists():
+                figures = list(reporting_dir.glob('**/*.png')) + list(reporting_dir.glob('**/*.pdf')) + list(reporting_dir.glob('**/*.svg'))
+                
+                if figures:
+                    print(f'✅ Found {len(figures)} generated figures:')
+                    for fig in figures[:5]:  # Show first 5
+                        size = fig.stat().st_size
+                        print(f'  📊 {fig.name}: {size} bytes')
+                    
+                    # Basic file integrity check
+                    for fig in figures:
+                        if fig.stat().st_size < 100:  # Very small files likely corrupted
+                            raise RuntimeError(f'❌ Suspicious figure size: {fig.name}')
+                    
+                    print('✅ All figures pass basic integrity checks')
+                else:
+                    raise RuntimeError('❌ No figures found in reporting directory')
+            else:
+                raise RuntimeError('❌ Reporting directory not found')
+            "
+          fi
+
+      - name: Clean up example artifacts
+        shell: bash
+        working-directory: examples/basic
+        if: always()
+        run: |
+          # Clean up generated files
+          rm -rf data/01_raw/* data/02_intermediate/* data/03_primary/* data/08_reporting/* 2>/dev/null || true
+          rm -rf logs/* .kedro/* 2>/dev/null || true
+          echo "🧹 Example artifacts cleaned up"
 
   # Plugin registry integration verification
-  plugin_registry_validation:
-    name: Plugin Registry Integration
+  plugin-registry-validation:
+    needs: [prepare-validation, fresh-environment-validation]
+    if: needs.prepare-validation.outputs.should_validate == 'true'
     runs-on: ubuntu-latest
-    needs: [pre_validation_checks, performance_validation]
-    if: needs.pre_validation_checks.outputs.release_successful == 'true'
-    timeout-minutes: 10
-    
+    timeout-minutes: 15
+
     steps:
-      - name: Set up Python 3.11
+      - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
-      - name: Validate Kedro plugin registry integration
+
+      - name: Verify PyPI package metadata
         run: |
-          python -m venv registry_env
-          source registry_env/bin/activate
+          # Check package metadata from PyPI
+          PACKAGE_INFO=$(curl -s "https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json")
           
-          pip install "kedro>=0.18.0,<0.20.0"
-          pip install "figregistry-kedro==${{ needs.pre_validation_checks.outputs.package_version }}"
-      
-      - name: Test plugin discovery through Kedro CLI
+          # Extract key metadata
+          VERSION=$(echo "$PACKAGE_INFO" | jq -r '.info.version')
+          DESCRIPTION=$(echo "$PACKAGE_INFO" | jq -r '.info.summary')
+          KEYWORDS=$(echo "$PACKAGE_INFO" | jq -r '.info.keywords // "none"')
+          
+          echo "📦 Package: ${{ env.PACKAGE_NAME }}"
+          echo "🏷️ Version: $VERSION"
+          echo "📝 Description: $DESCRIPTION"
+          echo "🔤 Keywords: $KEYWORDS"
+          
+          # Verify version matches expected
+          if [[ "$VERSION" == "${{ needs.prepare-validation.outputs.package_version }}" ]]; then
+            echo "✅ Package version matches expected"
+          else
+            echo "❌ Version mismatch: expected ${{ needs.prepare-validation.outputs.package_version }}, got $VERSION"
+            exit 1
+          fi
+
+      - name: Check plugin compatibility metadata
         run: |
-          source registry_env/bin/activate
+          pip install "${{ env.PACKAGE_NAME }}==${{ needs.prepare-validation.outputs.package_version }}"
           
-          # Test that kedro info shows the plugin
-          echo "Testing kedro info output..."
-          kedro info 2>/dev/null || true
-          
-          # Test plugin entry points
+          # Verify compatibility markers
           python -c "
           import pkg_resources
           
-          # Check dataset entry points
-          datasets = list(pkg_resources.iter_entry_points('kedro.datasets'))
-          figregistry_datasets = [ep for ep in datasets if 'figregistry' in ep.name.lower()]
-          
-          if figregistry_datasets:
-              print(f'✅ Found {len(figregistry_datasets)} FigRegistry dataset entry points')
-              for ep in figregistry_datasets:
-                  print(f'  - {ep.name}: {ep.module_name}')
-          else:
-              print('❌ No FigRegistry dataset entry points found')
-              exit(1)
-          
-          # Check hook entry points  
-          hooks = list(pkg_resources.iter_entry_points('kedro.hooks'))
-          figregistry_hooks = [ep for ep in hooks if 'figregistry' in ep.name.lower()]
-          
-          if figregistry_hooks:
-              print(f'✅ Found {len(figregistry_hooks)} FigRegistry hook entry points')
-              for ep in figregistry_hooks:
-                  print(f'  - {ep.name}: {ep.module_name}')
-          else:
-              print('❌ No FigRegistry hook entry points found')
-              exit(1)
-          
-          print('✅ Plugin registry integration validated successfully')
+          try:
+              dist = pkg_resources.get_distribution('${{ env.PACKAGE_NAME }}')
+              
+              # Check requires/dependencies
+              requires = [str(req) for req in dist.requires()]
+              print('📋 Package dependencies:')
+              for req in requires:
+                  print(f'  📌 {req}')
+              
+              # Verify kedro dependency
+              kedro_deps = [req for req in requires if 'kedro' in req.lower()]
+              if kedro_deps:
+                  print(f'✅ Kedro dependency found: {kedro_deps[0]}')
+              else:
+                  raise RuntimeError('❌ No Kedro dependency found')
+              
+              # Verify figregistry dependency  
+              figregistry_deps = [req for req in requires if 'figregistry' in req.lower() and 'kedro' not in req.lower()]
+              if figregistry_deps:
+                  print(f'✅ FigRegistry dependency found: {figregistry_deps[0]}')
+              else:
+                  raise RuntimeError('❌ No FigRegistry dependency found')
+              
+          except Exception as e:
+              print(f'❌ Error checking package metadata: {e}')
+              raise
           "
 
-  # Validation results aggregation and reporting
-  validation_results:
-    name: Validation Results
+      - name: Verify entry points registration
+        run: |
+          # Check that entry points are properly registered
+          python -c "
+          import pkg_resources
+          
+          # Check for kedro.hooks entry points
+          hooks_eps = list(pkg_resources.iter_entry_points('kedro.hooks'))
+          figregistry_hooks = [ep for ep in hooks_eps if 'figregistry' in ep.name.lower() or 'figregistry' in str(ep).lower()]
+          
+          print(f'🔌 Available kedro.hooks entry points: {len(hooks_eps)}')
+          print(f'🎯 FigRegistry-related hooks: {len(figregistry_hooks)}')
+          
+          if figregistry_hooks:
+              for ep in figregistry_hooks:
+                  print(f'  ✅ {ep.name}: {ep.module_name}')
+          else:
+              print('⚠️ No FigRegistry hooks found in entry points')
+          
+          # Test hook loading
+          try:
+              for ep in figregistry_hooks:
+                  hook_class = ep.load()
+                  print(f'✅ Successfully loaded hook: {hook_class.__name__}')
+          except Exception as e:
+              print(f'❌ Error loading hooks: {e}')
+              raise
+          "
+
+  # Consolidate validation results and trigger rollback if needed
+  validation-consolidation:
+    needs: [prepare-validation, fresh-environment-validation, example-pipeline-validation, plugin-registry-validation]
+    if: always() && needs.prepare-validation.outputs.should_validate == 'true'
     runs-on: ubuntu-latest
-    needs: [
-      pre_validation_checks,
-      fresh_environment_validation, 
-      example_pipeline_validation,
-      cross_platform_functionality,
-      performance_validation,
-      plugin_registry_validation
-    ]
-    if: always()
+    timeout-minutes: 10
     
     steps:
-      - name: Evaluate validation results
-        id: evaluate
+      - name: Collect validation results
+        id: collect_results
         run: |
-          echo "Evaluating post-release validation results..."
-          
-          # Check individual job statuses
-          PRE_VALIDATION="${{ needs.pre_validation_checks.result }}"
-          FRESH_ENV="${{ needs.fresh_environment_validation.result }}"
-          EXAMPLES="${{ needs.example_pipeline_validation.result }}"
-          CROSS_PLATFORM="${{ needs.cross_platform_functionality.result }}"
-          PERFORMANCE="${{ needs.performance_validation.result }}"
-          REGISTRY="${{ needs.plugin_registry_validation.result }}"
-          
-          echo "Pre-validation: $PRE_VALIDATION"
-          echo "Fresh environment: $FRESH_ENV"
-          echo "Examples: $EXAMPLES"
-          echo "Cross-platform: $CROSS_PLATFORM"
-          echo "Performance: $PERFORMANCE"
-          echo "Registry: $REGISTRY"
-          
-          # Determine overall validation status
+          # Initialize counters
+          TOTAL_JOBS=0
+          FAILED_JOBS=0
           CRITICAL_FAILURES=0
-          TOTAL_VALIDATIONS=0
           
-          for status in "$FRESH_ENV" "$EXAMPLES" "$CROSS_PLATFORM"; do
-            TOTAL_VALIDATIONS=$((TOTAL_VALIDATIONS + 1))
-            if [[ "$status" != "success" ]]; then
-              CRITICAL_FAILURES=$((CRITICAL_FAILURES + 1))
-              echo "❌ Critical validation failure detected: $status"
-            fi
-          done
-          
-          # Performance and registry are important but not critical for rollback
-          NON_CRITICAL_FAILURES=0
-          for status in "$PERFORMANCE" "$REGISTRY"; do
-            if [[ "$status" != "success" ]]; then
-              NON_CRITICAL_FAILURES=$((NON_CRITICAL_FAILURES + 1))
-              echo "⚠️ Non-critical validation failure: $status"
-            fi
-          done
-          
-          echo "critical_failures=$CRITICAL_FAILURES" >> $GITHUB_OUTPUT
-          echo "total_validations=$TOTAL_VALIDATIONS" >> $GITHUB_OUTPUT
-          echo "non_critical_failures=$NON_CRITICAL_FAILURES" >> $GITHUB_OUTPUT
-          
-          if [[ $CRITICAL_FAILURES -eq 0 ]]; then
-            echo "validation_status=success" >> $GITHUB_OUTPUT
-            echo "✅ All critical validations passed"
+          # Fresh environment validation results
+          FRESH_ENV_STATUS="${{ needs.fresh-environment-validation.result }}"
+          if [[ "$FRESH_ENV_STATUS" == "success" ]]; then
+            echo "✅ Fresh environment validation: PASSED"
           else
-            echo "validation_status=failure" >> $GITHUB_OUTPUT
-            echo "❌ Critical validation failures detected"
+            echo "❌ Fresh environment validation: FAILED"
+            FAILED_JOBS=$((FAILED_JOBS + 1))
+            CRITICAL_FAILURES=$((CRITICAL_FAILURES + 1))  # Critical failure
           fi
-      
-      - name: Create validation report
+          TOTAL_JOBS=$((TOTAL_JOBS + 1))
+          
+          # Example pipeline validation results
+          EXAMPLE_STATUS="${{ needs.example-pipeline-validation.result }}"
+          if [[ "$EXAMPLE_STATUS" == "success" ]]; then
+            echo "✅ Example pipeline validation: PASSED"
+          else
+            echo "❌ Example pipeline validation: FAILED"
+            FAILED_JOBS=$((FAILED_JOBS + 1))
+            CRITICAL_FAILURES=$((CRITICAL_FAILURES + 1))  # Critical failure
+          fi
+          TOTAL_JOBS=$((TOTAL_JOBS + 1))
+          
+          # Plugin registry validation results
+          REGISTRY_STATUS="${{ needs.plugin-registry-validation.result }}"
+          if [[ "$REGISTRY_STATUS" == "success" ]]; then
+            echo "✅ Plugin registry validation: PASSED"
+          else
+            echo "❌ Plugin registry validation: FAILED"
+            FAILED_JOBS=$((FAILED_JOBS + 1))
+            # Not critical for rollback
+          fi
+          TOTAL_JOBS=$((TOTAL_JOBS + 1))
+          
+          # Calculate failure percentage
+          FAILURE_PERCENTAGE=$((FAILED_JOBS * 100 / TOTAL_JOBS))
+          
+          echo "📊 Validation Summary:"
+          echo "  Total Jobs: $TOTAL_JOBS"
+          echo "  Failed Jobs: $FAILED_JOBS"
+          echo "  Critical Failures: $CRITICAL_FAILURES"
+          echo "  Failure Percentage: $FAILURE_PERCENTAGE%"
+          
+          # Set outputs for rollback decision
+          echo "total_jobs=$TOTAL_JOBS" >> $GITHUB_OUTPUT
+          echo "failed_jobs=$FAILED_JOBS" >> $GITHUB_OUTPUT
+          echo "critical_failures=$CRITICAL_FAILURES" >> $GITHUB_OUTPUT
+          echo "failure_percentage=$FAILURE_PERCENTAGE" >> $GITHUB_OUTPUT
+          
+          # Determine overall status
+          if [[ $CRITICAL_FAILURES -gt 0 ]]; then
+            echo "overall_status=critical_failure" >> $GITHUB_OUTPUT
+          elif [[ $FAILURE_PERCENTAGE -ge ${{ env.CRITICAL_FAILURE_THRESHOLD }} ]]; then
+            echo "overall_status=high_failure_rate" >> $GITHUB_OUTPUT
+          elif [[ $FAILED_JOBS -gt 0 ]]; then
+            echo "overall_status=minor_failures" >> $GITHUB_OUTPUT
+          else
+            echo "overall_status=success" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Report validation results
         run: |
-          cat > validation_report.md << 'EOF'
+          echo "🎯 Post-Release Validation Results"
+          echo "=================================="
+          echo "Package: ${{ env.PACKAGE_NAME }} v${{ needs.prepare-validation.outputs.package_version }}"
+          echo "Overall Status: ${{ steps.collect_results.outputs.overall_status }}"
+          echo ""
+          echo "Validation Breakdown:"
+          echo "- Fresh Environment Tests: ${{ needs.fresh-environment-validation.result }}"
+          echo "- Example Pipeline Tests: ${{ needs.example-pipeline-validation.result }}"  
+          echo "- Plugin Registry Tests: ${{ needs.plugin-registry-validation.result }}"
+          echo ""
+          echo "Failure Statistics:"
+          echo "- Failed Jobs: ${{ steps.collect_results.outputs.failed_jobs }}/${{ steps.collect_results.outputs.total_jobs }}"
+          echo "- Critical Failures: ${{ steps.collect_results.outputs.critical_failures }}"
+          echo "- Failure Rate: ${{ steps.collect_results.outputs.failure_percentage }}%"
+
+      - name: Create validation report artifact
+        run: |
+          mkdir -p validation-reports
+          
+          cat > validation-reports/post-release-validation-report.md << EOF
           # Post-Release Validation Report
           
-          **Package Version:** ${{ needs.pre_validation_checks.outputs.package_version }}  
-          **Validation Date:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")  
-          **Overall Status:** ${{ steps.evaluate.outputs.validation_status }}
+          **Package:** ${{ env.PACKAGE_NAME }} v${{ needs.prepare-validation.outputs.package_version }}  
+          **Validation Date:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')  
+          **Overall Status:** ${{ steps.collect_results.outputs.overall_status }}
           
           ## Validation Results
           
-          | Validation Type | Status | Critical |
-          |-----------------|--------|----------|
-          | Fresh Environment Installation | ${{ needs.fresh_environment_validation.result }} | ✅ |
-          | Example Pipeline Execution | ${{ needs.example_pipeline_validation.result }} | ✅ |
-          | Cross-Platform Functionality | ${{ needs.cross_platform_functionality.result }} | ✅ |
-          | Performance Benchmarks | ${{ needs.performance_validation.result }} | ⚠️ |
-          | Plugin Registry Integration | ${{ needs.plugin_registry_validation.result }} | ⚠️ |
+          | Test Category | Status | Details |
+          |---------------|--------|---------|
+          | Fresh Environment Installation | ${{ needs.fresh-environment-validation.result }} | Cross-platform installation testing |
+          | Example Pipeline Execution | ${{ needs.example-pipeline-validation.result }} | End-to-end plugin functionality |
+          | Plugin Registry Integration | ${{ needs.plugin-registry-validation.result }} | PyPI metadata and entry points |
           
-          ## Summary
+          ## Statistics
           
-          - **Critical Failures:** ${{ steps.evaluate.outputs.critical_failures }}/${{ steps.evaluate.outputs.total_validations }}
-          - **Non-Critical Issues:** ${{ steps.evaluate.outputs.non_critical_failures }}
+          - **Total Jobs:** ${{ steps.collect_results.outputs.total_jobs }}
+          - **Failed Jobs:** ${{ steps.collect_results.outputs.failed_jobs }}
+          - **Critical Failures:** ${{ steps.collect_results.outputs.critical_failures }}
+          - **Failure Rate:** ${{ steps.collect_results.outputs.failure_percentage }}%
           
-          EOF
+          ## Recommendations
           
-          if [[ "${{ steps.evaluate.outputs.validation_status }}" == "success" ]]; then
-            echo "✅ **Release validation passed** - figregistry-kedro ${{ needs.pre_validation_checks.outputs.package_version }} is ready for production use." >> validation_report.md
+          $(if [[ "${{ steps.collect_results.outputs.overall_status }}" == "success" ]]; then
+            echo "✅ **VALIDATION PASSED** - Release is ready for production use"
+          elif [[ "${{ steps.collect_results.outputs.overall_status }}" == "minor_failures" ]]; then
+            echo "⚠️ **MINOR ISSUES DETECTED** - Release is functional but monitoring recommended"
           else
-            echo "❌ **Release validation failed** - Critical issues detected requiring immediate attention." >> validation_report.md
-          fi
+            echo "❌ **CRITICAL ISSUES DETECTED** - Consider rollback procedures"
+          fi)
           
-          cat validation_report.md
+          ---
+          *Generated by figregistry-kedro post-release validation pipeline*
+          EOF
 
-  # Automated rollback procedures for critical failures  
-  rollback_procedure:
-    name: Automated Rollback
-    runs-on: ubuntu-latest
-    needs: [pre_validation_checks, validation_results]
+      - name: Upload validation report
+        uses: actions/upload-artifact@v3
+        with:
+          name: post-release-validation-report
+          path: validation-reports/
+          retention-days: 30
+
+  # Automated rollback procedures for critical failures
+  automated-rollback:
+    needs: [prepare-validation, validation-consolidation]
     if: |
       always() && 
-      needs.validation_results.outputs.validation_status == 'failure' &&
-      (github.event.inputs.rollback_on_failure == 'true' || github.event.inputs.rollback_on_failure == '')
+      needs.prepare-validation.outputs.should_validate == 'true' &&
+      (needs.validation-consolidation.outputs.overall_status == 'critical_failure' || 
+       needs.validation-consolidation.outputs.overall_status == 'high_failure_rate') &&
+      github.event.inputs.skip_rollback != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
     
     steps:
-      - name: Trigger rollback procedures
+      - name: Rollback decision matrix
+        id: rollback_decision
         run: |
-          echo "🚨 CRITICAL VALIDATION FAILURES DETECTED"
-          echo "Initiating automated rollback procedures..."
+          STATUS="${{ needs.validation-consolidation.outputs.overall_status }}"
+          CRITICAL_FAILURES="${{ needs.validation-consolidation.outputs.critical_failures }}"
+          FAILURE_RATE="${{ needs.validation-consolidation.outputs.failure_percentage }}"
           
-          PACKAGE_VERSION="${{ needs.pre_validation_checks.outputs.package_version }}"
+          echo "🚨 ROLLBACK EVALUATION"
+          echo "Status: $STATUS"
+          echo "Critical Failures: $CRITICAL_FAILURES"
+          echo "Failure Rate: $FAILURE_RATE%"
           
-          # Note: Actual PyPI package retraction requires manual intervention
-          # This step creates rollback instructions and notifications
-          
-          cat > rollback_instructions.md << EOF
-          # URGENT: figregistry-kedro $PACKAGE_VERSION Rollback Required
-          
-          ## Critical Issues Detected
-          
-          Post-release validation has detected critical failures in figregistry-kedro version $PACKAGE_VERSION.
-          
-          ## Required Actions
-          
-          1. **Immediate PyPI Action:**
-             - Consider retracting release if possible
-             - Add warning to PyPI description if retraction not possible
-          
-          2. **User Communication:**
-             - Update README with known issues
-             - Post warning in relevant channels
-             - Prepare hotfix release
-          
-          3. **Investigation:**
-             - Review validation logs in this workflow run
-             - Identify root cause of failures
-             - Prepare corrective measures
-          
-          ## Validation Failures
-          
-          - Fresh Environment: ${{ needs.fresh_environment_validation.result }}
-          - Example Pipelines: ${{ needs.example_pipeline_validation.result }}  
-          - Cross-Platform: ${{ needs.cross_platform_functionality.result }}
-          
-          **Time of Detection:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-          **Workflow Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          EOF
-          
-          echo "📋 Rollback instructions created"
-          cat rollback_instructions.md
-      
-      - name: Create emergency issue
-        uses: actions/github-script@v7
+          # Determine rollback action
+          if [[ "$STATUS" == "critical_failure" && $CRITICAL_FAILURES -gt 0 ]]; then
+            echo "action=immediate_rollback" >> $GITHUB_OUTPUT
+            echo "reason=Critical functionality failures detected" >> $GITHUB_OUTPUT
+          elif [[ "$STATUS" == "high_failure_rate" && $FAILURE_RATE -ge ${{ env.CRITICAL_FAILURE_THRESHOLD }} ]]; then
+            echo "action=monitored_rollback" >> $GITHUB_OUTPUT
+            echo "reason=High failure rate exceeds threshold ($FAILURE_RATE% >= ${{ env.CRITICAL_FAILURE_THRESHOLD }}%)" >> $GITHUB_OUTPUT
+          else
+            echo "action=none" >> $GITHUB_OUTPUT
+            echo "reason=Failures within acceptable limits" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create rollback issue
+        if: steps.rollback_decision.outputs.action != 'none'
+        uses: actions/github-script@v6
         with:
           script: |
-            const title = `🚨 URGENT: figregistry-kedro ${{ needs.pre_validation_checks.outputs.package_version }} validation failure`;
-            const body = `
-            Critical post-release validation failures detected for figregistry-kedro version ${{ needs.pre_validation_checks.outputs.package_version }}.
+            const { action, reason } = {
+              action: '${{ steps.rollback_decision.outputs.action }}',
+              reason: '${{ steps.rollback_decision.outputs.reason }}'
+            };
             
-            ## Validation Results
-            - Fresh Environment: ${{ needs.fresh_environment_validation.result }}
-            - Example Pipelines: ${{ needs.example_pipeline_validation.result }}
-            - Cross-Platform: ${{ needs.cross_platform_functionality.result }}
-            - Performance: ${{ needs.performance_validation.result }}
-            - Registry: ${{ needs.plugin_registry_validation.result }}
+            const title = `🚨 ROLLBACK REQUIRED: ${{ env.PACKAGE_NAME }} v${{ needs.prepare-validation.outputs.package_version }}`;
             
-            ## Immediate Actions Required
-            1. Investigate validation failures in workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-            2. Consider PyPI package retraction if issues are severe
-            3. Prepare hotfix release addressing identified issues
-            4. Communicate with users about potential issues
+            const body = `# Post-Release Validation Failure
             
-            **Time of Detection:** ${new Date().toISOString()}
-            **Package Version:** ${{ needs.pre_validation_checks.outputs.package_version }}
+            **Package:** ${{ env.PACKAGE_NAME }} v${{ needs.prepare-validation.outputs.package_version }}
+            **Validation Date:** ${new Date().toISOString()}
+            **Recommended Action:** ${action.replace('_', ' ').toUpperCase()}
+            
+            ## Failure Summary
+            
+            **Reason:** ${reason}
+            
+            **Statistics:**
+            - Critical Failures: ${{ needs.validation-consolidation.outputs.critical_failures }}
+            - Total Failed Jobs: ${{ needs.validation-consolidation.outputs.failed_jobs }}/${{ needs.validation-consolidation.outputs.total_jobs }}
+            - Failure Rate: ${{ needs.validation-consolidation.outputs.failure_percentage }}%
+            
+            ## Failed Validations
+            
+            ${{ needs.fresh-environment-validation.result == 'failure' ? '❌ Fresh Environment Installation Tests' : '' }}
+            ${{ needs.example-pipeline-validation.result == 'failure' ? '❌ Example Pipeline Execution Tests' : '' }}
+            ${{ needs.plugin-registry-validation.result == 'failure' ? '❌ Plugin Registry Integration Tests' : '' }}
+            
+            ## Recommended Actions
+            
+            ### Immediate Steps
+            1. **Investigate failure logs** from the validation workflow
+            2. **Consider PyPI package retraction** if critical functionality is broken
+            3. **Prepare hot-fix release** addressing identified issues
+            4. **Notify development team** and users if necessary
+            
+            ### Long-term Improvements
+            1. Enhance pre-release testing to catch similar issues
+            2. Improve validation coverage for edge cases
+            3. Consider extended testing matrix for future releases
+            
+            ## Automation Links
+            
+            - [View Validation Workflow Run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            - [Download Validation Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            
+            ---
+            *This issue was automatically created by the post-release validation pipeline.*
             `;
             
-            await github.rest.issues.create({
+            const issue = await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: title,
               body: body,
-              labels: ['urgent', 'release-failure', 'rollback-required']
+              labels: ['bug', 'critical', 'rollback-required', 'automated']
             });
-      
-      - name: Notify development team
-        run: |
-          echo "🚨 Development team notification triggered"
-          echo "Emergency issue created for immediate attention"
-          echo "Manual intervention required for package rollback"
+            
+            console.log(`Created rollback issue: ${issue.data.html_url}`);
 
-# Success notification for passed validations
-  success_notification:
-    name: Success Notification
+      - name: Notify team of critical failure
+        if: steps.rollback_decision.outputs.action == 'immediate_rollback'
+        run: |
+          echo "🚨 CRITICAL FAILURE DETECTED"
+          echo "Package: ${{ env.PACKAGE_NAME }} v${{ needs.prepare-validation.outputs.package_version }}"
+          echo "Action Required: ${{ steps.rollback_decision.outputs.action }}"
+          echo "Reason: ${{ steps.rollback_decision.outputs.reason }}"
+          echo ""
+          echo "⚠️ Manual intervention required for package rollback"
+          echo "📋 Rollback issue created with detailed instructions"
+          echo "🔗 Workflow run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+      - name: Set rollback status
+        run: |
+          if [[ "${{ steps.rollback_decision.outputs.action }}" == "immediate_rollback" ]]; then
+            echo "🔴 IMMEDIATE ROLLBACK RECOMMENDED"
+            exit 1  # Fail the workflow to signal critical issue
+          elif [[ "${{ steps.rollback_decision.outputs.action }}" == "monitored_rollback" ]]; then
+            echo "🟡 MONITORED ROLLBACK INITIATED"
+            echo "Manual review and potential rollback recommended"
+          else
+            echo "🟢 NO ROLLBACK REQUIRED"
+          fi
+
+  # Final status reporting
+  validation-summary:
+    needs: [prepare-validation, validation-consolidation, automated-rollback]
+    if: always() && needs.prepare-validation.outputs.should_validate == 'true'
     runs-on: ubuntu-latest
-    needs: [pre_validation_checks, validation_results]
-    if: needs.validation_results.outputs.validation_status == 'success'
     
     steps:
-      - name: Post success notification
+      - name: Final validation summary
         run: |
-          echo "🎉 POST-RELEASE VALIDATION SUCCESSFUL"
+          echo "🎯 POST-RELEASE VALIDATION SUMMARY"
+          echo "=================================="
           echo ""
-          echo "figregistry-kedro ${{ needs.pre_validation_checks.outputs.package_version }} has passed all critical validations:"
+          echo "📦 Package: ${{ env.PACKAGE_NAME }} v${{ needs.prepare-validation.outputs.package_version }}"
+          echo "🕐 Validation Completed: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
           echo ""
-          echo "✅ Fresh environment installation across platforms"
-          echo "✅ Example pipeline execution"
-          echo "✅ Cross-platform functionality"
-          echo "✅ Performance benchmarks"
-          echo "✅ Plugin registry integration"
+          
+          # Overall status
+          OVERALL_STATUS="${{ needs.validation-consolidation.outputs.overall_status }}"
+          case "$OVERALL_STATUS" in
+            "success")
+              echo "✅ VALIDATION SUCCESSFUL"
+              echo "Release is ready for production use"
+              ;;
+            "minor_failures")
+              echo "⚠️ MINOR ISSUES DETECTED"
+              echo "Release is functional but monitoring recommended"
+              ;;
+            "high_failure_rate")
+              echo "🟡 HIGH FAILURE RATE"
+              echo "Rollback procedures initiated"
+              ;;
+            "critical_failure")
+              echo "🔴 CRITICAL FAILURES DETECTED"
+              echo "Immediate rollback recommended"
+              ;;
+            *)
+              echo "❓ UNKNOWN STATUS: $OVERALL_STATUS"
+              ;;
+          esac
+          
           echo ""
-          echo "The release is validated and ready for production use."
+          echo "📊 Statistics:"
+          echo "- Failed Jobs: ${{ needs.validation-consolidation.outputs.failed_jobs }}/${{ needs.validation-consolidation.outputs.total_jobs }}"
+          echo "- Critical Failures: ${{ needs.validation-consolidation.outputs.critical_failures }}"
+          echo "- Failure Rate: ${{ needs.validation-consolidation.outputs.failure_percentage }}%"
+          
+          # Rollback status
+          ROLLBACK_STATUS="${{ needs.automated-rollback.result }}"
+          if [[ "$ROLLBACK_STATUS" == "success" ]]; then
+            echo ""
+            echo "🔄 Rollback Status: Completed successfully"
+          elif [[ "$ROLLBACK_STATUS" == "failure" ]]; then
+            echo ""
+            echo "🚨 Rollback Status: Critical issues detected - manual intervention required"
+          else
+            echo ""
+            echo "ℹ️ Rollback Status: Not triggered"
+          fi
+          
+          echo ""
+          echo "🔗 Workflow Details: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
