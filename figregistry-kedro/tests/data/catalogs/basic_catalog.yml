@@ -1,427 +1,180 @@
-# Basic Kedro Catalog Configuration for FigRegistry Plugin Testing
-# 
-# This catalog provides fundamental FigureDataSet configurations for testing
-# core plugin functionality including AbstractDataSet interface compliance,
-# basic condition resolution, and essential FigRegistry integration workflows.
+# Basic Kedro catalog configuration for FigRegistry-Kedro plugin core functionality testing
+# This catalog provides fundamental FigureDataSet entries with essential parameter combinations
+# for validating AbstractDataSet interface compliance and FigRegistry integration workflows
 #
-# Coverage Areas:
-# - F-005-RQ-001: Basic FigureDataSet catalog entries with purpose parameters
-# - F-005-RQ-002: Non-versioned dataset scenarios for baseline testing
-# - F-005-RQ-004: Simple condition parameter resolution from pipeline context
-# - AbstractDataSet interface compliance validation
+# Testing Coverage:
+# - F-005-RQ-001: Basic FigureDataSet catalog entries with purpose parameter validation
+# - F-005-RQ-002: Non-versioned dataset scenarios for catalog integration testing
+# - F-005-RQ-003: Dataset parameter validation for condition_param configurations
+# - F-005-RQ-004: Simple condition resolution scenarios for style application testing
+#
+# Usage: Include this catalog in test scenarios to validate core plugin functionality
+# without versioning complexity or advanced configuration features
 
-# =============================================================================
-# BASIC PURPOSE CONFIGURATIONS
-# =============================================================================
-# These entries test the three standard purpose values with minimal parameters
-
-# Exploratory analysis figure - most basic configuration
-exploratory_figure:
+# Basic exploratory figure with minimal configuration
+# Tests: Core dataset functionality, basic parameter validation, minimal catalog integration
+basic_exploratory_figure:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/exploratory_figure.png
+  filepath: data/08_reporting/basic_exploratory_figure.png
   purpose: exploratory
+  versioned: false
 
-# Presentation figure with basic save arguments
-presentation_figure:
+# Basic presentation figure with condition parameter
+# Tests: Condition parameter resolution, presentation purpose styling, basic catalog workflow
+basic_presentation_figure:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/presentation_figure.png
+  filepath: data/08_reporting/basic_presentation_figure.png
   purpose: presentation
-  save_args:
-    dpi: 150
-    bbox_inches: tight
+  condition_param: experiment_condition
+  versioned: false
 
-# Publication figure with higher quality settings
-publication_figure:
+# Basic publication figure with styling overrides
+# Tests: Publication purpose styling, style_params override functionality, save_args configuration
+basic_publication_figure:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/publication_figure.pdf
+  filepath: data/08_reporting/basic_publication_figure.pdf
   purpose: publication
+  condition_param: model_type
+  style_params:
+    color: "#1A1A1A"
+    linewidth: 2.5
   save_args:
     dpi: 300
     bbox_inches: tight
-    format: pdf
+  versioned: false
 
-# =============================================================================
-# CONDITION PARAMETER CONFIGURATIONS  
-# =============================================================================
-# These entries test dynamic condition resolution from pipeline parameters
-
-# Simple condition parameter extraction
-simple_condition_figure:
+# Simple figure with save arguments testing
+# Tests: Format kwargs functionality, save argument passing, matplotlib integration
+simple_save_args_figure:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/simple_condition_figure.png
+  filepath: data/08_reporting/simple_save_args_figure.png
   purpose: exploratory
-  condition_param: experiment_type
+  save_args:
+    dpi: 150
+    facecolor: white
+    edgecolor: none
+  versioned: false
 
-# Condition parameter with presentation purpose
-presentation_condition_figure:
+# Simple figure with load arguments testing  
+# Tests: Load argument configuration, basic load functionality, AbstractDataSet compliance
+simple_load_args_figure:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/presentation_condition_figure.png
+  filepath: data/08_reporting/simple_load_args_figure.png
   purpose: presentation
+  load_args:
+    format: png
+  versioned: false
+
+# Condition parameter extraction testing figure
+# Tests: Dynamic condition resolution from pipeline parameters, context injection functionality
+condition_extraction_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/condition_extraction_figure.png
+  purpose: exploratory
   condition_param: analysis_type
-  save_args:
-    dpi: 200
-    transparent: false
-
-# Publication with condition parameter and quality settings
-publication_condition_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/publication_condition_figure.pdf
-  purpose: publication
-  condition_param: publication_type
-  save_args:
-    dpi: 600
-    format: pdf
-    bbox_inches: tight
-
-# =============================================================================
-# BASIC STYLE PARAMETER CONFIGURATIONS
-# =============================================================================
-# These entries test style_params overrides with simple configurations
-
-# Basic style parameters for exploratory work
-styled_exploratory_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/styled_exploratory_figure.png
-  purpose: exploratory
-  style_params:
-    font.size: 12
-    figure.facecolor: white
-
-# Style parameters with condition resolution
-styled_condition_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/styled_condition_figure.png
-  purpose: presentation
-  condition_param: style_condition
-  style_params:
-    font.size: 14
-    figure.dpi: 300
-    axes.linewidth: 1.5
-  save_args:
-    bbox_inches: tight
-
-# Publication style with comprehensive parameters
-styled_publication_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/styled_publication_figure.pdf
-  purpose: publication
-  condition_param: publication_style
-  style_params:
-    font.family: serif
-    font.size: 12
-    axes.titlesize: 14
-    axes.labelsize: 12
-    legend.fontsize: 10
-    figure.dpi: 600
-  save_args:
-    format: pdf
-    bbox_inches: tight
-    metadata:
-      Title: Publication Figure Test
-      Creator: FigRegistry-Kedro Plugin
-
-# =============================================================================
-# NON-VERSIONED DATASET CONFIGURATIONS
-# =============================================================================
-# These entries explicitly test versioning: false scenarios
-
-# Basic non-versioned figure
-unversioned_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/unversioned_figure.png
-  purpose: exploratory
   versioned: false
 
-# Non-versioned with condition parameter
-unversioned_condition_figure:
+# Multiple condition parameter scenario
+# Tests: Complex condition parameter names, identifier validation, parameter resolution
+multi_condition_figure:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/unversioned_condition_figure.png
+  filepath: data/08_reporting/multi_condition_figure.png
   purpose: presentation
-  condition_param: test_condition
+  condition_param: dataset_version
   versioned: false
-  save_args:
-    dpi: 150
 
-# Non-versioned publication figure
-unversioned_publication_figure:
+# Style parameter override testing
+# Tests: Style parameter merging, override precedence, styling application validation
+style_override_figure:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/unversioned_publication_figure.pdf
-  purpose: publication
-  condition_param: unversioned_test
-  versioned: false
-  save_args:
-    format: pdf
-    dpi: 300
-
-# =============================================================================
-# SAVE AND LOAD ARGS TESTING
-# =============================================================================
-# These entries test various save_args and load_args configurations
-
-# PNG format with basic save arguments
-png_save_args_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/png_save_args_figure.png
+  filepath: data/08_reporting/style_override_figure.png
   purpose: exploratory
-  save_args:
-    dpi: 100
-    bbox_inches: tight
-    pad_inches: 0.1
-    transparent: false
-  load_args: {}
+  condition_param: experiment_condition
+  style_params:
+    color: "#2E86AB"
+    marker: "o"
+    alpha: 0.8
+  versioned: false
 
-# SVG format for vector graphics testing
-svg_figure:
+# Basic SVG format figure
+# Tests: Alternative file formats, format detection, save operation compatibility
+basic_svg_figure:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/svg_figure.svg
-  purpose: presentation
-  condition_param: vector_test
+  filepath: data/08_reporting/basic_svg_figure.svg
+  purpose: publication
   save_args:
     format: svg
-    bbox_inches: tight
     transparent: true
-  load_args: {}
-
-# Multiple format testing figure
-multi_format_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/multi_format_figure.eps
-  purpose: publication
-  save_args:
-    format: eps
-    dpi: 300
-    bbox_inches: tight
-
-# =============================================================================
-# MINIMAL CONFIGURATIONS FOR INTERFACE COMPLIANCE
-# =============================================================================
-# These entries test minimal parameter requirements
-
-# Absolute minimal configuration (only required parameters)
-minimal_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/minimal_figure.png
-
-# Minimal with purpose only
-minimal_purpose_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/minimal_purpose_figure.png
-  purpose: exploratory
-
-# Minimal with condition parameter only
-minimal_condition_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/minimal_condition_figure.png
-  condition_param: minimal_test
-
-# =============================================================================
-# PATH PATTERN TESTING
-# =============================================================================
-# These entries test various filepath patterns and directory structures
-
-# Different directory structures
-raw_data_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/analysis/raw_data_figure.png
-  purpose: exploratory
-
-intermediate_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/02_intermediate/processing/intermediate_figure.png
-  purpose: exploratory
-  condition_param: processing_step
-
-primary_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/03_primary/results/primary_figure.png
-  purpose: presentation
-
-reporting_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/final/reporting_figure.pdf
-  purpose: publication
-  save_args:
-    format: pdf
-    dpi: 300
-
-# =============================================================================
-# CONDITION RESOLUTION TESTING SCENARIOS
-# =============================================================================
-# These entries test various condition parameter patterns
-
-# Different condition parameter names
-experiment_condition_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/experiment_condition_figure.png
-  purpose: exploratory
-  condition_param: experiment_id
-
-model_condition_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/model_condition_figure.png
-  purpose: presentation
-  condition_param: model_type
-
-analysis_condition_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/analysis_condition_figure.pdf
-  purpose: publication
-  condition_param: analysis_method
-  save_args:
-    format: pdf
-
-# =============================================================================
-# EDGE CASE CONFIGURATIONS
-# =============================================================================
-# These entries test edge cases and boundary conditions
-
-# Empty save_args and load_args
-empty_args_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/empty_args_figure.png
-  purpose: exploratory
-  save_args: {}
-  load_args: {}
-
-# Purpose with special characters (still valid)
-special_purpose_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/special_purpose_figure.png
-  purpose: exploratory_analysis
-  condition_param: special_condition
-
-# Long filepath testing
-long_path_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/very/deep/directory/structure/for/testing/long_path_figure.png
-  purpose: exploratory
-
-# =============================================================================
-# COMPREHENSIVE PARAMETER COMBINATIONS
-# =============================================================================
-# These entries test multiple parameters together
-
-# Full parameter combination for exploratory
-full_exploratory_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/full_exploratory_figure.png
-  purpose: exploratory
-  condition_param: full_test_exploratory
-  style_params:
-    font.size: 10
-    figure.facecolor: lightgray
-  save_args:
-    dpi: 100
-    bbox_inches: tight
-  load_args: {}
   versioned: false
 
-# Full parameter combination for presentation
-full_presentation_figure:
+# Minimal configuration validation figure
+# Tests: Minimum required parameters, default value usage, essential functionality
+minimal_config_figure:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/full_presentation_figure.png
+  filepath: data/08_reporting/minimal_config_figure.png
+  purpose: exploratory
+  versioned: false
+
+# Complex save arguments figure
+# Tests: Multiple save arguments, matplotlib compatibility, comprehensive format options
+complex_save_args_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/complex_save_args_figure.png
+  purpose: publication
+  condition_param: model_type
+  save_args:
+    dpi: 300
+    bbox_inches: tight
+    transparent: false
+    facecolor: white
+    edgecolor: none
+    metadata:
+      Title: Test Figure
+      Creator: FigRegistry-Kedro Plugin
+  versioned: false
+
+# Presentation with comprehensive style parameters
+# Tests: Comprehensive style parameter application, presentation styling, parameter merging
+comprehensive_style_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/comprehensive_style_figure.png
   purpose: presentation
-  condition_param: full_test_presentation
+  condition_param: experiment_condition
   style_params:
-    font.size: 14
-    figure.dpi: 200
-    axes.grid: true
+    color: "#FFB6C1"
+    linewidth: 2.0
+    marker: "s"
+    linestyle: "-"
+    alpha: 0.9
   save_args:
     dpi: 200
     bbox_inches: tight
-    transparent: false
-  load_args: {}
   versioned: false
 
-# Full parameter combination for publication
-full_publication_figure:
+# Non-versioned explicit testing
+# Tests: Explicit versioning disabled, versioning parameter validation, catalog behavior
+explicit_non_versioned_figure:
   type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/full_publication_figure.pdf
+  filepath: data/08_reporting/explicit_non_versioned_figure.png
+  purpose: exploratory
+  condition_param: dataset_version
+  versioned: false
+
+# Interface compliance validation figure
+# Tests: AbstractDataSet interface requirements, method implementations, Kedro compatibility
+interface_compliance_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/interface_compliance_figure.png
+  purpose: presentation
+  versioned: false
+
+# Parameter validation edge case figure
+# Tests: Parameter validation boundaries, edge case handling, error prevention
+parameter_validation_figure:
+  type: figregistry_kedro.datasets.FigureDataSet
+  filepath: data/08_reporting/parameter_validation_figure.png
   purpose: publication
-  condition_param: full_test_publication
+  condition_param: valid_identifier_123
   style_params:
-    font.family: serif
-    font.size: 12
-    axes.titlesize: 14
-    axes.labelsize: 12
-    legend.fontsize: 10
-    figure.dpi: 600
-    lines.linewidth: 1.0
-  save_args:
-    format: pdf
-    dpi: 600
-    bbox_inches: tight
-    metadata:
-      Title: Full Parameter Test Publication
-      Creator: FigRegistry-Kedro
-      Subject: Testing
-  load_args: {}
+    color: "#FF5733"
   versioned: false
-
-# =============================================================================
-# ABSTRACT DATASET INTERFACE COMPLIANCE TESTING
-# =============================================================================
-# These entries specifically test AbstractDataSet interface requirements
-
-# Basic interface compliance
-interface_test_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/interface_test_figure.png
-  purpose: exploratory
-
-# Interface compliance with all optional parameters
-interface_full_test_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/interface_full_test_figure.png
-  purpose: presentation
-  condition_param: interface_test
-  style_params:
-    font.size: 12
-  save_args:
-    dpi: 150
-  load_args: {}
-  versioned: false
-
-# Interface compliance for _describe method testing
-interface_describe_test_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/interface_describe_test_figure.png
-  purpose: exploratory
-  condition_param: describe_test
-
-# Interface compliance for _exists method testing
-interface_exists_test_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/01_raw/interface_exists_test_figure.png
-  purpose: exploratory
-
-# =============================================================================
-# PIPELINE INTEGRATION TESTING
-# =============================================================================
-# These entries test integration with Kedro pipeline context
-
-# Pipeline parameter integration
-pipeline_param_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/pipeline_param_figure.png
-  purpose: presentation
-  condition_param: pipeline_test_param
-
-# Pipeline context integration
-pipeline_context_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/pipeline_context_figure.png
-  purpose: presentation
-  condition_param: context_test_param
-  save_args:
-    dpi: 150
-
-# Pipeline metadata integration
-pipeline_metadata_figure:
-  type: figregistry_kedro.datasets.FigureDataSet
-  filepath: data/08_reporting/pipeline_metadata_figure.pdf
-  purpose: publication
-  condition_param: metadata_test_param
-  save_args:
-    format: pdf
-    dpi: 300
