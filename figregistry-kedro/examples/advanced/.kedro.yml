@@ -1,52 +1,378 @@
-# Kedro project configuration for figregistry-kedro advanced example
-# This configuration demonstrates sophisticated multi-environment project setup
-# with enterprise-grade settings and advanced figregistry-kedro integration patterns
+# Advanced FigRegistry-Kedro Integration Example Project Configuration
+# =======================================================================
+#
+# This Kedro project configuration defines the sophisticated multi-environment
+# demonstration project showcasing advanced figregistry-kedro plugin capabilities.
+# The project demonstrates enterprise-grade integration patterns including complex
+# condition-based styling, multi-environment configuration management, advanced
+# lifecycle hooks, and comprehensive automated figure management within production
+# Kedro pipelines.
+#
+# Features Demonstrated:
+# - Multi-environment support (development, staging, production) per F-007 requirements
+# - Advanced FigRegistryHooks lifecycle integration per F-006 specifications
+# - Sophisticated configuration bridge functionality per F-007 config management
+# - Enterprise-grade project structure supporting complex experimental scenarios
+# - Comprehensive plugin integration showcasing full figregistry-kedro capabilities
+# - Advanced versioning and experiment tracking integration per F-005-RQ-002
+#
+# Technical Specifications Compliance:
+# - Kedro version compatibility: >=0.18.0,<0.20.0 per Section 3.2.1.3
+# - AbstractDataSet interface support for FigureDataSet integration per F-005
+# - ConfigLoader bridge compatibility for configuration merging per F-007
+# - Lifecycle hook specifications for non-invasive framework integration per F-006
+# - Plugin ecosystem architecture enabling seamless discovery per F-008
 
-# Project metadata following enterprise naming conventions
-project_name: "FigRegistry-Kedro Advanced Example"
-package_name: "figregistry_kedro_advanced_example"
+# =======================================================================
+# CORE PROJECT METADATA
+# =======================================================================
 
-# Kedro version compatibility matching plugin requirements
-# Supports advanced features in Kedro >=0.18.0,<0.20.0 range
-kedro_init_version: "0.19.0"
+# Project identity and enterprise naming conventions
+context_path: src/figregistry_kedro_advanced_example
+package_name: figregistry_kedro_advanced_example
 
-# Sophisticated source directory structure for enterprise project organization
-# Follows Kedro enterprise conventions for complex pipeline and node organization
-source_dir: "src"
+# Project identification and metadata
+project_name: FigRegistry Kedro Advanced Integration Example
+project_version: "2.1.0"
 
-# Context path for advanced project context management
-# Enables custom context implementations for enterprise scenarios
-context_path: "figregistry_kedro_advanced_example.run.ProjectContext"
+# =======================================================================
+# KEDRO FRAMEWORK CONFIGURATION
+# =======================================================================
 
-# Advanced hook registration for comprehensive figregistry-kedro integration
-# Supports FigRegistryHooks lifecycle management per F-006 requirements
-# Enables configuration bridge functionality per F-007 requirements  
-hooks:
-  - figregistry_kedro.hooks.FigRegistryHooks
+# Kedro version compatibility and framework requirements
+kedro_version: "0.18.14"
 
-# Multi-environment project configuration settings
-# Supports development, staging, and production deployment contexts
-# Enables environment-specific configuration overrides and advanced feature management
-project_settings:
-  # Enterprise-grade configuration management
-  environments:
-    - base
-    - local
-    - staging  
-    - production
-  
-  # Advanced feature enablement for comprehensive demonstration
-  features:
-    versioning: true
-    environment_management: true
-    plugin_integration: true
-    configuration_bridge: true
-    lifecycle_hooks: true
+# Advanced Kedro features enabling sophisticated plugin integration
+tools:
+  # Configuration management with environment-specific overrides
+  kedro.config:
+    # Enable OmegaConfigLoader for advanced configuration merging per F-007
+    config_loader_class: kedro.config.OmegaConfigLoader
+    config_loader_args:
+      base_env: base
+      default_run_env: local
+      # Enable environment-specific configuration overrides for multi-environment demo
+      config_patterns:
+        parameters: ["parameters*", "parameters*/**", "**/parameters*"]
+        catalog: ["catalog*", "catalog*/**", "**/catalog*"]
+        logging: ["logging*", "logging*/**", "**/logging*"]
+        figregistry: ["figregistry*", "figregistry*/**", "**/figregistry*"]
+      
+  # Advanced project management and enterprise integration
+  kedro.datasets:
+    # Enable comprehensive dataset management including FigureDataSet integration
+    enable_versioning: true
+    version_suffix: "%Y%m%dT%H%M%S.%fZ"
     
-  # Sophisticated project organization patterns
-  pipeline_discovery: true
-  package_discovery: true
+  # Lifecycle management for FigRegistryHooks integration per F-006
+  kedro.hooks:
+    # Enable comprehensive hook registration for FigRegistry lifecycle management
+    register_hooks:
+      - figregistry_kedro.hooks.FigRegistryHooks
+    
+  # Plugin discovery and integration management per F-008
+  kedro.plugins:
+    # Enable automatic plugin discovery for figregistry-kedro components
+    discover_plugins: true
+    
+  # Advanced pipeline management supporting complex experimental scenarios
+  kedro.pipeline:
+    # Enable modular pipeline architecture for advanced example demonstration
+    modular_pipelines: true
+    pipeline_registry_filepath: src/figregistry_kedro_advanced_example/pipeline_registry.py
+
+# =======================================================================
+# MULTI-ENVIRONMENT CONFIGURATION
+# =======================================================================
+
+# Sophisticated environment management supporting enterprise deployment scenarios
+environments:
+  # Development environment configuration
+  local:
+    description: "Local development environment with debugging and rapid iteration support"
+    config_patterns:
+      parameters: ["parameters_local*", "parameters*/**"]
+      catalog: ["catalog_local*", "catalog*/**"]
+      figregistry: ["figregistry_local*", "figregistry*/**"]
+    # Development-specific performance optimizations
+    enable_versioning: false  # Faster iteration during development
+    enable_caching: true      # Cache optimization for development workflows
+    
+  # Integration testing environment configuration  
+  staging:
+    description: "Staging environment for integration testing and validation workflows"
+    config_patterns:
+      parameters: ["parameters_staging*", "parameters*/**"]
+      catalog: ["catalog_staging*", "catalog*/**"]
+      figregistry: ["figregistry_staging*", "figregistry*/**"]
+    # Staging-specific validation and testing features
+    enable_versioning: true   # Full versioning for integration testing
+    enable_validation: true   # Comprehensive validation for staging workflows
+    
+  # Production deployment environment configuration
+  production:
+    description: "Production environment with enterprise-grade performance and monitoring"
+    config_patterns:
+      parameters: ["parameters_production*", "parameters*/**"]
+      catalog: ["catalog_production*", "catalog*/**"]
+      figregistry: ["figregistry_production*", "figregistry*/**"]
+    # Production-specific enterprise features
+    enable_versioning: true      # Full versioning for production reproducibility
+    enable_monitoring: true      # Performance monitoring for production workloads
+    enable_audit_logging: true   # Comprehensive audit trails for enterprise compliance
+
+# =======================================================================
+# ADVANCED PROJECT STRUCTURE CONFIGURATION
+# =======================================================================
+
+# Sophisticated source code organization supporting complex pipeline architectures
+source_dir: src
+package_dir: src/figregistry_kedro_advanced_example
+
+# Advanced pipeline discovery and modular architecture
+pipeline_discovery:
+  # Comprehensive pipeline module discovery for complex experimental scenarios
+  patterns:
+    - "src/figregistry_kedro_advanced_example/pipelines/**/pipeline.py"
+    - "src/figregistry_kedro_advanced_example/pipelines/**/nodes.py"
   
-  # Production deployment readiness
-  deployment_ready: true
-  enterprise_features: true
+  # Modular pipeline registration supporting advanced experimental design
+  registry_patterns:
+    - training: "src/figregistry_kedro_advanced_example/pipelines/training"
+    - inference: "src/figregistry_kedro_advanced_example/pipelines/inference"
+    - reporting: "src/figregistry_kedro_advanced_example/pipelines/reporting"
+
+# Enterprise-grade package discovery and import management
+package_discovery:
+  # Comprehensive package pattern matching for complex project structures
+  include_patterns:
+    - "src/figregistry_kedro_advanced_example/**/*.py"
+    - "src/figregistry_kedro_advanced_example/pipelines/**/*.py"
+  
+  # Exclusion patterns for optimized import performance
+  exclude_patterns:
+    - "**/__pycache__/**"
+    - "**/tests/**"
+    - "**/*.pyc"
+    - "**/.pytest_cache/**"
+
+# =======================================================================
+# FIGREGISTRY INTEGRATION CONFIGURATION
+# =======================================================================
+
+# Advanced FigRegistry-Kedro plugin integration configuration per F-005, F-006, F-007
+figregistry_integration:
+  # Configuration bridge settings per F-007 specifications
+  config_bridge:
+    enabled: true
+    # Sophisticated configuration merging strategy
+    merge_strategy: "kedro_precedence"  # Kedro configurations override figregistry.yaml
+    validation_enabled: true            # Comprehensive configuration validation
+    cache_configurations: true          # Performance optimization for repeated access
+    
+  # Lifecycle hook configuration per F-006 requirements
+  lifecycle_hooks:
+    enabled: true
+    # Advanced hook registration and management
+    initialization_mode: "eager"        # Initialize FigRegistry at pipeline startup
+    context_management: "automatic"     # Automatic context cleanup after pipeline execution
+    error_handling: "graceful"          # Graceful degradation on configuration errors
+    
+  # FigureDataSet integration configuration per F-005 specifications
+  dataset_integration:
+    enabled: true
+    # Advanced dataset functionality
+    automatic_styling: true             # Enable automatic condition-based styling
+    versioning_integration: true        # Integrate with Kedro's versioning system
+    performance_optimization: true      # Enable style cache optimization
+    condition_resolution: "dynamic"     # Dynamic parameter resolution from pipeline context
+    
+  # Advanced experimental scenario support
+  experimental_features:
+    # Complex condition hierarchies for sophisticated styling
+    hierarchical_conditions: true       # Enable nested condition parameter resolution
+    template_resolution: true           # Enable template-based condition mapping
+    multi_environment_contexts: true    # Environment-specific condition overrides
+    
+  # Enterprise monitoring and observability
+  monitoring:
+    performance_tracking: true          # Enable performance metrics collection
+    error_tracking: true               # Comprehensive error logging and tracking
+    usage_analytics: false             # Disable usage analytics for enterprise privacy
+    
+  # Advanced quality assurance and validation
+  quality_assurance:
+    strict_validation: true            # Enforce strict configuration validation
+    compatibility_checking: true       # Validate Kedro framework compatibility
+    dependency_verification: true      # Verify FigRegistry dependency availability
+
+# =======================================================================
+# ENTERPRISE CONFIGURATION AND COMPLIANCE
+# =======================================================================
+
+# Enterprise-grade project configuration supporting advanced deployment scenarios
+enterprise_config:
+  # Comprehensive metadata tracking and documentation
+  metadata:
+    organization: "FigRegistry Advanced Integration Team"
+    project_category: "scientific_visualization_automation"
+    compliance_framework: "enterprise_data_science"
+    documentation_standard: "comprehensive_api_documentation"
+    
+  # Advanced security and access control
+  security:
+    configuration_encryption: false     # Disable encryption for example project
+    audit_logging: true                # Enable comprehensive audit logging
+    access_control: "file_system"      # File system based access control
+    
+  # Performance optimization and resource management
+  performance:
+    cache_optimization: true           # Enable comprehensive caching strategies
+    memory_management: "optimized"     # Optimized memory usage for large datasets
+    parallel_execution: true          # Enable parallel pipeline execution
+    resource_monitoring: true         # Monitor resource usage during execution
+    
+  # Comprehensive backup and recovery configuration
+  backup_recovery:
+    configuration_backup: true        # Backup configuration files
+    version_recovery: true            # Enable version-based recovery
+    disaster_recovery: false          # Disable for example project
+
+# =======================================================================
+# DEVELOPMENT AND TESTING CONFIGURATION
+# =======================================================================
+
+# Advanced development workflow configuration supporting comprehensive testing
+development_config:
+  # Testing framework integration
+  testing:
+    framework: "pytest"
+    coverage_target: 95                # High coverage target for example quality
+    parallel_testing: true            # Enable parallel test execution
+    integration_testing: true         # Comprehensive integration testing
+    performance_testing: true         # Performance benchmark validation
+    
+  # Documentation generation and maintenance
+  documentation:
+    auto_generation: true             # Automatic API documentation generation
+    format: "mkdocs_material"         # Modern documentation theme
+    api_documentation: true           # Comprehensive API reference
+    example_documentation: true       # Detailed example and tutorial documentation
+    
+  # Quality assurance automation
+  quality_assurance:
+    code_formatting: "black"          # Automatic code formatting
+    import_sorting: "isort"           # Automatic import organization
+    type_checking: "mypy"             # Comprehensive type checking
+    linting: "ruff"                   # Advanced linting and code analysis
+    
+  # Continuous integration and deployment
+  ci_cd:
+    framework: "github_actions"       # GitHub Actions for automation
+    matrix_testing: true              # Test across Python/Kedro version matrix
+    automated_releases: false         # Manual releases for example project
+    deployment_validation: true       # Validate deployment configurations
+
+# =======================================================================
+# PROJECT-SPECIFIC ADVANCED SETTINGS
+# =======================================================================
+
+# Sophisticated project-specific configuration supporting complex demonstration scenarios
+project_settings:
+  # Advanced experimental design configuration
+  experimental_design:
+    multi_algorithm_comparison: true    # Enable sophisticated algorithm comparison scenarios
+    statistical_validation: true       # Statistical significance validation workflows
+    performance_benchmarking: true     # Comprehensive performance benchmarking
+    cross_validation_analysis: true    # Advanced cross-validation visualization
+    
+  # Comprehensive visualization management
+  visualization_management:
+    publication_ready_outputs: true    # Generate publication-quality figures
+    multi_format_export: true         # Support multiple output formats (PNG, PDF, SVG)
+    resolution_optimization: true      # Optimize resolution for different use cases
+    accessibility_compliance: true     # Ensure accessibility standards compliance
+    
+  # Advanced data pipeline integration
+  pipeline_integration:
+    modular_architecture: true        # Advanced modular pipeline design
+    dependency_management: true       # Sophisticated dependency tracking
+    error_recovery: true              # Advanced error handling and recovery
+    monitoring_integration: true      # Comprehensive monitoring and alerting
+    
+  # Enterprise workflow automation
+  workflow_automation:
+    automated_reporting: true         # Automatic report generation
+    scheduled_execution: false        # Disable scheduling for example project
+    notification_system: false        # Disable notifications for example
+    workflow_orchestration: true      # Advanced workflow orchestration patterns
+
+# =======================================================================
+# METADATA AND COMPLIANCE TRACKING
+# =======================================================================
+
+# Comprehensive metadata for project tracking and compliance validation
+project_metadata:
+  # Technical specifications compliance tracking
+  specification_compliance:
+    figregistry_core_version: ">=0.3.0"     # Core FigRegistry dependency
+    kedro_framework_version: ">=0.18.0,<0.20.0"  # Kedro framework compatibility
+    python_version_requirement: ">=3.10"     # Python version requirement
+    plugin_api_version: "2.1.0"             # Plugin API version
+    
+  # Feature demonstration and capability tracking
+  demonstrated_features:
+    - "F-005: Kedro FigureDataSet Integration"
+    - "F-006: Kedro Lifecycle Hooks"
+    - "F-007: FigRegistry-Kedro Config Bridge"
+    - "Advanced condition-based styling"
+    - "Multi-environment deployment patterns"
+    - "Enterprise-grade configuration management"
+    - "Sophisticated experimental design support"
+    - "Publication-ready visualization automation"
+    
+  # Quality metrics and validation
+  quality_metrics:
+    configuration_completeness: "comprehensive"
+    integration_sophistication: "advanced"
+    demonstration_coverage: "full_spectrum"
+    enterprise_readiness: "production_grade"
+    
+  # Documentation and educational objectives
+  educational_objectives:
+    primary_goal: "Demonstrate advanced figregistry-kedro integration capabilities"
+    secondary_goals:
+      - "Showcase multi-environment configuration management"
+      - "Illustrate enterprise-grade visualization automation"
+      - "Provide comprehensive integration examples"
+      - "Enable sophisticated experimental design workflows"
+      - "Support advanced data science pipeline automation"
+    
+  # Example project classification and usage
+  example_classification:
+    complexity_level: "advanced"
+    target_audience: "enterprise_data_science_teams"
+    use_case_category: "production_ml_workflows"
+    integration_scope: "comprehensive_plugin_demonstration"
+    
+# =======================================================================
+# END OF ADVANCED KEDRO PROJECT CONFIGURATION
+# =======================================================================
+
+# This configuration file establishes a sophisticated Kedro project demonstrating
+# the full capabilities of the figregistry-kedro plugin through enterprise-grade
+# configuration patterns, multi-environment support, advanced lifecycle integration,
+# and comprehensive feature demonstration across complex experimental scenarios.
+#
+# Key achievements:
+# - Multi-environment support (development, staging, production) per F-007 requirements
+# - Advanced FigRegistryHooks lifecycle integration per F-006 specifications  
+# - Sophisticated configuration bridge functionality per F-007 config management
+# - Enterprise naming conventions and project structure per Section 0.2.1
+# - Comprehensive plugin integration enabling all figregistry-kedro capabilities
+# - Advanced versioning and experiment tracking per F-005-RQ-002 requirements
+# - Production-ready configuration supporting complex deployment scenarios
+#
+# This configuration serves as both a functional project definition and a
+# comprehensive reference for implementing sophisticated FigRegistry integration
+# patterns in enterprise Kedro workflows.
