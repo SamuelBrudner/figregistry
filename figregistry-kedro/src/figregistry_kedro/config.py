@@ -1,507 +1,923 @@
-"""FigRegistry-Kedro Configuration Bridge.
+"""
+FigRegistry-Kedro Configuration Bridge
 
-This module provides the FigRegistryConfigBridge that serves as the configuration 
-translation layer between Kedro's ConfigLoader system and FigRegistry's YAML-based 
-configuration management. The bridge enables seamless merging of environment-specific 
-Kedro parameters with traditional figregistry.yaml settings while maintaining 
+This module implements the FigRegistryConfigBridge that serves as the configuration
+translation layer between Kedro's ConfigLoader system and FigRegistry's YAML-based
+configuration management. The bridge enables seamless merging of environment-specific
+Kedro parameters with traditional figregistry.yaml settings while maintaining
 validation and type safety across both frameworks.
 
-The component operates as a read-only translator that respects configuration 
-hierarchies from both systems while providing clear precedence rules for 
+Key Features:
+- Configuration merging with clear precedence rules (F-007)
+- Pydantic validation for type safety across configuration systems
+- Performance-optimized operation (<10ms merge time target)
+- Thread-safe concurrent access for parallel Kedro runners
+- Comprehensive error aggregation for configuration validation failures
+- Environment-specific configuration support for multi-stage deployments
+
+The component operates as a read-only translator that respects configuration
+hierarchies from both systems while providing clear precedence rules for
 conflict resolution.
 """
 
 import logging
 import time
-from pathlib import Path
-from typing import Any, Dict, Optional, Union
-import threading
-from concurrent.futures import ThreadPoolExecutor
 import warnings
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+from concurrent.futures import ThreadPoolExecutor
+from threading import Lock
+import copy
 
-try:
-    import figregistry
-    from figregistry.core.config import Config as FigRegistryConfig, load_config
-except ImportError:
-    warnings.warn(
-        "FigRegistry not found. Please ensure figregistry>=0.3.0 is installed.",
-        ImportWarning
-    )
-    figregistry = None
-    FigRegistryConfig = None
-    load_config = None
+from pydantic import BaseModel, Field, ValidationError, validator
+import yaml
 
+# Optional Kedro imports with graceful fallback
 try:
     from kedro.config import ConfigLoader
+    from kedro.framework.context import KedroContext
+    HAS_KEDRO = True
 except ImportError:
-    warnings.warn(
-        "Kedro not found. Please ensure kedro>=0.18.0,<0.20.0 is installed.",
-        ImportWarning
-    )
+    HAS_KEDRO = False
     ConfigLoader = None
+    KedroContext = None
 
-import yaml
-from pydantic import BaseModel, Field, ValidationError, validator
-from pydantic.types import StrictBool, StrictStr
+# FigRegistry imports with graceful fallback  
+try:
+    import figregistry
+    from figregistry import Config as FigRegistryConfig
+    HAS_FIGREGISTRY = True
+except ImportError:
+    HAS_FIGREGISTRY = False
+    figregistry = None
+    FigRegistryConfig = None
 
+# Configure module logger
 logger = logging.getLogger(__name__)
 
-class FigRegistryKedroConfig(BaseModel):
-    """Pydantic model for merged FigRegistry-Kedro configuration.
+# Module-level configuration cache with thread safety
+_config_cache: Dict[str, Any] = {}
+_cache_lock = Lock()
+
+# Performance tracking for monitoring configuration operation times
+_performance_metrics = {
+    "merge_times": [],
+    "cache_hits": 0,
+    "cache_misses": 0,
+    "validation_failures": 0
+}
+
+
+class ConfigMergeError(Exception):
+    """Raised when configuration merging fails with validation or processing errors."""
     
-    This model ensures type safety across both configuration systems and provides
-    comprehensive validation for merged configuration structures.
+    def __init__(self, message: str, errors: Optional[List[str]] = None):
+        super().__init__(message)
+        self.errors = errors or []
+
+
+class ConfigValidationError(Exception):
+    """Raised when configuration validation fails with detailed error information."""
+    
+    def __init__(self, message: str, validation_errors: Optional[List[str]] = None):
+        super().__init__(message)
+        self.validation_errors = validation_errors or []
+
+
+class FigRegistryConfigSchema(BaseModel):
+    """
+    Pydantic schema for validating merged FigRegistry configurations.
+    
+    This schema ensures type safety and validation for configurations that merge
+    Kedro ConfigLoader settings with traditional FigRegistry YAML configurations.
+    It provides validation for all required and optional configuration sections
+    while maintaining compatibility with both systems' configuration structures.
     """
     
     # Core FigRegistry configuration sections
-    styles: Optional[Dict[str, Dict[str, Any]]] = Field(
+    figregistry_version: Optional[str] = Field(
+        default=">=0.3.0",
+        description="FigRegistry version constraint for compatibility validation"
+    )
+    
+    metadata: Optional[Dict[str, Any]] = Field(
+        default_factory=dict,
+        description="Configuration metadata for tracking and validation"
+    )
+    
+    styles: Dict[str, Dict[str, Any]] = Field(
         default_factory=dict,
         description="Condition-based style mappings for experimental visualizations"
     )
     
-    palettes: Optional[Dict[str, Any]] = Field(
+    palettes: Optional[Dict[str, Union[List[str], Dict[str, str]]]] = Field(
         default_factory=dict,
-        description="Color palette definitions and defaults"
+        description="Color palettes and fallback styling for undefined conditions"
     )
     
-    outputs: Optional[Dict[str, Any]] = Field(
+    defaults: Dict[str, Any] = Field(
         default_factory=dict,
-        description="Output path configurations and naming conventions"
+        description="Default styling parameters and fallback configurations"
     )
     
-    defaults: Optional[Dict[str, Any]] = Field(
+    outputs: Dict[str, Any] = Field(
         default_factory=dict,
-        description="Default styling parameters and fallback values"
+        description="Output management configuration for automated file handling"
     )
     
     # Kedro-specific integration settings
     kedro: Optional[Dict[str, Any]] = Field(
         default_factory=dict,
-        description="Kedro-specific configuration overrides and extensions"
+        description="Kedro-specific configuration extensions and integration settings"
     )
     
-    # Environment and precedence settings
-    environment: Optional[StrictStr] = Field(
-        default="base",
-        description="Current environment for configuration resolution"
+    # Advanced configuration sections
+    style_inheritance: Optional[Dict[str, Any]] = Field(
+        default_factory=dict,
+        description="Style inheritance and composition rules"
     )
     
-    enable_concurrent_access: Optional[StrictBool] = Field(
-        default=True,
-        description="Enable thread-safe configuration access for parallel runners"
+    conditional_rules: Optional[Dict[str, Any]] = Field(
+        default_factory=dict,
+        description="Conditional styling rules for complex scenarios"
     )
     
-    validation_enabled: Optional[StrictBool] = Field(
-        default=True,
-        description="Enable comprehensive configuration validation"
+    performance: Optional[Dict[str, Any]] = Field(
+        default_factory=dict,
+        description="Performance monitoring and optimization settings"
+    )
+    
+    validation: Optional[Dict[str, Any]] = Field(
+        default_factory=dict,
+        description="Configuration validation schema and rules"
+    )
+    
+    examples: Optional[Dict[str, Any]] = Field(
+        default_factory=dict,
+        description="Usage examples and documentation"
     )
     
     @validator('styles')
     def validate_styles(cls, v):
-        """Validate style mappings structure."""
-        if not isinstance(v, dict):
-            raise ValueError("Styles must be a dictionary")
-        
-        for condition, style_dict in v.items():
-            if not isinstance(style_dict, dict):
-                raise ValueError(f"Style definition for '{condition}' must be a dictionary")
-        
+        """Validate that each style contains at minimum a color specification."""
+        for style_name, style_config in v.items():
+            if not isinstance(style_config, dict):
+                raise ValueError(f"Style '{style_name}' must be a dictionary")
+            if 'color' not in style_config:
+                logger.warning(f"Style '{style_name}' missing required 'color' field")
         return v
     
     @validator('outputs')
     def validate_outputs(cls, v):
-        """Validate output configuration structure."""
-        if not isinstance(v, dict):
-            raise ValueError("Outputs must be a dictionary")
-            
-        # Validate common output configuration keys if present
-        if 'base_path' in v and not isinstance(v['base_path'], (str, Path)):
-            raise ValueError("Output base_path must be a string or Path")
-            
+        """Validate output configuration has required base_path."""
+        if v and 'base_path' not in v:
+            raise ValueError("Output configuration must include 'base_path' field")
+        return v
+    
+    @validator('figregistry_version')
+    def validate_version_constraint(cls, v):
+        """Validate version constraint format."""
+        if v and not any(op in v for op in ['>=', '>', '<=', '<', '==']):
+            raise ValueError(f"Invalid version constraint format: {v}")
         return v
     
     class Config:
-        """Pydantic configuration settings."""
-        extra = "allow"  # Allow additional fields for flexibility
-        validate_assignment = True  # Validate on assignment
-        use_enum_values = True  # Use enum values in validation
-
-
-class ConfigurationMergeError(Exception):
-    """Exception raised when configuration merging fails."""
-    
-    def __init__(self, message: str, errors: Optional[list] = None):
-        super().__init__(message)
-        self.errors = errors or []
+        """Pydantic model configuration for enhanced validation and performance."""
+        extra = "allow"  # Allow additional fields for extensibility
+        validate_assignment = True  # Validate on field assignment
+        arbitrary_types_allowed = True  # Allow complex types
+        use_enum_values = True  # Use enum values for serialization
 
 
 class FigRegistryConfigBridge:
-    """Configuration bridge between Kedro ConfigLoader and FigRegistry.
+    """
+    Configuration translation layer between Kedro's ConfigLoader and FigRegistry's
+    YAML-based configuration management system.
     
-    This bridge enables seamless integration of environment-specific Kedro 
-    parameters with FigRegistry's condition-based styling system while 
-    maintaining configuration validation and type safety across both frameworks.
+    This bridge enables seamless integration of environment-specific Kedro parameters
+    with FigRegistry's condition-based styling system while maintaining configuration
+    validation and type safety across both frameworks. The component operates as a
+    read-only translator that respects configuration hierarchies from both systems
+    while providing clear precedence rules for conflict resolution.
     
-    Features:
-    - Seamless merging of Kedro and FigRegistry configurations
-    - Environment-specific configuration overrides
-    - Pydantic validation for type safety
-    - Concurrent access support for parallel execution
-    - <10ms configuration merging overhead
-    - Comprehensive error aggregation and reporting
+    Key Features:
+    - Merges Kedro ConfigLoader with FigRegistry YAML configurations (F-007)
+    - Provides environment-specific configuration support (F-007.2)
+    - Maintains <10ms configuration merging overhead (Section 5.2.8)
+    - Supports concurrent access for parallel Kedro execution
+    - Comprehensive error aggregation for validation failures
+    - Pydantic validation for type safety across both systems
+    
+    Usage:
+        bridge = FigRegistryConfigBridge()
+        config = bridge.merge_configurations(config_loader, environment="local")
+        figregistry.init_config(config)
     """
     
-    # Class-level configuration cache for performance
-    _config_cache: Dict[str, FigRegistryKedroConfig] = {}
-    _cache_lock = threading.RLock()
-    
-    def __init__(self, 
-                 config_loader: Optional['ConfigLoader'] = None,
-                 environment: Optional[str] = None,
-                 enable_caching: bool = True):
-        """Initialize the configuration bridge.
+    def __init__(
+        self,
+        cache_enabled: bool = True,
+        validation_strict: bool = True,
+        performance_target_ms: float = 10.0,
+        max_cache_size: int = 1000
+    ):
+        """
+        Initialize the FigRegistry configuration bridge.
         
         Args:
-            config_loader: Kedro ConfigLoader instance for accessing project configuration
-            environment: Target environment for configuration resolution (e.g., 'local', 'production')
-            enable_caching: Enable configuration caching for performance optimization
+            cache_enabled: Enable configuration caching for performance
+            validation_strict: Enable strict validation for merged configurations
+            performance_target_ms: Target merge time in milliseconds (<10ms default)
+            max_cache_size: Maximum cache entries for merged configurations
         """
-        self.config_loader = config_loader
-        self.environment = environment or "base"
-        self.enable_caching = enable_caching
-        self._local_cache: Optional[FigRegistryKedroConfig] = None
-        self._cache_key: Optional[str] = None
+        self.cache_enabled = cache_enabled
+        self.validation_strict = validation_strict
+        self.performance_target_ms = performance_target_ms
+        self.max_cache_size = max_cache_size
         
-        logger.debug(f"Initialized FigRegistryConfigBridge for environment: {self.environment}")
+        # Thread safety for concurrent access
+        self._lock = Lock()
+        
+        # Performance monitoring
+        self._merge_times: List[float] = []
+        self._cache_stats = {"hits": 0, "misses": 0}
+        
+        logger.info(
+            f"Initialized FigRegistryConfigBridge with cache={cache_enabled}, "
+            f"strict_validation={validation_strict}, "
+            f"target_time={performance_target_ms}ms"
+        )
     
-    def _generate_cache_key(self, config_data: Dict[str, Any]) -> str:
-        """Generate a cache key based on configuration content and environment."""
-        import hashlib
-        import json
+    def merge_configurations(
+        self,
+        config_loader: Optional[Any] = None,
+        environment: str = "base",
+        project_path: Optional[Path] = None,
+        figregistry_config_name: str = "figregistry",
+        **override_params
+    ) -> Dict[str, Any]:
+        """
+        Merge Kedro ConfigLoader configurations with FigRegistry YAML settings.
         
-        # Create a deterministic representation of the configuration
-        cache_content = {
-            'environment': self.environment,
-            'config_hash': hashlib.md5(
-                json.dumps(config_data, sort_keys=True).encode()
-            ).hexdigest()
-        }
+        This method implements the core configuration bridge functionality by loading
+        configurations from both Kedro's ConfigLoader system and traditional
+        figregistry.yaml files, then merging them with clear precedence rules
+        while maintaining validation and type safety.
         
-        return json.dumps(cache_content, sort_keys=True)
-    
-    def _load_figregistry_config(self) -> Dict[str, Any]:
-        """Load traditional FigRegistry configuration from figregistry.yaml."""
-        config_data = {}
+        Args:
+            config_loader: Kedro ConfigLoader instance for loading project configurations
+            environment: Environment name for configuration resolution (local, staging, production)
+            project_path: Project root path for configuration file discovery
+            figregistry_config_name: Name of FigRegistry config file (without .yml extension)
+            **override_params: Additional parameters to override in merged configuration
         
-        # Try to load standalone figregistry.yaml first
-        figregistry_path = Path("figregistry.yaml")
-        if figregistry_path.exists():
-            try:
-                with open(figregistry_path, 'r') as f:
-                    standalone_config = yaml.safe_load(f) or {}
-                config_data.update(standalone_config)
-                logger.debug(f"Loaded standalone figregistry.yaml with {len(standalone_config)} sections")
-            except Exception as e:
-                logger.warning(f"Failed to load standalone figregistry.yaml: {e}")
+        Returns:
+            Dict containing merged and validated configuration ready for FigRegistry initialization
         
-        return config_data
-    
-    def _load_kedro_figregistry_config(self) -> Dict[str, Any]:
-        """Load FigRegistry configuration from Kedro's configuration system."""
-        if self.config_loader is None:
-            return {}
-            
-        config_data = {}
+        Raises:
+            ConfigMergeError: When configuration merging fails
+            ConfigValidationError: When validation of merged configuration fails
+        """
+        start_time = time.time()
         
         try:
-            # Try to load figregistry configuration through Kedro's ConfigLoader
-            # Support multiple naming patterns for flexibility
-            patterns = [
-                "figregistry",
-                "figregistry*",
-                "**/figregistry.yml",
-                "**/figregistry.yaml"
-            ]
+            # Generate cache key for configuration lookup
+            cache_key = self._generate_cache_key(
+                config_loader, environment, project_path, figregistry_config_name, **override_params
+            )
             
-            for pattern in patterns:
-                try:
-                    kedro_config = self.config_loader.get(pattern)
-                    if kedro_config:
-                        config_data.update(kedro_config)
-                        logger.debug(f"Loaded Kedro FigRegistry config with pattern '{pattern}': {len(kedro_config)} sections")
-                        break
-                except Exception as e:
-                    logger.debug(f"Pattern '{pattern}' not found or failed: {e}")
-                    continue
-                    
+            # Check cache first for performance optimization
+            if self.cache_enabled:
+                cached_config = self._get_cached_config(cache_key)
+                if cached_config is not None:
+                    self._cache_stats["hits"] += 1
+                    logger.debug(f"Configuration cache hit for key: {cache_key}")
+                    return cached_config
+                self._cache_stats["misses"] += 1
+            
+            logger.info(f"Merging configurations for environment: {environment}")
+            
+            # Load configurations from both systems
+            kedro_config = self._load_kedro_config(config_loader, environment)
+            figregistry_config = self._load_figregistry_config(
+                project_path, figregistry_config_name, environment
+            )
+            
+            # Merge configurations with precedence rules
+            merged_config = self._merge_config_sections(
+                kedro_config, figregistry_config, **override_params
+            )
+            
+            # Validate merged configuration
+            if self.validation_strict:
+                validated_config = self._validate_configuration(merged_config)
+            else:
+                validated_config = merged_config
+            
+            # Cache merged configuration for future use
+            if self.cache_enabled:
+                self._cache_config(cache_key, validated_config)
+            
+            # Track performance metrics
+            merge_time = (time.time() - start_time) * 1000  # Convert to milliseconds
+            self._merge_times.append(merge_time)
+            
+            if merge_time > self.performance_target_ms:
+                logger.warning(
+                    f"Configuration merge time {merge_time:.2f}ms exceeds target "
+                    f"{self.performance_target_ms}ms"
+                )
+            else:
+                logger.debug(f"Configuration merge completed in {merge_time:.2f}ms")
+            
+            return validated_config
+            
         except Exception as e:
-            logger.warning(f"Failed to load FigRegistry config from Kedro: {e}")
-        
-        return config_data
+            merge_time = (time.time() - start_time) * 1000
+            logger.error(f"Configuration merge failed after {merge_time:.2f}ms: {e}")
+            raise ConfigMergeError(f"Failed to merge configurations: {e}") from e
     
-    def _merge_configurations(self, 
-                            figregistry_config: Dict[str, Any], 
-                            kedro_config: Dict[str, Any]) -> Dict[str, Any]:
-        """Merge FigRegistry and Kedro configurations with proper precedence rules.
-        
-        Precedence Rules:
-        1. Environment-specific Kedro configurations override base configurations
-        2. Kedro configurations override standalone figregistry.yaml settings
-        3. Deep merging for nested dictionaries
-        4. Lists are replaced entirely (no merging)
+    def _load_kedro_config(
+        self, 
+        config_loader: Optional[Any], 
+        environment: str
+    ) -> Dict[str, Any]:
+        """
+        Load configuration from Kedro's ConfigLoader system.
         
         Args:
-            figregistry_config: Configuration from figregistry.yaml
-            kedro_config: Configuration from Kedro ConfigLoader
+            config_loader: Kedro ConfigLoader instance
+            environment: Environment name for configuration resolution
+        
+        Returns:
+            Dictionary containing Kedro configuration sections
+        """
+        kedro_config = {}
+        
+        if config_loader is None:
+            logger.debug("No Kedro ConfigLoader provided, using empty configuration")
+            return kedro_config
+        
+        if not HAS_KEDRO:
+            logger.warning("Kedro not available, skipping Kedro configuration loading")
+            return kedro_config
+        
+        try:
+            # Load all configuration sections from Kedro
+            config_sections = ["parameters", "figregistry", "catalog", "logging"]
             
+            for section in config_sections:
+                try:
+                    section_config = config_loader.get(section, environment)
+                    if section_config:
+                        kedro_config[section] = section_config
+                        logger.debug(f"Loaded Kedro config section '{section}' for environment '{environment}'")
+                except Exception as e:
+                    logger.debug(f"Kedro config section '{section}' not found or failed to load: {e}")
+                    continue
+            
+            logger.info(f"Successfully loaded {len(kedro_config)} Kedro configuration sections")
+            
+        except Exception as e:
+            logger.error(f"Failed to load Kedro configuration: {e}")
+            # Continue with empty configuration rather than failing completely
+        
+        return kedro_config
+    
+    def _load_figregistry_config(
+        self,
+        project_path: Optional[Path],
+        config_name: str,
+        environment: str
+    ) -> Dict[str, Any]:
+        """
+        Load configuration from FigRegistry YAML files.
+        
+        Args:
+            project_path: Project root path for configuration file discovery
+            config_name: Name of FigRegistry config file (without .yml extension)
+            environment: Environment name for configuration resolution
+        
+        Returns:
+            Dictionary containing FigRegistry configuration
+        """
+        figregistry_config = {}
+        
+        # Define potential configuration file paths
+        config_paths = self._get_figregistry_config_paths(project_path, config_name, environment)
+        
+        for config_path in config_paths:
+            if config_path.exists():
+                try:
+                    with open(config_path, 'r', encoding='utf-8') as f:
+                        file_config = yaml.safe_load(f) or {}
+                    
+                    # Merge with existing configuration (later files override earlier)
+                    figregistry_config = self._deep_merge_dicts(figregistry_config, file_config)
+                    logger.debug(f"Loaded FigRegistry config from: {config_path}")
+                    
+                except Exception as e:
+                    logger.error(f"Failed to load FigRegistry config from {config_path}: {e}")
+                    continue
+        
+        if not figregistry_config:
+            logger.warning("No FigRegistry configuration files found, using defaults")
+            figregistry_config = self._get_default_figregistry_config()
+        
+        return figregistry_config
+    
+    def _get_figregistry_config_paths(
+        self,
+        project_path: Optional[Path],
+        config_name: str,
+        environment: str
+    ) -> List[Path]:
+        """
+        Generate list of potential FigRegistry configuration file paths.
+        
+        Args:
+            project_path: Project root path
+            config_name: Configuration file name (without extension)
+            environment: Environment name
+        
+        Returns:
+            List of Path objects for configuration file locations
+        """
+        paths = []
+        
+        # Set default project path if not provided
+        if project_path is None:
+            project_path = Path.cwd()
+        
+        # Traditional FigRegistry config in project root
+        paths.append(project_path / f"{config_name}.yaml")
+        paths.append(project_path / f"{config_name}.yml")
+        
+        # Kedro-style configuration paths
+        conf_base = project_path / "conf" / "base"
+        if conf_base.exists():
+            paths.append(conf_base / f"{config_name}.yml")
+            paths.append(conf_base / f"{config_name}.yaml")
+        
+        # Environment-specific configuration paths
+        if environment != "base":
+            conf_env = project_path / "conf" / environment
+            if conf_env.exists():
+                paths.append(conf_env / f"{config_name}.yml")
+                paths.append(conf_env / f"{config_name}.yaml")
+        
+        return paths
+    
+    def _merge_config_sections(
+        self,
+        kedro_config: Dict[str, Any],
+        figregistry_config: Dict[str, Any],
+        **override_params
+    ) -> Dict[str, Any]:
+        """
+        Merge configuration sections with precedence rules.
+        
+        Precedence order (highest to lowest):
+        1. Override parameters passed directly to method
+        2. Kedro configuration values (environment-specific)
+        3. FigRegistry configuration values
+        4. Default values
+        
+        Args:
+            kedro_config: Configuration from Kedro ConfigLoader
+            figregistry_config: Configuration from FigRegistry YAML files
+            **override_params: Direct override parameters
+        
         Returns:
             Merged configuration dictionary
         """
-        start_time = time.perf_counter()
+        # Start with FigRegistry configuration as base
+        merged_config = copy.deepcopy(figregistry_config)
         
-        def deep_merge(base: Dict[str, Any], override: Dict[str, Any]) -> Dict[str, Any]:
-            """Deep merge two dictionaries with override precedence."""
-            result = base.copy()
+        # Merge Kedro parameters into styles and other relevant sections
+        if "parameters" in kedro_config:
+            parameters = kedro_config["parameters"]
             
-            for key, value in override.items():
-                if key in result and isinstance(result[key], dict) and isinstance(value, dict):
-                    # Recursively merge nested dictionaries
-                    result[key] = deep_merge(result[key], value)
-                else:
-                    # Override or add new key
-                    result[key] = value
+            # Add experimental condition parameters to configuration context
+            merged_config.setdefault("_kedro_context", {})
+            merged_config["_kedro_context"]["parameters"] = parameters
             
-            return result
+            # Merge parameters into appropriate configuration sections
+            self._merge_parameters_into_config(merged_config, parameters)
         
-        # Start with FigRegistry base configuration
-        merged_config = figregistry_config.copy()
+        # Merge Kedro figregistry configuration if present
+        if "figregistry" in kedro_config:
+            kedro_figregistry = kedro_config["figregistry"]
+            merged_config = self._deep_merge_dicts(merged_config, kedro_figregistry)
         
-        # Merge Kedro configuration with precedence
-        merged_config = deep_merge(merged_config, kedro_config)
+        # Apply direct override parameters
+        if override_params:
+            merged_config = self._deep_merge_dicts(merged_config, override_params)
         
-        # Add environment metadata
-        merged_config['environment'] = self.environment
-        
-        # Add Kedro-specific settings if not present
-        if 'kedro' not in merged_config:
-            merged_config['kedro'] = {}
-            
-        merge_time = time.perf_counter() - start_time
-        
-        # Ensure performance requirement of <10ms
-        if merge_time > 0.01:  # 10ms
-            logger.warning(f"Configuration merging took {merge_time*1000:.2f}ms, exceeding 10ms target")
-        else:
-            logger.debug(f"Configuration merging completed in {merge_time*1000:.2f}ms")
+        # Ensure required sections exist with defaults
+        self._ensure_required_sections(merged_config)
         
         return merged_config
     
-    def _validate_configuration(self, config_data: Dict[str, Any]) -> FigRegistryKedroConfig:
-        """Validate merged configuration using Pydantic model.
+    def _merge_parameters_into_config(
+        self,
+        config: Dict[str, Any],
+        parameters: Dict[str, Any]
+    ) -> None:
+        """
+        Merge Kedro parameters into appropriate configuration sections.
         
         Args:
-            config_data: Merged configuration dictionary
-            
+            config: Configuration dictionary to modify in-place
+            parameters: Kedro parameters to merge
+        """
+        # Extract experimental condition parameters for style resolution
+        condition_params = {
+            "experiment_condition": parameters.get("experiment_condition"),
+            "experiment_phase": parameters.get("experiment_phase"),
+            "analysis_stage": parameters.get("analysis_stage"),
+            "model_type": parameters.get("model_type")
+        }
+        
+        # Remove None values
+        condition_params = {k: v for k, v in condition_params.items() if v is not None}
+        
+        if condition_params:
+            config.setdefault("condition_parameters", {}).update(condition_params)
+        
+        # Merge visualization parameters if present
+        if "plot_settings" in parameters:
+            plot_settings = parameters["plot_settings"]
+            config.setdefault("defaults", {}).setdefault("figure", {}).update({
+                "figsize": plot_settings.get("figure_size", [10, 8]),
+                "dpi": plot_settings.get("dpi", 150)
+            })
+        
+        # Merge output configuration from execution parameters
+        if "execution_config" in parameters:
+            exec_config = parameters["execution_config"]
+            if "output_base_path" in exec_config:
+                config.setdefault("outputs", {})["base_path"] = exec_config["output_base_path"]
+            if "figure_formats" in exec_config:
+                config.setdefault("outputs", {}).setdefault("formats", {})["defaults"] = {
+                    "exploratory": exec_config["figure_formats"]
+                }
+    
+    def _deep_merge_dicts(self, dict1: Dict[str, Any], dict2: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Deep merge two dictionaries with dict2 values taking precedence.
+        
+        Args:
+            dict1: Base dictionary
+            dict2: Override dictionary (takes precedence)
+        
         Returns:
-            Validated FigRegistryKedroConfig instance
-            
+            Merged dictionary
+        """
+        result = copy.deepcopy(dict1)
+        
+        for key, value in dict2.items():
+            if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+                result[key] = self._deep_merge_dicts(result[key], value)
+            else:
+                result[key] = copy.deepcopy(value)
+        
+        return result
+    
+    def _ensure_required_sections(self, config: Dict[str, Any]) -> None:
+        """
+        Ensure required configuration sections exist with appropriate defaults.
+        
+        Args:
+            config: Configuration dictionary to modify in-place
+        """
+        # Required sections with defaults
+        required_sections = {
+            "styles": {},
+            "defaults": {
+                "figure": {"figsize": [10, 8], "dpi": 150},
+                "line": {"color": "#2E86AB", "linewidth": 2.0},
+                "fallback_style": {
+                    "color": "#95A5A6",
+                    "marker": "o",
+                    "linestyle": "-",
+                    "linewidth": 1.5,
+                    "alpha": 0.7,
+                    "label": "Unknown Condition"
+                }
+            },
+            "outputs": {
+                "base_path": "data/08_reporting",
+                "naming": {"template": "{name}_{condition}_{ts}"}
+            },
+            "kedro": {
+                "config_bridge": {"enabled": True, "merge_strategy": "override"},
+                "datasets": {"default_purpose": "exploratory"}
+            }
+        }
+        
+        for section, default_values in required_sections.items():
+            if section not in config:
+                config[section] = copy.deepcopy(default_values)
+            elif isinstance(default_values, dict):
+                for key, value in default_values.items():
+                    if key not in config[section]:
+                        config[section][key] = copy.deepcopy(value)
+    
+    def _validate_configuration(self, config: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Validate merged configuration using Pydantic schema.
+        
+        Args:
+            config: Configuration dictionary to validate
+        
+        Returns:
+            Validated configuration dictionary
+        
         Raises:
-            ConfigurationMergeError: If validation fails
+            ConfigValidationError: When validation fails
         """
         try:
-            validated_config = FigRegistryKedroConfig(**config_data)
-            logger.debug("Configuration validation successful")
-            return validated_config
+            # Validate using Pydantic schema
+            validated = FigRegistryConfigSchema(**config)
+            
+            # Convert back to dictionary for FigRegistry compatibility
+            validated_dict = validated.dict()
+            
+            logger.debug("Configuration validation passed")
+            return validated_dict
             
         except ValidationError as e:
-            error_details = []
+            error_messages = []
             for error in e.errors():
-                error_details.append({
-                    'field': '.'.join(str(loc) for loc in error['loc']),
-                    'message': error['msg'],
-                    'type': error['type']
-                })
+                field = " -> ".join(str(loc) for loc in error["loc"])
+                message = error["msg"]
+                error_messages.append(f"{field}: {message}")
             
-            error_message = f"Configuration validation failed with {len(error_details)} errors"
-            logger.error(f"{error_message}: {error_details}")
-            
-            raise ConfigurationMergeError(error_message, error_details)
+            logger.error(f"Configuration validation failed with {len(error_messages)} errors")
+            raise ConfigValidationError(
+                "Configuration validation failed",
+                validation_errors=error_messages
+            ) from e
     
-    def get_merged_config(self) -> FigRegistryKedroConfig:
-        """Get merged and validated FigRegistry-Kedro configuration.
-        
-        This method implements the core configuration bridge functionality,
-        merging traditional figregistry.yaml settings with Kedro's environment-specific
-        configurations while maintaining validation and caching for performance.
+    def _get_default_figregistry_config(self) -> Dict[str, Any]:
+        """
+        Generate default FigRegistry configuration when no files are found.
         
         Returns:
-            Validated FigRegistryKedroConfig instance
-            
-        Raises:
-            ConfigurationMergeError: If configuration merging or validation fails
+            Default configuration dictionary
         """
-        start_time = time.perf_counter()
+        return {
+            "metadata": {
+                "config_version": "1.0.0",
+                "created_by": "figregistry-kedro config bridge",
+                "description": "Default configuration for Kedro integration"
+            },
+            "styles": {
+                "exploratory": {
+                    "color": "#A8E6CF",
+                    "marker": "o",
+                    "linestyle": "-",
+                    "linewidth": 1.5,
+                    "alpha": 0.7,
+                    "label": "Exploratory"
+                },
+                "presentation": {
+                    "color": "#FFB6C1",
+                    "marker": "o",
+                    "linestyle": "-",
+                    "linewidth": 2.0,
+                    "alpha": 0.8,
+                    "label": "Presentation"
+                },
+                "publication": {
+                    "color": "#1A1A1A",
+                    "marker": "o",
+                    "linestyle": "-",
+                    "linewidth": 2.5,
+                    "alpha": 1.0,
+                    "label": "Publication"
+                }
+            },
+            "defaults": {
+                "figure": {"figsize": [10, 8], "dpi": 150},
+                "line": {"color": "#2E86AB", "linewidth": 2.0},
+                "fallback_style": {
+                    "color": "#95A5A6",
+                    "marker": "o",
+                    "linestyle": "-",
+                    "linewidth": 1.5,
+                    "alpha": 0.7,
+                    "label": "Unknown Condition"
+                }
+            },
+            "outputs": {
+                "base_path": "data/08_reporting",
+                "naming": {"template": "{name}_{condition}_{ts}"}
+            }
+        }
+    
+    def _generate_cache_key(self, *args, **kwargs) -> str:
+        """
+        Generate cache key for configuration lookup.
         
-        try:
-            # Load configurations from both sources
-            figregistry_config = self._load_figregistry_config()
-            kedro_config = self._load_kedro_figregistry_config()
-            
-            # Merge configurations with precedence rules
-            merged_config = self._merge_configurations(figregistry_config, kedro_config)
-            
-            # Check cache if enabled
-            if self.enable_caching:
-                cache_key = self._generate_cache_key(merged_config)
-                
-                with self._cache_lock:
-                    if cache_key in self._config_cache:
-                        logger.debug("Using cached configuration")
-                        self._local_cache = self._config_cache[cache_key]
-                        self._cache_key = cache_key
-                        return self._local_cache
-            
-            # Validate merged configuration
-            validated_config = self._validate_configuration(merged_config)
-            
-            # Cache validated configuration if enabled
-            if self.enable_caching:
-                with self._cache_lock:
-                    self._config_cache[cache_key] = validated_config
-                    self._local_cache = validated_config
-                    self._cache_key = cache_key
-            
-            total_time = time.perf_counter() - start_time
-            logger.debug(f"Configuration bridge completed in {total_time*1000:.2f}ms")
-            
-            return validated_config
-            
-        except Exception as e:
-            if isinstance(e, ConfigurationMergeError):
-                raise
-            
-            error_message = f"Configuration bridge failed: {str(e)}"
-            logger.error(error_message)
-            raise ConfigurationMergeError(error_message)
+        Args:
+            *args: Positional arguments
+            **kwargs: Keyword arguments
+        
+        Returns:
+            String cache key
+        """
+        # Create hashable representation of arguments
+        key_parts = []
+        
+        for arg in args:
+            if hasattr(arg, '__class__'):
+                key_parts.append(f"{arg.__class__.__name__}")
+            else:
+                key_parts.append(str(arg))
+        
+        for k, v in sorted(kwargs.items()):
+            key_parts.append(f"{k}={v}")
+        
+        return "_".join(key_parts)
     
-    def clear_cache(self):
-        """Clear configuration cache for forced reload."""
-        with self._cache_lock:
-            self._config_cache.clear()
-            self._local_cache = None
-            self._cache_key = None
-        logger.debug("Configuration cache cleared")
+    def _get_cached_config(self, cache_key: str) -> Optional[Dict[str, Any]]:
+        """
+        Retrieve configuration from cache if available.
+        
+        Args:
+            cache_key: Cache key for lookup
+        
+        Returns:
+            Cached configuration or None if not found
+        """
+        with self._lock:
+            return _config_cache.get(cache_key)
     
-    @classmethod
-    def clear_global_cache(cls):
-        """Clear global configuration cache."""
-        with cls._cache_lock:
-            cls._config_cache.clear()
-        logger.debug("Global configuration cache cleared")
+    def _cache_config(self, cache_key: str, config: Dict[str, Any]) -> None:
+        """
+        Cache configuration for future retrieval.
+        
+        Args:
+            cache_key: Key for cache storage
+            config: Configuration to cache
+        """
+        with self._lock:
+            # Implement cache size limit
+            if len(_config_cache) >= self.max_cache_size:
+                # Remove oldest entry (simple FIFO eviction)
+                oldest_key = next(iter(_config_cache))
+                del _config_cache[oldest_key]
+            
+            _config_cache[cache_key] = copy.deepcopy(config)
+    
+    def get_performance_metrics(self) -> Dict[str, Any]:
+        """
+        Get performance metrics for configuration bridge operations.
+        
+        Returns:
+            Dictionary containing performance statistics
+        """
+        with self._lock:
+            return {
+                "merge_times": {
+                    "count": len(self._merge_times),
+                    "average_ms": sum(self._merge_times) / len(self._merge_times) if self._merge_times else 0,
+                    "max_ms": max(self._merge_times) if self._merge_times else 0,
+                    "min_ms": min(self._merge_times) if self._merge_times else 0,
+                    "target_ms": self.performance_target_ms
+                },
+                "cache_stats": self._cache_stats.copy(),
+                "cache_size": len(_config_cache),
+                "max_cache_size": self.max_cache_size
+            }
+    
+    def clear_cache(self) -> None:
+        """Clear configuration cache."""
+        with self._lock:
+            _config_cache.clear()
+            self._cache_stats = {"hits": 0, "misses": 0}
+        logger.info("Configuration cache cleared")
 
 
-def init_config(config_loader: Optional['ConfigLoader'] = None,
-                environment: Optional[str] = None,
-                **kwargs) -> Optional[Any]:
-    """Initialize FigRegistry configuration through Kedro integration.
+def init_config(
+    config_loader: Optional[Any] = None,
+    environment: str = "base",
+    project_path: Optional[Path] = None,
+    **kwargs
+) -> Optional[Any]:
+    """
+    Initialize FigRegistry configuration through the configuration bridge.
     
-    This function serves as the primary entry point for FigRegistry initialization
-    during Kedro project startup. It creates a configuration bridge, merges
-    Kedro and FigRegistry configurations, and initializes FigRegistry with the
-    unified configuration.
+    This function provides the primary interface for initializing FigRegistry
+    with merged Kedro and FigRegistry configurations during pipeline startup.
+    It creates a FigRegistryConfigBridge instance, merges configurations from
+    both systems, and initializes FigRegistry with the resulting configuration.
     
     Args:
-        config_loader: Kedro ConfigLoader instance for accessing project configuration
-        environment: Target environment for configuration resolution
-        **kwargs: Additional configuration parameters
-        
-    Returns:
-        FigRegistry Config instance if successful, None if FigRegistry not available
-        
-    Raises:
-        ConfigurationMergeError: If configuration merging fails
-        ImportError: If required dependencies are not available
-    """
-    if figregistry is None or load_config is None:
-        logger.warning("FigRegistry not available - skipping configuration initialization")
-        return None
+        config_loader: Kedro ConfigLoader instance for loading project configurations
+        environment: Environment name for configuration resolution (default: "base")
+        project_path: Project root path for configuration file discovery
+        **kwargs: Additional parameters to pass to configuration bridge
     
-    if ConfigLoader is not None and config_loader is None:
-        logger.info("No Kedro ConfigLoader provided - using standalone FigRegistry configuration")
+    Returns:
+        FigRegistry configuration object if successful, None otherwise
+    
+    Raises:
+        ConfigMergeError: When configuration merging fails
+        ConfigValidationError: When validation of merged configuration fails
+    
+    Usage:
+        # Basic usage in Kedro hooks
+        from figregistry_kedro.config import init_config
+        
+        config = init_config(config_loader, environment="local")
+        
+        # Advanced usage with overrides
+        config = init_config(
+            config_loader,
+            environment="production",
+            project_path=Path("/path/to/project"),
+            validation_strict=True
+        )
+    """
+    if not HAS_FIGREGISTRY:
+        logger.error("FigRegistry not available - cannot initialize configuration")
+        return None
     
     try:
         # Create configuration bridge
-        bridge = FigRegistryConfigBridge(
+        bridge = FigRegistryConfigBridge(**kwargs)
+        
+        # Merge configurations from both systems
+        merged_config = bridge.merge_configurations(
             config_loader=config_loader,
             environment=environment,
-            **kwargs
+            project_path=project_path
         )
         
-        # Get merged configuration
-        merged_config = bridge.get_merged_config()
-        
-        # Convert to FigRegistry-compatible format
-        config_dict = merged_config.dict(exclude={'kedro', 'environment', 
-                                                 'enable_concurrent_access', 
-                                                 'validation_enabled'})
+        logger.info(f"Initializing FigRegistry with merged configuration for environment: {environment}")
         
         # Initialize FigRegistry with merged configuration
+        # Note: This assumes FigRegistry has an init_config function that accepts a dict
         if hasattr(figregistry, 'init_config'):
-            # Use FigRegistry's init_config if available
-            figregistry_config = figregistry.init_config(config_dict)
+            return figregistry.init_config(merged_config)
+        elif hasattr(figregistry, 'Config'):
+            # Fallback to Config class initialization
+            return figregistry.Config(**merged_config)
         else:
-            # Fallback to creating config directly
-            figregistry_config = FigRegistryConfig(**config_dict) if FigRegistryConfig else None
-        
-        logger.info(f"FigRegistry initialized successfully for environment: {environment or 'base'}")
-        return figregistry_config
-        
-    except Exception as e:
-        error_message = f"FigRegistry initialization failed: {str(e)}"
-        logger.error(error_message)
-        
-        if isinstance(e, (ConfigurationMergeError, ValidationError)):
-            raise
-        
-        raise ConfigurationMergeError(error_message)
-
-
-def get_config_bridge(config_loader: Optional['ConfigLoader'] = None,
-                     environment: Optional[str] = None,
-                     **kwargs) -> FigRegistryConfigBridge:
-    """Get a FigRegistryConfigBridge instance.
+            logger.warning("FigRegistry init_config method not found - returning raw configuration")
+            return merged_config
     
-    Convenience function for creating configuration bridge instances with
-    consistent parameter handling.
+    except Exception as e:
+        logger.error(f"Failed to initialize FigRegistry configuration: {e}")
+        # Re-raise for proper error handling by calling code
+        raise
+
+
+def get_merged_config(
+    config_loader: Optional[Any] = None,
+    environment: str = "base",
+    project_path: Optional[Path] = None,
+    **kwargs
+) -> Dict[str, Any]:
+    """
+    Get merged configuration without initializing FigRegistry.
+    
+    This function provides access to the merged configuration dictionary
+    for inspection or manual initialization purposes. It performs the same
+    configuration merging as init_config() but returns the raw dictionary
+    instead of initializing FigRegistry.
     
     Args:
         config_loader: Kedro ConfigLoader instance
-        environment: Target environment
-        **kwargs: Additional bridge configuration
-        
+        environment: Environment name for configuration resolution
+        project_path: Project root path for configuration file discovery
+        **kwargs: Additional parameters for configuration bridge
+    
     Returns:
-        FigRegistryConfigBridge instance
+        Merged configuration dictionary
+    
+    Usage:
+        # Get merged configuration for inspection
+        config = get_merged_config(config_loader, environment="staging")
+        print(f"Available styles: {list(config['styles'].keys())}")
     """
-    return FigRegistryConfigBridge(
+    bridge = FigRegistryConfigBridge(**kwargs)
+    return bridge.merge_configurations(
         config_loader=config_loader,
         environment=environment,
-        **kwargs
+        project_path=project_path
     )
 
 
-# Thread-safe configuration bridge instance for module-level access
-_bridge_instance: Optional[FigRegistryConfigBridge] = None
-_bridge_lock = threading.RLock()
-
-
-def get_bridge_instance() -> Optional[FigRegistryConfigBridge]:
-    """Get the module-level configuration bridge instance."""
-    with _bridge_lock:
-        return _bridge_instance
-
-
-def set_bridge_instance(bridge: FigRegistryConfigBridge):
-    """Set the module-level configuration bridge instance."""
-    global _bridge_instance
-    with _bridge_lock:
-        _bridge_instance = bridge
+# Export public API
+__all__ = [
+    "FigRegistryConfigBridge",
+    "FigRegistryConfigSchema", 
+    "ConfigMergeError",
+    "ConfigValidationError",
+    "init_config",
+    "get_merged_config"
+]
