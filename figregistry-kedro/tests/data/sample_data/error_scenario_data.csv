@@ -1,76 +1,90 @@
-experiment_id,condition,treatment_type,measurement_value,timestamp,researcher,purpose,file_path,condition_param,style_params,error_type,error_description
-# Malformed experimental conditions for testing F-002 fallback mechanisms
-ERR_001,NULL,treatment_a,15.3,2024-01-15T10:30:00,researcher_1,exploration,/tmp/outputs,condition,"{""color"": ""red""}",missing_condition,Test condition with NULL value that should trigger fallback style
-ERR_002,,treatment_b,22.7,2024-01-15T11:00:00,researcher_1,exploration,/tmp/outputs,condition,"",empty_condition,Empty condition string should use default styling
-ERR_003,INVALID_CONDITION_12345,control,8.9,2024-01-15T11:30:00,researcher_2,validation,/tmp/outputs,condition,"{""invalid_json"": }",invalid_condition,Non-existent condition that should fall back to default
-ERR_004,condition with spaces,treatment_a,19.2,2024-01-15T12:00:00,researcher_1,exploration,/tmp/outputs,condition,"{""color"": ""blue""}",malformed_condition,Condition with spaces should be normalized or rejected
+experiment_id,condition,treatment_type,measurement_value,timestamp,researcher,purpose,metadata,filepath_override,notes
+# Basic malformed condition scenarios for testing F-002 fallback requirements
+error_001,invalid-condition!@#,$%^&*(),control,42.5,2024-01-15T10:00:00Z,researcher_a,expl,"{""type"": ""basic""}",,"Invalid characters in condition - should trigger fallback"
+error_002,,control,35.2,2024-01-15T10:15:00Z,researcher_a,expl,"{""type"": ""basic""}",,"Empty condition - should trigger fallback to palette colors"
+error_003,null,treatment_a,28.9,2024-01-15T10:30:00Z,researcher_a,expl,"{""type"": ""basic""}",,"Explicit null condition - should use default styling"
+error_004,condition_that_is_way_too_long_and_exceeds_reasonable_limits_for_condition_identifiers_causing_potential_buffer_issues,treatment_b,51.3,2024-01-15T10:45:00Z,researcher_a,expl,"{""type"": ""basic""}",,"Extremely long condition name - should handle gracefully"
 
-# Invalid data types and type validation errors per Section 6.6.8.1
-ERR_005,control,NOT_A_VALID_TREATMENT,13.4,2024-01-15T12:30:00,researcher_3,exploration,/tmp/outputs,condition,"{""size"": ""invalid_size""}",invalid_data_type,Non-numeric values in numeric fields
-ERR_006,treatment_a,treatment_c,INVALID_NUMBER,2024-01-15T13:00:00,researcher_1,exploration,/tmp/outputs,condition,"{""alpha"": ""not_a_number""}",type_mismatch,String in numeric measurement field
-ERR_007,control,treatment_b,25.6,INVALID_TIMESTAMP,researcher_2,validation,/tmp/outputs,condition,"{""linewidth"": -1}",timestamp_error,Malformed timestamp format
-ERR_008,treatment_b,treatment_a,18.1,2024-01-15T13:30:00,12345,exploration,/tmp/outputs,condition,"{""marker"": 123}",researcher_type_error,Numeric researcher ID instead of string
+# Invalid data type scenarios for testing FigureDataSet error handling per Section 6.6.8.1
+error_005,control,invalid_treatment_123,not_a_number,2024-01-15T11:00:00Z,researcher_a,expl,"{""type"": ""basic""}",,"Non-numeric measurement_value - should handle type conversion error"
+error_006,treatment_a,null,45.2,,researcher_a,expl,"{""type"": ""basic""}",,"Missing timestamp - should handle datetime parsing error"
+error_007,treatment_b,control,67.8,invalid_timestamp_format,researcher_a,expl,"{""type"": ""basic""}",,"Invalid timestamp format - should handle gracefully"
+error_008,exploratory,treatment_c,999999999999999999999,2024-01-15T11:30:00Z,researcher_a,expl,"{""type"": ""basic""}",,"Extremely large number - should handle numeric overflow"
 
-# Path traversal and security testing scenarios per Section 6.6.8.1
-ERR_009,control,treatment_a,16.8,2024-01-15T14:00:00,researcher_1,exploration,../../../etc/passwd,condition,"{""color"": ""green""}",path_traversal,Directory traversal attempt in file path
-ERR_010,treatment_a,treatment_b,21.3,2024-01-15T14:30:00,researcher_2,validation,/root/sensitive_data,condition,"{""style"": ""default""}",unauthorized_path,Attempt to write to unauthorized directory
-ERR_011,control,treatment_c,14.7,2024-01-15T15:00:00,researcher_3,exploration,\\..\\windows\\system32\\,condition,"{""color"": ""black""}",windows_path_traversal,Windows-style path traversal attempt
-ERR_012,treatment_b,treatment_a,23.9,2024-01-15T15:30:00,researcher_1,exploration,/dev/null/../../../home,condition,"{""linewidth"": 2}",unix_path_traversal,Unix path traversal via symbolic link
+# Missing value and data quality scenarios for testing plugin robustness
+error_009,,,,,,,,,,"Completely empty row - should skip gracefully"
+error_010,control,treatment_a,42.5,2024-01-15T12:00:00Z,,,"{""type"": ""basic""}",,"Missing researcher field - should handle optional metadata missing"
+error_011,treatment_b,control,35.7,2024-01-15T12:15:00Z,researcher_b,,"{""type"": ""basic""}",,"Missing purpose field - should use default purpose"
+error_012,treatment_a,exploratory,48.3,2024-01-15T12:30:00Z,researcher_b,expl,,,"Missing metadata - should handle gracefully"
 
-# Missing value scenarios and data quality issues
-ERR_013,control,,12.5,2024-01-15T16:00:00,researcher_2,validation,/tmp/outputs,condition,"{""color"": ""yellow""}",missing_treatment,Missing treatment type field
-ERR_014,treatment_a,treatment_b,,2024-01-15T16:30:00,researcher_1,exploration,/tmp/outputs,condition,"{""alpha"": 0.8}",missing_measurement,Missing measurement value
-ERR_015,control,treatment_c,17.4,,researcher_3,validation,/tmp/outputs,condition,"{""marker"": ""o""}",missing_timestamp,Missing timestamp field
-ERR_016,treatment_b,treatment_a,20.1,2024-01-15T17:00:00,,exploration,/tmp/outputs,condition,"{""color"": ""purple""}",missing_researcher,Missing researcher information
+# Edge case scenarios for testing fallback mechanisms per F-002 requirements
+error_013,UNDEFINED_CONDITION,unknown_treatment,-999.99,2024-01-15T13:00:00Z,researcher_c,expl,"{""type"": ""edge_case""}",,"Undefined condition - should trigger style resolution fallback"
+error_014,condition_with_unicode_测试,unicode_treatment_αβγ,42.5,2024-01-15T13:15:00Z,researcher_测试,expl,"{""type"": ""unicode""}",,"Unicode characters - should handle encoding properly"
+error_015,condition.with.dots,treatment-with-dashes,0,2024-01-15T13:30:00Z,researcher_c,expl,"{""type"": ""special_chars""}",,"Special characters in identifiers - should sanitize properly"
+error_016,123_numeric_start,456_numeric_treatment,NaN,2024-01-15T13:45:00Z,researcher_c,expl,"{""type"": ""numeric""}",,"Identifiers starting with numbers - should handle validation"
 
-# Data corruption patterns and invalid condition mappings
-ERR_017,control;DROP TABLE experiments;--,treatment_a,15.8,2024-01-15T17:30:00,researcher_1,exploration,/tmp/outputs,condition,"{""style"": ""corrupted""}",sql_injection,SQL injection attempt in condition field
-ERR_018,condition\n\rwith\tspecial\bchars,treatment_b,19.6,2024-01-15T18:00:00,researcher_2,validation,/tmp/outputs,condition,"{""color"": ""#INVALID""}",special_characters,Condition with control characters and invalid color
-ERR_019,<script>alert('xss')</script>,treatment_c,13.2,2024-01-15T18:30:00,researcher_3,exploration,/tmp/outputs,condition,"{""javascript"": ""alert()""}",script_injection,XSS attempt in condition field
-ERR_020,condition_with_unicode_🦄_characters,treatment_a,22.4,2024-01-15T19:00:00,researcher_1,validation,/tmp/outputs,condition,"{""emoji"": ""🎨""}",unicode_handling,Unicode characters in condition field
+# Configuration corruption patterns for testing comprehensive error recovery
+error_017,control,treatment_a,42.5,2024-01-15T14:00:00Z,researcher_d,../../../etc/passwd,"{""malicious"": ""injection""}",,"Path traversal attempt in purpose - should sanitize"
+error_018,treatment_b,control,35.2,2024-01-15T14:15:00Z,researcher_d,expl,"{""type"": ""injection"", ""script"": ""<script>alert('xss')</script>""}",,"Script injection in metadata - should sanitize"
+error_019,<script>alert('condition')</script>,<img src=x onerror=alert('treatment')>,42.5,2024-01-15T14:30:00Z,"researcher_<script>",expl,"{""type"": ""xss""}",,"XSS attempts in multiple fields - should sanitize all"
+error_020,condition_sql'; DROP TABLE experiments; --,sql_injection_treatment,42.5,2024-01-15T14:45:00Z,researcher_d,expl,"{""type"": ""sql""}",,"SQL injection attempt - should handle safely"
 
-# Configuration conflicts and precedence testing
-ERR_021,control,treatment_a,16.3,2024-01-15T19:30:00,researcher_2,exploration,/tmp/outputs,conflicting_param,"{""color"": ""red"", ""color"": ""blue""}",config_conflict,Duplicate keys in style parameters
-ERR_022,treatment_a,treatment_b,18.7,2024-01-15T20:00:00,researcher_3,validation,/tmp/outputs,condition,"{""invalid_style_key"": ""value""}",invalid_style_key,Unrecognized matplotlib parameter
-ERR_023,control,treatment_c,24.1,2024-01-15T20:30:00,researcher_1,exploration,/tmp/outputs,condition,"{""linewidth"": ""very_thick""}",parameter_value_error,Invalid parameter value type
-ERR_024,treatment_b,treatment_a,11.9,2024-01-15T21:00:00,researcher_2,validation,/tmp/outputs,condition,"NOT_JSON_FORMAT",json_parse_error,Malformed JSON in style parameters
+# Invalid condition mappings for testing style resolution failure scenarios
+error_021,condition_that_does_not_exist_anywhere,unknown_mapping,42.5,2024-01-15T15:00:00Z,researcher_e,expl,"{""type"": ""mapping_failure""}",,"Non-existent condition mapping - should use fallback palette"
+error_022,condition*with*wildcards,wildcard_treatment,42.5,2024-01-15T15:15:00Z,researcher_e,expl,"{""type"": ""wildcard""}",,"Wildcard characters - should test partial matching"
+error_023,CONDITION_CASE_MISMATCH,case_sensitive_treatment,42.5,2024-01-15T15:30:00Z,researcher_e,expl,"{""type"": ""case_test""}",,"Case sensitivity testing - should handle consistently"
+error_024,condition/with/slashes,path_like_treatment,42.5,2024-01-15T15:45:00Z,researcher_e,expl,"{""type"": ""path_chars""}",,"Path-like condition - should not be interpreted as filesystem path"
 
-# Network and resource exhaustion scenarios
-ERR_025,control,treatment_a,14.5,2024-01-15T21:30:00,researcher_3,exploration,/tmp/outputs,condition,"{""data"": """ + "x" * 10000 + """}",large_payload,Extremely large style parameter payload
-ERR_026,CONDITION_WITH_VERY_LONG_NAME_THAT_EXCEEDS_REASONABLE_LENGTH_LIMITS_AND_MIGHT_CAUSE_BUFFER_OVERFLOW_OR_MEMORY_ISSUES,treatment_b,17.8,2024-01-15T22:00:00,researcher_1,validation,/tmp/outputs,condition,"{""color"": ""cyan""}",long_field_name,Excessively long condition name
-ERR_027,control,treatment_c,20.3,2024-01-15T22:30:00,researcher_with_extremely_long_name_that_might_cause_database_or_processing_issues,exploration,/tmp/outputs,condition,"{""alpha"": 0.5}",long_researcher_name,Excessively long researcher name
-ERR_028,treatment_a,treatment_a,15.7,2024-01-15T23:00:00,researcher_2,validation,/tmp/outputs,condition,"{""nested"": {""very"": {""deep"": {""structure"": ""value""}}}}",deeply_nested_json,Deeply nested JSON structure in style params
+# Data corruption and invalid format scenarios
+error_025,control,treatment_a,42.5,2024-13-45T99:99:99Z,researcher_f,expl,malformed_json_without_quotes,,"Invalid JSON metadata - should handle parsing error"
+error_026,treatment_b,control,42.5,2024-01-15T16:15:00Z,researcher_f,expl,"{""nested"": {""deeply"": {""very"": {""too"": ""deep""}}}}",,"Deeply nested JSON - should handle complexity gracefully"
+error_027,exploratory,circular_ref,42.5,2024-01-15T16:30:00Z,researcher_f,expl,"{""self"": ""reference"", ""cycle"": true}",,"Potential circular reference - should handle safely"
+error_028,treatment_a,control,Infinity,2024-01-15T16:45:00Z,researcher_f,expl,"{""type"": ""infinity""}",,"Infinity value - should handle special float values"
 
-# Concurrent execution and race condition scenarios
-ERR_029,control,treatment_a,19.4,2024-01-15T23:30:00,researcher_1,exploration,/tmp/outputs,condition,"{""color"": ""red""}",concurrent_access,Data for testing concurrent FigureDataSet operations
-ERR_030,treatment_a,treatment_b,16.1,2024-01-15T23:30:00,researcher_1,exploration,/tmp/outputs,condition,"{""color"": ""red""}",race_condition,Identical timestamp for race condition testing
-ERR_031,control,treatment_c,21.8,2024-01-15T23:30:00,researcher_1,exploration,/tmp/outputs,condition,"{""color"": ""red""}",parallel_write,Same output path for parallel write conflict testing
-ERR_032,treatment_b,treatment_a,13.6,2024-01-15T23:30:00,researcher_1,exploration,/tmp/outputs,condition,"{""color"": ""red""}",thread_safety,Thread safety validation data
+# Timestamp and chronological inconsistency scenarios
+error_029,control,treatment_a,42.5,1970-01-01T00:00:00Z,researcher_g,expl,"{""type"": ""epoch""}",,"Epoch timestamp - should handle edge case"
+error_030,treatment_b,control,42.5,2099-12-31T23:59:59Z,researcher_g,expl,"{""type"": ""future""}",,"Far future timestamp - should handle gracefully"
+error_031,exploratory,treatment_c,42.5,2024-01-15T16:45:00Z,researcher_g,expl,"{""type"": ""timezone"", ""tz"": ""invalid""}",,"Timezone confusion - should handle timezone issues"
+error_032,treatment_a,backward_time,42.5,2024-01-14T16:45:00Z,researcher_g,expl,"{""type"": ""backward""}",,"Chronologically backward timestamp - should handle"
 
-# Edge cases for numeric and boundary values
-ERR_033,control,treatment_a,1.7976931348623157e+308,2024-01-16T00:00:00,researcher_2,validation,/tmp/outputs,condition,"{""linewidth"": 0}",float_overflow,Maximum float value overflow test
-ERR_034,treatment_a,treatment_b,-1.7976931348623157e+308,2024-01-16T00:30:00,researcher_3,exploration,/tmp/outputs,condition,"{""alpha"": -1}",negative_overflow,Negative float overflow test
-ERR_035,control,treatment_c,NaN,2024-01-16T01:00:00,researcher_1,validation,/tmp/outputs,condition,"{""size"": 0}",nan_value,NaN (Not a Number) measurement value
-ERR_036,treatment_b,treatment_a,Infinity,2024-01-16T01:30:00,researcher_2,exploration,/tmp/outputs,condition,"{""rotation"": 720}",infinity_value,Infinity measurement value
+# Filepath override and directory traversal scenarios  
+error_033,control,treatment_a,42.5,2024-01-15T17:00:00Z,researcher_h,expl,"{""type"": ""basic""}",../../../sensitive/file.png,"Directory traversal in filepath - should sanitize"
+error_034,treatment_b,control,42.5,2024-01-15T17:15:00Z,researcher_h,expl,"{""type"": ""basic""}",/etc/passwd,"Absolute path in filepath - should restrict to project directory"
+error_035,exploratory,treatment_c,42.5,2024-01-15T17:30:00Z,researcher_h,expl,"{""type"": ""basic""}","C:\Windows\System32\config","Windows path injection - should handle cross-platform"
+error_036,treatment_a,symlink_test,42.5,2024-01-15T17:45:00Z,researcher_h,expl,"{""type"": ""basic""}",../../symlink_target,"Symlink target - should resolve safely"
 
-# File system and permission edge cases
-ERR_037,control,treatment_a,18.2,2024-01-16T02:00:00,researcher_3,exploration,/readonly/path/output.png,condition,"{""color"": ""orange""}",readonly_path,Read-only file system path
-ERR_038,treatment_a,treatment_b,25.4,2024-01-16T02:30:00,researcher_1,validation,/nonexistent/directory/file.png,condition,"{""marker"": ""s""}",nonexistent_directory,Non-existent directory path
-ERR_039,control,treatment_c,12.8,2024-01-16T03:00:00,researcher_2,exploration,/tmp/outputs,condition,"{""dpi"": -300}",negative_dpi,Negative DPI value for figure output
-ERR_040,treatment_b,treatment_a,21.7,2024-01-16T03:30:00,researcher_3,validation,/tmp/outputs,condition,"{""figsize"": [""a"", ""b""]}",invalid_figsize,Non-numeric figure size specification
+# Researcher field injection and validation scenarios
+error_037,control,treatment_a,42.5,2024-01-15T18:00:00Z,"researcher/../admin",expl,"{""type"": ""researcher_injection""}",,"Path traversal in researcher field - should sanitize"
+error_038,treatment_b,control,42.5,2024-01-15T18:15:00Z,researcher_with_very_long_name_that_exceeds_reasonable_field_length_limits_and_might_cause_buffer_overflow_issues,expl,"{""type"": ""long_researcher""}",,"Extremely long researcher name - should handle gracefully"
+error_039,exploratory,treatment_c,42.5,2024-01-15T18:30:00Z,"researcher\nwith\nnewlines",expl,"{""type"": ""newlines""}",,"Newlines in researcher field - should sanitize"
+error_040,treatment_a,null_researcher,42.5,2024-01-15T18:45:00Z,null,expl,"{""type"": ""null_researcher""}",,"Null researcher - should handle missing researcher"
 
-# Hook lifecycle and context validation edge cases
-ERR_041,control,treatment_a,14.9,2024-01-16T04:00:00,researcher_1,exploration,/tmp/outputs,condition,"{""backend"": ""invalid_backend""}",invalid_backend,Invalid matplotlib backend specification
-ERR_042,treatment_a,treatment_b,23.3,2024-01-16T04:30:00,researcher_2,validation,/tmp/outputs,condition,"{""format"": ""unsupported_format""}",unsupported_format,Unsupported output format
-ERR_043,control,treatment_c,17.1,2024-01-16T05:00:00,researcher_3,exploration,/tmp/outputs,condition,"{""transparent"": ""maybe""}",boolean_error,Invalid boolean value in style parameters
-ERR_044,treatment_b,treatment_a,19.8,2024-01-16T05:30:00,researcher_1,validation,/tmp/outputs,condition,"{""facecolor"": ""#GGGGGG""}",invalid_color_hex,Invalid hexadecimal color specification
+# Complex metadata corruption for JSON parsing stress tests
+error_041,control,treatment_a,42.5,2024-01-15T19:00:00Z,researcher_i,expl,"{""unclosed"": ""json""",,"Unclosed JSON object - should handle parsing error gracefully"
+error_042,treatment_b,control,42.5,2024-01-15T19:15:00Z,researcher_i,expl,"invalid_json_no_quotes",,"Invalid JSON without quotes - should handle parsing error"
+error_043,exploratory,treatment_c,42.5,2024-01-15T19:30:00Z,researcher_i,expl,"{""type"": ""control_chars"", ""data"": ""\u0000\u0001\u0002""}",,"Control characters in JSON - should handle safely"
+error_044,treatment_a,json_bomb,42.5,2024-01-15T19:45:00Z,researcher_i,expl,"{""a"":""" + "x" * 10000 + """}",,"Large JSON payload - should handle size limits"
 
-# Environment and configuration bridge edge cases
-ERR_045,control,treatment_a,16.6,2024-01-16T06:00:00,researcher_2,exploration,/tmp/outputs,missing_condition_param,,missing_condition_param,Missing condition parameter mapping
-ERR_046,treatment_a,treatment_b,22.2,2024-01-16T06:30:00,researcher_3,validation,/tmp/outputs,condition,"{""rcParams"": {""font.size"": ""huge""}}",invalid_rcparam,Invalid rcParams configuration value
-ERR_047,control,treatment_c,13.7,2024-01-16T07:00:00,researcher_1,exploration,/tmp/outputs,condition,"{""style"": ""nonexistent_style""}",nonexistent_style,Reference to non-existent style configuration
-ERR_048,treatment_b,treatment_a,20.5,2024-01-16T07:30:00,researcher_2,validation,/tmp/outputs,condition,"{""axes.prop_cycle"": ""invalid_cycle""}",invalid_prop_cycle,Invalid property cycle specification
+# Measurement value edge cases for numeric validation
+error_045,control,treatment_a,-Infinity,2024-01-15T20:00:00Z,researcher_j,expl,"{""type"": ""negative_infinity""}",,"Negative infinity - should handle special values"
+error_046,treatment_b,control,1e308,2024-01-15T20:15:00Z,researcher_j,expl,"{""type"": ""large_scientific""}",,"Very large scientific notation - should handle"
+error_047,exploratory,treatment_c,1e-308,2024-01-15T20:30:00Z,researcher_j,expl,"{""type"": ""small_scientific""}",,"Very small scientific notation - should handle"
+error_048,treatment_a,complex_number,3.14+2.71i,2024-01-15T20:45:00Z,researcher_j,expl,"{""type"": ""complex""}",,"Complex number - should handle non-real numbers"
 
-# Final comprehensive edge cases for complete coverage
-ERR_049,control,treatment_a,15.2,2024-01-16T08:00:00,researcher_3,exploration,/tmp/outputs,condition,"{""text.usetex"": ""auto""}",tex_error,Invalid LaTeX configuration
-ERR_050,treatment_a,treatment_b,18.9,2024-01-16T08:30:00,researcher_1,validation,/tmp/outputs,condition,"{""figure.max_open_warning"": -5}",negative_warning_limit,Negative figure warning limit
+# Treatment type validation and edge cases
+error_049,control,,42.5,2024-01-15T21:00:00Z,researcher_k,expl,"{""type"": ""empty_treatment""}",,"Empty treatment type - should handle missing values"
+error_050,treatment_with_numbers_123,treatment_456_with_numbers,42.5,2024-01-15T21:15:00Z,researcher_k,expl,"{""type"": ""numeric_names""}",,"Numeric components in names - should handle validation"
+error_051,condition_with_spaces spaces,treatment with spaces,42.5,2024-01-15T21:30:00Z,researcher_k,expl,"{""type"": ""spaces""}",,"Spaces in identifiers - should handle/sanitize properly"
+error_052,condition_with_tabs	tabs,treatment_with_tabs	tabs,42.5,2024-01-15T21:45:00Z,researcher_k,expl,"{""type"": ""tabs""}",,"Tab characters - should handle whitespace properly"
+
+# Binary and encoding edge cases
+error_053,condition_with_binary_\x00\x01,treatment_binary_\xFF\xFE,42.5,2024-01-15T22:00:00Z,researcher_l,expl,"{""type"": ""binary""}",,"Binary data in text fields - should handle encoding"
+error_054,utf8_condition_🚀,utf8_treatment_💥,42.5,2024-01-15T22:15:00Z,researcher_🔬,expl,"{""type"": ""emoji""}",,"Emoji characters - should handle Unicode properly"
+error_055,condition_with_bom_﻿,treatment_with_bom_﻿,42.5,2024-01-15T22:30:00Z,researcher_l,expl,"{""type"": ""bom""}",,"Byte order mark - should handle encoding markers"
+error_056,latin1_condition_ñáéíóú,latin1_treatment_çüöäß,42.5,2024-01-15T22:45:00Z,researcher_l,expl,"{""type"": ""latin1""}",,"Latin-1 characters - should handle different encodings"
+
+# Final edge cases for comprehensive error coverage
+error_057,condition_with_csv_delimiter\,comma,treatment_with_delimiter\,comma,42.5,2024-01-15T23:00:00Z,researcher_m,expl,"{""type"": ""csv_delimiter""}",,"CSV delimiter in data - should handle escaping"
+error_058,condition_with_quotes"quote",treatment_with_quotes'quote',42.5,2024-01-15T23:15:00Z,researcher_m,expl,"{""type"": ""quotes""}",,"Quote characters - should handle escaping"
+error_059,condition_with_backslash\\,treatment_with_backslash\\,42.5,2024-01-15T23:30:00Z,researcher_m,expl,"{""type"": ""backslash""}",,"Backslash characters - should handle escaping"
+error_060,final_test_condition,final_test_treatment,42.5,2024-01-15T23:59:59Z,final_researcher,expl,"{""type"": ""final"", ""status"": ""complete""}",,"Final valid record to ensure parser recovery after errors"
