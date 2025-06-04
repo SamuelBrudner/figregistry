@@ -1,382 +1,558 @@
-# Performance-optimized FigRegistry configuration for benchmarking
-# Designed for testing configuration bridge merge operations targeting <50ms per Section 6.6.4.3
-# Contains complex but efficient structures for systematic performance measurement
+# Performance-optimized configuration for benchmarking figregistry-kedro plugin operations
+# per Section 6.6.4.3 targeting <50ms configuration bridge merge time.
+#
+# This configuration provides complex but efficient structures for systematic performance
+# measurement of configuration loading, merging, and resolution operations while maintaining
+# optimal performance characteristics for the FigRegistryConfigBridge component.
 
-# Performance metadata for tracking optimization targets
-performance_metadata:
-  config_complexity_level: "high"
-  target_merge_time_ms: 50
-  target_load_time_ms: 100
-  benchmark_conditions: 50
-  benchmark_properties: 30
-  cache_optimization: true
+# =============================================================================
+# METADATA AND VERSION CONFIGURATION
+# =============================================================================
 
-# Optimized styling conditions with efficient lookup patterns
+figregistry_version: ">=0.3.0"
+
+metadata:
+  config_version: "1.2.0"
+  created_by: "performance_test_generator"
+  description: "Performance-optimized configuration for benchmarking plugin operations"
+  performance_target_ms: 50
+  complexity_level: "high_performance"
+  test_scenarios:
+    - "config_bridge_resolution"
+    - "style_lookup_performance"
+    - "cache_efficiency_testing"
+    - "concurrent_access_validation"
+  optimization_features:
+    - "shallow_nesting_structures"
+    - "efficient_key_patterns"
+    - "optimized_cache_keys"
+    - "minimal_redundancy"
+
+# =============================================================================
+# PERFORMANCE-OPTIMIZED STYLE CONFIGURATIONS
+# =============================================================================
+
 styles:
-  # High-frequency conditions optimized for cache performance
-  exploratory_baseline:
+  # High-frequency access patterns for cache performance testing
+  exploratory:
+    color: "#1f77b4"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    markersize: 6
+    alpha: 0.8
+    cache_key: "exp_primary"
+    
+  presentation:
+    color: "#ff7f0e"
+    marker: "s"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 8
+    alpha: 0.9
+    cache_key: "pres_primary"
+    
+  publication:
+    color: "#2ca02c"
+    marker: "^"
+    linestyle: "-"
+    linewidth: 2.5
+    markersize: 10
+    alpha: 1.0
+    cache_key: "pub_primary"
+
+  # Efficient condition mapping patterns for performance testing
+  baseline:
+    color: "#d62728"
+    marker: "v"
+    linestyle: "--"
+    linewidth: 1.8
+    markersize: 7
+    alpha: 0.85
+    
+  treatment_a:
+    color: "#9467bd"
+    marker: "D"
+    linestyle: "-."
+    linewidth: 2.2
+    markersize: 9
+    alpha: 0.9
+    
+  treatment_b:
+    color: "#8c564b"
+    marker: "p"
+    linestyle: ":"
+    linewidth: 1.9
+    markersize: 8
+    alpha: 0.87
+    
+  control:
+    color: "#e377c2"
+    marker: "*"
+    linestyle: "-"
+    linewidth: 1.6
+    markersize: 11
+    alpha: 0.83
+
+  # Optimized hierarchical conditions for resolution speed testing
+  experiment_phase_1:
+    color: "#7f7f7f"
+    marker: "h"
+    linestyle: "-"
+    linewidth: 1.4
+    markersize: 6
+    alpha: 0.75
+    resolution_priority: 1
+    
+  experiment_phase_2:
+    color: "#bcbd22"
+    marker: "H"
+    linestyle: "--"
+    linewidth: 1.7
+    markersize: 7
+    alpha: 0.78
+    resolution_priority: 2
+    
+  experiment_phase_3:
+    color: "#17becf"
+    marker: "+"
+    linestyle: "-."
+    linewidth: 2.1
+    markersize: 9
+    alpha: 0.82
+    resolution_priority: 3
+
+  # Performance-critical matplotlib rcParams for styling efficiency
+  high_performance_minimal:
     figure.figsize: [10, 8]
-    font.size: 12
-    axes.grid: true
-    axes.grid.alpha: 0.3
-    axes.labelsize: 11
+    figure.dpi: 300
+    axes.linewidth: 1.2
+    axes.labelsize: 12
     axes.titlesize: 14
+    lines.linewidth: 1.5
+    lines.markersize: 6
+    font.size: 11
     legend.fontsize: 10
-    xtick.labelsize: 9
-    ytick.labelsize: 9
-    axes.linewidth: 1.0
-    grid.linewidth: 0.8
-    lines.linewidth: 2.0
-    figure.facecolor: "white"
-    axes.facecolor: "white"
-    savefig.dpi: 150
-    savefig.bbox: "tight"
-    savefig.pad_inches: 0.1
-
-  presentation_optimized:
+    grid.alpha: 0.3
+    cache_strategy: "aggressive"
+    
+  high_performance_detailed:
     figure.figsize: [12, 9]
-    font.size: 14
-    axes.grid: true
-    axes.grid.alpha: 0.2
-    axes.labelsize: 13
-    axes.titlesize: 16
-    legend.fontsize: 12
-    xtick.labelsize: 11
-    ytick.labelsize: 11
-    axes.linewidth: 1.2
-    grid.linewidth: 0.6
-    lines.linewidth: 2.5
+    figure.dpi: 300
     figure.facecolor: "white"
-    axes.facecolor: "#f8f9fa"
-    savefig.dpi: 200
-    savefig.bbox: "tight"
-    savefig.pad_inches: 0.15
-    axes.spines.top: false
-    axes.spines.right: false
-
-  publication_quality:
-    figure.figsize: [8, 6]
-    font.size: 11
-    axes.grid: false
-    axes.labelsize: 10
-    axes.titlesize: 12
-    legend.fontsize: 9
-    xtick.labelsize: 8
-    ytick.labelsize: 8
+    figure.edgecolor: "none"
     axes.linewidth: 1.5
-    lines.linewidth: 1.8
-    figure.facecolor: "white"
-    axes.facecolor: "white"
-    savefig.dpi: 300
-    savefig.bbox: "tight"
-    savefig.pad_inches: 0.05
-    text.color: "black"
-    axes.labelcolor: "black"
-    xtick.color: "black"
-    ytick.color: "black"
-
-  # Performance test conditions with systematic variations
-  perf_condition_01:
-    figure.figsize: [9, 7]
-    font.size: 13
-    axes.grid: true
-    axes.grid.alpha: 0.25
-    savefig.dpi: 175
-
-  perf_condition_02:
-    figure.figsize: [11, 8]
-    font.size: 12
-    axes.grid: true
-    axes.grid.alpha: 0.35
-    savefig.dpi: 180
-
-  perf_condition_03:
-    figure.figsize: [10, 7]
-    font.size: 14
-    axes.grid: false
-    savefig.dpi: 185
-
-  perf_condition_04:
-    figure.figsize: [12, 8]
-    font.size: 11
-    axes.grid: true
-    axes.grid.alpha: 0.4
-    savefig.dpi: 190
-
-  perf_condition_05:
-    figure.figsize: [8, 7]
-    font.size: 15
-    axes.grid: false
-    savefig.dpi: 195
-
-  # Batch performance conditions for concurrent testing
-  batch_condition_a:
-    figure.figsize: [10, 8]
-    font.size: 12
-    axes.linewidth: 1.0
-    lines.linewidth: 2.0
-    savefig.dpi: 150
-
-  batch_condition_b:
-    figure.figsize: [11, 8]
-    font.size: 13
-    axes.linewidth: 1.1
-    lines.linewidth: 2.2
-    savefig.dpi: 160
-
-  batch_condition_c:
-    figure.figsize: [9, 7]
-    font.size: 11
-    axes.linewidth: 0.9
-    lines.linewidth: 1.8
-    savefig.dpi: 140
-
-  # Complex nested styling for merge performance testing
-  complex_nested_style:
-    figure.figsize: [12, 10]
-    font.size: 14
-    axes.grid: true
-    axes.grid.alpha: 0.3
-    axes.labelsize: 13
-    axes.titlesize: 16
-    legend.fontsize: 12
-    xtick.labelsize: 11
-    ytick.labelsize: 11
-    axes.linewidth: 1.2
-    grid.linewidth: 0.8
-    lines.linewidth: 2.5
-    figure.facecolor: "white"
-    axes.facecolor: "#f8f9fa"
-    savefig.dpi: 200
-    savefig.bbox: "tight"
-    savefig.pad_inches: 0.15
-    text.color: "#2c3e50"
-    axes.labelcolor: "#34495e"
-    xtick.color: "#34495e"
-    ytick.color: "#34495e"
+    axes.spines.left: true
+    axes.spines.bottom: true
     axes.spines.top: false
     axes.spines.right: false
-    axes.spines.bottom: true
-    axes.spines.left: true
+    axes.facecolor: "white"
+    axes.edgecolor: "black"
+    axes.labelsize: 13
+    axes.titlesize: 16
+    axes.labelpad: 4.0
+    xtick.labelsize: 11
+    ytick.labelsize: 11
+    xtick.major.size: 4
+    ytick.major.size: 4
+    lines.linewidth: 2.0
+    lines.markersize: 8
+    font.family: "sans-serif"
+    font.size: 12
+    legend.fontsize: 11
+    legend.frameon: true
+    legend.fancybox: true
+    grid.alpha: 0.4
+    grid.linewidth: 0.8
+    cache_strategy: "selective"
 
-# Optimized condition mappings for fast resolution
-conditions:
-  # High-performance lookups with simple mappings
-  experiment_type:
-    exploratory: "exploratory_baseline"
-    presentation: "presentation_optimized"
-    publication: "publication_quality"
-    performance_test: "perf_condition_01"
-    batch_test: "batch_condition_a"
+  # Benchmark-friendly complex conditions for comprehensive testing
+  ml_training_baseline:
+    color: "#3498db"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 2.0
+    markersize: 8
+    alpha: 0.9
+    figure.figsize: [14, 10]
+    figure.dpi: 300
+    axes.titlesize: 18
+    benchmark_category: "ml_training"
+    
+  ml_training_optimized:
+    color: "#e74c3c"
+    marker: "s"
+    linestyle: "--"
+    linewidth: 2.3
+    markersize: 9
+    alpha: 0.92
+    figure.figsize: [14, 10]
+    figure.dpi: 300
+    axes.titlesize: 18
+    benchmark_category: "ml_training"
+    
+  ml_validation_standard:
+    color: "#f39c12"
+    marker: "^"
+    linestyle: "-."
+    linewidth: 1.8
+    markersize: 7
+    alpha: 0.88
+    figure.figsize: [12, 8]
+    figure.dpi: 300
+    axes.titlesize: 16
+    benchmark_category: "ml_validation"
+    
+  ml_testing_final:
+    color: "#27ae60"
+    marker: "v"
+    linestyle: ":"
+    linewidth: 2.1
+    markersize: 8
+    alpha: 0.85
+    figure.figsize: [16, 12]
+    figure.dpi: 600
+    axes.titlesize: 20
+    benchmark_category: "ml_testing"
 
-  analysis_mode:
-    baseline: "exploratory_baseline"
-    comparison: "presentation_optimized"
-    final: "publication_quality"
-    benchmark: "perf_condition_02"
-    validation: "batch_condition_b"
+# =============================================================================
+# OPTIMIZED PALETTE CONFIGURATIONS
+# =============================================================================
 
-  data_version:
-    v1: "perf_condition_01"
-    v2: "perf_condition_02"
-    v3: "perf_condition_03"
-    v4: "perf_condition_04"
-    v5: "perf_condition_05"
+palettes:
+  performance_primary:
+    - "#1f77b4"  # Blue
+    - "#ff7f0e"  # Orange
+    - "#2ca02c"  # Green
+    - "#d62728"  # Red
+    - "#9467bd"  # Purple
+    - "#8c564b"  # Brown
+    - "#e377c2"  # Pink
+    - "#7f7f7f"  # Gray
+    
+  performance_extended:
+    - "#3498db"  # Light Blue
+    - "#e74c3c"  # Light Red
+    - "#f39c12"  # Orange
+    - "#27ae60"  # Green
+    - "#9b59b6"  # Purple
+    - "#34495e"  # Dark Gray
+    - "#e67e22"  # Dark Orange
+    - "#95a5a6"  # Silver
+    - "#f1c40f"  # Yellow
+    - "#16a085"  # Teal
+    
+  categorical_optimized:
+    exploratory: "#a8e6cf"
+    presentation: "#ffb6c1"
+    publication: "#87ceeb"
+    baseline: "#dda0dd"
+    treatment: "#f0e68c"
+    control: "#ffa07a"
 
-  model_variant:
-    linear: "batch_condition_a"
-    polynomial: "batch_condition_b"
-    ensemble: "batch_condition_c"
-    deep_learning: "complex_nested_style"
-    optimization: "presentation_optimized"
+# =============================================================================
+# EFFICIENT DEFAULT CONFIGURATIONS
+# =============================================================================
 
-  # Performance-specific condition mappings
-  performance_category:
-    fast_render: "exploratory_baseline"
-    standard_render: "presentation_optimized"
-    high_quality: "publication_quality"
-    benchmark_test: "perf_condition_01"
-    stress_test: "complex_nested_style"
-
-  pipeline_stage:
-    preprocessing: "exploratory_baseline"
-    training: "perf_condition_02"
-    validation: "perf_condition_03"
-    testing: "perf_condition_04"
-    deployment: "publication_quality"
-
-# Performance-optimized output configurations
-outputs:
-  base_path: "data/08_reporting/figures/performance_test"
-  timestamp_format: "%Y%m%d_%H%M%S"
-  
-  # Path optimization for fast resolution
-  path_templates:
-    exploratory: "${base_path}/exploratory/{condition}/{timestamp}"
-    presentation: "${base_path}/presentation/{condition}/{timestamp}"
-    publication: "${base_path}/publication/{condition}/{timestamp}"
-    performance: "${base_path}/performance/{condition}/{timestamp}"
-    batch: "${base_path}/batch/{condition}/{timestamp}"
-
-  # Cache-friendly path aliases
-  path_aliases:
-    expl: "exploratory"
-    pres: "presentation"
-    publ: "publication"
-    perf: "performance"
-    batch: "batch"
-
-  # Performance monitoring configuration
-  performance_tracking:
-    enabled: true
-    metrics:
-      - "save_time_ms"
-      - "style_resolution_time_ms"
-      - "path_resolution_time_ms"
-      - "file_write_time_ms"
-    thresholds:
-      max_save_time_ms: 20
-      max_style_resolution_ms: 5
-      max_path_resolution_ms: 2
-
-  # Versioning for performance testing
-  versioning:
-    enabled: true
-    strategy: "timestamp"
-    format: "performance_test_{timestamp}"
-    max_versions: 10
-
-# Default configurations optimized for performance
 defaults:
-  style: "exploratory_baseline"
-  condition_param: "experiment_type"
-  output_format: "png"
-  cache_enabled: true
+  figure:
+    figsize: [10, 8]
+    dpi: 300
+    facecolor: "white"
+    edgecolor: "none"
+    
+  line:
+    color: "#2E86AB"
+    linewidth: 2.0
+    linestyle: "-"
+    marker: "o"
+    markersize: 6
+    alpha: 0.8
+    
+  axes:
+    linewidth: 1.2
+    labelsize: 12
+    titlesize: 14
+    spines.left: true
+    spines.bottom: true
+    spines.top: false
+    spines.right: false
+    
+  text:
+    font.size: 11
+    font.family: "sans-serif"
+    
+  legend:
+    fontsize: 10
+    frameon: true
+    fancybox: true
+    shadow: false
+    
+  grid:
+    alpha: 0.3
+    linewidth: 0.8
+    
+  fallback_style:
+    color: "#95A5A6"
+    marker: "o"
+    linestyle: "-"
+    linewidth: 1.5
+    alpha: 0.7
+    label: "Unknown Condition"
+
+# =============================================================================
+# PERFORMANCE-FOCUSED OUTPUT CONFIGURATIONS
+# =============================================================================
+
+outputs:
+  base_path: "data/08_reporting"
   
-  # Performance-oriented defaults
-  performance_defaults:
-    lazy_loading: true
-    style_caching: true
-    path_caching: true
-    merge_optimization: true
-    concurrent_access: true
+  # Optimized path resolution for performance testing
+  path_aliases:
+    perf: "data/08_reporting/performance"
+    bench: "data/08_reporting/benchmarks"
+    test: "data/08_reporting/testing"
+    cache: "data/08_reporting/cached"
+    temp: "data/08_reporting/temporary"
+    
+  # Efficient naming patterns for path generation speed
+  naming:
+    template: "{name}_{condition}_{ts}"
+    timestamp_format: "%Y%m%d_%H%M%S"
+    condition_separator: "_"
+    
+  # Format configurations optimized for save performance
+  formats:
+    defaults:
+      exploratory: ["png"]
+      presentation: ["png", "pdf"]  
+      publication: ["pdf", "svg"]
+      
+  # DPI settings for different performance scenarios
+  dpi_settings:
+    fast: 150
+    standard: 300
+    high_quality: 600
+    
+  # Save arguments optimized for performance
+  save_args:
+    png:
+      dpi: 300
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      transparent: false
+      optimize: true
+      
+    pdf:
+      dpi: 300
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      transparent: false
+      
+    svg:
+      bbox_inches: "tight"
+      pad_inches: 0.1
+      transparent: false
 
-# Cache configuration for optimal performance
-cache:
-  enabled: true
-  strategy: "lru"
-  max_size: 1000
-  ttl_seconds: 3600
-  
-  # Performance-specific cache settings
-  style_cache:
-    enabled: true
-    max_entries: 500
-    preload_common: true
-    common_conditions:
-      - "exploratory_baseline"
-      - "presentation_optimized"
-      - "publication_quality"
+# =============================================================================
+# KEDRO INTEGRATION PERFORMANCE SETTINGS
+# =============================================================================
 
-  condition_cache:
-    enabled: true
-    max_entries: 200
-    hash_optimization: true
-
-  path_cache:
-    enabled: true
-    max_entries: 300
-    template_compilation: true
-
-# Performance benchmark configurations
-benchmarks:
-  merge_operations:
-    target_time_ms: 50
-    test_scenarios:
-      - "single_environment"
-      - "multi_environment_override"
-      - "complex_nested_merge"
-      - "concurrent_access"
-    measurement_iterations: 100
-
-  style_resolution:
-    target_time_ms: 5
-    test_conditions:
-      - "exploratory_baseline"
-      - "complex_nested_style"
-      - "batch_condition_a"
-    cache_scenarios:
-      - "cold_cache"
-      - "warm_cache"
-      - "cache_miss"
-
-  configuration_loading:
-    target_time_ms: 100
-    load_scenarios:
-      - "initial_load"
-      - "reload_with_cache"
-      - "invalidate_and_reload"
-    validation_included: true
-
-# Optimization settings for configuration bridge
-optimization:
-  merge_strategy: "deep_merge_optimized"
-  lazy_evaluation: true
-  cache_intermediate_results: true
-  parallel_validation: true
-  
-  memory_management:
-    max_cache_size_mb: 50
-    gc_threshold: 1000
-    cleanup_interval_seconds: 300
-
-  performance_monitoring:
-    enabled: true
-    detailed_timing: true
-    memory_tracking: true
-    bottleneck_detection: true
-
-# Kedro-specific configuration optimizations
 kedro:
-  dataset_optimization:
-    preload_styles: true
-    cache_figure_contexts: true
-    batch_style_resolution: true
+  config_bridge:
+    enabled: true
+    merge_strategy: "override"
+    cache_enabled: true
+    cache_ttl_seconds: 300
+    performance_target_ms: 50
     
-  hook_optimization:
-    lazy_initialization: true
-    context_caching: true
-    minimal_overhead_mode: true
+  datasets:
+    default_purpose: "exploratory"
+    versioning_enabled: true
+    default_save_args:
+      bbox_inches: "tight"
+      dpi: 300
+      
+  hooks:
+    initialization_timeout_ms: 25
+    context_cleanup_enabled: true
+    performance_monitoring: true
     
-  catalog_integration:
-    fast_parameter_extraction: true
-    optimized_path_resolution: true
-    concurrent_save_support: true
+  performance:
+    config_resolution_cache_size: 100
+    style_lookup_cache_size: 500
+    concurrent_access_optimization: true
 
-# Environment-specific performance settings
-environments:
-  performance_test:
-    cache_size_multiplier: 2.0
-    enable_detailed_logging: true
-    memory_profiling: true
-    timing_precision: "microsecond"
-    
-  benchmark:
-    cache_size_multiplier: 1.5
-    enable_detailed_logging: false
-    memory_profiling: false
-    timing_precision: "millisecond"
-    optimization_level: "maximum"
+# =============================================================================
+# ADVANCED PERFORMANCE CONFIGURATIONS
+# =============================================================================
 
-# Configuration validation optimizations
+performance:
+  # Configuration cache settings for optimal merge performance
+  cache:
+    config_cache_size: 200
+    style_cache_size: 1000
+    resolution_cache_ttl: 600
+    cache_warming_enabled: true
+    cache_eviction_strategy: "lru"
+    
+  # Memory optimization settings
+  memory:
+    max_config_size_mb: 5
+    cleanup_threshold_mb: 3
+    garbage_collection_hints: true
+    
+  # Concurrent access optimization
+  concurrency:
+    max_concurrent_resolutions: 16
+    lock_timeout_ms: 100
+    thread_safety_level: "high"
+    
+  # Monitoring and benchmarking
+  monitoring:
+    track_resolution_times: true
+    track_memory_usage: true
+    track_cache_efficiency: true
+    performance_alerts_enabled: true
+    
+  # Optimization hints for specific operations
+  optimization_hints:
+    style_resolution: "cache_first"
+    config_merging: "shallow_copy"
+    path_generation: "template_cache"
+
+# =============================================================================
+# STYLE INHERITANCE FOR EFFICIENT RESOLUTION
+# =============================================================================
+
+style_inheritance:
+  # Base styles for efficient inheritance patterns
+  base_scientific:
+    figure.figsize: [10, 8]
+    figure.dpi: 300
+    axes.linewidth: 1.2
+    font.size: 12
+    
+  base_presentation:
+    figure.figsize: [12, 9]
+    figure.dpi: 300
+    axes.linewidth: 1.5
+    font.size: 14
+    
+  # Inheritance hierarchy for performance testing
+  inheritance_chains:
+    exploratory_chain:
+      - "base_scientific"
+      - "exploratory"
+      
+    presentation_chain:
+      - "base_presentation"
+      - "presentation"
+      
+    publication_chain:
+      - "base_scientific"
+      - "publication"
+
+# =============================================================================
+# CONDITIONAL RULES FOR PERFORMANCE VALIDATION
+# =============================================================================
+
+conditional_rules:
+  # Performance-optimized condition matching
+  experiment_conditions:
+    baseline:
+      style: "baseline"
+      priority: 1
+      cache_key: "exp_baseline"
+      
+    treatment_a:
+      style: "treatment_a"
+      priority: 2
+      cache_key: "exp_treat_a"
+      
+    treatment_b:
+      style: "treatment_b"
+      priority: 3
+      cache_key: "exp_treat_b"
+      
+    control:
+      style: "control"
+      priority: 4
+      cache_key: "exp_control"
+      
+  # Phase-based conditions for systematic testing
+  phase_conditions:
+    training:
+      style: "ml_training_baseline"
+      output_path: "perf/training"
+      
+    validation:
+      style: "ml_validation_standard"
+      output_path: "perf/validation"
+      
+    testing:
+      style: "ml_testing_final"
+      output_path: "perf/testing"
+
+# =============================================================================
+# VALIDATION SCHEMA FOR PERFORMANCE TESTING
+# =============================================================================
+
 validation:
-  schema_caching: true
-  lazy_validation: true
-  performance_mode: true
-  skip_non_critical: false
+  # Schema validation rules optimized for performance
+  schema_version: "1.0"
+  strict_validation: false  # Relaxed for performance
   
-  performance_validation:
-    max_merge_time_ms: 50
-    max_load_time_ms: 100
-    max_memory_usage_mb: 10
-    concurrent_access_support: true
+  required_fields:
+    - "styles"
+    - "outputs"
+    - "defaults"
+    
+  performance_constraints:
+    max_style_resolution_ms: 10
+    max_config_merge_ms: 50
+    max_memory_usage_mb: 5
+    
+  # Validation caching for performance
+  validation_cache:
+    enabled: true
+    cache_size: 50
+    ttl_seconds: 180
+
+# =============================================================================
+# EXAMPLES FOR PERFORMANCE DOCUMENTATION
+# =============================================================================
+
+examples:
+  # High-performance usage patterns
+  minimal_overhead:
+    description: "Minimal configuration for maximum performance"
+    condition: "exploratory"
+    expected_resolution_ms: 5
+    
+  standard_scientific:
+    description: "Standard scientific plotting with good performance"
+    condition: "baseline"
+    expected_resolution_ms: 8
+    
+  complex_publication:
+    description: "Complex publication-quality with acceptable overhead"
+    condition: "publication"
+    expected_resolution_ms: 15
+    
+  # Benchmark scenarios
+  benchmark_scenarios:
+    rapid_iteration:
+      conditions: ["exploratory", "baseline", "treatment_a"]
+      iterations: 1000
+      target_avg_ms: 7
+      
+    mixed_workload:
+      conditions: ["exploratory", "presentation", "publication"]
+      concurrent_operations: 10
+      target_total_ms: 200
+      
+    stress_test:
+      conditions: ["ml_training_baseline", "ml_validation_standard", "ml_testing_final"]
+      concurrent_operations: 16
+      target_max_ms: 45
