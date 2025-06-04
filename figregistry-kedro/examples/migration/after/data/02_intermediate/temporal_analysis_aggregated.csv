@@ -1,173 +1,79 @@
-# =============================================================================
-# Temporal Analysis Aggregated Data - FigRegistry-Kedro Migration Example (After)
-# =============================================================================
-# This dataset demonstrates automated temporal data processing where condition-based
-# styling eliminates manual line plot styling, hardcoded color schemes, and 
-# scattered plt.savefig() calls characteristic of traditional workflows.
-#
-# MIGRATION TRANSFORMATION DEMONSTRATED:
-# BEFORE: Manual temporal styling with hardcoded parameters in every time series plot
-# AFTER:  Automated temporal visualization through condition_param resolution
-# BEFORE: Scattered plt.savefig() calls with manual path management for time series
-# AFTER:  FigureDataSet catalog integration with automated styling and versioning
-# BEFORE: Repetitive temporal plot formatting code across pipeline nodes
-# AFTER:  Zero temporal styling code - handled automatically by FigRegistry
-#
-# AUTOMATED STYLING FEATURES ENABLED:
-# - condition_param resolution from experimental_condition for line plot styling
-# - trend_direction-based automatic color and marker selection per F-002
-# - seasonal_component-driven linestyle automation through style engine
-# - data_quality-based alpha and linewidth adjustment through condition mapping
-# - time_window aggregation supporting automated temporal chart formatting
-# - rolling statistics context enabling automatic axis scaling and grid settings
-#
-# COLUMN DESCRIPTIONS:
-# - time_window: Temporal aggregation period (daily, weekly, monthly, quarterly)
-# - experimental_condition: Primary condition parameter for automated styling via F-005
-# - trend_direction: Temporal trend indicator (increasing, decreasing, stable, volatile)
-# - seasonal_component: Seasonal pattern strength (strong, moderate, weak, none)
-# - data_quality: Quality assessment for automated styling decisions (high, medium, low)
-# - measurement_count: Number of observations in aggregation window
-# - mean_value: Central tendency measure for time series visualization
-# - std_deviation: Variability measure for automated error band styling
-# - rolling_mean_7d: 7-day rolling average for temporal smoothing
-# - rolling_std_7d: 7-day rolling standard deviation for variability context
-# - min_value: Minimum value in aggregation window for axis range automation
-# - max_value: Maximum value in aggregation window for axis range automation
-# - median_value: Median value for robust central tendency
-# - percentile_25: First quartile for automated quartile visualization
-# - percentile_75: Third quartile for automated quartile bands
-# - autocorrelation_lag1: First-order autocorrelation for temporal dependency indication
-# - temporal_pattern_strength: Overall pattern strength (0-1) for styling intensity
-# - anomaly_score: Anomaly detection score for automated highlighting
-# - confidence_interval_lower: Lower confidence bound for automated confidence bands
-# - confidence_interval_upper: Upper confidence bound for automated confidence bands
-# =============================================================================
-time_window,experimental_condition,trend_direction,seasonal_component,data_quality,measurement_count,mean_value,std_deviation,rolling_mean_7d,rolling_std_7d,min_value,max_value,median_value,percentile_25,percentile_75,autocorrelation_lag1,temporal_pattern_strength,anomaly_score,confidence_interval_lower,confidence_interval_upper
-# Exploratory analysis phase - early time periods with high variability
-daily,exploratory_analysis,volatile,weak,high_quality,24,15.73,4.82,14.56,3.91,8.21,26.45,15.12,12.34,18.67,0.23,0.42,0.12,13.89,17.57
-daily,exploratory_analysis,increasing,moderate,high_quality,24,18.94,5.21,17.23,4.67,10.12,29.33,18.45,14.78,22.56,0.34,0.58,0.08,16.87,21.01
-daily,exploratory_analysis,stable,strong,medium_quality,24,22.15,3.67,21.89,3.12,16.78,28.90,21.67,19.45,24.23,0.67,0.74,0.15,20.34,23.96
-weekly,exploratory_analysis,decreasing,moderate,high_quality,168,19.87,6.34,18.45,5.78,7.23,34.56,19.23,15.67,23.45,0.45,0.61,0.18,17.12,22.62
-weekly,exploratory_analysis,increasing,weak,medium_quality,168,25.43,7.89,24.12,6.92,12.34,39.87,24.78,20.12,29.34,0.28,0.49,0.22,22.45,28.41
-monthly,exploratory_analysis,stable,none,high_quality,720,28.67,4.23,27.89,3.87,20.45,36.78,28.12,25.34,31.23,0.12,0.38,0.09,26.78,30.56
-
-# Random forest model training phase - structured patterns emerging
-daily,random_forest,increasing,strong,high_quality,24,32.45,3.89,31.78,3.45,26.12,39.67,32.23,29.67,34.89,0.78,0.82,0.06,30.67,34.23
-daily,random_forest,stable,moderate,high_quality,24,35.67,2.34,35.12,2.89,31.23,39.45,35.45,33.78,37.12,0.65,0.71,0.11,34.23,37.11
-weekly,random_forest,increasing,strong,high_quality,168,38.94,4.56,37.67,4.12,29.78,47.23,38.45,35.67,41.78,0.73,0.79,0.14,36.78,41.10
-weekly,random_forest,stable,moderate,medium_quality,168,42.13,5.67,41.23,5.23,32.45,51.67,41.89,38.45,45.23,0.58,0.69,0.16,39.45,44.81
-monthly,random_forest,increasing,weak,high_quality,720,45.78,3.45,44.89,3.12,39.23,52.34,45.34,43.12,47.89,0.34,0.56,0.12,43.67,47.89
-quarterly,random_forest,stable,none,high_quality,2160,48.23,2.87,47.78,2.56,43.45,53.67,47.89,46.34,49.78,0.21,0.42,0.08,46.45,50.01
-
-# Moderate complexity optimization phase - balanced performance patterns
-daily,moderate,increasing,moderate,high_quality,24,51.34,4.23,50.67,3.89,44.56,58.78,50.89,48.23,53.67,0.56,0.67,0.09,49.23,53.45
-daily,moderate,stable,strong,medium_quality,24,54.67,3.78,53.89,3.45,48.23,60.45,54.12,52.34,56.78,0.69,0.75,0.13,52.45,56.89
-weekly,moderate,decreasing,moderate,high_quality,168,52.89,5.34,51.67,4.89,43.78,62.34,52.45,49.67,55.89,0.43,0.61,0.17,50.23,55.55
-weekly,moderate,increasing,weak,high_quality,168,56.78,4.89,55.45,4.34,48.23,65.67,56.23,53.45,59.12,0.38,0.58,0.14,54.12,59.44
-monthly,moderate,stable,strong,high_quality,720,59.45,3.67,58.67,3.23,52.34,66.78,59.12,56.78,61.45,0.72,0.78,0.11,57.34,61.56
-quarterly,moderate,increasing,moderate,medium_quality,2160,62.13,4.45,61.23,4.12,54.67,70.89,61.78,58.89,64.67,0.54,0.68,0.15,59.78,64.48
-
-# Optimized training phase - high performance with controlled variability
-daily,optimized,increasing,strong,high_quality,24,68.92,2.89,68.34,2.56,64.23,73.45,68.67,66.78,70.45,0.81,0.87,0.05,67.23,70.61
-daily,optimized,stable,moderate,high_quality,24,72.45,2.34,71.89,2.12,68.78,76.23,72.12,70.89,73.67,0.74,0.82,0.07,71.12,73.78
-weekly,optimized,increasing,strong,high_quality,168,75.67,3.45,74.89,3.12,69.23,81.34,75.23,73.45,77.89,0.79,0.85,0.09,73.89,77.45
-weekly,optimized,stable,weak,medium_quality,168,78.34,4.12,77.56,3.78,71.45,85.67,77.89,75.67,80.45,0.62,0.73,0.12,76.23,80.45
-monthly,optimized,increasing,moderate,high_quality,720,81.78,2.67,80.89,2.34,77.45,86.23,81.34,79.67,83.12,0.68,0.76,0.08,80.23,83.33
-quarterly,optimized,stable,strong,high_quality,2160,84.56,2.12,83.78,1.89,80.34,88.67,84.12,83.23,85.67,0.83,0.89,0.06,83.34,85.78
-
-# Real-world dataset validation phase - realistic performance patterns
-daily,real_world,volatile,weak,medium_quality,24,79.23,6.78,78.45,6.23,67.89,89.56,78.67,74.56,83.45,0.31,0.52,0.19,75.67,82.79
-daily,real_world,decreasing,moderate,high_quality,24,76.89,5.34,75.67,4.89,68.23,85.45,76.34,73.45,79.67,0.47,0.63,0.16,73.89,79.89
-weekly,real_world,stable,strong,medium_quality,168,74.56,7.23,73.23,6.78,62.34,87.89,73.89,69.78,78.67,0.59,0.71,0.21,70.89,78.23
-weekly,real_world,increasing,moderate,high_quality,168,77.34,6.45,76.12,5.89,66.78,88.23,76.89,72.45,81.23,0.52,0.67,0.18,73.67,81.01
-monthly,real_world,stable,weak,medium_quality,720,80.12,5.67,79.34,5.23,70.45,89.67,79.67,76.23,83.45,0.41,0.59,0.15,77.45,82.79
-quarterly,real_world,decreasing,none,high_quality,2160,77.89,4.89,76.67,4.45,69.23,86.45,77.34,74.67,80.78,0.28,0.48,0.13,75.23,80.55
-
-# High quality data analysis phase - consistent high-performance metrics
-daily,high_quality,stable,strong,high_quality,24,85.67,1.89,85.12,1.67,82.34,88.45,85.45,84.23,86.78,0.87,0.92,0.04,84.67,86.67
-daily,high_quality,increasing,moderate,high_quality,24,87.23,2.12,86.67,1.89,83.45,90.67,86.89,85.67,88.34,0.79,0.86,0.06,86.12,88.34
-weekly,high_quality,stable,strong,high_quality,168,89.45,2.34,88.78,2.12,85.67,93.23,89.12,87.78,90.67,0.84,0.89,0.07,88.12,90.78
-weekly,high_quality,increasing,weak,high_quality,168,91.78,2.67,90.89,2.34,87.23,95.67,91.34,89.89,93.12,0.72,0.81,0.09,90.23,93.33
-monthly,high_quality,stable,moderate,high_quality,720,93.56,1.78,92.89,1.56,90.45,96.78,93.23,92.34,94.45,0.88,0.93,0.05,92.67,94.45
-quarterly,high_quality,increasing,strong,high_quality,2160,95.34,1.45,94.67,1.23,92.78,97.89,95.12,94.23,96.12,0.91,0.95,0.03,94.56,96.12
-
-# Medium sample size analysis - representative performance patterns
-daily,medium_sample,stable,moderate,medium_quality,24,82.45,3.67,81.78,3.34,76.23,87.89,82.12,79.89,84.67,0.64,0.74,0.11,80.67,84.23
-daily,medium_sample,increasing,strong,high_quality,24,84.78,3.23,83.89,2.89,79.45,89.23,84.34,82.67,86.45,0.76,0.83,0.08,82.89,86.67
-weekly,medium_sample,volatile,weak,medium_quality,168,81.23,5.89,80.45,5.34,71.67,91.45,80.89,77.34,84.67,0.39,0.57,0.18,78.45,84.01
-weekly,medium_sample,stable,moderate,high_quality,168,83.67,4.45,82.89,4.12,76.78,90.23,83.23,80.89,86.12,0.61,0.72,0.14,81.34,86.00
-monthly,medium_sample,increasing,strong,high_quality,720,86.23,3.78,85.45,3.45,79.89,92.67,85.89,83.67,88.34,0.73,0.81,0.12,84.12,88.34
-quarterly,medium_sample,stable,weak,medium_quality,2160,88.45,3.23,87.67,2.89,83.23,93.78,88.12,86.34,90.23,0.58,0.69,0.10,86.89,90.01
-
-# Validation phase analysis - rigorous performance assessment
-daily,validation,decreasing,moderate,high_quality,24,84.12,4.34,83.45,3.89,76.67,90.45,83.78,81.23,86.89,0.48,0.64,0.15,81.78,86.46
-daily,validation,stable,strong,high_quality,24,86.78,3.45,86.12,3.12,81.23,92.34,86.45,84.67,88.67,0.71,0.79,0.11,84.89,88.67
-weekly,validation,increasing,moderate,medium_quality,168,88.34,4.67,87.56,4.23,80.67,95.23,87.89,85.34,90.78,0.59,0.71,0.16,85.89,90.79
-weekly,validation,stable,weak,high_quality,168,90.67,3.89,89.89,3.56,84.23,96.78,90.23,88.45,92.45,0.66,0.75,0.13,88.45,92.89
-monthly,validation,decreasing,none,high_quality,720,87.89,5.23,87.12,4.78,79.45,95.67,87.45,84.67,90.89,0.35,0.56,0.17,85.12,90.66
-quarterly,validation,stable,moderate,high_quality,2160,89.23,4.12,88.45,3.78,82.34,95.89,88.89,86.78,91.34,0.62,0.73,0.14,87.12,91.34
-
-# Detailed analysis phase - comprehensive performance evaluation
-daily,detailed,increasing,strong,high_quality,24,91.45,2.78,90.78,2.45,87.23,95.67,91.12,89.67,92.78,0.82,0.88,0.07,90.12,92.78
-daily,detailed,stable,moderate,high_quality,24,93.23,2.34,92.67,2.12,89.45,96.78,92.89,91.78,94.23,0.77,0.84,0.08,92.12,94.34
-weekly,detailed,increasing,strong,high_quality,168,94.67,2.89,93.89,2.56,90.23,98.45,94.34,92.89,96.12,0.79,0.86,0.09,93.12,96.22
-weekly,detailed,stable,weak,medium_quality,168,92.34,3.67,91.67,3.34,86.78,97.23,92.12,89.89,94.45,0.64,0.75,0.12,90.45,94.23
-monthly,detailed,decreasing,moderate,high_quality,720,90.78,4.23,90.12,3.89,84.45,96.89,90.45,88.23,93.12,0.53,0.68,0.14,88.67,92.89
-quarterly,detailed,stable,strong,high_quality,2160,92.56,3.45,91.89,3.12,87.67,97.23,92.23,90.78,94.12,0.74,0.82,0.11,90.89,94.23
-
-# Stakeholder presentation phase - business-focused performance metrics
-daily,stakeholder,increasing,moderate,high_quality,24,89.67,3.23,88.89,2.89,84.45,94.23,89.34,87.67,91.45,0.69,0.77,0.10,88.12,91.22
-daily,stakeholder,stable,strong,high_quality,24,91.34,2.67,90.67,2.34,87.23,95.45,91.12,89.89,92.67,0.81,0.87,0.08,90.12,92.56
-weekly,stakeholder,increasing,weak,medium_quality,168,93.78,3.45,92.89,3.12,88.67,98.23,93.45,91.78,95.34,0.62,0.73,0.12,92.12,95.44
-weekly,stakeholder,stable,moderate,high_quality,168,95.23,2.89,94.56,2.56,91.34,99.12,94.89,93.45,96.78,0.75,0.83,0.09,93.67,96.79
-monthly,stakeholder,decreasing,strong,high_quality,720,92.45,4.12,91.78,3.78,86.23,98.67,92.12,90.34,94.56,0.58,0.71,0.13,90.67,94.23
-quarterly,stakeholder,stable,none,high_quality,2160,94.12,3.34,93.45,3.01,89.78,99.45,93.89,92.34,95.67,0.66,0.76,0.11,92.56,95.68
-
-# Review quality assessment phase - quality control metrics
-daily,review,volatile,weak,medium_quality,24,86.23,5.67,85.45,5.23,78.45,94.67,85.89,82.67,89.34,0.37,0.55,0.19,83.45,89.01
-daily,review,stable,moderate,high_quality,24,88.67,4.23,87.89,3.89,82.34,95.23,88.34,86.12,90.78,0.63,0.74,0.14,86.67,90.67
-weekly,review,increasing,strong,medium_quality,168,90.34,4.78,89.56,4.34,83.67,97.89,89.89,87.78,92.45,0.69,0.78,0.16,88.12,92.56
-weekly,review,decreasing,moderate,high_quality,168,87.78,5.34,87.01,4.89,80.23,95.67,87.45,84.89,90.67,0.51,0.67,0.17,85.23,90.33
-monthly,review,stable,weak,high_quality,720,89.45,4.45,88.67,4.12,82.78,96.23,89.12,86.78,91.89,0.56,0.69,0.15,87.23,91.67
-quarterly,review,increasing,none,medium_quality,2160,91.23,3.89,90.45,3.56,85.67,97.45,90.89,88.89,93.34,0.48,0.64,0.13,89.12,93.34
-
-# Technical audience analysis - precision-focused metrics
-daily,technical,stable,strong,high_quality,24,93.45,1.89,92.78,1.67,90.67,96.23,93.23,92.34,94.45,0.88,0.92,0.05,92.67,94.23
-daily,technical,increasing,moderate,high_quality,24,94.78,2.12,94.12,1.89,91.45,97.67,94.45,93.67,95.67,0.83,0.89,0.06,93.89,95.67
-weekly,technical,stable,strong,high_quality,168,96.23,2.34,95.56,2.12,92.89,99.45,95.89,94.78,97.23,0.86,0.91,0.07,95.12,97.34
-weekly,technical,decreasing,weak,medium_quality,168,94.12,3.45,93.45,3.12,89.67,98.78,93.78,92.34,95.89,0.64,0.75,0.11,92.67,95.57
-monthly,technical,increasing,moderate,high_quality,720,97.34,2.67,96.67,2.34,93.45,101.23,97.12,95.89,98.45,0.78,0.85,0.08,96.12,98.56
-quarterly,technical,stable,none,high_quality,2160,98.67,2.12,97.89,1.89,95.34,102.45,98.34,97.45,99.67,0.81,0.88,0.06,97.67,99.67
-
-# Screen display optimization - visual presentation metrics
-daily,screen,increasing,moderate,high_quality,24,91.78,3.45,91.12,3.12,86.34,96.45,91.45,89.67,93.56,0.71,0.79,0.11,90.12,93.44
-daily,screen,stable,strong,medium_quality,24,93.45,2.89,92.78,2.56,89.67,97.23,93.12,91.89,94.78,0.76,0.83,0.09,92.12,94.78
-weekly,screen,volatile,weak,medium_quality,168,90.23,4.67,89.45,4.23,83.78,97.67,89.89,87.34,92.78,0.44,0.62,0.16,87.89,92.57
-weekly,screen,increasing,moderate,high_quality,168,92.67,3.78,91.89,3.45,87.23,98.45,92.34,90.45,94.56,0.67,0.76,0.13,90.45,94.89
-monthly,screen,stable,strong,high_quality,720,94.78,3.23,94.12,2.89,89.45,99.67,94.45,92.89,96.34,0.73,0.81,0.10,93.12,96.44
-quarterly,screen,decreasing,none,high_quality,2160,92.34,4.12,91.67,3.78,86.78,98.23,92.12,90.23,94.45,0.58,0.71,0.14,90.67,94.01
-
-# Colorblind safe analysis - accessibility-focused metrics
-daily,colorblind_safe,stable,moderate,high_quality,24,88.34,3.67,87.67,3.34,83.45,93.78,88.12,86.23,90.45,0.65,0.75,0.12,86.67,90.01
-daily,colorblind_safe,increasing,strong,high_quality,24,90.67,3.12,89.89,2.78,86.23,95.12,90.34,88.78,92.23,0.74,0.82,0.10,89.12,92.22
-weekly,colorblind_safe,stable,weak,medium_quality,168,89.45,4.23,88.78,3.89,83.67,95.89,89.12,87.23,91.67,0.59,0.71,0.14,87.67,91.23
-weekly,colorblind_safe,decreasing,moderate,high_quality,168,87.23,4.78,86.56,4.34,80.45,94.67,86.89,84.67,89.78,0.52,0.68,0.16,85.12,89.34
-monthly,colorblind_safe,increasing,strong,high_quality,720,91.56,3.45,90.89,3.12,86.78,96.78,91.23,89.67,93.12,0.71,0.79,0.11,90.12,93.00
-quarterly,colorblind_safe,stable,none,high_quality,2160,93.78,2.89,93.12,2.56,89.45,98.23,93.45,92.23,95.12,0.68,0.76,0.09,92.45,95.11
-
-# Testing environment metrics - development and validation context
-daily,testing,volatile,weak,medium_quality,24,82.67,6.23,81.89,5.78,74.45,92.34,82.34,79.23,85.89,0.33,0.51,0.21,79.67,85.67
-daily,testing,stable,moderate,high_quality,24,85.34,4.89,84.67,4.45,78.78,93.67,85.12,82.45,87.89,0.61,0.72,0.16,82.89,87.79
-weekly,testing,increasing,strong,medium_quality,168,87.78,5.45,87.01,4.98,80.23,96.45,87.45,84.67,90.34,0.67,0.76,0.18,85.23,90.33
-weekly,testing,decreasing,moderate,high_quality,168,84.45,6.12,83.78,5.67,76.89,94.23,84.12,81.34,87.56,0.46,0.63,0.19,81.78,87.12
-monthly,testing,stable,weak,medium_quality,720,86.67,5.78,86.01,5.34,78.45,95.89,86.34,83.45,89.23,0.54,0.68,0.17,83.89,89.45
-quarterly,testing,increasing,none,high_quality,2160,88.23,4.67,87.56,4.23,81.67,96.78,87.89,85.67,90.45,0.42,0.61,0.15,86.12,90.34
-
-# Standard resource allocation - baseline performance metrics
-daily,standard,stable,moderate,medium_quality,24,87.45,4.12,86.78,3.78,81.23,93.67,87.12,85.34,89.56,0.63,0.74,0.13,85.67,89.23
-daily,standard,increasing,strong,high_quality,24,89.78,3.56,89.12,3.23,84.67,95.23,89.45,87.89,91.34,0.72,0.81,0.11,88.12,91.44
-weekly,standard,stable,weak,medium_quality,168,86.23,5.23,85.56,4.78,79.45,94.67,85.89,83.45,88.78,0.57,0.69,0.16,83.67,88.79
-weekly,standard,volatile,moderate,high_quality,168,88.67,4.78,87.89,4.34,81.89,96.45,88.34,86.12,91.23,0.49,0.65,0.15,86.34,91.00
-monthly,standard,increasing,strong,high_quality,720,91.34,3.89,90.67,3.56,85.78,97.23,91.12,89.45,93.12,0.69,0.77,0.12,89.67,93.01
-quarterly,standard,stable,none,medium_quality,2160,93.12,3.34,92.45,3.01,88.78,98.45,92.78,91.23,94.67,0.64,0.74,0.10,91.45,94.79
+time_window,experimental_condition,mean_measurement,std_measurement,trend_direction,seasonal_component,data_quality,rolling_mean_5pt,rolling_std_5pt,measurement_count,quality_score_avg,coefficient_variation,temporal_stability,change_rate_per_hour,baseline_deviation,significance_level,analysis_phase,output_target,notes
+00:00-00:15,control,12.45,0.0,stable,none,high_quality,12.45,0.0,1,0.98,0.00,1.00,0.0,0.0,ns,exploration,technical,Initial baseline measurement - automated control styling via condition_param
+00:15-00:30,control,12.485,0.021,stable,none,high_quality,12.468,0.021,2,0.975,0.17,0.99,0.28,0.035,ns,exploration,technical,Early temporal stability demonstration - condition-based styling active
+00:30-00:45,control,12.48,0.028,stable,none,high_quality,12.472,0.024,3,0.98,0.19,0.98,0.24,0.03,ns,exploration,technical,Stable control pattern emerging - FigureDataSet styling automation
+00:45-01:00,control,12.445,0.032,stable,none,high_quality,12.465,0.026,4,0.9775,0.21,0.97,0.2,-0.005,ns,exploration,technical,Sustained control stability - eliminates manual plt.savefig() styling
+01:00-01:15,control,12.42,0.045,stable,none,high_quality,12.456,0.029,5,0.976,0.23,0.96,0.16,-0.03,ns,exploration,technical,Control group consistency - automated line plot styling through F-005
+01:15-01:30,control,12.44,0.048,stable,none,high_quality,12.446,0.031,6,0.97,0.25,0.95,0.13,-0.005,ns,exploration,technical,Temporal pattern established - condition_param resolution success
+01:30-01:45,control,12.465,0.049,stable,none,high_quality,12.444,0.032,7,0.973,0.26,0.94,0.11,0.02,ns,exploration,technical,Control stability confirmed - FigRegistry styling engine active
+01:45-02:00,control,12.46,0.051,stable,none,high_quality,12.446,0.032,8,0.975,0.26,0.93,0.09,0.015,ns,exploration,technical,Baseline pattern complete - automated temporal visualization ready
+02:00-02:15,control,12.445,0.049,stable,none,high_quality,12.448,0.031,9,0.974,0.25,0.92,0.08,0.0,ns,exploration,technical,Extended control validation - zero manual styling overhead
+02:15-02:30,control,12.455,0.050,stable,none,high_quality,12.451,0.030,10,0.973,0.24,0.91,0.07,0.01,ns,validation,technical,Control pattern validated - transition to validation phase styling
+00:00-00:15,treatment_A,13.12,0.0,increasing,none,high_quality,13.12,0.0,1,0.98,0.00,1.00,0.0,0.67,ns,exploration,technical,Treatment A initial response - distinct styling from control condition
+00:15-00:30,treatment_A,13.285,0.233,increasing,none,high_quality,13.203,0.233,2,0.985,1.76,0.99,1.65,0.935,*,exploration,technical,Treatment A effect emerging - automated differentiation via condition mapping
+00:30-00:45,treatment_A,13.615,0.284,increasing,none,high_quality,13.34,0.317,3,0.98,2.32,0.98,2.2,1.165,**,exploration,technical,Treatment A response building - FigRegistry styling eliminates manual formatting
+00:45-01:00,treatment_A,13.95,0.314,increasing,none,high_quality,13.493,0.419,4,0.98,3.10,0.97,2.47,1.5,**,exploration,technical,Treatment A sustained increase - condition-based line styling active
+01:00-01:15,treatment_A,14.34,0.348,increasing,none,high_quality,13.66,0.550,5,0.984,4.02,0.96,2.6,1.89,***,exploration,technical,Treatment A peak response - automated styling through condition_param
+01:15-01:30,treatment_A,14.685,0.372,increasing,none,high_quality,13.84,0.687,6,0.98,4.96,0.95,2.64,2.235,***,exploration,technical,Treatment A plateau approaching - F-002 condition mapping success
+01:30-01:45,treatment_A,14.98,0.386,stable,none,high_quality,14.025,0.826,7,0.983,5.89,0.94,2.56,2.53,***,exploration,technical,Treatment A plateau reached - trend direction change detected
+01:45-02:00,treatment_A,15.205,0.392,stable,none,high_quality,14.218,0.965,8,0.985,6.79,0.93,2.44,2.755,***,exploration,technical,Treatment A stable high level - automated stability analysis
+02:00-02:15,treatment_A,15.27,0.395,stable,none,high_quality,14.415,1.104,9,0.982,7.66,0.92,2.29,2.82,***,exploration,technical,Treatment A maintained effect - temporal pattern recognition
+02:15-02:30,treatment_A,15.325,0.398,stable,none,high_quality,14.613,1.242,10,0.981,8.49,0.91,2.13,2.875,***,validation,technical,Treatment A stable response - validation phase styling transition
+00:00-00:15,treatment_B,11.98,0.0,increasing,none,high_quality,11.98,0.0,1,0.97,0.00,1.00,0.0,-0.47,ns,exploration,technical,Treatment B baseline - intermediate response pattern initialization
+00:15-00:30,treatment_B,12.105,0.177,increasing,none,high_quality,12.043,0.177,2,0.975,1.46,0.99,1.0,-0.345,ns,exploration,technical,Treatment B modest response - automated intermediate styling
+00:30-00:45,treatment_B,12.395,0.233,increasing,none,high_quality,12.16,0.274,3,0.98,2.25,0.98,1.94,-0.05,ns,exploration,technical,Treatment B gradual increase - condition-specific styling active
+00:45-01:00,treatment_B,12.725,0.269,increasing,none,high_quality,12.301,0.388,4,0.975,3.15,0.97,2.2,0.275,*,exploration,technical,Treatment B intermediate response - distinct from treatments A and C
+01:00-01:15,treatment_B,13.005,0.295,increasing,none,high_quality,12.442,0.507,5,0.98,4.08,0.96,2.25,0.555,*,exploration,technical,Treatment B building effect - automated style variation demonstration
+01:15-01:30,treatment_B,13.255,0.312,increasing,none,high_quality,12.593,0.622,6,0.985,4.94,0.95,2.21,0.805,**,exploration,technical,Treatment B sustained response - F-005 integration effectiveness
+01:30-01:45,treatment_B,13.56,0.322,increasing,none,high_quality,12.76,0.735,7,0.975,5.76,0.94,2.11,1.11,**,exploration,technical,Treatment B continued effect - automated workflow demonstration
+01:45-02:00,treatment_B,13.825,0.328,stable,none,high_quality,12.941,0.846,8,0.98,6.54,0.93,1.96,1.375,**,exploration,technical,Treatment B peak reached - trend transition detected
+02:00-02:15,treatment_B,13.975,0.331,stable,none,high_quality,13.129,0.954,9,0.985,7.27,0.92,1.78,1.525,**,exploration,technical,Treatment B plateau - eliminates manual temporal styling
+02:15-02:30,treatment_B,14.025,0.332,stable,none,high_quality,13.319,1.059,10,0.976,7.95,0.91,1.58,1.575,**,validation,technical,Treatment B stable effect - pandas DataFrame processing compatibility
+00:00-00:15,treatment_C,10.23,0.0,decreasing,none,high_quality,10.23,0.0,1,0.98,0.00,1.00,0.0,-2.22,ns,exploration,technical,Treatment C baseline - negative response pattern initiation
+00:15-00:30,treatment_C,10.06,0.241,decreasing,none,high_quality,10.145,0.241,2,0.975,2.38,0.99,-1.7,-2.385,*,exploration,technical,Treatment C initial decrease - distinct styling for negative effects
+00:30-00:45,treatment_C,9.795,0.316,decreasing,none,high_quality,10.028,0.292,3,0.985,2.91,0.98,-2.12,-2.65,**,exploration,technical,Treatment C suppression - automated negative response styling
+00:45-01:00,treatment_C,9.545,0.365,decreasing,none,high_quality,9.908,0.365,4,0.98,3.68,0.97,-2.5,-2.9,**,exploration,technical,Treatment C continued decrease - condition_param properly resolved
+01:00-01:15,treatment_C,9.33,0.403,decreasing,none,high_quality,9.792,0.436,5,0.975,4.45,0.96,-2.5,-3.12,***,exploration,technical,Treatment C minimum approaching - dynamic styling demonstration
+01:15-01:30,treatment_C,9.375,0.416,stable,none,high_quality,9.695,0.466,6,0.98,4.81,0.95,-2.08,-3.07,***,exploration,technical,Treatment C recovery start - trend direction change detected
+01:30-01:45,treatment_C,9.52,0.419,increasing,none,high_quality,9.598,0.462,7,0.985,4.81,0.94,-1.55,-2.925,**,exploration,technical,Treatment C gradual recovery - automated figure management
+01:45-02:00,treatment_C,9.735,0.417,increasing,none,high_quality,9.516,0.449,8,0.975,4.72,0.93,-0.86,-2.71,**,exploration,technical,Treatment C continued recovery - FigureDataSet save operations
+02:00-02:15,treatment_C,9.945,0.413,increasing,none,high_quality,9.454,0.432,9,0.98,4.57,0.92,-0.14,-2.5,*,exploration,technical,Treatment C approaching baseline - catalog integration success
+02:15-02:30,treatment_C,10.115,0.407,increasing,none,high_quality,9.412,0.414,10,0.985,4.40,0.91,0.51,-2.33,*,validation,technical,Treatment C near baseline - automated workflow complete
+00:00-00:15,treatment_D,8.45,0.0,stable,none,medium_quality,8.45,0.0,1,0.91,0.00,1.00,0.0,-4.0,ns,exploration,technical,Treatment D baseline - extreme response condition for styling range
+00:15-00:30,treatment_D,8.125,0.459,decreasing,none,medium_quality,8.288,0.459,2,0.905,5.53,0.99,-2.6,-4.325,*,exploration,technical,Treatment D strong decrease - tests styling robustness
+00:30-00:45,treatment_D,7.685,0.572,decreasing,none,medium_quality,8.087,0.541,3,0.915,6.69,0.98,-3.52,-4.765,**,exploration,technical,Treatment D severe suppression - extreme condition styling
+00:45-01:00,treatment_D,7.245,0.639,decreasing,none,medium_quality,7.876,0.640,4,0.91,8.13,0.97,-4.12,-5.205,***,exploration,technical,Treatment D maximum suppression - robust styling system
+01:00-01:15,treatment_D,7.12,0.666,stable,none,medium_quality,7.721,0.710,5,0.915,9.19,0.96,-4.5,-5.33,***,exploration,technical,Treatment D nadir reached - minimum response detected
+01:15-01:30,treatment_D,7.385,0.673,increasing,none,medium_quality,7.576,0.719,6,0.92,9.49,0.95,-3.62,-5.065,***,exploration,technical,Treatment D recovery initiation - rebound pattern styling
+01:30-01:45,treatment_D,7.815,0.665,increasing,none,medium_quality,7.458,0.697,7,0.925,9.35,0.94,-2.42,-4.635,**,exploration,technical,Treatment D strong recovery - recovery pattern recognition
+01:45-02:00,treatment_D,8.345,0.639,increasing,none,medium_quality,7.378,0.656,8,0.93,8.89,0.93,-1.06,-4.105,**,exploration,technical,Treatment D approaching baseline - recovery trend confirmed
+02:00-02:15,treatment_D,8.755,0.599,increasing,none,medium_quality,7.33,0.601,9,0.935,8.20,0.92,0.38,-3.695,*,exploration,technical,Treatment D baseline recovery - complete response cycle
+02:15-02:30,treatment_D,9.025,0.551,increasing,none,medium_quality,7.309,0.540,10,0.94,7.39,0.91,1.62,-3.425,*,validation,technical,Treatment D overcorrection - rebound effect demonstration
+00:00-00:30,combined_A_B,12.815,0.887,increasing,none,high_quality,12.815,0.887,2,0.98,6.92,0.99,1.0,0.365,*,exploration,stakeholder,Combined A+B initial synergy - stakeholder-focused styling
+00:30-01:00,combined_A_B,13.175,0.919,increasing,none,high_quality,12.995,0.905,4,0.979,6.96,0.98,1.44,0.725,**,exploration,stakeholder,Combined A+B building effect - presentation styling active
+01:00-01:30,combined_A_B,13.585,0.942,increasing,none,high_quality,13.192,0.918,6,0.983,6.96,0.97,1.64,1.135,**,exploration,stakeholder,Combined A+B synergistic response - stakeholder visualization
+01:30-02:00,combined_A_B,13.925,0.958,stable,none,high_quality,13.375,0.937,8,0.981,7.01,0.96,1.48,1.475,***,exploration,stakeholder,Combined A+B plateau - combination effect demonstration
+02:00-02:30,combined_A_B,14.125,0.967,stable,none,high_quality,13.521,0.956,10,0.982,7.07,0.95,1.2,1.675,***,validation,stakeholder,Combined A+B stable synergy - stakeholder reporting ready
+00:00-00:30,novel_compound,16.45,0.456,increasing,none,high_quality,16.45,0.456,2,0.985,2.77,0.99,2.5,3.995,**,discovery,academic,Novel compound initial response - discovery phase styling
+00:30-01:00,novel_compound,17.125,0.523,increasing,none,high_quality,16.788,0.491,4,0.981,2.92,0.98,2.7,4.675,***,discovery,academic,Novel compound strong effect - academic publication styling
+01:00-01:30,novel_compound,17.675,0.576,increasing,none,high_quality,17.083,0.612,6,0.983,3.58,0.97,2.46,5.225,***,discovery,academic,Novel compound peak response - publication-ready formatting
+01:30-02:00,novel_compound,18.025,0.612,stable,none,high_quality,17.319,0.731,8,0.984,4.22,0.96,2.0,5.575,***,discovery,academic,Novel compound plateau - discovery significance demonstrated
+02:00-02:30,novel_compound,18.175,0.632,stable,none,high_quality,17.506,0.847,10,0.983,4.84,0.95,1.5,5.725,***,validation,academic,Novel compound stable efficacy - validation phase transition
+00:00-00:30,placebo,12.505,0.329,stable,none,high_quality,12.505,0.329,2,0.985,2.63,0.99,0.11,0.055,ns,regulatory,publication,Placebo baseline - regulatory phase publication styling
+00:30-01:00,placebo,12.525,0.341,stable,none,high_quality,12.515,0.335,4,0.983,2.68,0.98,0.08,0.075,ns,regulatory,publication,Placebo stability - regulatory standard styling active
+01:00-01:30,placebo,12.535,0.348,stable,none,high_quality,12.522,0.340,6,0.984,2.71,0.97,0.06,0.085,ns,regulatory,publication,Placebo consistency - publication-quality regulatory styling
+01:30-02:00,placebo,12.545,0.352,stable,none,high_quality,12.528,0.343,8,0.985,2.74,0.96,0.05,0.095,ns,regulatory,publication,Placebo validation - regulatory compliance demonstration
+02:00-02:30,placebo,12.555,0.355,stable,none,high_quality,12.533,0.345,10,0.984,2.75,0.95,0.04,0.105,ns,regulatory,publication,Placebo stable control - regulatory documentation ready
+05:45-06:00,time_course_6h,16.78,0.0,stable,none,high_quality,16.78,0.0,1,0.98,0.00,1.00,0.0,4.33,***,validation,technical,6-hour timepoint - validation phase styling demonstration
+11:45-12:00,time_course_12h,18.12,0.0,stable,none,high_quality,18.12,0.0,1,0.97,0.00,1.00,0.0,5.67,***,validation,technical,12-hour timepoint - mid-validation styling pattern
+23:45-24:00,time_course_24h,19.45,0.0,stable,none,high_quality,19.45,0.0,1,0.99,0.00,1.00,0.0,6.995,***,validation,technical,24-hour timepoint - late validation styling application
+00:00-00:30,high_responder,22.395,1.456,increasing,none,excellent_quality,22.395,1.456,2,0.985,6.50,0.99,6.5,9.945,***,validation,academic,High responder pattern - validation with distinct styling
+00:30-01:00,high_responder,23.125,1.523,increasing,none,excellent_quality,22.76,1.491,4,0.982,6.55,0.98,5.84,10.675,***,validation,academic,High responder peak - exceptional response styling
+01:00-01:30,high_responder,23.565,1.578,stable,none,excellent_quality,23.028,1.519,6,0.984,6.60,0.97,4.88,11.115,***,validation,academic,High responder plateau - academic validation styling
+01:30-02:00,high_responder,23.785,1.612,stable,none,excellent_quality,23.218,1.542,8,0.985,6.64,0.96,3.76,11.335,***,validation,academic,High responder stable - validation excellence demonstrated
+02:00-02:30,high_responder,23.895,1.634,stable,none,excellent_quality,23.354,1.561,10,0.984,6.68,0.95,2.64,11.445,***,validation,academic,High responder maximum - exceptional efficacy confirmed
+00:00-00:30,low_responder,8.115,0.632,stable,none,good_quality,8.115,0.632,2,0.98,7.79,0.99,-0.3,-4.335,ns,validation,technical,Low responder baseline - contrasting validation styling
+00:30-01:00,low_responder,8.025,0.641,stable,none,good_quality,8.07,0.637,4,0.975,7.89,0.98,-0.36,-4.425,ns,validation,technical,Low responder minimal change - technical documentation styling
+01:00-01:30,low_responder,7.985,0.646,stable,none,good_quality,8.042,0.640,6,0.977,7.96,0.97,-0.32,-4.465,ns,validation,technical,Low responder stability - low-response pattern styling
+01:30-02:00,low_responder,7.965,0.648,stable,none,good_quality,8.023,0.641,8,0.978,7.99,0.96,-0.28,-4.485,ns,validation,technical,Low responder consistent - minimal effect confirmation
+02:00-02:30,low_responder,7.955,0.649,stable,none,good_quality,8.009,0.642,10,0.977,8.02,0.95,-0.24,-4.495,ns,validation,technical,Low responder final - non-responder pattern confirmed
