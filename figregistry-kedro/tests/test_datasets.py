@@ -1144,6 +1144,24 @@ class TestPerformanceRequirements:
         
         # Verify FigRegistry called only once (cache working)
         assert mock_figregistry_api['get_style'].call_count == 1
+
+    def test_style_cache_logging(self, basic_dataset_config, mock_figregistry_api, caplog):
+        """Test debug logging for cache hits and misses."""
+
+        dataset = FigureDataSet(**basic_dataset_config)
+        condition = 'cache_test'
+
+        with caplog.at_level('DEBUG'):
+            dataset._get_style_configuration(condition)
+
+        assert any('cache miss' in record.message.lower() for record in caplog.records)
+
+        caplog.clear()
+
+        with caplog.at_level('DEBUG'):
+            dataset._get_style_configuration(condition)
+
+        assert any('cache hit' in record.message.lower() for record in caplog.records)
     
     @pytest.mark.performance
     @pytest.mark.skipif(not BENCHMARK_AVAILABLE, reason="pytest-benchmark not available")
