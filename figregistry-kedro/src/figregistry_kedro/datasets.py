@@ -563,8 +563,14 @@ class FigureDataSet(AbstractDataset[Figure, Figure]):
             with _cache_lock:
                 if cache_key in _style_cache:
                     _performance_metrics["cache_hits"] += 1
+                    logger.debug(
+                        "Style configuration cache hit for key %s", cache_key
+                    )
                     return copy.deepcopy(_style_cache[cache_key])
                 _performance_metrics["cache_misses"] += 1
+                logger.debug(
+                    "Style configuration cache miss for key %s", cache_key
+                )
         
         try:
             # Get base style from FigRegistry
@@ -580,6 +586,10 @@ class FigureDataSet(AbstractDataset[Figure, Figure]):
             if self._cache_enabled:
                 with _cache_lock:
                     _style_cache[cache_key] = copy.deepcopy(merged_style)
+                    logger.debug(
+                        "Cached computed style configuration for key %s",
+                        cache_key,
+                    )
             
             return merged_style
             
