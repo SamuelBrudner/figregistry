@@ -37,6 +37,14 @@ Configuration translation layer between Kedro and FigRegistry:
 - Unified configuration source eliminating duplicate configuration management
 - Automatic validation and type safety across both systems
 
+### Comparison with Kedro's `MatplotlibWriter`
+
+`figregistry-kedro` extends Kedro's built-in `MatplotlibWriter` with several additional capabilities:
+
+- **Automated Styling & Saving**: Figures are styled and saved automatically based on your FigRegistry configuration, eliminating most `plt.savefig()` boilerplate.
+- **Configuration Merging**: Plugin settings merge with your `figregistry.yaml`, so you can keep existing FigRegistry settings alongside Kedro configuration.
+- **Condition-Based Styling**: Styles change dynamically according to pipeline parameters, reducing manual code for different output conditions.
+
 ### Kedro Plugin Quick Start
 
 1. Install the plugin:
